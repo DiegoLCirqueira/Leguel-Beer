@@ -12,9 +12,9 @@ Configura `docs/` como vault do Obsidian e prepara o repositório para o desenvo
 
 ## Decisões registradas
 
-- [ADR-001](docs/03-decisoes/ADR-001-stack.md): stack Next.js + NestJS + Prisma + Supabase (só Postgres, auth e arquivos) + Vercel. **Aceito.**
-- [ADR-002](docs/03-decisoes/ADR-002-hospedagem-api.md): API NestJS em funções serverless na Vercel (Hobby), sem processos de longa duração no MVP. **Proposto.**
-- [Corte do MVP](docs/01-produto/mvp-corte.md): 14 épicos no MVP (63 cards / 210 pontos no núcleo + 33 adiáveis / 85 pontos) e 4 épicos no Pós-MVP. **Proposto, `aprovado: false`.**
+- ADR-001 (`docs/03-decisoes/ADR-001-stack.md`): stack Next.js + NestJS + Prisma + Supabase (só Postgres, auth e arquivos) + Vercel. **Aceito.**
+- ADR-002 (`docs/03-decisoes/ADR-002-hospedagem-api.md`): API NestJS em funções serverless na Vercel (Hobby), sem processos de longa duração no MVP. **Proposto.**
+- Corte do MVP (`docs/01-produto/mvp-corte.md`): 14 épicos no MVP (63 cards / 210 pontos no núcleo + 33 adiáveis / 85 pontos) e 4 épicos no Pós-MVP. **Proposto, `aprovado: false`.**
 - **TDD:** red-green em fatias verticais; refatoração em passo e commit separados, só com todos os testes verdes (CLAUDE.md).
 - **Issue tracker:** GitHub Issues para o MVP; o Notion fica como banco de ideias do Pós-MVP (CLAUDE.md).
 - **Papéis da banda do Maestri:** textos completos em `docs/00-inbox/maestri-banda.md`, prontos para colar.
