@@ -29,4 +29,4 @@ Estas regras têm prioridade sobre os caminhos padrão descritos nos SKILL.md em
 - Specs: `docs/02-features/<slug>.md` usando `docs/templates/feature.md`, com cenários Gherkin em português.
 - Rascunhos e arquivos temporários: `docs/00-inbox/` (nunca `.scratch/` ou pastas novas).
 - Revisão de código contra a spec: usar `/review-spec`.
-- Issue tracker: DECISÃO PENDENTE entre Notion e GitHub Issues. Até lá, `to-spec` e `to-tickets` não devem publicar em nenhum tracker; apenas gravar em `docs/02-features/` e listar os tickets propostos no fim da spec.
+- Issue tracker: DECISÃO PENDENTE entre Notion e GitHub Issues. Até lá, `to-spec` e `to-tickets` não devem publicar em nenhum tracker; apenas gravar em `docs/02-features/` e listar os tickets propostos no fim da spec. Material para a decisão: proposta de corte do MVP em [[mvp-corte]] (`docs/01-produto/mvp-corte.md`) e script de migração para o GitHub Issues em `scripts/migrar-backlog/` (não rode com `--executar` sem autorização do Diego).
