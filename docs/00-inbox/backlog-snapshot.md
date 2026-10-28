@@ -2,7 +2,7 @@
 tipo: snapshot
 fonte-notion: https://app.notion.com/p/732ced3c78e64734be971ae3ed4c952a
 capturado: 2026-10-28
-tags: [backlog, decisao-pendente]
+tags: [backlog]
 ---
 
 # Snapshot do backlog (Notion → GitHub Issues?)
@@ -202,4 +202,4 @@ Todos os cards virariam **tickets** (sub-issues do épico indicado). Nenhum card
 > - Os números de issue do GitHub não vão coincidir com os códigos LB-NN; por isso o prefixo no título.
 > - Manter os dois sistemas em paralelo duplica o trabalho de atualização de status.
 
-> [!todo] Decisão pendente (Diego): Notion ou GitHub Issues como issue tracker. Depois de decidir, atualizar a regra "Issue tracker" no CLAUDE.md.
+> [!success] Decidido em 2026-10-28: GitHub Issues é o tracker do MVP e o Notion fica como banco de ideias do Pós-MVP. O corte está em [[mvp-corte]] e a migração em `scripts/migrar-backlog/`.
