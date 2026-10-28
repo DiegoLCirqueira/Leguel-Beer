@@ -39,6 +39,13 @@ node scripts/migrar-backlog/migrar.js --repo dono/nome
 3. Cria uma issue `[LB-NN] <título>` por card e a vincula como sub-issue do épico.
    - Cards listados em "Cards Pós-MVP" no `mvp-corte.md` ficam de fora, mesmo em épicos MVP.
    - Cards listados em "Cards adiáveis" entram com a label extra `adiavel`.
+4. Cria, se ainda não existirem, os milestones **MVP** e **MVP+**, e atribui:
+   - épicos e cards do núcleo → **MVP**;
+   - cards adiáveis → **MVP+** (com a label `adiavel`).
+
+   Se uma issue já migrada estiver em outro milestone, o script corrige.
+
+**Regra de trabalho:** a banda só puxa issues do milestone **MVP+** depois que o milestone **MVP** estiver fechado.
 
 Cada issue guarda o ID do Notion no corpo (`<!-- notion-id: ... -->`). Ao rodar de novo, o script procura esse ID e não duplica issues nem vínculos.
 

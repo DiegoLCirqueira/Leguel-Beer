@@ -49,21 +49,55 @@ function lerEstadoDoGitHub() {
     gh(["auth", "status"]);
   } catch {
     console.warn("! gh não autenticado: a simulação assume que nada existe no GitHub.\n");
-    return { labels: new Set(), issuesPorNotionId: new Map(), online: false };
+    return { labels: new Set(), issuesPorNotionId: new Map(), milestones: new Map(), online: false };
   }
   const labels = new Set(
     gh(["api", "--paginate", `repos/${repo}/labels?per_page=100`, "--jq", ".[].name"]).split("\n").filter(Boolean).map((l) => l.toLowerCase())
   );
+  const milestones = new Map(
+    gh(["api", "--paginate", `repos/${repo}/milestones?state=all&per_page=100`, "--jq", ".[] | [.title, .number] | @tsv"])
+      .split("\n").filter(Boolean).map((l) => l.split("\t")).map(([titulo, numero]) => [titulo, Number(numero)])
+  );
   const linhas = gh([
     "api", "--paginate", `repos/${repo}/issues?state=all&per_page=100`, "--jq",
-    '.[] | select(.pull_request | not) | [.number, .id, ((.body // "") | [match("notion-id: ([0-9a-f]{32})").captures[0].string] | first // "")] | @tsv',
+    '.[] | select(.pull_request | not) | [.number, .id, ((.body // "") | [match("notion-id: ([0-9a-f]{32})").captures[0].string] | first // ""), (.milestone.title // "")] | @tsv',
   ]).split("\n").filter(Boolean);
   const issuesPorNotionId = new Map();
   for (const linha of linhas) {
-    const [numero, id, notionId] = linha.split("\t");
-    if (notionId) issuesPorNotionId.set(notionId, { numero: Number(numero), id: Number(id) });
+    const [numero, id, notionId, milestone] = linha.split("\t");
+    if (notionId) issuesPorNotionId.set(notionId, { numero: Number(numero), id: Number(id), milestone });
   }
-  return { labels, issuesPorNotionId, online: true };
+  return { labels, issuesPorNotionId, milestones, online: true };
+}
+
+// A banda só puxa trabalho do "MVP+" depois que o milestone "MVP" estiver fechado.
+const MILESTONES = {
+  MVP: "Núcleo do MVP: compra de ponta a ponta. Ver docs/01-produto/mvp-corte.md.",
+  "MVP+": "Cards adiáveis do MVP (label adiavel). Só começa depois que o milestone MVP estiver fechado.",
+};
+
+function garantirMilestones(estado, prefixo, resumo) {
+  const numeros = {};
+  for (const [titulo, descricao] of Object.entries(MILESTONES)) {
+    if (estado.milestones.has(titulo)) {
+      numeros[titulo] = estado.milestones.get(titulo);
+      continue;
+    }
+    console.log(`${prefixo}milestone ${titulo}`);
+    if (executar) {
+      const criado = JSON.parse(gh(["api", `repos/${repo}/milestones`, "--method", "POST", "-f", `title=${titulo}`, "-f", `description=${descricao}`]));
+      numeros[titulo] = criado.number;
+    }
+    resumo.milestones++;
+  }
+  return numeros;
+}
+
+function ajustarMilestone(issue, titulo, numeros, prefixo, resumo) {
+  if (issue.milestone === titulo) return;
+  console.log(`${prefixo}  milestone de #${issue.numero}: "${issue.milestone || "nenhum"}" → "${titulo}"`);
+  if (executar) gh(["api", `repos/${repo}/issues/${issue.numero}`, "--method", "PATCH", "-F", `milestone=${numeros[titulo]}`]);
+  resumo.milestonesAjustados++;
 }
 
 function corpoDoEpico(epico, filhos) {
@@ -94,8 +128,9 @@ function corpoDoCard(card, epico) {
   ].join("\n");
 }
 
-function criarIssue(titulo, corpo, labels) {
-  const resposta = JSON.parse(gh(["api", `repos/${repo}/issues`, "--method", "POST", "--input", "-"], JSON.stringify({ title: titulo, body: corpo, labels })));
+function criarIssue(titulo, corpo, labels, milestone) {
+  const dados = { title: titulo, body: corpo, labels, milestone };
+  const resposta = JSON.parse(gh(["api", `repos/${repo}/issues`, "--method", "POST", "--input", "-"], JSON.stringify(dados)));
   return { numero: resposta.number, id: resposta.id };
 }
 
@@ -114,7 +149,9 @@ function main() {
     .map((c) => (corte.cardsAdiaveis.has(c.codigo) ? { ...c, labels: [...c.labels, "adiavel"] } : c));
   const estado = lerEstadoDoGitHub();
   const prefixo = executar ? "" : "[simulação] ";
-  const resumo = { labels: 0, epicos: 0, cards: 0, subIssues: 0, jaExistiam: 0 };
+  const resumo = { labels: 0, milestones: 0, epicos: 0, cards: 0, subIssues: 0, jaExistiam: 0, milestonesAjustados: 0 };
+  const porMilestone = { MVP: 0, "MVP+": 0 };
+  const milestoneDoCard = (card) => (corte.cardsAdiaveis.has(card.codigo) ? "MVP+" : "MVP");
 
   const adiaveis = cardsMvp.filter((c) => corte.cardsAdiaveis.has(c.codigo)).length;
   console.log(
@@ -130,16 +167,20 @@ function main() {
     resumo.labels++;
   }
 
+  const numerosMilestone = garantirMilestones(estado, prefixo, resumo);
+
   for (const epico of epicosMvp) {
     const filhos = cardsMvp.filter((c) => c.epico === epico.id);
     let issueEpico = estado.issuesPorNotionId.get(epico.notionId);
     if (issueEpico) {
       resumo.jaExistiam++;
+      ajustarMilestone(issueEpico, "MVP", numerosMilestone, prefixo, resumo);
     } else {
-      console.log(`${prefixo}épico "[Épico] ${epico.nome}" (${filhos.length} cards)`);
-      if (executar) issueEpico = criarIssue(`[Épico] ${epico.nome}`, corpoDoEpico(epico, filhos), epico.labels);
+      console.log(`${prefixo}épico "[Épico] ${epico.nome}" (${filhos.length} cards) → MVP`);
+      if (executar) issueEpico = criarIssue(`[Épico] ${epico.nome}`, corpoDoEpico(epico, filhos), epico.labels, numerosMilestone.MVP);
       resumo.epicos++;
     }
+    porMilestone.MVP++;
 
     const subIssuesExistentes = new Set(
       executar && issueEpico && estado.online
@@ -147,14 +188,17 @@ function main() {
         : []
     );
     for (const card of filhos) {
+      const milestone = milestoneDoCard(card);
       let issueCard = estado.issuesPorNotionId.get(card.notionId);
       if (issueCard) {
         resumo.jaExistiam++;
+        ajustarMilestone(issueCard, milestone, numerosMilestone, prefixo, resumo);
       } else {
-        console.log(`${prefixo}  issue "[${card.codigo}] ${card.titulo}" ${card.labels.join(" ")}`);
-        if (executar) issueCard = criarIssue(`[${card.codigo}] ${card.titulo}`, corpoDoCard(card, epico), card.labels);
+        console.log(`${prefixo}  issue "[${card.codigo}] ${card.titulo}" ${card.labels.join(" ")} → ${milestone}`);
+        if (executar) issueCard = criarIssue(`[${card.codigo}] ${card.titulo}`, corpoDoCard(card, epico), card.labels, numerosMilestone[milestone]);
         resumo.cards++;
       }
+      porMilestone[milestone]++;
       if (issueCard && subIssuesExistentes.has(issueCard.id)) continue;
       if (executar) gh(["api", `repos/${repo}/issues/${issueEpico.numero}/sub_issues`, "--method", "POST", "-F", `sub_issue_id=${issueCard.id}`]);
       resumo.subIssues++;
@@ -162,9 +206,11 @@ function main() {
   }
 
   console.log(
-    `\n${executar ? "Criados" : "Seriam criados"}: ${resumo.labels} labels, ${resumo.epicos} épicos, ${resumo.cards} issues de card, ` +
-      `${resumo.subIssues} vínculos de sub-issue. Já existiam no GitHub: ${resumo.jaExistiam}.`
+    `\n${executar ? "Criados" : "Seriam criados"}: ${resumo.labels} labels, ${resumo.milestones} milestones, ${resumo.epicos} épicos, ` +
+      `${resumo.cards} issues de card, ${resumo.subIssues} vínculos de sub-issue. ` +
+      `Já existiam no GitHub: ${resumo.jaExistiam} (milestones ajustados: ${resumo.milestonesAjustados}).`
   );
+  console.log(`Issues por milestone: MVP ${porMilestone.MVP} (épicos + núcleo), MVP+ ${porMilestone["MVP+"]} (adiáveis).`);
   if (!executar) console.log(`Corte aprovado: ${corte.aprovado ? "sim" : "não (a execução real será recusada)"}.`);
 }
 
