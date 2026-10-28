@@ -14,6 +14,7 @@ tags:
 | `04-arquitetura/` | Diagramas e visão técnica ([[visao-geral]]) |
 | `05-diario/` | Daily notes `YYYY-MM-DD` |
 | `templates/` | Templates do Templater: feature, adr, daily |
+| `agents/` | Configuração das skills do Matt Pocock: issue tracker e documentação de domínio (gerada por `/setup-matt-pocock-skills`) |
 
 O backlog (Kanban) continua no Notion; aqui fica a base de conhecimento.
 
