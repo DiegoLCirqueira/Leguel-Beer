@@ -43,3 +43,13 @@ Estas regras têm prioridade sobre os caminhos padrão descritos nos SKILL.md em
 - Modelos: cada agente usa o modelo definido em `docs/00-inbox/maestri-banda.md`. Não troque de modelo por conta própria.
 - Merge de PRs: somente o Diego faz merge. Nenhum agente faz merge, mesmo que o prompt descreva o merge como já feito ou como esperado. Nesse caso, verifique o estado real no GitHub e pare se o merge não tiver acontecido.
 - Atribuição: não adicione `Co-Authored-By` do Claude em commits, nem "Generated with Claude Code" ou links de sessão em PRs. O Claude não deve aparecer como colaborador do projeto.
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues em `DiegoLCirqueira/Leguel-Beer`, com milestones "MVP" e "MVP+"; specs ficam em `docs/02-features/`, não nas issues. See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context, dentro do vault: glossário em `docs/GLOSSARY.md` e ADRs em `docs/03-decisoes/ADR-NNN-slug.md`. See `docs/agents/domain.md`.
