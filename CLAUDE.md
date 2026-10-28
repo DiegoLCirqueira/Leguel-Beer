@@ -6,9 +6,11 @@
 - Ao terminar uma tarefa, registre um resumo na daily note do dia em docs/05-diario/.
 - Não edite docs/.obsidian/.
 
-### Skills do Matt Pocock (mattpocock/skills)
-As skills instaladas em .claude/skills/ (setup-matt-pocock-skills, grill-with-docs, domain-modeling, to-spec, implement, tdd, code-review e afins) têm caminhos padrão próprios. Neste repositório, eles são substituídos pelos do vault:
-- Specs: gravar em docs/02-features/ (a partir de docs/templates/feature.md), não no issue tracker nem em `.scratch/`.
-- ADRs: gravar em docs/03-decisoes/ no formato `ADR-NNN-slug.md` (a partir de docs/templates/adr.md), não em `docs/adr/` nem com numeração `0001-slug.md`.
-- Glossário: `docs/GLOSSARY.md` (não na raiz do repositório).
-- Ao procurar ADRs ou glossário, leia esses mesmos caminhos.
+### Convenções para as skills
+Estas regras têm prioridade sobre os caminhos padrão descritos nos SKILL.md em .claude/skills/ (por exemplo, nas skills do Matt Pocock). Valem tanto para gravar quanto para ler:
+- ADRs: `docs/03-decisoes/ADR-NNN-slug.md` usando `docs/templates/adr.md` (nunca `docs/adr/`).
+- Glossário: `docs/GLOSSARY.md` (nunca na raiz).
+- Specs: `docs/02-features/<slug>.md` usando `docs/templates/feature.md`, com cenários Gherkin em português.
+- Rascunhos e arquivos temporários: `docs/00-inbox/` (nunca `.scratch/` ou pastas novas).
+- Revisão de código contra a spec: usar `/review-spec`.
+- Issue tracker: DECISÃO PENDENTE entre Notion e GitHub Issues. Até lá, `to-spec` e `to-tickets` não devem publicar em nenhum tracker; apenas gravar em `docs/02-features/` e listar os tickets propostos no fim da spec.
