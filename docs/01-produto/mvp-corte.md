@@ -10,7 +10,7 @@ tags: [produto, mvp]
 # Proposta de corte do MVP
 
 > [!success] Aprovado pelo Diego em 2026-10-28
-> Classificação dos 18 épicos do Notion (retrato de 2026-10-28 em [[backlog-snapshot]]), com as decisões do Diego de 2026-10-28. O script em `scripts/migrar-backlog/` lê as tabelas desta nota; mudar uma classificação exige rodar a simulação de novo antes de executar.
+> Classificação dos 18 épicos do Notion (retrato de 2026-10-28 em [[backlog-snapshot]]), com as decisões do Diego de 2026-10-28. Migrado para o GitHub Issues em 2026-10-28 (milestones "MVP" e "MVP+"). A partir daqui, mudanças de escopo são feitas nas issues e nos milestones.
 
 ## Critério
 

@@ -202,4 +202,4 @@ Todos os cards virariam **tickets** (sub-issues do épico indicado). Nenhum card
 > - Os números de issue do GitHub não vão coincidir com os códigos LB-NN; por isso o prefixo no título.
 > - Manter os dois sistemas em paralelo duplica o trabalho de atualização de status.
 
-> [!success] Decidido em 2026-10-28: GitHub Issues é o tracker do MVP e o Notion fica como banco de ideias do Pós-MVP. O corte está em [[mvp-corte]] e a migração em `scripts/migrar-backlog/`.
+> [!success] Decidido em 2026-10-28: GitHub Issues é o tracker do MVP e o Notion fica como banco de ideias do Pós-MVP. O corte está em [[mvp-corte]] e a migração para o GitHub Issues foi feita em 2026-10-28.
