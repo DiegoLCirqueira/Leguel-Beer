@@ -16,3 +16,12 @@ tags:
 | `templates/` | Templates do Templater: feature, adr, daily |
 
 O backlog (Kanban) continua no Notion; aqui fica a base de conhecimento.
+
+## Manutenção das skills
+
+- Rode `npx skills update` só de propósito, não por hábito.
+- Depois de cada update, refaça a renomeação de `code-review` para `review-spec`:
+  - renomear a pasta `.claude/skills/code-review` para `.claude/skills/review-spec`;
+  - trocar o campo `name` no frontmatter do `SKILL.md` para `review-spec`;
+  - atualizar as referências em `.claude/skills/implement/SKILL.md` e `.claude/skills/tdd/SKILL.md`;
+  - renomear a chave `code-review` para `review-spec` no `skills-lock.json` (o `skillPath` continua apontando para o caminho original).
