@@ -1,7 +1,6 @@
 ---
 data: <% tp.date.now("YYYY-MM-DD") %>
-tags:
-  - diario
+tags: [daily]
 ---
 
 # <% tp.file.title %>
