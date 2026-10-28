@@ -35,7 +35,7 @@ flowchart LR
 - O front fala com a API; a regra de negócio fica toda no NestJS.
 - O Supabase serve apenas Postgres, autenticação e arquivos. A Data API pública fica desligada.
 
-> [!todo] Preencher: onde a API NestJS será hospedada (spike pendente). O diagrama mostra só o front dentro da Vercel.
+> [!todo] Hospedagem da API proposta no [[ADR-002-hospedagem-api]] (funções serverless na Vercel). Atualizar o diagrama quando o ADR for aceito; hoje ele mostra só o front dentro da Vercel.
 
 ## Ver também
 
