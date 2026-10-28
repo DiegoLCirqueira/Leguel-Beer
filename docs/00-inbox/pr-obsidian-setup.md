@@ -13,15 +13,17 @@ Configura `docs/` como vault do Obsidian e prepara o repositório para o desenvo
 ## Decisões registradas
 
 - ADR-001 (`docs/03-decisoes/ADR-001-stack.md`): stack Next.js + NestJS + Prisma + Supabase (só Postgres, auth e arquivos) + Vercel. **Aceito.**
-- ADR-002 (`docs/03-decisoes/ADR-002-hospedagem-api.md`): API NestJS em funções serverless na Vercel (Hobby), sem processos de longa duração no MVP. **Proposto.**
-- Corte do MVP (`docs/01-produto/mvp-corte.md`): 14 épicos no MVP (63 cards / 210 pontos no núcleo + 33 adiáveis / 85 pontos) e 4 épicos no Pós-MVP. **Proposto, `aprovado: false`.**
+- ADR-002 (`docs/03-decisoes/ADR-002-hospedagem-api.md`): API NestJS em funções serverless na Vercel (Hobby), sem processos de longa duração no MVP. **Aceito.**
+- ADR-003 a ADR-005 (`docs/03-decisoes/`): migrados do Notion (site mobile-first, Mercado Pago em sandbox como proposto até o spike LB-54, monorepo em camadas), com PWA instalável, assinaturas e WebSocket em seções Pós-MVP.
+- **Modelos e ultracode:** modelo por agente em `docs/00-inbox/maestri-banda.md`; ultracode e workflows só com autorização (CLAUDE.md).
+- Corte do MVP (`docs/01-produto/mvp-corte.md`): 14 épicos no MVP (63 cards / 210 pontos no núcleo + 33 adiáveis / 85 pontos) e 4 épicos no Pós-MVP; milestones MVP (77 issues) e MVP+ (33). **Aprovado.**
 - **TDD:** red-green em fatias verticais; refatoração em passo e commit separados, só com todos os testes verdes (CLAUDE.md).
 - **Issue tracker:** GitHub Issues para o MVP; o Notion fica como banco de ideias do Pós-MVP (CLAUDE.md).
 - **Papéis da banda do Maestri:** textos completos em `docs/00-inbox/maestri-banda.md`, prontos para colar.
 
 ## Pendências (fora desta branch)
 
-- [ ] Aprovar o ADR-002 (`status: aceito`) e o corte do MVP (`aprovado: true`).
+- [ ] Conferir as aprovações do ADR-002 e do corte do MVP feitas em 2026-10-28.
 - [ ] Rodar `node scripts/migrar-backlog/migrar.js --executar` e depois apagar `scripts/migrar-backlog/`.
 - [ ] Confirmar o tamanho e as categorias do catálogo e resolver os callouts `[!todo]`.
 - [ ] Trocar o Node por uma versão 22 recente via fnm e criar o `.nvmrc`.
