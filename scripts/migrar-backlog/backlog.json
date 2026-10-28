@@ -1,0 +1,2118 @@
+{
+  "fonte": "docs/00-inbox/backlog-snapshot.md",
+  "epicos": [
+    {
+      "id": "E1",
+      "nome": "Back-end em camadas pronto para crescer",
+      "notionId": "3fd490a7ac7d81409e79d39ea89ca78d",
+      "prioridade": "P0",
+      "labels": [
+        "epic",
+        "area:infra",
+        "prio:p0"
+      ]
+    },
+    {
+      "id": "E2",
+      "nome": "Base técnica pronta para evoluir com segurança",
+      "notionId": "3fd490a7ac7d810d8551d33c8a4f0fe3",
+      "prioridade": "P0",
+      "labels": [
+        "epic",
+        "area:infra",
+        "prio:p0"
+      ]
+    },
+    {
+      "id": "E3",
+      "nome": "Catálogo fácil de explorar",
+      "notionId": "3fd490a7ac7d81048f7ac59e357a46a9",
+      "prioridade": "P0",
+      "labels": [
+        "epic",
+        "area:loja",
+        "prio:p0"
+      ]
+    },
+    {
+      "id": "E4",
+      "nome": "Checkout com Pix e cartão confiável",
+      "notionId": "3fd490a7ac7d813cb2e5f0ae492e8a59",
+      "prioridade": "P0",
+      "labels": [
+        "epic",
+        "area:checkout",
+        "prio:p0"
+      ]
+    },
+    {
+      "id": "E5",
+      "nome": "Conta do cliente sem atrito",
+      "notionId": "3fd490a7ac7d810082c5f4ac19b47d86",
+      "prioridade": "P0",
+      "labels": [
+        "epic",
+        "area:seguranca",
+        "prio:p0"
+      ]
+    },
+    {
+      "id": "E6",
+      "nome": "Entrega local calculada por distância",
+      "notionId": "3fd490a7ac7d813cbd7df51c3de7c392",
+      "prioridade": "P0",
+      "labels": [
+        "epic",
+        "area:checkout",
+        "prio:p0"
+      ]
+    },
+    {
+      "id": "E7",
+      "nome": "Geladeira fluida e confiável",
+      "notionId": "3fd490a7ac7d81609903e90d3c9bffc1",
+      "prioridade": "P0",
+      "labels": [
+        "epic",
+        "area:loja",
+        "prio:p0"
+      ]
+    },
+    {
+      "id": "E8",
+      "nome": "Identidade visual consistente em todo o site",
+      "notionId": "3fd490a7ac7d8130ad3dea849dcae01e",
+      "prioridade": "P0",
+      "labels": [
+        "epic",
+        "area:design",
+        "prio:p0"
+      ]
+    },
+    {
+      "id": "E9",
+      "nome": "Painel admin para operar a loja sozinho",
+      "notionId": "3fd490a7ac7d8184bac7c68e631c2d86",
+      "prioridade": "P0",
+      "labels": [
+        "epic",
+        "area:admin",
+        "prio:p0"
+      ]
+    },
+    {
+      "id": "E10",
+      "nome": "Página de produto que convence",
+      "notionId": "3fd490a7ac7d811388f5cd9fd760c133",
+      "prioridade": "P0",
+      "labels": [
+        "epic",
+        "area:loja",
+        "prio:p0"
+      ]
+    },
+    {
+      "id": "E11",
+      "nome": "Qualidade comprovada e portfólio publicado",
+      "notionId": "3fd490a7ac7d8180a521f06d8fa2364d",
+      "prioridade": "P0",
+      "labels": [
+        "epic",
+        "area:qualidade",
+        "prio:p0"
+      ]
+    },
+    {
+      "id": "E12",
+      "nome": "Acesso responsável e dados protegidos",
+      "notionId": "3fd490a7ac7d81c3a8ced145fa05c006",
+      "prioridade": "P1",
+      "labels": [
+        "epic",
+        "area:seguranca",
+        "prio:p1"
+      ]
+    },
+    {
+      "id": "E13",
+      "nome": "Avisos e relatório mensal automáticos",
+      "notionId": "3fd490a7ac7d810cb9e5d39f9cabec9f",
+      "prioridade": "P1",
+      "labels": [
+        "epic",
+        "area:admin",
+        "prio:p1"
+      ]
+    },
+    {
+      "id": "E14",
+      "nome": "Clube do Leguelé com assinatura recorrente",
+      "notionId": "3fd490a7ac7d811788cadeaaee3ca486",
+      "prioridade": "P1",
+      "labels": [
+        "epic",
+        "area:loja",
+        "prio:p1"
+      ]
+    },
+    {
+      "id": "E15",
+      "nome": "Mix & Match com packs personalizados",
+      "notionId": "3fd490a7ac7d8136a5aef3983d3164c5",
+      "prioridade": "P1",
+      "labels": [
+        "epic",
+        "area:loja",
+        "prio:p1"
+      ]
+    },
+    {
+      "id": "E16",
+      "nome": "Pedidos acompanháveis do início ao fim",
+      "notionId": "3fd490a7ac7d812ba8becf4af2d0648d",
+      "prioridade": "P1",
+      "labels": [
+        "epic",
+        "area:loja",
+        "prio:p1"
+      ]
+    },
+    {
+      "id": "E17",
+      "nome": "Site encontrável, instalável e rápido",
+      "notionId": "3fd490a7ac7d81158825fa1bfd057a88",
+      "prioridade": "P1",
+      "labels": [
+        "epic",
+        "area:marketing",
+        "prio:p1"
+      ]
+    },
+    {
+      "id": "E18",
+      "nome": "Favoritos e avaliações reais",
+      "notionId": "3fd490a7ac7d811aad41d1a33c7869ba",
+      "prioridade": "P2",
+      "labels": [
+        "epic",
+        "area:loja",
+        "prio:p2"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "codigo": "LB-1",
+      "titulo": "Criar monorepo com Turborepo, Next.js e NestJS",
+      "notionId": "3fd490a7ac7d81169892e34e0e6cc3ef",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E2",
+      "labels": [
+        "tipo:tecnica",
+        "area:infra",
+        "prio:p0",
+        "frontend",
+        "backend",
+        "infra"
+      ]
+    },
+    {
+      "codigo": "LB-2",
+      "titulo": "Configurar padrões de código com ESLint, Prettier, Husky e Commitlint",
+      "notionId": "3fd490a7ac7d81d6806dfd7859a5ec31",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 2,
+      "epico": "E2",
+      "labels": [
+        "tipo:tecnica",
+        "area:qualidade",
+        "prio:p0",
+        "infra"
+      ]
+    },
+    {
+      "codigo": "LB-3",
+      "titulo": "Configurar PostgreSQL local e Prisma com migrations",
+      "notionId": "3fd490a7ac7d812d82c8d2d5efc3c72b",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E2",
+      "labels": [
+        "tipo:tecnica",
+        "area:infra",
+        "prio:p0",
+        "banco",
+        "backend",
+        "infra"
+      ]
+    },
+    {
+      "codigo": "LB-4",
+      "titulo": "Modelar schema inicial do catálogo e seed com cervejas de exemplo",
+      "notionId": "3fd490a7ac7d81099583f628bacb3a58",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 5,
+      "epico": "E2",
+      "labels": [
+        "tipo:tecnica",
+        "area:infra",
+        "prio:p0",
+        "banco",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-5",
+      "titulo": "Configurar Vitest, Testing Library e MSW",
+      "notionId": "3fd490a7ac7d81118b6eea85cbbf0c7d",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E2",
+      "labels": [
+        "tipo:teste",
+        "area:qualidade",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-6",
+      "titulo": "Configurar Playwright com playwright-bdd e cenário de fumaça",
+      "notionId": "3fd490a7ac7d81e4b19dc8904c87080f",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E2",
+      "labels": [
+        "tipo:teste",
+        "area:qualidade",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-7",
+      "titulo": "Criar pipeline de CI no GitHub Actions",
+      "notionId": "3fd490a7ac7d81eb9f18e52ca401a79a",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E2",
+      "labels": [
+        "tipo:tecnica",
+        "area:infra",
+        "prio:p0",
+        "infra"
+      ]
+    },
+    {
+      "codigo": "LB-8",
+      "titulo": "Configurar deploy na Vercel com preview por PR",
+      "notionId": "3fd490a7ac7d81de827ad9b54cc57de1",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 1,
+      "epico": "E2",
+      "labels": [
+        "tipo:tecnica",
+        "area:infra",
+        "prio:p0",
+        "infra"
+      ]
+    },
+    {
+      "codigo": "LB-9",
+      "titulo": "Validar variáveis de ambiente com Zod",
+      "notionId": "3fd490a7ac7d815b8c4ad81f94ef0031",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 1,
+      "epico": "E2",
+      "labels": [
+        "tipo:tecnica",
+        "area:infra",
+        "prio:p1",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-10",
+      "titulo": "Documentar setup e arquitetura no README",
+      "notionId": "3fd490a7ac7d81c88672fa027d26d38c",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 2,
+      "epico": "E2",
+      "labels": [
+        "tipo:tecnica",
+        "area:marketing",
+        "prio:p1",
+        "docs"
+      ]
+    },
+    {
+      "codigo": "LB-11",
+      "titulo": "Definir tokens de cor, tipografia e espaçamento da marca",
+      "notionId": "3fd490a7ac7d818bbd1ef6ebfb609310",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E8",
+      "labels": [
+        "tipo:tecnica",
+        "area:design",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-12",
+      "titulo": "Criar componentes de botão, badge de estilo e chip de categoria",
+      "notionId": "3fd490a7ac7d811692bfd9f27e792650",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E8",
+      "labels": [
+        "tipo:tecnica",
+        "area:design",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-13",
+      "titulo": "Criar card de produto e stepper de quantidade",
+      "notionId": "3fd490a7ac7d818e85f2e461ca63c158",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E8",
+      "labels": [
+        "tipo:tecnica",
+        "area:design",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-14",
+      "titulo": "Criar bottom sheet, toast e skeleton loaders",
+      "notionId": "3fd490a7ac7d8173a46cfe560f2fd56d",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 3,
+      "epico": "E8",
+      "labels": [
+        "tipo:tecnica",
+        "area:design",
+        "prio:p1",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-15",
+      "titulo": "Implementar header com contador da geladeira e tab bar inferior",
+      "notionId": "3fd490a7ac7d816fa733f11df342d41f",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 5,
+      "epico": "E8",
+      "labels": [
+        "tipo:feature",
+        "area:design",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-16",
+      "titulo": "Exportar logo, favicon e ícones do PWA",
+      "notionId": "3fd490a7ac7d81908e0fd33ec5e4342e",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 2,
+      "epico": "E8",
+      "labels": [
+        "tipo:tecnica",
+        "area:design",
+        "prio:p1",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-17",
+      "titulo": "Otimizar fundo de folhagem para mobile",
+      "notionId": "3fd490a7ac7d8182a8f3f1d225ccbc3f",
+      "status": "Pronto",
+      "prioridade": "P2",
+      "pontos": 2,
+      "epico": "E8",
+      "labels": [
+        "tipo:tecnica",
+        "area:design",
+        "prio:p2",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-18",
+      "titulo": "Criar páginas de erro 404/500 e estados vazios",
+      "notionId": "3fd490a7ac7d813bb9dbf26c7d57c6db",
+      "status": "Pronto",
+      "prioridade": "P2",
+      "pontos": 2,
+      "epico": "E8",
+      "labels": [
+        "tipo:feature",
+        "area:design",
+        "prio:p2",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-19",
+      "titulo": "Implementar verificação de idade 18+ na entrada",
+      "notionId": "3fd490a7ac7d81caab51c2698587fd52",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E12",
+      "labels": [
+        "tipo:feature",
+        "area:seguranca",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-20",
+      "titulo": "Bloquear compra para menores pela data de nascimento",
+      "notionId": "3fd490a7ac7d81738862f1c452e27114",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 2,
+      "epico": "E12",
+      "labels": [
+        "tipo:feature",
+        "area:seguranca",
+        "prio:p0",
+        "backend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-21",
+      "titulo": "Implementar banner de consentimento de cookies",
+      "notionId": "3fd490a7ac7d8131a68de6dc1dd0bd2f",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 3,
+      "epico": "E12",
+      "labels": [
+        "tipo:feature",
+        "area:seguranca",
+        "prio:p1",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-22",
+      "titulo": "Publicar termos, privacidade e aviso de projeto de portfólio",
+      "notionId": "3fd490a7ac7d815c9785f1be8cd09271",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 2,
+      "epico": "E12",
+      "labels": [
+        "tipo:feature",
+        "area:seguranca",
+        "prio:p1",
+        "frontend",
+        "docs"
+      ]
+    },
+    {
+      "codigo": "LB-23",
+      "titulo": "Permitir exportar e excluir os dados da conta",
+      "notionId": "3fd490a7ac7d81df8556dbe73e93b3fa",
+      "status": "Pronto",
+      "prioridade": "P2",
+      "pontos": 3,
+      "epico": "E12",
+      "labels": [
+        "tipo:feature",
+        "area:seguranca",
+        "prio:p2",
+        "backend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-24",
+      "titulo": "Implementar tela de boas-vindas com entrar, criar conta e convidado",
+      "notionId": "3fd490a7ac7d8172b935df8e794f5411",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 2,
+      "epico": "E5",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-25",
+      "titulo": "Implementar cadastro e login com e-mail e senha",
+      "notionId": "3fd490a7ac7d81709d51f352c2257c0b",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E5",
+      "labels": [
+        "tipo:feature",
+        "area:seguranca",
+        "prio:p0",
+        "frontend",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-26",
+      "titulo": "Implementar login social com Google e Facebook",
+      "notionId": "3fd490a7ac7d8195af8de157e8915b11",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 3,
+      "epico": "E5",
+      "labels": [
+        "tipo:feature",
+        "area:seguranca",
+        "prio:p1",
+        "frontend",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-27",
+      "titulo": "Implementar recuperação de senha",
+      "notionId": "3fd490a7ac7d814fbeded6d8c0143a57",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 2,
+      "epico": "E5",
+      "labels": [
+        "tipo:feature",
+        "area:seguranca",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-28",
+      "titulo": "Proteger a API com guards de autenticação e papéis",
+      "notionId": "3fd490a7ac7d815a954cf82cc4a284db",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E5",
+      "labels": [
+        "tipo:tecnica",
+        "area:seguranca",
+        "prio:p0",
+        "backend",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-29",
+      "titulo": "Implementar edição de perfil com telefone, nascimento e CPF",
+      "notionId": "3fd490a7ac7d8162ad6cf31191864c1a",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E5",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p0",
+        "frontend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-30",
+      "titulo": "Implementar gestão de endereços com busca por CEP e geolocalização",
+      "notionId": "3fd490a7ac7d8112990dd5d423575b82",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 5,
+      "epico": "E5",
+      "labels": [
+        "tipo:feature",
+        "area:checkout",
+        "prio:p0",
+        "frontend",
+        "backend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-31",
+      "titulo": "Exigir login quando o convidado for finalizar a compra",
+      "notionId": "3fd490a7ac7d81e5b5a4d3685d32e0ff",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 2,
+      "epico": "E5",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p1",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-32",
+      "titulo": "Exibir banner rotativo de destaques na home",
+      "notionId": "3fd490a7ac7d81f6a4b6f692da54136c",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 3,
+      "epico": "E3",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p1",
+        "frontend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-33",
+      "titulo": "Filtrar cervejas por categoria com contadores",
+      "notionId": "3fd490a7ac7d81cc857be47445b362a1",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E3",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p0",
+        "frontend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-34",
+      "titulo": "Exibir cervejas em destaque na home",
+      "notionId": "3fd490a7ac7d81a7b531f26160f4ed1c",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 2,
+      "epico": "E3",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-35",
+      "titulo": "Adicionar cerveja à geladeira direto do card",
+      "notionId": "3fd490a7ac7d818f8902cacfd96e2c0b",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 2,
+      "epico": "E3",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-36",
+      "titulo": "Criar página de catálogo com filtros e ordenação",
+      "notionId": "3fd490a7ac7d81c5ba2cf6a3db8448c6",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 5,
+      "epico": "E3",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p0",
+        "frontend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-37",
+      "titulo": "Implementar busca por nome, estilo e ingrediente",
+      "notionId": "3fd490a7ac7d81edae37ce535503eb60",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 5,
+      "epico": "E3",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p1",
+        "frontend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-38",
+      "titulo": "Sinalizar cervejas esgotadas",
+      "notionId": "3fd490a7ac7d81e286f6ff9859c59b61",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 2,
+      "epico": "E3",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p0",
+        "frontend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-39",
+      "titulo": "Exibir chamada do Clube do Leguelé na home",
+      "notionId": "3fd490a7ac7d814a9e55cf05dbba07e2",
+      "status": "Pronto",
+      "prioridade": "P2",
+      "pontos": 1,
+      "epico": "E3",
+      "labels": [
+        "tipo:feature",
+        "area:marketing",
+        "prio:p2",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-40",
+      "titulo": "Exibir dados e ficha técnica da cerveja",
+      "notionId": "3fd490a7ac7d8112b745ef42b7882d97",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 5,
+      "epico": "E10",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-41",
+      "titulo": "Calcular e exibir desconto a partir do preço anterior",
+      "notionId": "3fd490a7ac7d81d29217d6463d50a12b",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 1,
+      "epico": "E10",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-42",
+      "titulo": "Adicionar à geladeira com quantidade e botão fixo",
+      "notionId": "3fd490a7ac7d8164bd04f0507e123355",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E10",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-43",
+      "titulo": "Implementar abas de descrição, ingredientes, harmonização e avaliações",
+      "notionId": "3fd490a7ac7d819787d8d0319c58353c",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 3,
+      "epico": "E10",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p1",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-44",
+      "titulo": "Exibir quanto falta para o frete grátis",
+      "notionId": "3fd490a7ac7d81f08d69efb2f7ea2276",
+      "status": "Pronto",
+      "prioridade": "P2",
+      "pontos": 2,
+      "epico": "E10",
+      "labels": [
+        "tipo:feature",
+        "area:checkout",
+        "prio:p2",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-45",
+      "titulo": "Sugerir cervejas do mesmo estilo",
+      "notionId": "3fd490a7ac7d812a9c56fe50714199c5",
+      "status": "Pronto",
+      "prioridade": "P3",
+      "pontos": 2,
+      "epico": "E10",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p3",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-46",
+      "titulo": "Compartilhar cerveja com Web Share e preview Open Graph",
+      "notionId": "3fd490a7ac7d81e99a85f2ccba401fd9",
+      "status": "Pronto",
+      "prioridade": "P2",
+      "pontos": 2,
+      "epico": "E10",
+      "labels": [
+        "tipo:feature",
+        "area:marketing",
+        "prio:p2",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-47",
+      "titulo": "Persistir geladeira localmente e na conta",
+      "notionId": "3fd490a7ac7d81df9bc0d6332e64430c",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 5,
+      "epico": "E7",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p0",
+        "frontend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-48",
+      "titulo": "Mesclar geladeira do convidado ao fazer login",
+      "notionId": "3fd490a7ac7d8150b017f43a53be40e2",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 3,
+      "epico": "E7",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p1",
+        "frontend",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-49",
+      "titulo": "Exibir geladeira em prateleiras por estilo",
+      "notionId": "3fd490a7ac7d812eaddfc4fed1ed0477",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 8,
+      "epico": "E7",
+      "labels": [
+        "tipo:feature",
+        "area:design",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-50",
+      "titulo": "Alterar quantidade e remover itens da geladeira",
+      "notionId": "3fd490a7ac7d811b9eb5e3d5bd355674",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 2,
+      "epico": "E7",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-51",
+      "titulo": "Exibir resumo da geladeira em bottom sheet",
+      "notionId": "3fd490a7ac7d81bb8f7ad07ebe13cb6b",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E7",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-52",
+      "titulo": "Revalidar preço e estoque da geladeira no servidor",
+      "notionId": "3fd490a7ac7d81b8b533c5e288a43024",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E7",
+      "labels": [
+        "tipo:tecnica",
+        "area:loja",
+        "prio:p0",
+        "backend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-53",
+      "titulo": "Aplicar cupom de desconto na geladeira",
+      "notionId": "3fd490a7ac7d811181a8c8eff17da759",
+      "status": "Pronto",
+      "prioridade": "P2",
+      "pontos": 3,
+      "epico": "E7",
+      "labels": [
+        "tipo:feature",
+        "area:checkout",
+        "prio:p2",
+        "frontend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-54",
+      "titulo": "Comparar gateways gratuitos para Pix, cartão e assinatura",
+      "notionId": "3fd490a7ac7d810ebc04ebe7b354b1ce",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 2,
+      "epico": "E4",
+      "labels": [
+        "tipo:spike",
+        "area:checkout",
+        "prio:p0",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-55",
+      "titulo": "Montar checkout em etapas no celular",
+      "notionId": "3fd490a7ac7d8128a0c5c62279998c00",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 5,
+      "epico": "E4",
+      "labels": [
+        "tipo:feature",
+        "area:checkout",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-56",
+      "titulo": "Criar pedido com reserva atômica de estoque",
+      "notionId": "3fd490a7ac7d81b6bb42f1a62de70670",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 5,
+      "epico": "E4",
+      "labels": [
+        "tipo:tecnica",
+        "area:checkout",
+        "prio:p0",
+        "backend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-57",
+      "titulo": "Pagar com Pix com QR Code e validade de 30 minutos",
+      "notionId": "3fd490a7ac7d81dd8e55ee63c71ba30d",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 5,
+      "epico": "E4",
+      "labels": [
+        "tipo:feature",
+        "area:checkout",
+        "prio:p0",
+        "frontend",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-58",
+      "titulo": "Pagar com cartão em até 12x com juros a partir da 3ª parcela",
+      "notionId": "3fd490a7ac7d8116ad8de271ebbc26a7",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 5,
+      "epico": "E4",
+      "labels": [
+        "tipo:feature",
+        "area:checkout",
+        "prio:p0",
+        "frontend",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-59",
+      "titulo": "Processar webhooks de pagamento de forma idempotente",
+      "notionId": "3fd490a7ac7d8160b1dac9761da75004",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 5,
+      "epico": "E4",
+      "labels": [
+        "tipo:tecnica",
+        "area:checkout",
+        "prio:p0",
+        "backend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-60",
+      "titulo": "Cancelar pedidos expirados e liberar o estoque",
+      "notionId": "3fd490a7ac7d810ba5a1f05dd1683822",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E4",
+      "labels": [
+        "tipo:tecnica",
+        "area:checkout",
+        "prio:p0",
+        "backend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-61",
+      "titulo": "Exibir tela de pedido confirmado",
+      "notionId": "3fd490a7ac7d81fb8dbbd75adec3634e",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 2,
+      "epico": "E4",
+      "labels": [
+        "tipo:feature",
+        "area:checkout",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-62",
+      "titulo": "Pesquisar API gratuita de geocodificação e distância de rota",
+      "notionId": "3fd490a7ac7d81f1a42cf61e835b74ca",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 2,
+      "epico": "E6",
+      "labels": [
+        "tipo:spike",
+        "area:checkout",
+        "prio:p0",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-63",
+      "titulo": "Calcular frete por distância até a cervejaria",
+      "notionId": "3fd490a7ac7d8140a8a5da8a9f45d06e",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 5,
+      "epico": "E6",
+      "labels": [
+        "tipo:feature",
+        "area:checkout",
+        "prio:p0",
+        "backend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-64",
+      "titulo": "Restringir a entrega a Maceió e região",
+      "notionId": "3fd490a7ac7d8150ab9ac5e2fd2cb86e",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 2,
+      "epico": "E6",
+      "labels": [
+        "tipo:feature",
+        "area:checkout",
+        "prio:p0",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-65",
+      "titulo": "Estimar tempo de entrega com preparo e deslocamento",
+      "notionId": "3fd490a7ac7d81a99300f101621322a2",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 3,
+      "epico": "E6",
+      "labels": [
+        "tipo:feature",
+        "area:checkout",
+        "prio:p1",
+        "backend",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-66",
+      "titulo": "Aplicar frete grátis acima de R$ 150",
+      "notionId": "3fd490a7ac7d81c79dbaf3c28862f234",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 1,
+      "epico": "E6",
+      "labels": [
+        "tipo:feature",
+        "area:checkout",
+        "prio:p0",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-67",
+      "titulo": "Listar histórico de pedidos do cliente",
+      "notionId": "3fd490a7ac7d811e8403e328a31c2812",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E16",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-68",
+      "titulo": "Exibir detalhe do pedido com linha do tempo de status",
+      "notionId": "3fd490a7ac7d81ba9fa9d1833b1f653c",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E16",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-69",
+      "titulo": "Atualizar status do pedido em tempo real",
+      "notionId": "3fd490a7ac7d81ae8aadcdaaefcb9fc0",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 3,
+      "epico": "E16",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p1",
+        "frontend",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-70",
+      "titulo": "Comprar novamente um pedido anterior",
+      "notionId": "3fd490a7ac7d81348a28e9644a129ce4",
+      "status": "Pronto",
+      "prioridade": "P2",
+      "pontos": 2,
+      "epico": "E16",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p2",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-71",
+      "titulo": "Abrir conversa no WhatsApp a partir do pedido",
+      "notionId": "3fd490a7ac7d816995fadf14fc2ba203",
+      "status": "Pronto",
+      "prioridade": "P2",
+      "pontos": 1,
+      "epico": "E16",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p2",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-72",
+      "titulo": "Criar layout do painel admin protegido por papel",
+      "notionId": "3fd490a7ac7d815b85f5ed27a5c4424f",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 2,
+      "epico": "E9",
+      "labels": [
+        "tipo:tecnica",
+        "area:admin",
+        "prio:p0",
+        "frontend",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-73",
+      "titulo": "Cadastrar e editar cervejas com fotos no admin",
+      "notionId": "3fd490a7ac7d81fc8984f1dbf6102d09",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 8,
+      "epico": "E9",
+      "labels": [
+        "tipo:feature",
+        "area:admin",
+        "prio:p0",
+        "frontend",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-74",
+      "titulo": "Gerenciar categorias de cerveja no admin",
+      "notionId": "3fd490a7ac7d8120af69c86b7dfe8891",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 2,
+      "epico": "E9",
+      "labels": [
+        "tipo:feature",
+        "area:admin",
+        "prio:p1",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-75",
+      "titulo": "Controlar estoque com alerta de estoque baixo",
+      "notionId": "3fd490a7ac7d811d80add7a71ecfc9cd",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E9",
+      "labels": [
+        "tipo:feature",
+        "area:admin",
+        "prio:p0",
+        "frontend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-76",
+      "titulo": "Gerenciar pedidos e alterar status no admin",
+      "notionId": "3fd490a7ac7d811cb675e523a5f7e4e9",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 5,
+      "epico": "E9",
+      "labels": [
+        "tipo:feature",
+        "area:admin",
+        "prio:p0",
+        "frontend",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-77",
+      "titulo": "Configurar regras de entrega no admin",
+      "notionId": "3fd490a7ac7d81a8869fe1d4d0336836",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E9",
+      "labels": [
+        "tipo:feature",
+        "area:admin",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-78",
+      "titulo": "Exibir dashboard de vendas no admin",
+      "notionId": "3fd490a7ac7d8167b1a8d1a2bf966e30",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 5,
+      "epico": "E9",
+      "labels": [
+        "tipo:feature",
+        "area:admin",
+        "prio:p1",
+        "frontend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-79",
+      "titulo": "Gerenciar banners da home no admin",
+      "notionId": "3fd490a7ac7d817192a8c538a9ad4814",
+      "status": "Pronto",
+      "prioridade": "P2",
+      "pontos": 3,
+      "epico": "E9",
+      "labels": [
+        "tipo:feature",
+        "area:admin",
+        "prio:p2",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-80",
+      "titulo": "Gerenciar cupons de desconto no admin",
+      "notionId": "3fd490a7ac7d8138927dfd2dbeeab555",
+      "status": "Pronto",
+      "prioridade": "P2",
+      "pontos": 3,
+      "epico": "E9",
+      "labels": [
+        "tipo:feature",
+        "area:admin",
+        "prio:p2",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-81",
+      "titulo": "Enviar e-mails transacionais do pedido",
+      "notionId": "3fd490a7ac7d810c89bce27827e3afa7",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 5,
+      "epico": "E13",
+      "labels": [
+        "tipo:feature",
+        "area:admin",
+        "prio:p0",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-82",
+      "titulo": "Pesquisar envio gratuito de notificação por WhatsApp",
+      "notionId": "3fd490a7ac7d811e9b2bc27e08db1a4c",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 2,
+      "epico": "E13",
+      "labels": [
+        "tipo:spike",
+        "area:admin",
+        "prio:p1",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-83",
+      "titulo": "Notificar o admin no WhatsApp a cada pedido pago",
+      "notionId": "3fd490a7ac7d816ab112f7df75154ccc",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 3,
+      "epico": "E13",
+      "labels": [
+        "tipo:feature",
+        "area:admin",
+        "prio:p1",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-84",
+      "titulo": "Gerar relatório mensal exportável para planilha",
+      "notionId": "3fd490a7ac7d81d68849d7fc9f143434",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 5,
+      "epico": "E13",
+      "labels": [
+        "tipo:feature",
+        "area:admin",
+        "prio:p1",
+        "backend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-85",
+      "titulo": "Modelar packs do Mix & Match com preço especial",
+      "notionId": "3fd490a7ac7d818ca3aef2cb4cb43abb",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 3,
+      "epico": "E15",
+      "labels": [
+        "tipo:tecnica",
+        "area:loja",
+        "prio:p1",
+        "banco",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-86",
+      "titulo": "Escolher o tamanho do pack de 3, 6 ou 12",
+      "notionId": "3fd490a7ac7d8178965cf20020591eb2",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 2,
+      "epico": "E15",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p1",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-87",
+      "titulo": "Montar pack misturando estilos com vagas visuais",
+      "notionId": "3fd490a7ac7d819f8331dcdbb8093913",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 5,
+      "epico": "E15",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p1",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-88",
+      "titulo": "Mostrar preço especial do pack em tempo real",
+      "notionId": "3fd490a7ac7d8167a974e35520ca2a59",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 2,
+      "epico": "E15",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p1",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-89",
+      "titulo": "Oferecer combinações sugeridas de packs",
+      "notionId": "3fd490a7ac7d8123aa7de82cce645b2a",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 3,
+      "epico": "E15",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p1",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-90",
+      "titulo": "Adicionar embalagem de presente com custo extra e mensagem",
+      "notionId": "3fd490a7ac7d8120b401c0ebb3a9bea5",
+      "status": "Pronto",
+      "prioridade": "P2",
+      "pontos": 3,
+      "epico": "E15",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p2",
+        "frontend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-91",
+      "titulo": "Configurar packs, combinações e embalagem no admin",
+      "notionId": "3fd490a7ac7d814b8e1ae776a218bfe3",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 5,
+      "epico": "E15",
+      "labels": [
+        "tipo:feature",
+        "area:admin",
+        "prio:p1",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-92",
+      "titulo": "Modelar planos, assinaturas e ciclos do Clube",
+      "notionId": "3fd490a7ac7d8111899adb8e8ef59f6b",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 5,
+      "epico": "E14",
+      "labels": [
+        "tipo:tecnica",
+        "area:loja",
+        "prio:p1",
+        "banco",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-93",
+      "titulo": "Exibir os planos do Clube do Leguelé",
+      "notionId": "3fd490a7ac7d8161ae78d896b8cb22f9",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 3,
+      "epico": "E14",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p1",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-94",
+      "titulo": "Exibir detalhes e vantagens de cada plano",
+      "notionId": "3fd490a7ac7d81a29873edd5f3ee708b",
+      "status": "Backlog",
+      "prioridade": "P1",
+      "pontos": 2,
+      "epico": "E14",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p1",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-95",
+      "titulo": "Assinar plano do Clube com cobrança recorrente",
+      "notionId": "3fd490a7ac7d81d98fbecd9bf152a403",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 8,
+      "epico": "E14",
+      "labels": [
+        "tipo:feature",
+        "area:checkout",
+        "prio:p1",
+        "frontend",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-96",
+      "titulo": "Pausar, pular mês, trocar de plano ou cancelar a assinatura",
+      "notionId": "3fd490a7ac7d819fb39cfbdc9d652f78",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 5,
+      "epico": "E14",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p1",
+        "frontend",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-97",
+      "titulo": "Definir a curadoria mensal e gerar os envios dos assinantes",
+      "notionId": "3fd490a7ac7d8148880af62941b58f63",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 5,
+      "epico": "E14",
+      "labels": [
+        "tipo:feature",
+        "area:admin",
+        "prio:p1",
+        "frontend",
+        "backend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-98",
+      "titulo": "Tratar falha de cobrança da assinatura com retentativas",
+      "notionId": "3fd490a7ac7d81ebb95ef4ba481310bb",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 3,
+      "epico": "E14",
+      "labels": [
+        "tipo:feature",
+        "area:checkout",
+        "prio:p1",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-99",
+      "titulo": "Aplicar desconto de assinante em todo o site",
+      "notionId": "3fd490a7ac7d81f895aad6970d902085",
+      "status": "Backlog",
+      "prioridade": "P1",
+      "pontos": 2,
+      "epico": "E14",
+      "labels": [
+        "tipo:feature",
+        "area:checkout",
+        "prio:p1",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-100",
+      "titulo": "Exibir a edição do mês e o histórico de envios ao assinante",
+      "notionId": "3fd490a7ac7d817ba2acfde7cb90eb7c",
+      "status": "Pronto",
+      "prioridade": "P2",
+      "pontos": 3,
+      "epico": "E14",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p2",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-101",
+      "titulo": "Promover cerveja sazonal do Clube para o catálogo",
+      "notionId": "3fd490a7ac7d8127a2b7c1b66ceb6c69",
+      "status": "Pronto",
+      "prioridade": "P3",
+      "pontos": 1,
+      "epico": "E14",
+      "labels": [
+        "tipo:feature",
+        "area:admin",
+        "prio:p3",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-102",
+      "titulo": "Liberar conteúdo exclusivo e lançamentos antecipados para assinantes",
+      "notionId": "3fd490a7ac7d81d39572e6409d810046",
+      "status": "Backlog",
+      "prioridade": "P3",
+      "pontos": 3,
+      "epico": "E14",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p3",
+        "frontend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-103",
+      "titulo": "Favoritar cervejas e ver a lista de favoritos",
+      "notionId": "3fd490a7ac7d81509f25db3668c9c217",
+      "status": "Pronto",
+      "prioridade": "P2",
+      "pontos": 3,
+      "epico": "E18",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p2",
+        "frontend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-104",
+      "titulo": "Avaliar cervejas compradas com nota e comentário",
+      "notionId": "3fd490a7ac7d81fa84d8c842608a0ad1",
+      "status": "Pronto",
+      "prioridade": "P2",
+      "pontos": 3,
+      "epico": "E18",
+      "labels": [
+        "tipo:feature",
+        "area:loja",
+        "prio:p2",
+        "frontend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-105",
+      "titulo": "Moderar avaliações no admin",
+      "notionId": "3fd490a7ac7d81778c8ff0f244e63665",
+      "status": "Pronto",
+      "prioridade": "P3",
+      "pontos": 2,
+      "epico": "E18",
+      "labels": [
+        "tipo:feature",
+        "area:admin",
+        "prio:p3",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-106",
+      "titulo": "Configurar metadados, sitemap e dados estruturados",
+      "notionId": "3fd490a7ac7d817db5caeee3226cd105",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 3,
+      "epico": "E17",
+      "labels": [
+        "tipo:feature",
+        "area:marketing",
+        "prio:p1",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-107",
+      "titulo": "Tornar o site instalável como PWA com cache offline",
+      "notionId": "3fd490a7ac7d81658d90ead8e732e030",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 5,
+      "epico": "E17",
+      "labels": [
+        "tipo:feature",
+        "area:infra",
+        "prio:p1",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-108",
+      "titulo": "Otimizar imagens e Core Web Vitals no celular",
+      "notionId": "3fd490a7ac7d81698cc1da60b27b8f24",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 3,
+      "epico": "E17",
+      "labels": [
+        "tipo:refactor",
+        "area:qualidade",
+        "prio:p1",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-109",
+      "titulo": "Instrumentar o funil de conversão com analytics",
+      "notionId": "3fd490a7ac7d81ce8149eecd287a91f2",
+      "status": "Pronto",
+      "prioridade": "P2",
+      "pontos": 2,
+      "epico": "E17",
+      "labels": [
+        "tipo:feature",
+        "area:marketing",
+        "prio:p2",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-110",
+      "titulo": "Criar página Sobre a cervejaria",
+      "notionId": "3fd490a7ac7d81dd98edcf218129ec03",
+      "status": "Pronto",
+      "prioridade": "P3",
+      "pontos": 2,
+      "epico": "E17",
+      "labels": [
+        "tipo:feature",
+        "area:marketing",
+        "prio:p3",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-111",
+      "titulo": "Revisar autorização, validação e acesso ao banco",
+      "notionId": "3fd490a7ac7d8183aaf6c79707f689c3",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E11",
+      "labels": [
+        "tipo:teste",
+        "area:seguranca",
+        "prio:p0",
+        "backend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-112",
+      "titulo": "Cobrir o fluxo de compra completo com testes E2E",
+      "notionId": "3fd490a7ac7d81f5bee1ef1b4055b50d",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 5,
+      "epico": "E11",
+      "labels": [
+        "tipo:teste",
+        "area:qualidade",
+        "prio:p0",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-113",
+      "titulo": "Auditar acessibilidade das telas principais",
+      "notionId": "3fd490a7ac7d81d08bf0c8ebe8154969",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 3,
+      "epico": "E11",
+      "labels": [
+        "tipo:teste",
+        "area:qualidade",
+        "prio:p1",
+        "frontend"
+      ]
+    },
+    {
+      "codigo": "LB-114",
+      "titulo": "Monitorar erros em produção com Sentry",
+      "notionId": "3fd490a7ac7d81459034e6b3d08259cb",
+      "status": "Pronto",
+      "prioridade": "P2",
+      "pontos": 1,
+      "epico": "E11",
+      "labels": [
+        "tipo:tecnica",
+        "area:infra",
+        "prio:p2",
+        "infra"
+      ]
+    },
+    {
+      "codigo": "LB-115",
+      "titulo": "Preparar README de portfólio com prints, GIF e decisões",
+      "notionId": "3fd490a7ac7d8148898dfa132676f2bf",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 3,
+      "epico": "E11",
+      "labels": [
+        "tipo:tecnica",
+        "area:marketing",
+        "prio:p1",
+        "docs"
+      ]
+    },
+    {
+      "codigo": "LB-116",
+      "titulo": "Criar dados de demonstração e conta de teste para recrutadores",
+      "notionId": "3fd490a7ac7d81a98c69e74f58edd3ad",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 2,
+      "epico": "E11",
+      "labels": [
+        "tipo:tecnica",
+        "area:marketing",
+        "prio:p1",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-117",
+      "titulo": "Criar API NestJS com validação, erros padronizados e Swagger",
+      "notionId": "3fd490a7ac7d81c4978df45985ecce6b",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 5,
+      "epico": "E1",
+      "labels": [
+        "tipo:tecnica",
+        "area:infra",
+        "prio:p0",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-118",
+      "titulo": "Definir arquitetura em camadas e template de módulo da API",
+      "notionId": "3fd490a7ac7d8170828bf1a12b37a404",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E1",
+      "labels": [
+        "tipo:tecnica",
+        "area:qualidade",
+        "prio:p0",
+        "backend",
+        "docs"
+      ]
+    },
+    {
+      "codigo": "LB-119",
+      "titulo": "Configurar testes da API com Jest, Supertest e Testcontainers",
+      "notionId": "3fd490a7ac7d819d80f6f048f08cfd42",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E1",
+      "labels": [
+        "tipo:teste",
+        "area:qualidade",
+        "prio:p0",
+        "backend",
+        "banco"
+      ]
+    },
+    {
+      "codigo": "LB-120",
+      "titulo": "Criar pacote compartilhado de schemas e cliente tipado da API",
+      "notionId": "3fd490a7ac7d81debc2be710474791d7",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E1",
+      "labels": [
+        "tipo:tecnica",
+        "area:infra",
+        "prio:p0",
+        "frontend",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-121",
+      "titulo": "Pesquisar hospedagem gratuita para a API NestJS",
+      "notionId": "3fd490a7ac7d81098f0ecd9094ae8840",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 2,
+      "epico": "E1",
+      "labels": [
+        "tipo:spike",
+        "area:infra",
+        "prio:p0",
+        "infra"
+      ]
+    },
+    {
+      "codigo": "LB-122",
+      "titulo": "Publicar a API em produção com deploy automático",
+      "notionId": "3fd490a7ac7d8130ad3edb5e07116336",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E1",
+      "labels": [
+        "tipo:tecnica",
+        "area:infra",
+        "prio:p0",
+        "infra",
+        "backend"
+      ]
+    },
+    {
+      "codigo": "LB-123",
+      "titulo": "Configurar filas e agendamentos com BullMQ e @nestjs/schedule",
+      "notionId": "3fd490a7ac7d81099f0ace27529104a4",
+      "status": "Pronto",
+      "prioridade": "P1",
+      "pontos": 3,
+      "epico": "E1",
+      "labels": [
+        "tipo:tecnica",
+        "area:infra",
+        "prio:p1",
+        "backend",
+        "infra"
+      ]
+    },
+    {
+      "codigo": "LB-124",
+      "titulo": "Gerar imagens recortadas das garrafas para a geladeira",
+      "notionId": "3fe490a7ac7d816ebf46ea7bb950dddb",
+      "status": "Pronto",
+      "prioridade": "P0",
+      "pontos": 3,
+      "epico": "E7",
+      "labels": [
+        "tipo:tecnica",
+        "area:design",
+        "prio:p0",
+        "frontend"
+      ]
+    }
+  ]
+}
