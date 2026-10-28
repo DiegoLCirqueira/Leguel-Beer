@@ -43,6 +43,9 @@ Hospedar a API NestJS como **função serverless na Vercel (plano Hobby)**, num 
 - **Bootstrap:** o app NestJS é criado uma vez por instância e reaproveitado entre invocações, com bundle em webpack, como recomenda a documentação do NestJS.
 - **Cancelar pedidos com Pix expirado (LB-60):** o cron do Hobby roda só uma vez por dia e com imprecisão de ±59 min, o que não atende a validade de 30 min do Pix. A expiração é verificada **sob demanda**: ao ler o pedido, ao receber o webhook e antes de reservar estoque. Um **cron diário** faz a limpeza do que sobrar.
 - **E-mail transacional:** chamada síncrona à API HTTP do provedor, fora da transação do banco.
+- **Manter o Supabase ativo:** o mesmo cron diário da Vercel também executa uma consulta leve no banco (por exemplo, `SELECT 1` via Prisma). Assim o projeto do Supabase Free não é pausado por inatividade, o que importa num portfólio que recrutadores podem abrir a qualquer momento.
+  - O Supabase considera inativo o projeto Free que "não recebe atividade de usuário suficiente no banco ao longo da última semana" e diz que algumas requisições por dia normalmente bastam, **sem garantia**.
+  - Se uma consulta diária não for suficiente, dá para cadastrar mais crons diários em horários diferentes: o Hobby permite até 100 por projeto, cada um no máximo uma vez por dia.
 
 ### Por que não as outras
 
@@ -62,7 +65,10 @@ Hospedar a API NestJS como **função serverless na Vercel (plano Hobby)**, num 
   - Cron apenas diário: a expiração do Pix precisa ser verificada sob demanda (afeta a spec de LB-60).
   - Cold start nas primeiras requisições após inatividade.
   - Logs de runtime guardados por só 1 hora no Hobby.
-  - O projeto Supabase Free é pausado após 1 semana sem atividade. A demo precisa de uso periódico ou de reativação manual.
+  - O projeto Supabase Free é pausado quando não recebe atividade suficiente no banco ao longo de uma semana. O cron diário com consulta leve reduz esse risco, mas o Supabase não garante que algumas requisições por dia bastem.
+    - Antes da pausa, o dono recebe um e-mail de aviso, cerca de uma semana antes.
+    - Um projeto pausado pode ser restaurado por até 1 ano.
+    - O dono do projeto precisa ficar atento a esse e-mail.
   - BullMQ, Redis, WebSocket e workers seguem fora do MVP. Voltar a eles no Pós-MVP exigirá rever este ADR.
 
 > [!todo] Diego: aprovar ou ajustar este ADR (mudar `status` para `aceito`). Se aprovado, atualizar a spec de LB-60 com a expiração sob demanda.
@@ -75,6 +81,7 @@ Hospedar a API NestJS como **função serverless na Vercel (plano Hobby)**, num 
 - NestJS, Serverless: https://docs.nestjs.com/faq/serverless
 - Supabase, Prisma: https://supabase.com/docs/guides/database/prisma
 - Supabase, Pricing: https://supabase.com/pricing
+- Supabase, Project Pausing: https://supabase.com/docs/guides/platform/free-project-pausing (consultada em 2026-10-28; a página não mostra data de atualização)
 - Render, Deploy for Free: https://render.com/docs/free
 - Railway, Pricing: https://railway.com/pricing e https://docs.railway.com/reference/pricing/plans
 - Koyeb, Pricing: https://www.koyeb.com/pricing
