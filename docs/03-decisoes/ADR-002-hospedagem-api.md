@@ -1,5 +1,5 @@
 ---
-status: proposto
+status: aceito
 data: 2026-10-28
 card-notion: https://app.notion.com/p/3fd490a7ac7d81098f0ecd9094ae8840
 tags:
@@ -9,7 +9,7 @@ tags:
 # ADR-002: Hospedagem gratuita da API NestJS no MVP
 
 > [!info] Status
-> **Proposto.** Resultado do spike LB-121 (pesquisar hospedagem gratuita para a API). Aguarda aprovação do Diego. Complementa o [[ADR-001-stack]].
+> **Aceito** pelo Diego em 2026-10-28. Resultado do spike LB-121 (pesquisar hospedagem gratuita para a API). Complementa o [[ADR-001-stack]].
 
 ## Contexto
 
@@ -71,7 +71,7 @@ Hospedar a API NestJS como **função serverless na Vercel (plano Hobby)**, num 
     - O dono do projeto precisa ficar atento a esse e-mail.
   - BullMQ, Redis, WebSocket e workers seguem fora do MVP. Voltar a eles no Pós-MVP exigirá rever este ADR.
 
-> [!todo] Diego: aprovar ou ajustar este ADR (mudar `status` para `aceito`). Se aprovado, atualizar a spec de LB-60 com a expiração sob demanda.
+> [!success] Aceito pelo Diego em 2026-10-28. A regra da expiração do Pix verificada no momento do uso (LB-60) foi registrada na spec [[checkout]].
 
 ## Fontes (consultadas em 2026-10-28)
 

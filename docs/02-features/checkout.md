@@ -49,6 +49,10 @@ Funcionalidade: Checkout em etapas
 - Três etapas com progresso visível: **Entrega** (escolher/adicionar endereço, ver frete e prazo) → **Pagamento** (Pix ou cartão) → **Revisão** (itens, totais, avisos legais, "Confirmar pedido").
 - Endereço padrão pré-selecionado; resumo fixo; estado preservado ao voltar etapas.
 - Pix com validade de 30 minutos.
+- Expiração do Pix (LB-60): verificada **no momento do uso**.
+  - A checagem acontece ao ler o pedido, ao receber o webhook de pagamento e antes de reservar estoque.
+  - Um cron diário da plataforma cancela os pedidos expirados que restarem e libera o estoque.
+  - Não há fila nem processo em segundo plano (ver [[ADR-002-hospedagem-api]]).
 - Cartão em até 12x: sem juros até 2x, com juros a partir da 3ª parcela.
 - Entrega apenas em Maceió e região; fora da área, mostrar "Ainda não entregamos neste endereço" e não avançar.
 - Frete calculado por distância; frete grátis acima de R$ 150.

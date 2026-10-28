@@ -23,7 +23,7 @@ Projeto de portfólio feito por uma pessoa, com custo zero e foco em mostrar eng
 - **Supabase apenas para:** PostgreSQL gerenciado, autenticação (Supabase Auth; a API valida o JWT via JWKS) e armazenamento de arquivos (Storage). A Data API pública do Supabase fica desligada; só a API acessa o banco.
 - **Custo:** tudo em planos gratuitos.
 
-> [!todo] Hospedagem da API: proposta no [[ADR-002-hospedagem-api]] (spike LB-121), aguardando aprovação.
+> [!info] Hospedagem da API: definida no [[ADR-002-hospedagem-api]] (spike LB-121, aceito).
 
 ## Alternativas consideradas
 
