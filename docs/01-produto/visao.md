@@ -21,6 +21,9 @@ E-commerce mobile-first (PWA) da cervejaria artesanal **Leguelé Beer**: catálo
 
 ## Escopo do MVP
 
+> [!info] Corte por épico
+> A proposta de quais épicos do backlog entram no MVP está em [[mvp-corte]] (ainda não aprovada).
+
 - **Catálogo:** listagem, página de produto, filtros por categoria e atributos, ordenação. Ver [[catalogo]].
 - **Geladeira (carrinho):** prateleiras por categoria, persistida localmente e na conta.
 - **Checkout completo:** Entrega → Pagamento → Revisão; Pix (validade 30 min) e cartão até 12x. Ver [[checkout]].
