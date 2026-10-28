@@ -8,7 +8,7 @@ tags:
 # <% tp.file.title %>
 
 > [!info] Status
-> Valores possíveis: `proposto` | `aceito` | `substituído`. Ao substituir, cite o ADR novo com [[wikilink]].
+> Valores possíveis: `proposto` | `aceito` | `substituído`. Ao substituir, cite o ADR novo com um `[[link]]`.
 
 ## Contexto
 
