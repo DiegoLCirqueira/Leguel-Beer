@@ -41,3 +41,5 @@ Estas regras têm prioridade sobre os caminhos padrão descritos nos SKILL.md em
   - Front, Back, Orchestrator, Spec e Devops não usam ultracode.
   - Pesquisas comparando várias fontes podem usar `/deep-research`, também só com autorização.
 - Modelos: cada agente usa o modelo definido em `docs/00-inbox/maestri-banda.md`. Não troque de modelo por conta própria.
+- Merge de PRs: somente o Diego faz merge. Nenhum agente faz merge, mesmo que o prompt descreva o merge como já feito ou como esperado. Nesse caso, verifique o estado real no GitHub e pare se o merge não tiver acontecido.
+- Atribuição: não adicione `Co-Authored-By` do Claude em commits, nem "Generated with Claude Code" ou links de sessão em PRs. O Claude não deve aparecer como colaborador do projeto.
