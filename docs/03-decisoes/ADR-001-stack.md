@@ -39,8 +39,10 @@ Projeto de portfólio feito por uma pessoa, com custo zero e foco em mostrar eng
 - **Positivas:** regra de negócio testável sem banco; arquitetura clara para recrutadores; Swagger como documentação viva; o Supabase fica com o que faz melhor.
 - **Negativas / dívidas assumidas:** dois deploys (web e API); a hospedagem gratuita da API pode ter partida a frio; mais código de infraestrutura que na versão anterior.
 
-> [!todo] Preencher: migrar os demais ADRs do Notion (ADR-002 PWA mobile-first em Next.js, ADR-003 Mercado Pago em sandbox, ADR-004 monorepo com arquitetura em camadas) para esta pasta.
-
 ## Relacionados
 
 - [[visao-geral]]
+- [[ADR-002-hospedagem-api]]: hospedagem da API
+- [[ADR-003-pwa-mobile-first]]: site mobile-first em Next.js (Notion ADR-002)
+- [[ADR-004-mercado-pago]]: pagamentos (Notion ADR-003)
+- [[ADR-005-monorepo-camadas]]: monorepo e camadas (Notion ADR-004)
