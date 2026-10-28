@@ -1,16 +1,16 @@
 ---
-tipo: proposta
-aprovado: false
+tipo: decisao
+aprovado: true
 criado: 2026-10-28
 atualizado: 2026-10-28
 fonte: "[[backlog-snapshot]]"
-tags: [produto, mvp, decisao-pendente]
+tags: [produto, mvp]
 ---
 
 # Proposta de corte do MVP
 
-> [!warning] Proposta para revisão — não aprovada
-> Classificação dos 18 épicos do Notion (retrato de 2026-10-28 em [[backlog-snapshot]]), já com as decisões do Diego de 2026-10-28. Ao aprovar, troque `aprovado: false` por `aprovado: true` no frontmatter. O script em `scripts/migrar-backlog/` lê as tabelas desta nota e só cria issues de verdade com essa marca.
+> [!success] Aprovado pelo Diego em 2026-10-28
+> Classificação dos 18 épicos do Notion (retrato de 2026-10-28 em [[backlog-snapshot]]), com as decisões do Diego de 2026-10-28. O script em `scripts/migrar-backlog/` lê as tabelas desta nota; mudar uma classificação exige rodar a simulação de novo antes de executar.
 
 ## Critério
 
@@ -128,4 +128,3 @@ Cards de épicos MVP que podem ficar para depois sem quebrar a compra de ponta a
 | E16 | LB-70 Comprar novamente um pedido anterior | 2 | Fora do escopo reduzido de E16. |
 | E16 | LB-71 Abrir conversa no WhatsApp a partir do pedido | 1 | Fora do escopo reduzido de E16. |
 
-> [!todo] Diego: revisar os grupos e os cards adiáveis; depois marcar `aprovado: true`.
