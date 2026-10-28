@@ -1,3 +1,19 @@
+## Projeto
+Leguelé Beer: e-commerce mobile-first da cervejaria artesanal Leguelé Beer (projeto de portfólio).
+Stack: Next.js (front) + NestJS (API) + Prisma; Supabase apenas para Postgres, autenticação e arquivos; deploy na Vercel. Ver docs/03-decisoes/ADR-001-stack.md.
+
+### Estrutura de pastas
+> PENDENTE: preencher quando houver código.
+
+### Comandos (dev, teste, build, lint)
+> PENDENTE: preencher quando houver código.
+
+### Convenções de teste
+> PENDENTE: preencher quando houver código.
+
+### Variáveis de ambiente
+> PENDENTE: preencher quando houver código.
+
 ## Documentação (docs/ é um vault do Obsidian)
 - Antes de implementar uma funcionalidade, leia a spec correspondente em docs/02-features/.
 - Fluxo obrigatório: cenário Gherkin → teste falhando → implementação mínima → refatoração.
