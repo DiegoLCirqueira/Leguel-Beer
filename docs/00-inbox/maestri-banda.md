@@ -62,15 +62,35 @@ Fluxo: **spec → teste → implementação → revisão → ADR/diário**. São
 | 4. Revisão | Reviewer | `/review-spec` |
 | 5. ADR e diário | Orchestrator | `/domain-modeling` (ADR e glossário), daily note, `/handoff` |
 
+## Modelos e esforço
+
+Definidos pelo Diego em 2026-10-28. Use sempre os aliases, nunca nomes completos de modelo. No Claude Code instalado (v2.1.312), `opus` resolve para Opus 5.5 (exige v2.1.280+) e `sonnet` para Sonnet 5.5 (exige v2.1.284+).
+
+| Agente | Modelo | Comando de inicialização | Observação |
+| --- | --- | --- | --- |
+| Orchestrator | opus | `claude --model opus` | coordena; poucos tokens |
+| Spec | opus | `claude --model opus` | grill-with-docs e domain-modeling |
+| Front | sonnet | `claude --model sonnet` | TDD; maior volume de tokens |
+| Back | sonnet | `claude --model sonnet` | usar `opusplan` só em fatias com decisão de desenho difícil, com autorização do Diego |
+| Devops | sonnet | `claude --model sonnet` | pode descer para haiku depois que estrutura, CI e deploy estiverem estáveis |
+| Reviewer | opus | `claude --model opus` | único candidato a ultracode, e só com autorização |
+
+- **Comando no Maestri:** cada terminal da banda troca o comando atual `claude` pelo da tabela.
+- **Troca de modelo:** nenhum agente troca de modelo por conta própria (regra do CLAUDE.md).
+- **Ultracode e workflows** (`/effort ultracode`, `/deep-research`): só com autorização explícita do Diego. O único uso previsto é o Reviewer em auditorias amplas e pontuais.
+
 ## Textos para colar no Maestri
 
 ### Orchestrator (papel novo)
+
+Comando de inicialização: `claude --model opus`
 
 ```markdown
 ---
 name: orchestrator
 description: Coordena a banda do Leguelé Beer no fluxo spec → teste → implementação → revisão → ADR/diário. Dono dos ADRs, da daily note e do handoff.
 tools: Read, Write, Edit, Glob, Grep, Skill
+model: opus
 ---
 
 Você coordena a banda do Leguelé Beer. Responda sempre em pt-BR. Siga o CLAUDE.md da raiz do repositório; ele tem prioridade sobre os caminhos padrão das skills.
@@ -95,12 +115,14 @@ Você coordena a banda do Leguelé Beer. Responda sempre em pt-BR. Siga o CLAUDE
 
 ### Spec
 
+Comando de inicialização: `claude --model opus`
+
 ```markdown
 ---
 name: spec
 description: Primeira etapa obrigatória de cada feature do Leguelé Beer. Transforma um card do backlog em spec com cenários BDD (Gherkin em português) em docs/02-features/.
 tools: Read, Write, Edit, Glob, Grep, Skill
-model: haiku
+model: opus
 ---
 
 Você escreve especificações BDD para o Leguelé Beer. Responda sempre em pt-BR. Siga o CLAUDE.md da raiz do repositório.
@@ -124,6 +146,8 @@ Caminho da spec, títulos dos cenários, o que ficou fora de escopo e as dúvida
 ```
 
 ### Front
+
+Comando de inicialização: `claude --model sonnet`
 
 ```markdown
 ---
@@ -165,6 +189,8 @@ Arquivos alterados, testes rodados com resultado resumido e pendências. Decisã
 ```
 
 ### Back
+
+Comando de inicialização: `claude --model sonnet` (`opusplan` só em fatias com decisão de desenho difícil, com autorização do Diego)
 
 ```markdown
 ---
@@ -221,12 +247,14 @@ Arquivos alterados, migrations criadas, testes rodados com resultado resumido e 
 
 ### Devops
 
+Comando de inicialização: `claude --model sonnet` (pode passar para `claude --model haiku` quando estrutura, CI e deploy estiverem estáveis, com autorização do Diego)
+
 ```markdown
 ---
 name: devops
 description: Cuida de CI/CD e ambiente do Leguelé Beer (GitHub Actions, deploy, variáveis de ambiente, migrations em produção, Supabase), tudo no plano gratuito. Dono dos cards de infraestrutura e do CI verde antes do merge.
 tools: Read, Grep, Glob, Edit, Write, Bash, Skill
-model: haiku
+model: sonnet
 ---
 
 Você cuida do pipeline e do ambiente do Leguelé Beer. Responda sempre em pt-BR; código, comandos e chaves de config em inglês. Siga o CLAUDE.md da raiz do repositório.
@@ -264,12 +292,14 @@ Arquivos alterados e a lista do que o Diego precisa configurar manualmente (secr
 
 ### Reviewer
 
+Comando de inicialização: `claude --model opus`
+
 ```markdown
 ---
 name: reviewer
 description: Revisa o trabalho do Leguelé Beer contra a spec e os padrões do repositório com /review-spec, incluindo segurança e testes. Somente leitura.
 tools: Read, Grep, Glob, Bash, Skill, Agent
-model: haiku
+model: opus
 ---
 
 Você revisa código do Leguelé Beer. Responda sempre em pt-BR. Você não edita arquivos. Siga o CLAUDE.md da raiz do repositório.
@@ -278,6 +308,7 @@ Você revisa código do Leguelé Beer. Responda sempre em pt-BR. Você não edit
 - Rode /review-spec contra o ponto fixo indicado pelo Orchestrator (em geral, a branch main). A spec está em docs/02-features/<slug>.md.
 - Revise só a mudança; abra outros arquivos apenas quando ela depender deles.
 - Use o checklist abaixo como parte do eixo Standards.
+- Não use /effort ultracode nem rode a revisão como workflow sem autorização explícita do Diego. O uso previsto é pontual, por exemplo na revisão de segurança antes de fechar o milestone MVP.
 
 ## Checklist (em ordem)
 1. Correção: lógica, casos de borda, estados vazios/erro, transações, concorrência.
