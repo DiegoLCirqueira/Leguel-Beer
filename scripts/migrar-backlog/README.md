@@ -37,6 +37,8 @@ node scripts/migrar-backlog/migrar.js --repo dono/nome
 1. Cria as labels que faltam (`epic`, `tipo:*`, `area:*`, `prio:*`, `frontend`, `backend`, `banco`, `infra`, `docs`).
 2. Cria uma issue `[Épico] <nome>` por épico MVP.
 3. Cria uma issue `[LB-NN] <título>` por card e a vincula como sub-issue do épico.
+   - Cards listados em "Cards Pós-MVP" no `mvp-corte.md` ficam de fora, mesmo em épicos MVP.
+   - Cards listados em "Cards adiáveis" entram com a label extra `adiavel`.
 
 Cada issue guarda o ID do Notion no corpo (`<!-- notion-id: ... -->`). Ao rodar de novo, o script procura esse ID e não duplica issues nem vínculos.
 

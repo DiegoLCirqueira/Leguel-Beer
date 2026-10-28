@@ -14,7 +14,7 @@ const args = process.argv.slice(2);
 const executar = args.includes("--executar");
 const repo = args.includes("--repo") ? args[args.indexOf("--repo") + 1] : repoDoOrigin();
 
-const CORES = { tipo: "1d76db", area: "5319e7", "prio:p0": "b60205", "prio:p1": "d93f0b", "prio:p2": "fbca04", "prio:p3": "0e8a16", epic: "3e4b9e" };
+const CORES = { tipo: "1d76db", area: "5319e7", "prio:p0": "b60205", "prio:p1": "d93f0b", "prio:p2": "fbca04", "prio:p3": "0e8a16", epic: "3e4b9e", adiavel: "ededed" };
 const corDa = (label) => CORES[label] || CORES[label.split(":")[0]] || "c5def5";
 
 function gh(argsGh, entrada) {
@@ -30,12 +30,18 @@ function lerCorte() {
   const md = fs.readFileSync(path.join(raiz, "docs/01-produto/mvp-corte.md"), "utf8");
   const aprovado = /^aprovado:\s*true\s*$/m.test(md);
   const grupos = {};
+  const cardsPosMvp = new Set();
+  const cardsAdiaveis = new Set();
+  let secao = "";
   for (const linha of md.split(/\r?\n/)) {
+    if (linha.startsWith("## ")) secao = linha.slice(3).trim();
     const c = linha.split("|").map((s) => s.trim());
-    // Só a tabela de épicos tem a coluna Grupo; a de cards adiáveis também começa com E<n>.
-    if (/^E\d+$/.test(c[1] || "") && ["MVP", "Pós-MVP", "Dúvida"].includes(c[6])) grupos[c[1]] = c[6];
+    if (secao === "Épicos" && /^E\d+$/.test(c[1] || "")) grupos[c[1]] = c[6];
+    const codigo = (c[2] || "").match(/^LB-\d+/);
+    if (codigo && secao === "Cards Pós-MVP") cardsPosMvp.add(codigo[0]);
+    if (codigo && secao === "Cards adiáveis") cardsAdiaveis.add(codigo[0]);
   }
-  return { aprovado, grupos };
+  return { aprovado, grupos, cardsPosMvp, cardsAdiaveis };
 }
 
 function lerEstadoDoGitHub() {
@@ -102,12 +108,19 @@ function main() {
   }
 
   const epicosMvp = epicos.filter((e) => corte.grupos[e.id] === "MVP");
-  const cardsMvp = cards.filter((c) => epicosMvp.some((e) => e.id === c.epico));
+  // Cards Pós-MVP ficam de fora mesmo em épicos MVP; adiáveis entram com a label `adiavel`.
+  const cardsMvp = cards
+    .filter((c) => epicosMvp.some((e) => e.id === c.epico) && !corte.cardsPosMvp.has(c.codigo))
+    .map((c) => (corte.cardsAdiaveis.has(c.codigo) ? { ...c, labels: [...c.labels, "adiavel"] } : c));
   const estado = lerEstadoDoGitHub();
   const prefixo = executar ? "" : "[simulação] ";
   const resumo = { labels: 0, epicos: 0, cards: 0, subIssues: 0, jaExistiam: 0 };
 
-  console.log(`${executar ? "EXECUTANDO" : "SIMULAÇÃO"} em ${repo}: ${epicosMvp.length} épicos MVP, ${cardsMvp.length} cards.\n`);
+  const adiaveis = cardsMvp.filter((c) => corte.cardsAdiaveis.has(c.codigo)).length;
+  console.log(
+    `${executar ? "EXECUTANDO" : "SIMULAÇÃO"} em ${repo}: ${epicosMvp.length} épicos MVP, ${cardsMvp.length} cards ` +
+      `(${adiaveis} adiáveis; ${corte.cardsPosMvp.size} cards Pós-MVP ignorados).\n`
+  );
 
   const labelsNecessarias = [...new Set([...epicosMvp, ...cardsMvp].flatMap((x) => x.labels))].sort();
   for (const label of labelsNecessarias) {
