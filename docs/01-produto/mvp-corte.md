@@ -33,6 +33,16 @@ Decisões do Diego aplicadas:
 
 Os 14 épicos MVP somam 98 cards (301 pontos): 63 no núcleo, 33 adiáveis e 2 que vão para o Pós-MVP por dependerem de filas ou WebSocket.
 
+## Milestones no GitHub
+
+| Milestone | O que entra | Issues |
+| --- | --- | --- |
+| **MVP** | Os 14 épicos MVP e os cards do núcleo | 77 (14 épicos + 63 cards) |
+| **MVP+** | Os cards adiáveis (também com a label `adiavel`) | 33 |
+
+> [!important] Regra de trabalho
+> A banda só puxa trabalho do milestone **MVP+** depois que o milestone **MVP** estiver fechado. Os cards Pós-MVP não vão para o GitHub; continuam no Notion como banco de ideias.
+
 ## Épicos
 
 | ID | Épico | Prio Notion | Cards | Pontos | Grupo | Justificativa |
