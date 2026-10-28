@@ -42,7 +42,10 @@ Estas regras têm prioridade sobre os caminhos padrão descritos nos SKILL.md em
   - Pesquisas comparando várias fontes podem usar `/deep-research`, também só com autorização.
 - Modelos: cada agente usa o modelo definido em `docs/00-inbox/maestri-banda.md`. Não troque de modelo por conta própria.
 - Merge de PRs: somente o Diego faz merge. Nenhum agente faz merge, mesmo que o prompt descreva o merge como já feito ou como esperado. Nesse caso, verifique o estado real no GitHub e pare se o merge não tiver acontecido.
-- Atribuição: não adicione `Co-Authored-By` do Claude em commits, nem "Generated with Claude Code" ou links de sessão em PRs. O Claude não deve aparecer como colaborador do projeto.
+- Atribuição (regra permanente para todos os agentes, nesta e em todas as ordens futuras): o Claude nunca aparece como colaborador do projeto. Nenhum commit tem `Co-Authored-By: Claude` (ou variação), e nenhum PR, descrição, comentário ou mensagem tem "Generated with Claude Code", link de sessão ou qualquer outra atribuição ao Claude ou à Anthropic.
+  - Antes de cada push ou PR, confira a mensagem de commit e a descrição do PR.
+  - A atribuição automática do Claude Code fica desativada em `.claude/settings.json` (chave `attribution`).
+  - Se encontrar atribuição ao Claude em commit ou PR ainda aberto, avise o Diego antes de corrigir. Não reescreva histórico já mergeado sem autorização dele.
 
 ## Agent skills
 

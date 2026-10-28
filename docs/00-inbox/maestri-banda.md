@@ -39,7 +39,12 @@ O terminal "Claude Code", que fica fora da banda e sem papel, **não faz parte d
 ### Ferramentas (decisão do Diego)
 
 - `Skill` em Front, Back, Devops e Reviewer, para rodar `/implement`, `/tdd`, `/diagnosing-bugs` e `/review-spec`.
+- `Skill` também no Spec, para rodar `/grill-with-docs`, `/domain-modeling`, `/to-spec` e `/to-tickets`.
+- `Skill` também no Orchestrator, só para falar com os terminais do Maestri (skills `maestri*`) e para o `/handoff`. As skills de spec, implementação e revisão continuam com os especialistas.
 - `Agent` só no Reviewer, porque o SKILL.md de `review-spec` inicia de fato dois sub-agentes em paralelo (eixos Standards e Spec).
+
+> [!warning] Restrição só por texto
+> A ferramenta `Skill` não limita quais skills um agente pode chamar. As restrições por papel (por exemplo, o Orchestrator só com Maestri e `/handoff`) valem pelo texto do papel; não há bloqueio técnico.
 
 ### Conteúdo retirado dos papéis
 
