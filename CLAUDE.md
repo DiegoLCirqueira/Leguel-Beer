@@ -35,7 +35,7 @@ Estas regras têm prioridade sobre os caminhos padrão descritos nos SKILL.md em
 - Issue tracker: GitHub Issues é o tracker do MVP.
   - `to-spec` e `to-tickets` gravam a spec em `docs/02-features/` e só publicam issues depois que a migração do backlog tiver sido feita. Enquanto não existirem issues migradas no repositório (issues com o marcador `notion-id` no corpo), apenas listam os tickets propostos no fim da spec.
   - O Notion guarda as ideias do Pós-MVP e não deve ser alterado pelos agentes.
-  - Corte do MVP: [[mvp-corte]] (`docs/01-produto/mvp-corte.md`). A migração usa `scripts/migrar-backlog/` e só o Diego roda com `--executar`.
+  - Corte do MVP: [[mvp-corte]] (`docs/01-produto/mvp-corte.md`). A migração do backlog foi feita em 2026-10-28: 110 issues com o marcador `notion-id` (14 épicos + 96 cards) nos milestones "MVP" e "MVP+".
 - Ultracode e workflows: não use `/effort ultracode` nem execute tarefas como workflow sem autorização explícita do Diego.
   - Uso previsto: auditorias amplas e pontuais pelo Reviewer, como a revisão de segurança antes de fechar o milestone "MVP".
   - Front, Back, Orchestrator, Spec e Devops não usam ultracode.
