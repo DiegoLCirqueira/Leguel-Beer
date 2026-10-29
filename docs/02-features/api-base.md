@@ -134,7 +134,7 @@ Funcionalidade: Base da API
 
 ## Decisões relacionadas
 
-- [[ADR-001-stack]], [[ADR-002-hospedagem-api]], [[ADR-005-monorepo-camadas]]
+- [[ADR-001-stack]], [[ADR-002-hospedagem-api]], [[ADR-005-monorepo-camadas]], [[ADR-007-banco-de-teste]]
 - [[base-monorepo]]: o que já existe em `apps/api`.
 - [[guards-api]]: autenticação e papéis sobre esta base.
 
@@ -143,7 +143,7 @@ Funcionalidade: Base da API
 Decisões pequenas e fáceis de reverter, pela política de autonomia. Qualquer uma pode ser vetada.
 
 - **Supabase CLI no lugar do Docker Compose:** decorre da decisão do Orchestrator (Supabase local) e evita duas formas de subir o banco.
-- **Banco de testes:** banco separado no Postgres local e *service container* no CI, em vez de Testcontainers. Resolve o item "banco local e de CI" em aberto no Complemento do [[ADR-005-monorepo-camadas]]; vale registrar como ADR (próximo número livre, ADR-007) se o Orchestrator quiser.
+- **Banco de testes:** banco separado no Postgres local e *service container* no CI, em vez de Testcontainers. Registrado no [[ADR-007-banco-de-teste]] (decisão técnica do Orchestrator).
 - **Módulo de referência:** a conta, primeiro módulo da ordem do [[roteiro-mvp]], segue o template; `ListBeers` e `Money` vão com o catálogo.
 - **Health:** 503 quando o banco está fora.
 - **Limite global:** 100 requisições por minuto por IP.
