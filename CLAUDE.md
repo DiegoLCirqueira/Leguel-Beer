@@ -111,7 +111,7 @@ Os agentes têm autonomia para decidir e executar a maior parte do trabalho sem 
 - Os especialistas mandam as dúvidas ao Orchestrator, que só encaminha ao Diego as que se encaixam em "Decisões que são do Diego".
 
 **Prioridades:**
-- As regras específicas deste CLAUDE.md e de docs/agents/ que exigem autorização explícita do Diego continuam valendo, mesmo fora das 9 categorias: criar issues, labels e milestones, e editar issues quando a mudança não for só reflexo de uma decisão já tomada pelo Diego (ajustes de reconciliação com specs e decisões dele têm aprovação permanente: "sempre sim", 2026-10-29); ultracode, workflows e /deep-research; troca de modelo dos agentes.
+- As regras específicas deste CLAUDE.md e de docs/agents/ que exigem autorização explícita do Diego continuam valendo, mesmo fora das 9 categorias: criar issues; criar ou editar labels e milestones; editar issues, exceto quando a mudança só reconcilia a issue com uma spec já mergeada na `main` ou com uma decisão registrada do Diego (ADR, mvp-corte, daily note), o que tem aprovação permanente ("sempre sim", 2026-10-29) e inclui título, corpo, labels, milestone e fechar ou reabrir a issue; ultracode, workflows e /deep-research; troca de modelo dos agentes.
 - Quando uma ordem do Diego disser explicitamente "pare e me pergunte", isso vale acima desta política.
 - A regra de nenhuma atribuição ao Claude (commits, PRs, descrições) continua valendo sempre.
 
