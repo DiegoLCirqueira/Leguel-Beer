@@ -66,7 +66,7 @@ Os agentes têm autonomia para decidir e executar a maior parte do trabalho sem 
 5. Ações irreversíveis ou destrutivas: force push, reescrever histórico, apagar branch com trabalho não mergeado, apagar dados, migration destrutiva em produção, descartar alterações que não sejam claramente lixo.
 6. Segredos e acessos: criar, trocar ou expor credenciais, mudar permissões do repositório ou dos serviços.
 7. Segurança e lei: dados pessoais de clientes (LGPD), pagamentos, termos de uso.
-8. Merge na main: os agentes abrem os PRs; o merge é do Diego, a menos que ele autorize uma tarefa específica.
+8. Merge na main: segue a regra "Merge de PRs" acima ([[ADR-006-merge-por-agentes]]): o Orchestrator decide e o Devops executa, só com todas as condições cumpridas. Fora dessas condições, o merge é do Diego.
 9. Dúvida real: quando as opções têm consequências bem diferentes para o produto e nenhuma é claramente melhor.
 
 **Como consultar o Diego:**
