@@ -7,7 +7,7 @@ Issues for this repo live in GitHub Issues at `DiegoLCirqueira/Leguel-Beer`. Use
 - The backlog was migrated from Notion on 2026-10-28: 14 epics + 96 cards, each with a `<!-- notion-id: ... -->` marker in the body. Before creating an issue, search the existing ones (open and closed) so you never duplicate a migrated issue; prefer proposing edits to the existing issue.
 - Milestones: **MVP** (core) and **MVP+** (deferrable cards, label `adiavel`). Work on MVP+ only after the MVP milestone is closed. Pós-MVP ideas stay in Notion, which agents must not edit.
 - Labels in use: `epic`, `adiavel`, `tipo:*`, `area:*`, `prio:p0` to `prio:p3`, `frontend`, `backend`, `banco`, `infra`, `docs`. Reuse them; don't create near-duplicates.
-- Creating or editing issues, labels or milestones requires Diego's explicit approval in the session. PR merges follow the "Merge de PRs" rule in CLAUDE.md (ADR-006): the Orchestrator decides and Devops executes, only after Reviewer approval of the current commit and green CI.
+- Creating issues, labels or milestones requires Diego's explicit approval in the session. Editing an issue to reconcile it with a spec or decision Diego already made has his standing approval ("sempre sim", 2026-10-29); any other edit needs explicit approval. PR merges follow the "Merge de PRs" rule in CLAUDE.md (ADR-006): the Orchestrator decides and Devops executes, only after Reviewer approval of the current commit and green CI.
 - No Claude attribution in issues, PRs or commits (no `Co-Authored-By`, no "Generated with Claude Code", no session links).
 
 ## Conventions
