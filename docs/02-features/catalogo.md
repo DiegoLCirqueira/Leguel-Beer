@@ -167,7 +167,7 @@ Decisões pequenas e fáceis de reverter, tomadas pela política de autonomia do
 
 ## Tickets propostos
 
-Reconciliação com as issues migradas do milestone MVP, para as três specs do épico E3. **Nada foi criado nem editado no GitHub:** aplicar só com a aprovação do Diego. Hoje o corpo das issues só aponta para o card do Notion; a proposta é trazer os critérios para a issue e apontar para a spec.
+Reconciliação com as issues migradas do milestone MVP, para as três specs do épico E3. **Aplicada em 2026-10-29** nas issues #13, #20, #22, #23, #24, #25 e #27, sem issue nova. Hoje o corpo das issues só aponta para o card do Notion; a proposta é trazer os critérios para a issue e apontar para a spec.
 
 ### Issues existentes afetadas
 
