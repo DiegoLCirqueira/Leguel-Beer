@@ -52,6 +52,10 @@ Padrão de https://github.com/iuricode/padroes-de-commits (vale para os commits 
 - Use [[wikilinks]] entre notas; não crie notas fora das pastas existentes (na dúvida, docs/00-inbox/).
 - Ao terminar uma tarefa, registre um resumo na daily note do dia em docs/05-diario/.
 - Toda spec ou ADR novo é linkado em [[mapa-do-projeto]], e a daily note linka as notas criadas ou alteradas no dia.
+- Lições aprendidas: todo agente lê [[licoes-aprendidas]] (`docs/agents/licoes-aprendidas.md`) no início de cada ordem. Ao errar ou ser corrigido, registra a lição lá (data, quem, o que aconteceu, causa, regra) antes de encerrar a tarefa.
+- Handoff: ao fim de cada ordem, o Orchestrator grava o handoff em `docs/00-inbox/handoff.md` (sobrescrito a cada ordem), não no diretório temporário do sistema. A próxima conversa começa lendo o handoff, a daily note mais recente e [[licoes-aprendidas]]. O handoff entra no git junto com a daily note, no PR da ordem.
+- Memória automática do Claude Code (`~/.claude/projects/.../memory/`) é só atalho: fica fora do vault e do git. O que precisa sobreviver vai para o vault.
+- `/clear`: só entre ordens, depois de a daily note, o relatório e o handoff estarem gravados. Nunca no meio de uma ordem.
 - Não edite docs/.obsidian/.
 
 ### Convenções para as skills
@@ -60,6 +64,7 @@ Estas regras têm prioridade sobre os caminhos padrão descritos nos SKILL.md em
 - Glossário: `docs/GLOSSARY.md` (nunca na raiz).
 - Specs: `docs/02-features/<slug>.md` usando `docs/templates/feature.md`, com cenários Gherkin em português.
 - Rascunhos e arquivos temporários: `docs/00-inbox/` (nunca `.scratch/` ou pastas novas).
+- Handoff (skill `/handoff`): `docs/00-inbox/handoff.md`, nunca no diretório temporário do sistema.
 - Revisão de código contra a spec: usar `/review-spec`.
 - Issue tracker: GitHub Issues é o tracker do MVP.
   - `to-spec` e `to-tickets` gravam a spec em `docs/02-features/` e só publicam issues depois que a migração do backlog tiver sido feita. Enquanto não existirem issues migradas no repositório (issues com o marcador `notion-id` no corpo), apenas listam os tickets propostos no fim da spec.
