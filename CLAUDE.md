@@ -15,6 +15,34 @@ Hospedagem da API: docs/03-decisoes/ADR-002-hospedagem-api.md. No MVP não há p
 ### Variáveis de ambiente
 > PENDENTE: preencher quando houver código.
 
+### Convenção de commits
+Padrão de https://github.com/iuricode/padroes-de-commits (vale para os commits novos; o histórico antigo não é reescrito). O título do PR segue o mesmo formato, já que o squash usa o título como mensagem.
+- Formato: `:emoji: tipo(escopo opcional): descrição`. O emoji é o shortcode (`:sparkles:`), não o caractere. Use `!` depois do tipo/escopo para mudança que quebra compatibilidade (`:sparkles: feat(api)!: ...`).
+- Descrição curta, em pt-BR, no imperativo ou no infinitivo, sem ponto final. Um assunto por commit.
+- Tipos:
+
+| Emoji | Tipo | Uso |
+| --- | --- | --- |
+| `:sparkles:` | `feat` | Novo recurso |
+| `:bug:` | `fix` | Correção de bug |
+| `:books:` | `docs` | Documentação, sem alterar código |
+| `:test_tube:` | `test` | Criação, alteração ou exclusão de testes |
+| `:package:` | `build` | Arquivos de build e dependências |
+| `:zap:` | `perf` | Melhoria de performance |
+| `:ok_hand:` | `style` | Formatação, lint e ajustes visuais do código |
+| `:recycle:` | `refactor` | Refatoração sem mudar comportamento |
+| `:wrench:` | `chore` | Configuração, pacotes e administração |
+| `:bricks:` | `ci` | Integração contínua |
+| `:card_file_box:` | `raw` | Arquivos de configuração, dados, parâmetros |
+| `:broom:` | `cleanup` | Remoção de código comentado e trechos desnecessários |
+| `:wastebasket:` | `remove` | Exclusão de arquivos ou funcionalidades obsoletas |
+| `:tada:` | `init` | Commit inicial do projeto |
+| `:boom:` | `revert` | Reversão de um commit anterior |
+| `:lock:` | `security` | Correção de segurança e hardening |
+
+- Exemplos: `:sparkles: feat: adiciona página de login`, `:bug: fix: corrige loop infinito no carrinho`, `:recycle: refactor: extrai cálculo de frete`.
+- A regra de Atribuição vale em todo commit: sem `Co-Authored-By` do Claude.
+
 ## Documentação (docs/ é um vault do Obsidian)
 - Antes de implementar uma funcionalidade, leia a spec correspondente em docs/02-features/.
 - Fluxo obrigatório (red-green-refactor): cenário Gherkin → teste falhando (red) → implementação mínima até passar (green) → refatoração.
