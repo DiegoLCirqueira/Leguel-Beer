@@ -28,9 +28,10 @@ E-commerce mobile-first (PWA) da cervejaria artesanal **Leguelé Beer**: catálo
 - **Geladeira (carrinho):** prateleiras por categoria, persistida localmente e na conta.
 - **Checkout completo:** Entrega → Pagamento → Revisão; Pix (validade 30 min) e cartão até 12x. Ver [[checkout]].
 - **Entrega:** apenas Maceió e região, frete por distância, frete grátis acima de R$ 150.
-- **Conta:** e-mail/senha, Google e Facebook. Convidado só navega; a compra exige conta.
+- **Conta:** e-mail/senha, Google e Facebook. Convidado navega e monta a Geladeira; finalizar a compra exige conta (decisão do Diego, 2026-10-28; ver [[adicionar-do-card]]).
 
-> [!todo] Preencher: tamanho do catálogo. A página do projeto no Notion fala em 16 cervejas em 4 categorias (IPA, Frutas, Malt, Lager), mas o card LB-33 cita também Stouts e o LB-36 fala em "~30 cervejas".
+> [!info] Tamanho do catálogo
+> 16 cervejas em 4 categorias (IPA, Frutas, Malt, Lager), sem Stout, conforme o LB-4 (decisão do Diego, 2026-10-28). As categorias vêm do cadastro e podem mudar. Ver [[catalogo]].
 
 ## Depois do MVP
 
