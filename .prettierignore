@@ -8,3 +8,4 @@ docs
 .claude
 .maestri
 skills-lock.json
+*.md
