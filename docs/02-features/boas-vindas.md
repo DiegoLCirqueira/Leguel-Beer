@@ -1,0 +1,121 @@
+---
+status: rascunho
+modulo: acesso
+card-notion: https://app.notion.com/p/3fd490a7ac7d8172b935df8e794f5411
+prioridade: P0
+criado: 2026-10-29
+atualizado: 2026-10-29
+issues:
+  - "#39 LB-24"
+tags:
+  - feature
+---
+
+# Tela de boas-vindas
+
+> [!info] Origem
+> Derivada do card do Notion **LB-24** (#39) e da tela inicial do Figma (primeira das 15 telas de `figma-pagina-completa.png`). Vem depois da [[maioridade-entrada]] e leva a [[cadastro-login]] ou à home como convidado. É a primeira página da entrega de acesso ([[roteiro-mvp]]).
+
+## História de usuário
+
+- **Como** convidado que acabou de confirmar a maioridade
+- **Quero** escolher entre entrar, criar conta ou seguir sem conta
+- **Para** começar a usar a loja do jeito que eu preferir
+
+## Cenários
+
+```gherkin
+# language: pt
+Funcionalidade: Tela de boas-vindas
+
+  Cenário: Tela inicial como no Figma
+    Dado que confirmei a maioridade e não entrei numa conta
+    Quando abro o site num celular de 360 px de largura
+    Então vejo o logo, "Cervejas artesanais e muito mais!" e "Sabor Qualidade Tradição"
+    E vejo os botões "Entrar", "Criar conta" e "Continuar como convidado"
+    E vejo "Manter-me conectado" marcado
+    E a página não tem rolagem horizontal
+
+  Cenário: Continuar como convidado
+    Dado que estou na tela de boas-vindas
+    Quando toco em "Continuar como convidado"
+    Então vou para a home e posso abrir o catálogo
+    E, ao abrir a home de novo na mesma sessão do navegador, a tela de boas-vindas não aparece
+
+  Esquema do Cenário: Entrar levando a escolha de "Manter-me conectado"
+    Dado que estou na tela de boas-vindas
+    E "Manter-me conectado" está <estado>
+    Quando toco em "Entrar"
+    Então vou para a tela de entrar
+    E lá "Manter-me conectado" aparece <estado>
+
+    Exemplos:
+      | estado     |
+      | marcado    |
+      | desmarcado |
+
+  Cenário: Criar conta
+    Dado que estou na tela de boas-vindas
+    Quando toco em "Criar conta"
+    Então vou para a tela "Criar sua conta"
+
+  Cenário: Cliente com sessão ativa não vê a boas-vindas
+    Dado que entrei na minha conta e a sessão está ativa
+    Quando abro a home
+    Então vejo a home direto, sem a tela de boas-vindas
+```
+
+## Regras de negócio
+
+- **Endereço:** `/boas-vindas`.
+- **Quem vê:** quem abre a home sem sessão ativa e sem ter escolhido "convidado" nesta sessão do navegador. Links diretos para outras páginas (ex.: um link do catálogo) abrem a página pedida, sem passar pela boas-vindas.
+- **Convidado:** a escolha vale até o navegador ser fechado. O convidado navega e monta a Geladeira, mas só finaliza a compra entrando numa conta ([[GLOSSARY]], [[adicionar-do-card]]).
+- **"Manter-me conectado":** começa marcado (como no Figma) e é levado para a tela de entrar. O efeito na sessão está em [[cadastro-login]].
+- **Textos do Figma** (decisão do Diego já tomada): "Cervejas artesanais e muito mais!", "Sabor Qualidade Tradição", "Entrar", "Criar conta", "ou", "Continuar como convidado", "Manter-me conectado".
+- **Imagens:** logo, garrafa com copo, barril e folhagem de `Imagens/`, otimizadas para celular. A imagem principal tem texto alternativo.
+- **Componentes:** "Entrar" é o botão primário com ícone e seta; "Criar conta", o botão de contorno; "Continuar como convidado", o botão discreto ([[identidade-visual]]).
+
+> [!todo] Preencher: o que o ícone (i) ao lado de "Manter-me conectado" mostra ao ser tocado. Ver "Textos propostos".
+
+## Textos propostos
+
+Aguardam aprovação do Diego.
+
+| Lugar | Texto proposto |
+| --- | --- |
+| Dica do ícone (i) de "Manter-me conectado" | "Sua sessão continua ativa neste aparelho por até 30 dias, mesmo depois de fechar o navegador." |
+| Texto alternativo da imagem principal | "Garrafa de IPA Leguelé Beer ao lado de um copo cheio, entre folhas de lúpulo" |
+
+## Seams de teste
+
+> [!info] Proposta, ainda não combinada com o Diego
+> Tirada do plano de testes do card.
+
+- **Decisão de rota da home:** função pura que recebe "tem sessão" e "escolheu convidado" e devolve home ou boas-vindas (teste unitário).
+- **Tela:** teste de componente para os três botões e o estado de "Manter-me conectado".
+- **Cenários desta spec:** E2E com viewport de celular, com o Supabase local.
+
+## Fora de escopo
+
+- Formulários de entrar e de criar conta ([[cadastro-login]]).
+- Login social com Google e Facebook (LB-26, #41, MVP+): a tela não mostra esses botões no MVP.
+- Mesclar a Geladeira do convidado ao entrar (LB-48, MVP+).
+
+## Decisões relacionadas
+
+- [[maioridade-entrada]], [[cadastro-login]], [[identidade-visual]]
+- [[GLOSSARY]]: Convidado, Cliente.
+
+## Decisões tomadas sem consulta
+
+Decisões pequenas e fáceis de reverter, pela política de autonomia. Qualquer uma pode ser vetada.
+
+- **Só a home leva à boas-vindas;** links diretos abrem a página pedida.
+- **"Convidado" lembrado até fechar o navegador** ("lembrada na sessão", do card).
+- **"Manter-me conectado" na boas-vindas é levado à tela de entrar,** que também mostra a opção (quem chega ao entrar por outro caminho também escolhe).
+
+## Tickets propostos
+
+| Issue | Ajuste proposto | Motivo |
+| --- | --- | --- |
+| #39 LB-24 | Link para esta spec; critérios: os 5 cenários; só a home leva à boas-vindas; "Manter-me conectado" levado à tela de entrar; sem botões de login social no MVP | O card não diz o que fazer com "Manter-me conectado" nem com links diretos |
