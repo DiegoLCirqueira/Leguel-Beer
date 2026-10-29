@@ -75,12 +75,12 @@ packages/
 | Ponto | Resultado |
 | --- | --- |
 | [[ADR-001-stack]]: Next.js + NestJS + Prisma, Supabase só para banco, auth e arquivos | Consistente. Prisma e o schema ficam só em `apps/api`; o front nunca fala com o banco |
-| [[ADR-002-hospedagem-api]]: API como função serverless no plano Hobby da Vercel | Consistente. A Vercel hoje trata o NestJS como "um único Vercel Function", com Fluid compute por padrão e detecção do entrypoint (`src/main.ts` entre os nomes aceitos). O ADR-002 recomenda bundle com webpack e cache da instância do app; a página atual da Vercel não menciona isso. **A confirmar** no LB-1 se o bundle ainda é necessário (limite de 250 MB do bundle Node) |
+| [[ADR-002-hospedagem-api]]: API como função serverless no plano Hobby da Vercel | Consistente. A Vercel hoje trata o NestJS como "um único Vercel Function", com Fluid compute por padrão e detecção do entrypoint (`src/main.ts` entre os nomes aceitos). O ADR-002 recomenda bundle com webpack e cache da instância do app; a página atual da Vercel não menciona isso. **A confirmar** no LB-1 se o bundle ainda é necessário (limite de 250 MB do bundle Node). Dispensar o bundle webpack do ADR-002 muda uma decisão já aceita: se o LB-1 confirmar que ele não é necessário, a mudança vai ao Diego antes de valer (política de autonomia, item 3) |
 | [[ADR-003-pwa-mobile-first]]: Next.js mobile-first, PWA no Pós-MVP | Consistente. Nada deste complemento depende de PWA |
 | Gratuito: Vercel Hobby | Dois projetos ligados ao mesmo repositório cabem no limite do Hobby (25 projetos por repositório; 100 deploys por dia; 45 min de build por deploy). O Hobby é só para uso pessoal e não comercial, como já registrado no ADR-002 |
 | Gratuito: GitHub Actions | Runners padrão do GitHub em repositório **público** não consomem a franquia (o repositório é público hoje). Em repositório privado, o GitHub Free inclui US$ 12 de uso de computação por mês. Se o repositório virar privado, rever o CI |
 | Gratuito: Turborepo e pnpm | Ferramentas de código aberto, sem custo. O Vercel Remote Cache é opcional; seus limites no Hobby estão **a confirmar** |
-| Item pendente deste ADR | A nota "Revisar e completar este ADR antes de iniciar o LB-1" fica atendida por este complemento; quem fechar o LB-1 pode removê-la |
+| Item pendente deste ADR | A nota "Revisar e completar este ADR antes de iniciar o LB-1" continua no fim do ADR, reescrita: este complemento cobre ferramentas e deploy, e a nota passa a listar só o que falta resolver (os itens **a confirmar**). Quem fechar o LB-1 pode removê-la quando esses itens estiverem resolvidos |
 
 ### 1. Gerenciador de pacotes e workspaces
 
@@ -160,4 +160,12 @@ Se o Diego escolher uma das duas últimas, registrar a decisão como ADR novo (p
 - Next.js, Testing: https://nextjs.org/docs/app/guides/testing
 - NestJS, Testing: https://docs.nestjs.com/fundamentals/testing
 
-> [!todo] Revisar e completar este ADR antes de iniciar o card LB-1 (criar o monorepo). O "Complemento" acima cobre os itens de ferramentas e deploy; falta só resolver os itens **a confirmar** durante o LB-1.
+> [!todo] Resolver durante o card LB-1 (criar o monorepo) os itens **a confirmar** do Complemento:
+> - campo da versão do pnpm (`packageManager` ou `devEngines`) e versões das ferramentas;
+> - `packages/shared` compilado ou consumido como TypeScript com o entrypoint da API na Vercel;
+> - se o bundle webpack do ADR-002 ainda é necessário (mudança de decisão aceita: vai ao Diego);
+> - Vitest como padrão em projetos Nest novos;
+> - Remote Cache, Related Projects e produção escalonada (staged production) no plano Hobby;
+> - em qual banco rodam os previews e quantos projetos o Supabase Free permite;
+> - banco local e de CI para os testes de integração;
+> - ordem entre `prisma migrate deploy` e o deploy da Vercel no mesmo merge.

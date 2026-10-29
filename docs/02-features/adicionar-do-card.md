@@ -13,7 +13,7 @@ tags:
 # Adicionar direto do card
 
 > [!info] Origem
-> Derivada do card do Notion **LB-35** (#24), parte do épico E3 junto com [[catalogo]] e [[destaques-home]]. Separada do [[catalogo]] pelo limite de 6 cenários por spec (decisão do Diego, 2026-10-28). Os termos seguem o [[GLOSSARY]].
+> Derivada do card do Notion **LB-35** (#24), parte do épico E3 junto com [[catalogo]] e [[destaques-home]]. O Diego pôs o LB-35 no escopo (pergunta 2 da entrevista do [[catalogo]]); a separação em spec própria, pelo limite de 6 cenários por spec, foi proposta do Spec adotada pelo Orchestrator. Os termos seguem o [[GLOSSARY]].
 
 ## História de usuário
 
@@ -90,7 +90,7 @@ Funcionalidade: Adicionar cerveja à Geladeira direto do card
 
 Decisões pequenas e fáceis de reverter, tomadas pela política de autonomia do Diego. Qualquer uma pode ser vetada.
 
-- **História de usuário:** escrita a partir do card, incluindo o convidado (pergunta 8).
+- **História de usuário:** escrita a partir do card, incluindo o convidado conforme a pergunta 8 da entrevista do [[catalogo]], decidida pelo Diego.
 - **Duração do toast:** 5 segundos; "Desfazer" só vale enquanto o toast estiver visível. O card não definia a duração.
 - **Singular da mensagem de limite:** "Só temos 1 unidade", seguindo o padrão de "1 cerveja" aprovado pelo Diego.
 - **Limite com reservas:** o limite usa a quantidade disponível (com reservas), e não o estoque bruto, para bater com a regra de esgotada do [[catalogo]].

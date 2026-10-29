@@ -13,11 +13,11 @@ tags:
 # Destaques da home
 
 > [!info] Origem
-> Derivada do card do Notion **LB-34** (#23), parte do épico E3 junto com [[catalogo]] e [[adicionar-do-card]]. Separada do [[catalogo]] pelo limite de 6 cenários por spec (decisão do Diego, 2026-10-28). Os termos seguem o [[GLOSSARY]].
+> Derivada do card do Notion **LB-34** (#23), parte do épico E3 junto com [[catalogo]] e [[adicionar-do-card]]. O Diego pôs o LB-34 no escopo (pergunta 2 da entrevista do [[catalogo]]); a separação em spec própria, pelo limite de 6 cenários por spec, foi proposta do Spec adotada pelo Orchestrator. Os termos seguem o [[GLOSSARY]].
 
 ## História de usuário
 
-- **Como** cliente no celular
+- **Como** cliente ou convidado no celular
 - **Quero** ver logo na home as cervejas em destaque
 - **Para** descobrir rápido o que a Leguelé recomenda sem abrir o catálogo
 

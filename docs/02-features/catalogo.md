@@ -20,7 +20,7 @@ tags:
 
 ## História de usuário
 
-- **Como** cliente no celular
+- **Como** cliente ou convidado no celular
 - **Quero** explorar as cervejas filtrando por categoria e atributos e ordenando a lista
 - **Para** encontrar rápido a cerveja que combina com o meu gosto
 
@@ -30,11 +30,17 @@ tags:
 # language: pt
 Funcionalidade: Catálogo de cervejas
 
-  Cenário: Combinar filtros e ordenação
-    Dado que estou no catálogo
-    Quando filtro pela categoria IPA e por uma faixa de IBU e ordeno por menor preço
-    Então vejo só IPAs com IBU dentro da faixa, da mais barata para a mais cara
-    E vejo a contagem de resultados, como "3 cervejas", e a ação "Limpar filtros"
+  Esquema do Cenário: Combinar filtros e ordenação
+    Dado que <quantidade> IPAs ativas têm IBU dentro de uma faixa de IBU
+    E as outras cervejas são de outras categorias ou têm IBU fora dessa faixa
+    Quando filtro pela categoria IPA e por essa faixa de IBU e ordeno por menor preço
+    Então vejo só essas IPAs, da mais barata para a mais cara
+    E vejo a contagem "<contagem>" e a ação "Limpar filtros"
+
+    Exemplos:
+      | quantidade | contagem   |
+      | 3          | 3 cervejas |
+      | 1          | 1 cerveja  |
 
   Cenário: Abrir um link compartilhado com filtros
     Dado uma URL do catálogo com filtros e ordenação aplicados
@@ -47,18 +53,29 @@ Funcionalidade: Catálogo de cervejas
     Então vejo "Nenhuma cerveja encontrada com esses filtros." e a ação "Limpar filtros"
     E ao tocar em "Limpar filtros" vejo todas as cervejas ativas
 
-  Cenário: Filtrar pela faixa de categorias
-    Dado que estou na home
-    Quando toco no chip "IPAs" da faixa de categorias
-    Então vejo o catálogo só com cervejas da categoria IPA
-    E o chip "IPAs" fica destacado
-
-  Cenário: Contador da categoria ignora cervejas inativas
+  Cenário: Filtrar pela faixa de categorias com contador
     Dado 6 IPAs ativas e 1 IPA inativa
     E uma categoria sem nenhuma cerveja ativa
-    Quando vejo a faixa de categorias
-    Então o chip "IPAs" mostra 6
+    Quando toco no chip "IPAs" da faixa de categorias na home
+    Então vejo o catálogo só com as 6 IPAs ativas
+    E o chip "IPAs" fica destacado e mostra 6
     E a categoria sem cervejas ativas não aparece na faixa
+
+  Esquema do Cenário: Ordem padrão por relevância e "mais novas"
+    Dado que existem estas cervejas ativas, todas com quantidade disponível:
+      | cerveja      | categoria | destaque | cadastrada em |
+      | Lager Praia  | Lager     | sim      | 2026-10-01    |
+      | IPA Zabumba  | IPA       | não      | 2026-10-03    |
+      | IPA Aratu    | IPA       | não      | 2026-10-02    |
+      | Frutas Caju  | Frutas    | não      | 2026-10-04    |
+    E a ordem das categorias é IPA, Frutas, Malt, Lager
+    Quando abro o catálogo com a ordenação <ordenação>
+    Então vejo as cervejas na ordem <ordem>
+
+    Exemplos:
+      | ordenação             | ordem                                            |
+      | padrão (sem escolher) | Lager Praia, IPA Aratu, IPA Zabumba, Frutas Caju |
+      | "mais novas"          | Frutas Caju, IPA Zabumba, IPA Aratu, Lager Praia |
 
   Cenário: Cerveja esgotada por reservas vai para o fim
     Dado uma cerveja com estoque 3 e 3 unidades reservadas em pedidos pendentes
@@ -124,14 +141,16 @@ Funcionalidade: Catálogo de cervejas
 
 ### Decisões do Diego (entrevista de 2026-10-28)
 
-1. Catálogo do MVP: 16 cervejas, 4 categorias (IPA, Frutas, Malt, Lager), sem Stout; categorias vêm do cadastro.
-2. Escopo: o épico E3 do milestone MVP inteiro (LB-33, 34, 35, 36, 38), sem a página de produto (E10), a busca (LB-37) e o banner (LB-32). LB-34 e LB-35 ficam em specs próprias.
-3. Relevância é a ordenação padrão: destaques, depois a ordem das categorias, depois o nome.
-4. Esgotadas sempre no fim; a ordenação vale dentro de cada grupo; "só disponíveis" esconde esgotadas.
-5. Filtros de teor alcoólico, IBU e preço com faixas fixas, limite inferior incluído e superior excluído (valores em aberto).
-7. Textos dos cards aprovados; estado vazio "Nenhuma cerveja encontrada com esses filtros."; contagem "N cervejas" / "1 cerveja".
-8. O convidado adiciona à Geladeira e só entra na conta no checkout; o [[visao]] foi ajustado.
-- Confirmou a decisão "uma categoria por vez".
+Os números são os da entrevista; a pergunta 6 foi decidida pelo Orchestrator (ver "Decisões tomadas sem consulta").
+
+- **Pergunta 1:** catálogo do MVP com 16 cervejas, 4 categorias (IPA, Frutas, Malt, Lager), sem Stout; categorias vêm do cadastro.
+- **Pergunta 2:** escopo é o épico E3 do milestone MVP inteiro (LB-33, 34, 35, 36, 38), sem a página de produto (E10), a busca (LB-37) e o banner (LB-32).
+- **Pergunta 3:** relevância é a ordenação padrão: destaques, depois a ordem das categorias, depois o nome.
+- **Pergunta 4:** esgotadas sempre no fim; a ordenação vale dentro de cada grupo; "só disponíveis" esconde esgotadas.
+- **Pergunta 5:** filtros de teor alcoólico, IBU e preço com faixas fixas, limite inferior incluído e superior excluído (valores em aberto).
+- **Pergunta 7:** textos dos cards aprovados; estado vazio "Nenhuma cerveja encontrada com esses filtros."; contagem "N cervejas" / "1 cerveja".
+- **Pergunta 8:** o convidado adiciona à Geladeira e só entra na conta no checkout; o [[visao]] foi ajustado.
+- **Uma categoria por vez:** proposta do Spec, confirmada pelo Diego.
 
 ## Decisões tomadas sem consulta
 
@@ -143,7 +162,8 @@ Decisões pequenas e fáceis de reverter, tomadas pela política de autonomia do
 - **Contadores fixos:** o contador de cada chip conta as cervejas ativas da categoria, incluindo as esgotadas, e não muda com os outros filtros aplicados.
 - **"Mais novas":** pela data de cadastro da cerveja.
 - **"Só disponíveis":** começa desligado.
-- **Specs separadas:** destaques da home ([[destaques-home]]) e Adicionar direto do card ([[adicionar-do-card]]) ficam em specs próprias, por causa do limite de 6 cenários por spec.
+- **Nomes nos exemplos:** os nomes de cerveja dos cenários (Lager Praia, IPA Aratu etc.) são dados de teste, não rótulos da Leguelé.
+- **Specs separadas:** destaques da home ([[destaques-home]]) e Adicionar direto do card ([[adicionar-do-card]]) ficam em specs próprias, por causa do limite de 6 cenários por spec (proposta do Spec, adotada pelo Orchestrator; o Diego decidiu só o escopo, na pergunta 2).
 
 ## Tickets propostos
 
@@ -154,8 +174,8 @@ Reconciliação com as issues migradas do milestone MVP, para as três specs do 
 | Issue | Título atual | Ajuste proposto | Motivo |
 | --- | --- | --- | --- |
 | #20 | [Épico] Catálogo fácil de explorar | Título mantido. Descrição: links para [[catalogo]], [[destaques-home]] e [[adicionar-do-card]]. | O épico não aponta para as specs. |
-| #25 | [LB-36] Criar página de catálogo com filtros e ordenação | Título mantido. Descrição: link para `docs/02-features/catalogo.md`. Critérios: cenários "Combinar filtros e ordenação", "Abrir um link compartilhado com filtros" e "Filtros sem nenhum resultado"; relevância como ordenação padrão (destaques, ordem das categorias, nome); "mais novas" pela data de cadastro; faixas fixas com limite inferior incluído e superior excluído; parâmetro inválido ignorado; textos de contagem e estado vazio. Valores das faixas: pendentes. | A issue não traz critério nenhum; a spec define relevância, faixas, estado vazio e textos, que o card não tinha. |
-| #22 | [LB-33] Filtrar cervejas por categoria com contadores | Título mantido. Descrição: link para a spec; faixa com "Todas" + IPA, Frutas, Malt e Lager (sem Stouts). Critérios: cenários "Filtrar pela faixa de categorias" e "Contador da categoria ignora cervejas inativas"; uma categoria por vez; chip na home abre `/catalogo` filtrado; contador fixo, incluindo esgotadas. | O card lista Stouts, que saíram do catálogo; seleção e contador não estavam definidos. |
+| #25 | [LB-36] Criar página de catálogo com filtros e ordenação | Título mantido. Descrição: link para `docs/02-features/catalogo.md`. Critérios: cenários "Combinar filtros e ordenação", "Abrir um link compartilhado com filtros", "Filtros sem nenhum resultado" e "Ordem padrão por relevância e 'mais novas'"; relevância como ordenação padrão (destaques, ordem das categorias, nome); "mais novas" pela data de cadastro; faixas fixas com limite inferior incluído e superior excluído; parâmetro inválido ignorado; textos de contagem e estado vazio. Valores das faixas: pendentes. | A issue não traz critério nenhum; a spec define relevância, faixas, estado vazio e textos, que o card não tinha. |
+| #22 | [LB-33] Filtrar cervejas por categoria com contadores | Título mantido. Descrição: link para a spec; faixa com "Todas" + IPA, Frutas, Malt e Lager (sem Stouts). Critérios: cenário "Filtrar pela faixa de categorias com contador"; uma categoria por vez; chip na home abre `/catalogo` filtrado; contador fixo, incluindo esgotadas. | O card lista Stouts, que saíram do catálogo; seleção e contador não estavam definidos. |
 | #27 | [LB-38] Sinalizar cervejas esgotadas | Título mantido. Descrição: link para a spec e definição de quantidade disponível do [[GLOSSARY]]. Critérios: cenário "Cerveja esgotada por reservas vai para o fim"; esgotadas no fim com qualquer ordenação; "só disponíveis" esconde esgotadas. Dependência explícita de #32 (LB-56, reserva de estoque). | A regra de ordem das esgotadas com outras ordenações e a interação com "só disponíveis" não estavam definidas. |
 | #23 | [LB-34] Exibir cervejas em destaque na home | Título mantido. Descrição: link para `docs/02-features/destaques-home.md`. Critérios: os cenários da spec (até 6 destaques, ordem de relevância, esgotada no fim com selo, seção some sem destaques). | A issue não traz critério; a ordem dos destaques e o caso sem destaques não estavam definidos. |
 | #24 | [LB-35] Adicionar cerveja à geladeira direto do card | Título: "[LB-35] Adicionar cerveja à Geladeira direto do card" (Geladeira com maiúscula, termo oficial). Descrição: link para `docs/02-features/adicionar-do-card.md`. Critérios: os cenários da spec, incluindo convidado sem login, limite pela quantidade disponível e botão desabilitado para esgotada. | O papel do convidado e o limite pela quantidade disponível (com reservas) não estavam explícitos. |

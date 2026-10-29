@@ -39,7 +39,7 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 
 ## Diário
 
-- [[2026-10-28]]: daily note mais recente.
+- As daily notes ficam em `docs/05-diario/`, uma por dia (`AAAA-MM-DD.md`); a mais recente é a de data maior. Exemplo: [[2026-10-28]], o primeiro dia registrado.
 
 ## Rascunhos e apoio
 
