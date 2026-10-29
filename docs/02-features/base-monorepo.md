@@ -97,7 +97,7 @@ Funcionalidade: Base do monorepo
 
 Esta spec é técnica: as "regras" abaixo são os critérios da base, não regras de venda.
 
-- **Workspaces:** pnpm workspaces (`pnpm-workspace.yaml` com `apps/*` e `packages/*`) e Turborepo (`turbo.json` com as tarefas `dev`, `build`, `lint`, `format:check`, `typecheck`, `test` e `test:e2e`). Lockfile único na raiz. Node pelo `.nvmrc` (22.23.4); versão do pnpm no campo `packageManager` do `package.json` da raiz.
+- **Workspaces:** pnpm workspaces (`pnpm-workspace.yaml` com `apps/*` e `packages/*`) e Turborepo (`turbo.json` com as tarefas `dev`, `build`, `lint`, `typecheck`, `test` e `test:e2e`; o `format:check` roda o Prettier direto na raiz). Lockfile único na raiz. Node pelo `.nvmrc` (22.23.4); versão do pnpm no campo `packageManager` do `package.json` da raiz.
 - **Pacotes:** `apps/web`, `apps/api`, `packages/shared` e `packages/config`, com nomes de escopo próprio (`@leguele/web`, `@leguele/api`, `@leguele/shared`, `@leguele/config`) e dependências internas declaradas com `workspace:*`.
 - **`apps/web`:** Next.js com App Router, pasta `src/`, alias `@/`, Tailwind e shadcn/ui com tema escuro, como pede o card. Sem tokens da marca (design system é outro card). Porta 3000.
 - **Página inicial:** placeholder técnico com um único título (`<h1>`) "Leguelé Beer", como no plano de testes do card.
