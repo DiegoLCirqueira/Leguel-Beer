@@ -52,6 +52,10 @@ Padrão de https://github.com/iuricode/padroes-de-commits (vale para os commits 
 - Use [[wikilinks]] entre notas; não crie notas fora das pastas existentes (na dúvida, docs/00-inbox/).
 - Ao terminar uma tarefa, registre um resumo na daily note do dia em docs/05-diario/.
 - Toda spec ou ADR novo é linkado em [[mapa-do-projeto]], e a daily note linka as notas criadas ou alteradas no dia.
+- Lições aprendidas: todo agente lê [[licoes-aprendidas]] (`docs/agents/licoes-aprendidas.md`) no início de cada ordem. Ao errar ou ser corrigido, registra a lição lá (data, quem, o que aconteceu, causa, regra) antes de encerrar a tarefa.
+- Handoff: ao fim de cada ordem, o Orchestrator grava o handoff em `docs/00-inbox/handoff.md` (sobrescrito a cada ordem), não no diretório temporário do sistema. A próxima conversa começa lendo o handoff, a daily note mais recente e [[licoes-aprendidas]].
+- Memória automática do Claude Code (`~/.claude/projects/.../memory/`) é só atalho: fica fora do vault e do git. O que precisa sobreviver vai para o vault.
+- `/clear`: só entre ordens, depois de a daily note, o relatório e o handoff estarem gravados. Nunca no meio de uma ordem.
 - Não edite docs/.obsidian/.
 
 ### Convenções para as skills

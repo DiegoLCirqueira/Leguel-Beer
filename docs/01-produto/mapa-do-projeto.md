@@ -46,3 +46,4 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[LEIA-ME]]: estrutura do vault.
 - [[backlog-snapshot]]: retrato do backlog do Notion antes da migração para o GitHub Issues.
 - [[maestri-banda]]: a banda de agentes do Maestri e o modelo de cada um.
+- [[licoes-aprendidas]]: erros da banda e a regra que cada um gerou (todo agente lê no início de cada ordem).
