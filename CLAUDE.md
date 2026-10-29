@@ -4,16 +4,30 @@ Stack: Next.js (front) + NestJS (API) + Prisma; Supabase apenas para Postgres, a
 Hospedagem da API: docs/03-decisoes/ADR-002-hospedagem-api.md. No MVP não há processos de longa duração: sem filas (BullMQ), Redis, WebSocket ou workers. E-mail é enviado de forma síncrona pela API do provedor; tarefas agendadas, se houver, usam o cron da plataforma. Esses recursos ficam para o Pós-MVP.
 
 ### Estrutura de pastas
-> PENDENTE: preencher quando houver código.
+Monorepo pnpm + Turborepo (spec: docs/02-features/base-monorepo.md).
+- `apps/web` (`@leguele/web`): Next.js, porta 3000. E2E em `apps/web/e2e`.
+- `apps/api` (`@leguele/api`): NestJS, porta 3333. Código em `src/modules/<contexto>/{domain,application,infrastructure,presentation}`.
+- `packages/shared` (`@leguele/shared`): código puro compartilhado, compilado com `tsc` (`dist/`).
+- `packages/config` (`@leguele/config`): ESLint flat, `tsconfig.base.json` e Prettier.
+- Na raiz: `turbo.json`, `pnpm-workspace.yaml`, `.dependency-cruiser.cjs` (domain não importa framework) e `.github/workflows/ci.yml`.
 
 ### Comandos (dev, teste, build, lint)
-> PENDENTE: preencher quando houver código.
+Todos na raiz, com Node do `.nvmrc` e pnpm do `packageManager`.
+- `pnpm install`: instala (o CI usa `--frozen-lockfile`).
+- `pnpm dev`: sobe web e API.
+- `pnpm test`: Vitest nos pacotes. `pnpm test:e2e`: Playwright (sobe web e API sozinho).
+- `pnpm lint`: ESLint + dependency-cruiser. `pnpm arch`: só o dependency-cruiser.
+- `pnpm format:check` / `pnpm format`: Prettier.
+- `pnpm typecheck` e `pnpm build`.
 
 ### Convenções de teste
-> PENDENTE: preencher quando houver código.
+- Vitest para unidade e componente (Testing Library no web); Supertest para HTTP na API; Playwright para E2E (viewport de celular).
+- Arquivos `*.test.ts(x)` ao lado do código; E2E em `apps/web/e2e/*.spec.ts`.
+- No CI (`CI=1`) o E2E roda contra o build (`next start`, `node dist/main.js`); no local, em modo dev.
+- Fluxo red → green em commits separados (ver Documentação).
 
 ### Variáveis de ambiente
-> PENDENTE: preencher quando houver código.
+Nenhuma ainda. As portas (3000 e 3333) são fixas no código. Quando houver variáveis, listar as chaves em `.env.example` (sem valores) e descrevê-las aqui.
 
 ### Convenção de commits
 Padrão de https://github.com/iuricode/padroes-de-commits (vale para os commits novos; o histórico antigo não é reescrito). O título do PR segue o mesmo formato, já que o squash usa o título como mensagem.
