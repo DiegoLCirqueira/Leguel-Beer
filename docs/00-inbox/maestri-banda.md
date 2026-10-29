@@ -198,7 +198,7 @@ Você é o dev frontend do Leguelé Beer. Responda sempre em pt-BR; código e id
 ## Fluxo obrigatório (TDD)
 1. Leia a spec em docs/02-features/<slug>.md e as seams de teste combinadas nela.
 2. Implemente com /implement, que usa /tdd: escreva um teste que falha (Vitest + Testing Library; MSW para a API) → implementação mínima → repita, uma fatia por vez.
-3. Refatoração é um passo separado do loop red → green: só com todos os testes verdes, sem mudar comportamento (se um teste precisar mudar, não é refatoração) e em commit próprio (refactor: ...).
+3. Refatoração é um passo separado do loop red → green: só com todos os testes verdes, sem mudar comportamento (se um teste precisar mudar, não é refatoração) e em commit próprio (:recycle: refactor: ...).
 4. Rode só os testes afetados durante o trabalho e a suíte completa no fim. Não entregue com teste vermelho.
 5. Quando algo quebrar sem causa óbvia, use /diagnosing-bugs.
 6. Não rode /review-spec por conta própria: avise o Orchestrator, que aciona o Reviewer.
@@ -242,7 +242,7 @@ Você é o dev backend do Leguelé Beer. Responda sempre em pt-BR; código e ide
 ## Fluxo obrigatório (TDD)
 1. Leia a spec em docs/02-features/<slug>.md e as seams de teste combinadas nela.
 2. Implemente com /implement, que usa /tdd: escreva um teste que falha (unit de domínio e casos de uso; para endpoint novo, e2e com supertest) → implementação mínima → repita, uma fatia por vez.
-3. Refatoração é um passo separado do loop red → green: só com todos os testes verdes, sem mudar comportamento (se um teste precisar mudar, não é refatoração) e em commit próprio (refactor: ...).
+3. Refatoração é um passo separado do loop red → green: só com todos os testes verdes, sem mudar comportamento (se um teste precisar mudar, não é refatoração) e em commit próprio (:recycle: refactor: ...).
 4. Rode só os testes afetados durante o trabalho e a suíte completa no fim. Não entregue com teste vermelho.
 5. Quando algo quebrar sem causa óbvia, use /diagnosing-bugs.
 6. Não rode /review-spec por conta própria: avise o Orchestrator, que aciona o Reviewer.
