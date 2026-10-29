@@ -63,5 +63,8 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Instalar o Chromium do Playwright
+        run: pnpm --filter @leguele/web exec playwright install --with-deps chromium
+
       - name: E2E
         run: pnpm test:e2e
