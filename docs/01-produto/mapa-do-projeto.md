@@ -22,6 +22,8 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[base-monorepo]]: monorepo, apps web e api, pacotes, testes, lint e CI (LB-1).
 - [[identidade-visual]]: tokens de cor, tipografia e espaçamento; botão, badge e chip (LB-11, LB-12).
 - [[api-base]]: Supabase local, Prisma, erros padronizados, Swagger e camadas da API (LB-3, LB-117, LB-118).
+- [[testes-api]]: testes da API em unidade, integração com banco real e HTTP (LB-119).
+- [[contratos-compartilhados]]: schemas Zod compartilhados e cliente tipado da API (LB-120).
 - [[maioridade-entrada]]: confirmação de maioridade na entrada do site (LB-19).
 - [[boas-vindas]]: tela inicial com entrar, criar conta e convidado (LB-24).
 - [[cadastro-login]]: cadastro e login com e-mail e senha (LB-25).

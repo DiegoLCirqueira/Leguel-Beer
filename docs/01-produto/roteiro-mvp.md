@@ -28,7 +28,7 @@ tags:
 | --- | --- | --- | --- |
 | 1 | LB-3 (#12) banco local com Supabase CLI e Prisma · LB-11 (#63) tokens da marca | [[api-base]] · [[identidade-visual]] | LB-1 (feito) |
 | 2 | LB-117 (#3) validação, erros e Swagger · LB-12 (#64) botão, badge e chip | [[api-base]] · [[identidade-visual]] | Etapa 1 |
-| 3 | LB-118 (#4) camadas e template de módulo · LB-119 (#5) testes da API com banco real ([[ADR-007-banco-de-teste]]) · LB-120 (#6) schemas compartilhados | [[api-base]] · spec a escrever (LB-119, LB-120) | Etapa 2 |
+| 3 | LB-118 (#4) camadas e template de módulo · LB-119 (#5) testes da API com banco real ([[ADR-007-banco-de-teste]]) · LB-120 (#6) schemas compartilhados | [[api-base]] · [[testes-api]] · [[contratos-compartilhados]] | Etapa 2 |
 | 4 | LB-19 (#97) confirmação de maioridade | [[maioridade-entrada]] | LB-12 |
 | 5 | LB-24 (#39) boas-vindas | [[boas-vindas]] | LB-19, LB-12 |
 | 6 | LB-28 (#43) proteção da API e do site | [[guards-api]] | Etapas 1 a 3 |
