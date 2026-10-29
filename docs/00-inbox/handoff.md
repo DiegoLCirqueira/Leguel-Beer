@@ -7,30 +7,32 @@ atualizado: 2026-10-29
 
 Sobrescrito pelo Orchestrator ao fim de cada ordem. A próxima conversa começa lendo este arquivo, a daily note mais recente em `docs/05-diario/` e [[licoes-aprendidas]].
 
-## Última ordem: spec do catálogo e complemento do ADR-005 (28–29/10)
+## Última ordem: LB-1, criar o monorepo (29/10)
 
-Encerrada. O resumo está em [[2026-10-28]] e [[2026-10-29]].
-
-- Mergeados: #116, #117 ([[ADR-006-merge-por-agentes]]), #118 (commits emoji + tipo), #119 (política de autonomia), #120 ([[catalogo]], [[destaques-home]], [[adicionar-do-card]], [[GLOSSARY]], [[mapa-do-projeto]], Complemento do [[ADR-005-monorepo-camadas]]) e #121 (memória da banda).
-- Issues #13, #20, #22, #23, #24, #25 e #27 reconciliadas com as specs.
+Encerrada. #123 mergeado (8205a95), issue #10 fechada. Spec: [[base-monorepo]]. Resumo em [[2026-10-29]].
 
 ## Estado
 
 - `main` limpa. O stash `obsidian` (docs/.obsidian/) é do Diego: não aplicar nem descartar.
-- Backup local, não versionado, dos corpos das issues antes da reconciliação: `docs/00-inbox/backup-issues-2026-10-29.md`.
-- Portais no canvas do Maestri ("Leguelé Desktop", "Leguelé iPhone", "Leguelé Android") apontam para `http://localhost:3000`. Recarregar quando o front subir. Sem Android SDK, o Android é só viewport.
-- O Devops tem `gh pr merge` liberado pelo Diego. O merge segue o ADR-006.
+- Servidores de desenvolvimento rodando em segundo plano: site em `localhost:3000` (subido pelo Front) e API em `localhost:3333` (subida pelo Back). A API caiu uma vez na troca de branch depois do merge e foi religada. Os portais "Leguelé Desktop", "Leguelé iPhone" e "Leguelé Android" mostram o site.
+- O Devops tem `gh pr merge` liberado. Merge segue o [[ADR-006-merge-por-agentes]].
+- pnpm 12.16.1 foi instalado globalmente com `npm -g` no PC do Diego.
+
+## Follow-ups técnicos (da revisão do #123)
+
+- `apps/api/src/main.ts`: helmet e `enableShutdownHooks` antes do primeiro endpoint de negócio.
+- `.dependency-cruiser.cjs`: barrar `domain` → `application`/`infrastructure`/`presentation` quando entrar o primeiro caso de uso.
+- Partes de LB-2 (#11), LB-5 (#14), LB-6 (#15) e LB-7 (#16) que o LB-1 só esboçou estão em "Fora de escopo" de [[base-monorepo]]; reconciliar essas issues (aprovação permanente).
 
 ## Pendências com o Diego
 
-1. Registrar o "sempre sim" (aprovação permanente para ajustes de issue que só refletem decisões dele) no primeiro item de "Prioridades" do CLAUDE.md e em `docs/agents/issue-tracker.md:10`. O classificador negou a edição ao Devops; o Diego faz ou autoriza no terminal do Devops.
-2. Valores das faixas de teor alcoólico, IBU e preço (LB-36), em aberto em [[catalogo]].
-3. Cadastro de papéis do Maestri (`maestri role show`) desatualizado em relação a [[maestri-banda]]. O Diego atualiza pela interface.
-4. Ponto em aberto do ADR-006 e do ADR-005: com a Vercel ligada à `main`, merge = deploy em produção (decidir no LB-8).
+1. Valores das faixas de teor alcoólico, IBU e preço (LB-36), em aberto em [[catalogo]].
+2. Cadastro de papéis do Maestri desatualizado em relação a [[maestri-banda]], se ainda não foi atualizado pela interface.
+3. Merge = deploy em produção ([[ADR-006-merge-por-agentes]], [[ADR-005-monorepo-camadas]]): decidir no LB-8.
 
 ## Próxima ordem provável
 
-LB-1 (criar o monorepo) a partir do Complemento do [[ADR-005-monorepo-camadas]], com TDD/BDD, resolvendo os itens "a confirmar". Quando o dev server do front subir, recarregar os três portais.
+LB-2 a LB-8 do épico "Base técnica" (qualidade, banco/Prisma no LB-3, Vercel no LB-8) ou o catálogo (LB-4, LB-33 a LB-38). Ao citar um card, dizer o que ele é.
 
 ## Skills sugeridas
 
