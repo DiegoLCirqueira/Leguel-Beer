@@ -17,6 +17,16 @@ describe("regra de camadas: domain não importa framework", () => {
     mkdirSync(domainDir, { recursive: true });
     writeFileSync(join(domainDir, "usa-nest.ts"), 'import "@nestjs/common";\n');
     writeFileSync(join(domainDir, "usa-prisma.ts"), 'import "@prisma/client";\n');
+    // Sem node_modules na fixture o import resolve como "unknown" e a regra dispara por engano.
+    for (const pacote of ["@nestjs/common", "@prisma/client"]) {
+      const pacoteDir = join(workdir, "node_modules", pacote);
+      mkdirSync(pacoteDir, { recursive: true });
+      writeFileSync(
+        join(pacoteDir, "package.json"),
+        JSON.stringify({ name: pacote, main: "index.js" }),
+      );
+      writeFileSync(join(pacoteDir, "index.js"), "module.exports = {};");
+    }
     writeFileSync(join(domainDir, "puro.ts"), "export const valor = 1;\n");
   });
 
