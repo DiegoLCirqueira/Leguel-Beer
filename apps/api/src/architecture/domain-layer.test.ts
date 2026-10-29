@@ -25,7 +25,12 @@ describe("regra de camadas: domain não importa framework", () => {
   });
 
   async function violacoes(): Promise<{ from: string; rule: string }[]> {
-    const result = await cruise(["apps"], { ...ruleSet.options, ruleSet, validate: true, baseDir: workdir });
+    const result = await cruise(["apps"], {
+      ...ruleSet.options,
+      ruleSet,
+      validate: true,
+      baseDir: workdir,
+    });
     if (typeof result.output === "string") throw new Error("saída inesperada");
     return result.output.summary.violations.map((v) => ({ from: v.from, rule: v.rule.name }));
   }
@@ -42,6 +47,8 @@ describe("regra de camadas: domain não importa framework", () => {
   it("aceita um arquivo puro na pasta domain", async () => {
     const encontradas = await violacoes();
 
-    expect(encontradas.map((v) => v.from)).not.toContain("apps/api/src/modules/exemplo/domain/puro.ts");
+    expect(encontradas.map((v) => v.from)).not.toContain(
+      "apps/api/src/modules/exemplo/domain/puro.ts",
+    );
   });
 });
