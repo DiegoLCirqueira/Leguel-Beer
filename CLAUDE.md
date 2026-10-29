@@ -23,6 +23,7 @@ Hospedagem da API: docs/03-decisoes/ADR-002-hospedagem-api.md. No MVP não há p
 - Toda decisão técnica relevante vira um ADR em docs/03-decisoes/ usando docs/templates/adr.md.
 - Use [[wikilinks]] entre notas; não crie notas fora das pastas existentes (na dúvida, docs/00-inbox/).
 - Ao terminar uma tarefa, registre um resumo na daily note do dia em docs/05-diario/.
+- Toda spec ou ADR novo é linkado em [[mapa-do-projeto]], e a daily note linka as notas criadas ou alteradas no dia.
 - Não edite docs/.obsidian/.
 
 ### Convenções para as skills
