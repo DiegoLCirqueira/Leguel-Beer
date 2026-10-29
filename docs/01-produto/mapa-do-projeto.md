@@ -18,6 +18,7 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 
 ## Features (specs BDD)
 
+- [[base-monorepo]]: monorepo, apps web e api, pacotes, testes, lint e CI (LB-1).
 - [[catalogo]]: listagem, filtros, ordenação, faixa de categorias e esgotadas.
 - [[destaques-home]]: seção "Cervejas em destaque" da home.
 - [[adicionar-do-card]]: colocar uma cerveja na Geladeira direto do card.
