@@ -1,8 +1,9 @@
 import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { contrastRatio } from "@/lib/contrast";
 
-const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+const css = readFileSync(resolve(process.cwd(), "src/app/globals.css"), "utf8");
 
 function token(name: string): string {
   const match = css.match(new RegExp(`--color-${name}:\s*([^;]+);`));
