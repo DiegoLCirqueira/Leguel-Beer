@@ -102,7 +102,7 @@ Esta spec é técnica: as "regras" abaixo são os critérios da base, não regra
 - **`apps/web`:** Next.js com App Router, pasta `src/`, alias `@/`, Tailwind e shadcn/ui com tema escuro, como pede o card. Sem tokens da marca (design system é outro card). Porta 3000.
 - **Página inicial:** placeholder técnico com um único título (`<h1>`) "Leguelé Beer", como no plano de testes do card.
 - **`apps/api`:** NestJS na porta 3333, com as pastas de camada do [[ADR-005-monorepo-camadas]] em `src/modules/<contexto>/` (`domain`, `application`, `infrastructure`, `presentation`). Endpoint `GET /health` responde 200 com `{"status":"ok"}`, sem acessar banco.
-- **`packages/shared`:** sem código de negócio, pronto para receber schemas Zod e tipos de contrato. Compilado com `tsc` (saída em `dist/`), e o `turbo.json` declara `dependsOn: ["^build"]`.
+- **`packages/shared`:** só regras puras, sem framework, pronto para receber schemas Zod e tipos de contrato. No LB-1 tem uma única função pura de exemplo, `formatPriceBRL`, feita em TDD (o [[ADR-005-monorepo-camadas]] já prevê `formatBRL` em `shared`). Compilado com `tsc` (saída em `dist/`), e o `turbo.json` declara `dependsOn: ["^build"]`.
 - **`packages/config`:** `tsconfig` base com `strict` e `noUncheckedIndexedAccess`, estendido por app (Next e Nest têm opções de módulo e decorators diferentes); configuração flat do ESLint com typescript-eslint; Prettier.
 - **Testes:** no front, Vitest + Testing Library (unidade e componente) e Playwright (E2E); no back, Vitest (unidade) + Supertest (HTTP). `pnpm test` roda Vitest nos pacotes; `pnpm test:e2e` roda o Playwright, que sobe web e API sozinho.
 - **Regra de camadas:** dependency-cruiser proíbe que arquivos em `apps/api/src/modules/*/domain/**` importem `@nestjs/*`, `@prisma/*` ou qualquer pacote fora de uma lista permitida (no LB-1, nenhum). Roda dentro de `pnpm lint` e como etapa própria no CI.
@@ -147,6 +147,7 @@ Decisões técnicas, pequenas e fáceis de reverter, tomadas pela política de a
 - **Endpoint de saúde:** `GET /health` com `{"status":"ok"}` no lugar do `GET /` do plano de testes do card, como pediu a ordem.
 - **Porta da API:** 3333, como no card.
 - **Versão do pnpm:** campo `packageManager` (item "a confirmar" do Complemento do ADR-005).
+- **`formatPriceBRL` em `packages/shared`:** mantida no LB-1 como função pura de exemplo, testada, que valida o build e os testes do pacote; o ADR-005 já cita `formatBRL` em `shared` (decisão do Orchestrator na revisão do #123, 2026-10-29).
 - **`packages/shared` compilado com `tsc`:** funciona tanto com o Next quanto com o Nest sem `transpilePackages`; o LB-8 revê se o entrypoint da API na Vercel pedir outra coisa.
 - **Vitest na API:** adotado pelo ADR-005 independentemente do padrão do `nest new`; a configuração Jest gerada, se vier, é trocada.
 - **`pnpm test` sem E2E:** o Playwright fica em `pnpm test:e2e`, porque precisa do app no ar.
