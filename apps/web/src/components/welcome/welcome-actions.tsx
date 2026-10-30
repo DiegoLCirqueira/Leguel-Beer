@@ -13,7 +13,6 @@ const HINT =
 export function WelcomeActions() {
   const [keepConnected, setKeepConnected] = useState(true);
   const [showHint, setShowHint] = useState(false);
-  const checkboxId = useId();
   const hintId = useId();
 
   return (
@@ -49,15 +48,16 @@ export function WelcomeActions() {
         <Link2 aria-hidden="true" className="size-5" />
         Continuar como convidado
       </Link>
-      <div className="relative flex min-h-11 items-center gap-1 text-xs">
-        <input
-          id={checkboxId}
-          type="checkbox"
-          checked={keepConnected}
-          onChange={(event) => setKeepConnected(event.target.checked)}
-          className="size-5 accent-primaria"
-        />
-        <label htmlFor={checkboxId}>Manter-me conectado</label>
+      <div className="relative flex items-center gap-1 text-xs">
+        <label className="flex min-h-11 cursor-pointer items-center gap-2">
+          <input
+            type="checkbox"
+            checked={keepConnected}
+            onChange={(event) => setKeepConnected(event.target.checked)}
+            className="size-5 accent-primaria focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaria"
+          />
+          Manter-me conectado
+        </label>
         <button
           type="button"
           aria-label="Saiba mais sobre Manter-me conectado"
@@ -70,6 +70,7 @@ export function WelcomeActions() {
         </button>
         <div
           id={hintId}
+          aria-live="polite"
           className="absolute bottom-full left-1/2 z-20 w-64 -translate-x-1/2 rounded-campo border border-borda bg-superficie px-3 py-2 text-center text-xs text-texto-suave empty:hidden"
         >
           {showHint ? HINT : null}
