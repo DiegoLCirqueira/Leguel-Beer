@@ -1,6 +1,8 @@
+const LOOPBACK = new Set(["localhost", "127.0.0.1", "[::1]", "::1"]);
+
 function identity(url: string): string {
   const { hostname, port, pathname } = new URL(url);
-  return `${hostname}:${port || "5432"}${pathname}`;
+  return `${LOOPBACK.has(hostname) ? "loopback" : hostname}:${port || "5432"}${pathname}`;
 }
 
 /** Protege o banco de desenvolvimento: o banco de teste termina em _test e nunca é o das variáveis da aplicação. */

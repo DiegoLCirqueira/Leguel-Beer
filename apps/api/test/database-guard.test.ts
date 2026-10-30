@@ -22,4 +22,16 @@ describe("assertTestDatabase", () => {
   it("recusa um nome de banco que não termina em _test", () => {
     expect(() => assertTestDatabase(DEV, [undefined])).toThrow(/_test/);
   });
+
+  it.each([
+    ["localhost", "127.0.0.1"],
+    ["127.0.0.1", "[::1]"],
+    ["[::1]", "localhost"],
+  ])("trata %s e %s como o mesmo banco (loopback)", (hostTeste, hostDev) => {
+    expect(() =>
+      assertTestDatabase(`postgresql://postgres:postgres@${hostTeste}:54322/leguele_test`, [
+        `postgresql://postgres:postgres@${hostDev}:54322/leguele_test`,
+      ]),
+    ).toThrow(/mesmo banco/);
+  });
 });
