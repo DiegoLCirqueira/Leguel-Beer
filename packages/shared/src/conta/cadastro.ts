@@ -4,7 +4,7 @@ import { nomeCompletoSchema } from "./nome.js";
 import { senhaSchema } from "./senha.js";
 import { telefoneSchema } from "./telefone.js";
 
-/** Formulário "Criar sua conta" ([[cadastro-login]]). */
+/** Formulário "Criar sua conta". */
 export const cadastroFormSchema = z
   .object({
     nome: nomeCompletoSchema,
