@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useId, useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { markGuest } from "@/lib/guest";
+import { cn } from "@/lib/utils";
 
 const HINT =
   "Sua sessão continua ativa neste aparelho por até 30 dias, mesmo depois de fechar o navegador.";
@@ -16,25 +17,39 @@ export function WelcomeActions() {
   const hintId = useId();
 
   return (
-    <div className="flex w-full flex-col items-center gap-3">
+    <div className="flex w-full shrink-0 flex-col items-center gap-2">
       <Link
         href={`/entrar?manter-conectado=${keepConnected ? 1 : 0}`}
-        className={buttonVariants({ variant: "primary" })}
+        className={cn(buttonVariants({ variant: "primary" }), "w-[88%] text-[15px]")}
       >
         <UserRound aria-hidden="true" className="size-5" />
         Entrar
         <ArrowRight aria-hidden="true" className="size-5" />
       </Link>
-      <Link href="/criar-conta" className={buttonVariants({ variant: "outline" })}>
+      <Link
+        href="/criar-conta"
+        className={cn(buttonVariants({ variant: "outline" }), "w-[88%] text-[15px]")}
+      >
         <UserPlus aria-hidden="true" className="size-5" />
         Criar conta
       </Link>
-      <p className="text-sm text-texto-suave">ou</p>
-      <Link href="/" onClick={markGuest} className={buttonVariants({ variant: "ghost" })}>
+      <div className="flex w-[88%] items-center gap-3 text-xs text-texto-suave">
+        <span aria-hidden="true" className="h-px flex-1 bg-borda" />
+        <p>ou</p>
+        <span aria-hidden="true" className="h-px flex-1 bg-borda" />
+      </div>
+      <Link
+        href="/"
+        onClick={markGuest}
+        className={cn(
+          buttonVariants({ variant: "ghost" }),
+          "w-[72%] whitespace-nowrap text-[13px]",
+        )}
+      >
         <Link2 aria-hidden="true" className="size-5" />
         Continuar como convidado
       </Link>
-      <div className="flex min-h-11 items-center gap-2 text-sm">
+      <div className="relative flex min-h-11 items-center gap-1 text-xs">
         <input
           id={checkboxId}
           type="checkbox"
@@ -53,9 +68,12 @@ export function WelcomeActions() {
         >
           <Info aria-hidden="true" className="size-4" />
         </button>
-      </div>
-      <div id={hintId} className="text-center text-xs text-texto-suave">
-        {showHint ? HINT : null}
+        <div
+          id={hintId}
+          className="absolute bottom-full left-1/2 z-20 w-64 -translate-x-1/2 rounded-campo border border-borda bg-superficie px-3 py-2 text-center text-xs text-texto-suave empty:hidden"
+        >
+          {showHint ? HINT : null}
+        </div>
       </div>
     </div>
   );
