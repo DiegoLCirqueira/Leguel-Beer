@@ -19,6 +19,13 @@
     "test": {
       "dependsOn": ["^build"]
     },
+    "test:integration": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "test:coverage": {
+      "dependsOn": ["^build"]
+    },
     "test:e2e": {
       "dependsOn": ["^build"],
       "cache": false
