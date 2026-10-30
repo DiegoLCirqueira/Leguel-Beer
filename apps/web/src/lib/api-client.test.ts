@@ -71,4 +71,25 @@ describe("createApiClient", () => {
       details: [{ field: "telefone", message: "Informe um telefone com DDD." }],
     });
   });
+
+  it("em 401 renova a sessão uma vez e repete a chamada com o token novo", async () => {
+    let renovacoes = 0;
+    const { client, calls } = clientWith(
+      [
+        { status: 401, body: { code: "UNAUTHORIZED", message: "Não autenticado." } },
+        { status: 200, body: perfil },
+      ],
+      () => {
+        renovacoes++;
+        return Promise.resolve("token-novo");
+      },
+    );
+
+    const result = await client.request("/perfil", { schema: perfilResponseSchema });
+
+    expect(result).toEqual(perfil);
+    expect(renovacoes).toBe(1);
+    expect(calls).toHaveLength(2);
+    expect(calls[1]?.init.headers).toMatchObject({ Authorization: "Bearer token-novo" });
+  });
 });
