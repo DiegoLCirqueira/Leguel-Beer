@@ -71,6 +71,7 @@ Funcionalidade: Confirmação de maioridade na entrada
 - **Resposta "não":** mostra "Acesso não permitido" e não é lembrada; ao abrir o site de novo, a pergunta volta. Nenhuma página do site é exibida a quem respondeu "não".
 - **Retorno:** depois de confirmar, a pessoa vai para a página que tentou abrir, com os mesmos parâmetros. Sem página pedida, ou quando ela é a home, vai para a [[boas-vindas]]. Só endereços do próprio site são aceitos como retorno; qualquer outro é ignorado.
 - **Robôs de busca:** uma lista de user-agents conhecidos (ex.: Googlebot, Bingbot) passa sem a pergunta, para não atrapalhar a indexação.
+- **Risco aceito:** o user-agent é informado pelo próprio navegador, então qualquer pessoa pode se passar por robô e pular a pergunta. É aceito porque a pergunta é uma confirmação declarada, sem validação; a compra continua exigindo conta e a confirmação no checkout (LB-20).
 - **Sem documento:** não há validação de documento nem de data de nascimento na entrada.
 - **Textos do card:** "Você tem 18 anos ou mais?" e "Acesso não permitido".
 
