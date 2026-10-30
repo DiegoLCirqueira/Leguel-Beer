@@ -106,6 +106,11 @@ Decisões pequenas e fáceis de reverter, pela política de autonomia. Qualquer 
 - **Tipos direto dos schemas Zod,** sem gerar cliente pelo OpenAPI (o ADR-005 aceita as duas formas).
 - **Exemplo com o perfil** em vez de `useBeers`, porque o catálogo vem depois no [[roteiro-mvp]].
 - **Regra do dependency-cruiser para `packages/shared`,** além da que já existe para `domain`.
+- **Campos em português** nos schemas (`nome`, `telefone`, `aceite`, `papel`), como as mensagens; os códigos de erro seguem em inglês, como em [[api-base]].
+- **Telefone guardado só com dígitos** e e-mail em minúsculas: os schemas normalizam, e a API recebe o valor já limpo.
+- **Criar perfil é estrito:** o schema recusa `email`, `id` e `papel` no corpo.
+- **Cliente HTTP testado com `fetch` injetado,** sem MSW, para não somar dependência; o cliente aceita qualquer schema com `parse`.
+- **Adiado para o LB-25:** o hook do perfil com TanStack Query (dependência nova) e o cenário de typecheck entre site e API, que só existe quando as telas e a rota do perfil usarem os schemas.
 
 ## Tickets propostos
 
