@@ -123,7 +123,7 @@ Funcionalidade: Cadastro e login com e-mail e senha
 - **Onde fica o token:** só em cookies do site, nunca em `localStorage` nem em variável acessível ao JavaScript da página.
 - **Atributos dos cookies de sessão:** `HttpOnly`, `Secure` (menos em `http://localhost` no desenvolvimento), `SameSite=Lax` e `Path=/`.
 - **Consequência:** como o navegador não lê o token, o login, a renovação e as chamadas autenticadas à API saem do lado servidor do site (Server Components, Server Actions ou rotas do Next), que repassa o token à API em `Authorization: Bearer` ([[contratos-compartilhados]]).
-- **Validade do token de acesso:** 1 hora (padrão do Supabase Auth). A renovação usa o refresh token, que só pode ser usado uma vez.
+- **Validade do token de acesso:** 1 hora (padrão do Supabase Auth). A renovação usa o refresh token, de uso único, com uma janela de reuso de 10 segundos no Supabase Auth (o mesmo refresh token ainda é aceito nesse intervalo, para renovações simultâneas de abas ou requisições paralelas).
 
 ### Limites de tentativa
 
