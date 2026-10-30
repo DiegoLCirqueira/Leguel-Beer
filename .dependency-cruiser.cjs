@@ -6,7 +6,7 @@ module.exports = {
       comment:
         "packages/shared roda no navegador e na API: não importa módulo do Node, Nest, Next, React nem Prisma (contratos-compartilhados).",
       severity: "error",
-      from: { path: "^packages/shared/src/", pathNot: "\.test\.ts$" },
+      from: { path: "^packages/shared/src/", pathNot: "\\.test\\.ts$" },
       to: {
         dependencyTypes: ["core"],
       },
@@ -14,9 +14,9 @@ module.exports = {
     {
       name: "shared-sem-framework",
       comment:
-        "packages/shared roda no navegador e na API: não importa Nest, Next, React nem Prisma (contratos-compartilhados).",
+        "Mesma proteção para os pacotes de framework, resolvidos em node_modules ou não (contratos-compartilhados).",
       severity: "error",
-      from: { path: "^packages/shared/src/", pathNot: "\.test\.ts$" },
+      from: { path: "^packages/shared/src/", pathNot: "\\.test\\.ts$" },
       to: {
         path: "(^|/)node_modules/(@nestjs|next|react|react-dom|@prisma|express)(/|$)|^(@nestjs|next|react|react-dom|@prisma|express)(/|$)",
       },
