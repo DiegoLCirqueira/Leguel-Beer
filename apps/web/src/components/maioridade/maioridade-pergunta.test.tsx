@@ -62,4 +62,13 @@ describe("MaioridadePergunta", () => {
       expect(imagem).not.toHaveAttribute("loading", "lazy");
     }
   });
+
+  it("usa a imagem de fundo do estúdio, decorativa", () => {
+    const { container } = renderizar();
+
+    const fundo = container.querySelector('img[src*="maioridade%2Ffundo.webp"]');
+
+    expect(fundo).not.toBeNull();
+    expect(fundo).toHaveAttribute("alt", "");
+  });
 });
