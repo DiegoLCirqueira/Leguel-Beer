@@ -2,7 +2,7 @@
 
 import { ArrowRight, Info, Link2, UserPlus, UserRound } from "lucide-react";
 import Link from "next/link";
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { markGuest } from "@/lib/guest";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,28 @@ export function WelcomeActions() {
   const [keepConnected, setKeepConnected] = useState(true);
   const [showHint, setShowHint] = useState(false);
   const hintId = useId();
+  const infoRef = useRef<HTMLButtonElement>(null);
+  const hintRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showHint) return;
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      setShowHint(false);
+      infoRef.current?.focus();
+    }
+    function closeOnOutsidePress(event: PointerEvent) {
+      const target = event.target as Node;
+      if (hintRef.current?.contains(target) || infoRef.current?.contains(target)) return;
+      setShowHint(false);
+    }
+    document.addEventListener("keydown", closeOnEscape);
+    document.addEventListener("pointerdown", closeOnOutsidePress);
+    return () => {
+      document.removeEventListener("keydown", closeOnEscape);
+      document.removeEventListener("pointerdown", closeOnOutsidePress);
+    };
+  }, [showHint]);
 
   return (
     <div className="flex w-full shrink-0 flex-col items-center gap-2">
@@ -48,7 +70,7 @@ export function WelcomeActions() {
         <Link2 aria-hidden="true" className="size-5" />
         Continuar como convidado
       </Link>
-      <div className="relative flex items-center gap-1 text-xs">
+      <div className="flex items-center gap-1 text-xs">
         <label className="flex min-h-11 cursor-pointer items-center gap-2">
           <input
             type="checkbox"
@@ -59,6 +81,7 @@ export function WelcomeActions() {
           Manter-me conectado
         </label>
         <button
+          ref={infoRef}
           type="button"
           aria-label="Saiba mais sobre Manter-me conectado"
           aria-expanded={showHint}
@@ -68,13 +91,14 @@ export function WelcomeActions() {
         >
           <Info aria-hidden="true" className="size-4" />
         </button>
-        <div
-          id={hintId}
-          aria-live="polite"
-          className="absolute bottom-full left-1/2 z-20 w-64 -translate-x-1/2 rounded-campo border border-borda bg-superficie px-3 py-2 text-center text-xs text-texto-suave empty:hidden"
-        >
-          {showHint ? HINT : null}
-        </div>
+      </div>
+      <div
+        ref={hintRef}
+        id={hintId}
+        aria-live="polite"
+        className="fixed inset-x-4 bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-30 mx-auto max-w-xs rounded-campo border border-borda bg-superficie px-3 py-2 text-center text-xs leading-snug text-texto-suave empty:hidden"
+      >
+        {showHint ? HINT : null}
       </div>
     </div>
   );
