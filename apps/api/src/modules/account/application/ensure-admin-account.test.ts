@@ -19,7 +19,12 @@ describe("EnsureAdminAccount", () => {
 
     expect(result).toEqual({ userId: "user-1", created: true });
     expect(auth.users).toEqual([
-      { id: "user-1", email: "admin@leguele.test", password: "senha-forte-123456" },
+      {
+        id: "user-1",
+        email: "admin@leguele.test",
+        emailConfirmed: true,
+        password: "senha-forte-123456",
+      },
     ]);
     expect(profiles.profiles.get("user-1")).toEqual({
       id: "user-1",
@@ -56,5 +61,23 @@ describe("EnsureAdminAccount", () => {
     expect(second.created).toBe(false);
     expect(auth.users.map((u) => u.email)).toEqual(["admin@leguele.test"]);
     expect(profiles.profiles.size).toBe(1);
+  });
+
+  it("recusa promover a conta existente com e-mail não confirmado, sem gravar perfil", async () => {
+    const { auth, profiles, useCase } = setup();
+    auth.users.push({
+      id: "user-1",
+      email: "admin@leguele.test",
+      emailConfirmed: false,
+      password: "senha-do-invasor-123",
+    });
+
+    const attempt = useCase.execute({
+      email: "admin@leguele.test",
+      password: "senha-forte-123456",
+    });
+
+    await expect(attempt).rejects.toThrow(/não confirmado/);
+    expect(profiles.profiles.size).toBe(0);
   });
 });
