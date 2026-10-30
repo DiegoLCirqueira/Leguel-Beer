@@ -9,7 +9,7 @@ const LINKS = [
 
 export function SiteFooter() {
   return (
-    <footer className="flex flex-col items-center gap-4 border-t border-borda bg-fundo px-6 py-8 pb-[max(2rem,env(safe-area-inset-bottom,0px))] text-center text-sm text-texto-suave">
+    <footer className="relative flex flex-col items-center gap-4 border-t border-borda bg-fundo px-6 py-8 pb-[max(2rem,env(safe-area-inset-bottom,0px))] text-center text-sm text-texto-suave">
       <div className="flex flex-col gap-1">
         {AVISOS_RODAPE.map((aviso) => (
           <p key={aviso}>{aviso}</p>
