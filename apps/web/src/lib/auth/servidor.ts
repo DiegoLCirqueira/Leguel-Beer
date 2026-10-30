@@ -28,7 +28,10 @@ export function origemDoSite(): string | undefined {
 
 /** Cliente da API com o token desta sessão (o servidor do site repassa em Authorization: Bearer). */
 export function criarClienteApi(sessao: Sessao) {
-  const baseUrl = process.env.API_URL ?? (emProducao() ? "" : API_LOCAL);
+  const baseUrl = process.env.API_URL || (emProducao() ? undefined : API_LOCAL);
+  // Em produção a falta de API_URL é erro de configuração: falha alto, sem criar o perfil em silêncio.
+  if (!baseUrl)
+    throw new Error("API_URL é obrigatória em produção (endereço da API do Leguelé Beer).");
   return createApiClient({
     baseUrl,
     getToken: async () => sessao.accessToken,
