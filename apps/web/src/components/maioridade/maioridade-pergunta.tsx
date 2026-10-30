@@ -51,7 +51,7 @@ export function MaioridadePergunta({ retorno, confirmar }: Props) {
             <h1
               ref={tituloNegado}
               tabIndex={-1}
-              className="font-titulo text-3xl text-texto outline-none"
+              className="font-titulo text-balance text-3xl text-texto outline-none"
             >
               Acesso não permitido
             </h1>
@@ -59,7 +59,9 @@ export function MaioridadePergunta({ retorno, confirmar }: Props) {
           </>
         ) : (
           <>
-            <h1 className="font-titulo text-3xl text-texto">Você tem 18 anos ou mais?</h1>
+            <h1 className="font-titulo text-balance text-3xl text-texto">
+              Você tem 18 anos ou mais?
+            </h1>
             <p className="text-texto-suave">Para entrar, confirme sua idade.</p>
             <form action={confirmar} className="flex w-full flex-col gap-3">
               <input type="hidden" name="retorno" value={retorno} />
