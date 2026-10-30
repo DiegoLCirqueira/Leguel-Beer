@@ -10,3 +10,7 @@ export function retornoSeguro(retorno: string | undefined): string {
   if (retorno === PERGUNTA || retorno.startsWith(`${PERGUNTA}?`)) return DESTINO_PADRAO;
   return retorno;
 }
+
+export const MAIORIDADE_COOKIE = "leguele_maioridade";
+export const MAIORIDADE_VALIDADE_DIAS = 30;
+export const MAIORIDADE_VALIDADE_MS = MAIORIDADE_VALIDADE_DIAS * 24 * 60 * 60 * 1000;
