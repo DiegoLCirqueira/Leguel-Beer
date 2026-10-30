@@ -41,7 +41,15 @@ export function createApiClient(config: ApiClientConfig) {
     }
     if (!response.ok) throw ApiError.fromBody(response.status, await readBody(response));
     const data = await readBody(response);
-    return options.schema ? options.schema.parse(data) : (data as T);
+    if (!options.schema) return data as T;
+    try {
+      return options.schema.parse(data);
+    } catch {
+      throw new ApiError(response.status, {
+        code: "INVALID_RESPONSE",
+        message: "A resposta da API não está no formato esperado.",
+      });
+    }
   }
 
   return { request };
