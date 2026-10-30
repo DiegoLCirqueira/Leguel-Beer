@@ -24,6 +24,7 @@ export function MaioridadePergunta({ retorno, confirmar }: Props) {
     <main className="relative isolate flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-fundo px-6 py-10 text-center">
       <Image
         src="/maioridade/fundo.webp"
+        quality={90}
         alt=""
         fill
         sizes="100vw"
@@ -49,9 +50,11 @@ export function MaioridadePergunta({ retorno, confirmar }: Props) {
       <div className="flex w-full max-w-sm flex-col items-center gap-6">
         <Image
           src="/maioridade/logo.webp"
+          quality={90}
           alt="Leguelé Beer"
-          width={320}
-          height={320}
+          width={768}
+          height={768}
+          sizes="128px"
           priority
           className="size-32"
         />

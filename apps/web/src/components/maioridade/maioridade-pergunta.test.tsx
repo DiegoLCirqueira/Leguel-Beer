@@ -71,4 +71,13 @@ describe("MaioridadePergunta", () => {
     expect(fundo).not.toBeNull();
     expect(fundo).toHaveAttribute("alt", "");
   });
+
+  it("serve o logo em larguras para telas de alta densidade (srcset por largura)", () => {
+    renderizar();
+
+    const logo = screen.getByRole("img", { name: "Leguelé Beer" });
+
+    expect(logo.getAttribute("srcset")).toMatch(/ 384w/);
+    expect(logo).toHaveAttribute("sizes", "128px");
+  });
 });
