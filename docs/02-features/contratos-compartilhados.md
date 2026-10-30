@@ -35,10 +35,10 @@ Funcionalidade: Contratos compartilhados e cliente tipado
     E a saída aponta os arquivos de apps/web e de apps/api que usam o campo antigo
 
   Cenário: A mesma regra vale no formulário e na API
-    Dado o schema de cadastro em packages/shared
-    Quando envio a senha "abc123" pelo formulário de "Criar sua conta"
-    Então o formulário mostra "A senha precisa ter pelo menos 8 caracteres." sem chamar a API
-    E a mesma senha enviada direto à API recebe 400 com code "VALIDATION_ERROR" e o campo "senha" em details
+    Dado o schema do perfil em packages/shared
+    Quando escrevo o telefone "(82) 1234" no formulário de "Criar sua conta"
+    Então o formulário mostra "Informe um telefone com DDD." sem chamar a API
+    E o mesmo telefone enviado direto à API na criação do perfil recebe 400 com code "VALIDATION_ERROR" e o campo "telefone" em details
 
   Cenário: Erro da API vira um erro tipado no site
     Dado que a API responde 400 no formato { code, message, details }
@@ -70,7 +70,8 @@ Funcionalidade: Contratos compartilhados e cliente tipado
 - **Nada de Node, Nest, Next, React ou Prisma** dentro do pacote: ele roda no navegador e na API. Verificado pelo dependency-cruiser.
 - **Contratos da fase 1:** cadastro, entrar, nova senha, perfil e o formato de erro `{ code, message, details }` de [[api-base]]. As mensagens de validação são as das specs de acesso, em pt-BR.
 - **API:** o pipe de validação de [[api-base]] usa esses schemas; o Swagger é gerado a partir deles.
-- **Site:** os formulários usam os mesmos schemas; o cliente HTTP:
+- **Senha:** validada pelo schema no formulário; quem guarda a senha é o Supabase Auth, que aplica o mesmo mínimo na sua configuração. A API nunca recebe senha.
+- **Site:** os formulários usam os mesmos schemas; o cliente HTTP roda no lado servidor do site, porque os cookies de sessão são `HttpOnly` ([[cadastro-login]], "Sessão e cookies"), e:
   - envia o token da sessão do Supabase Auth em `Authorization: Bearer`;
   - transforma qualquer resposta de erro da API num erro de API tipado;
   - em 401, renova a sessão uma vez e repete a chamada; se falhar de novo, lança o erro.
