@@ -32,10 +32,12 @@ tags:
 | 4 | LB-19 (#97) confirmação de maioridade | [[maioridade-entrada]] | LB-12 |
 | 5 | LB-24 (#39) boas-vindas | [[boas-vindas]] | LB-19, LB-12 |
 | 6 | LB-28 (#43) proteção da API e do site | [[guards-api]] | Etapas 1 a 3 |
-| 7 | LB-25 (#40) cadastro e login | [[cadastro-login]] | LB-24, LB-28, LB-120 |
-| 8 | LB-27 (#42) recuperação de senha | [[recuperacao-senha]] | LB-25 |
+| 7 | LB-22 (#100) termos, privacidade e aviso de portfólio | [[termos-privacidade]] | LB-12, LB-19 |
+| 8 | LB-25 (#40) cadastro e login | [[cadastro-login]] | LB-24, LB-28, LB-120, LB-22 |
+| 9 | LB-27 (#42) recuperação de senha | [[recuperacao-senha]] | LB-25 |
 
-> [!todo] Preencher: se o LB-22 (termos e privacidade, hoje MVP+) entra na fase 1, por causa dos links do cadastro. Pergunta ao Diego em [[cadastro-login]].
+> [!info] LB-22 no MVP
+> O LB-22 era MVP+ e entrou na fase 1 por decisão do Diego (2026-10-29): os links "Termos de Uso" e "Política de Privacidade" do cadastro precisam de destino.
 
 ## Fase 2: o resto do MVP
 

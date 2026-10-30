@@ -26,6 +26,7 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[contratos-compartilhados]]: schemas Zod compartilhados e cliente tipado da API (LB-120).
 - [[maioridade-entrada]]: confirmação de maioridade na entrada do site (LB-19).
 - [[boas-vindas]]: tela inicial com entrar, criar conta e convidado (LB-24).
+- [[termos-privacidade]]: Termos de Uso, Política de Privacidade, Entregas e aviso de portfólio (LB-22).
 - [[cadastro-login]]: cadastro e login com e-mail e senha (LB-25).
 - [[recuperacao-senha]]: link por e-mail e nova senha (LB-27).
 - [[guards-api]]: proteção da API e do site por autenticação e papéis (LB-28).
