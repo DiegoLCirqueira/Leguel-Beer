@@ -68,7 +68,7 @@ describe("POST e GET /me/profile (banco real)", () => {
       nome: "Ana Souza",
       telefone: "82912345678",
       papel: "cliente",
-      aceite: { termosVersao: "2026-10-30", privacidadeVersao: "2026-10-30" },
+      aceite: { termosVersao: "2026-10-31", privacidadeVersao: "2026-10-31" },
     });
     expect(Math.abs(Date.now() - Date.parse(perfil.aceite.aceitoEm))).toBeLessThan(10_000);
   });
