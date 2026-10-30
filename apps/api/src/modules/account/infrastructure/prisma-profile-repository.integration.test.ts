@@ -63,4 +63,17 @@ describe("PrismaProfileRepository (banco real)", () => {
     await expect(attempt).rejects.toThrow(/outro id/);
     await expect(attempt).rejects.not.toThrow(/P2002|Unique constraint/);
   });
+
+  it("devolve o papel gravado do perfil e null quando não há perfil", async () => {
+    const adminId = newId();
+    const customerId = newId();
+    await prisma.profile.create({
+      data: { id: adminId, email: `${adminId}@leguele.test`, role: "ADMIN" },
+    });
+    await prisma.profile.create({ data: { id: customerId, email: `${customerId}@leguele.test` } });
+
+    expect(await repository.findRole(adminId)).toBe("admin");
+    expect(await repository.findRole(customerId)).toBe("customer");
+    expect(await repository.findRole(randomUUID())).toBeNull();
+  });
 });
