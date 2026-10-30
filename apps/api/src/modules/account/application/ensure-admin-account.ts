@@ -17,7 +17,9 @@ export class EnsureAdminAccount {
     private readonly profiles: ProfileRepository,
   ) {}
 
-  async execute({ email, password }: EnsureAdminAccountInput): Promise<EnsureAdminAccountResult> {
+  async execute(input: EnsureAdminAccountInput): Promise<EnsureAdminAccountResult> {
+    const email = input.email.trim().toLowerCase();
+    const { password } = input;
     const existing = await this.auth.findByEmail(email);
     const user = existing ?? (await this.auth.createConfirmedUser(email, password));
     await this.profiles.ensureRole({ id: user.id, email: user.email }, "admin");
