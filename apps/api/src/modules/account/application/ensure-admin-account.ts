@@ -21,6 +21,11 @@ export class EnsureAdminAccount {
     const email = input.email.trim().toLowerCase();
     const { password } = input;
     const existing = await this.auth.findByEmail(email);
+    if (existing && !existing.emailConfirmed) {
+      throw new Error(
+        "A conta com o ADMIN_EMAIL tem e-mail não confirmado; recusando promover a admin",
+      );
+    }
     const user = existing ?? (await this.auth.createConfirmedUser(email, password));
     await this.profiles.ensureRole({ id: user.id, email: user.email }, "admin");
     return { userId: user.id, created: existing === null };
