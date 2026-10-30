@@ -2,6 +2,26 @@
 module.exports = {
   forbidden: [
     {
+      name: "shared-sem-node-nem-framework",
+      comment:
+        "packages/shared roda no navegador e na API: não importa módulo do Node, Nest, Next, React nem Prisma (contratos-compartilhados).",
+      severity: "error",
+      from: { path: "^packages/shared/src/", pathNot: "\\.test\\.ts$" },
+      to: {
+        dependencyTypes: ["core"],
+      },
+    },
+    {
+      name: "shared-sem-framework",
+      comment:
+        "Mesma proteção para os pacotes de framework, resolvidos em node_modules ou não (contratos-compartilhados).",
+      severity: "error",
+      from: { path: "^packages/shared/src/", pathNot: "\\.test\\.ts$" },
+      to: {
+        path: "(^|/)node_modules/(@nestjs|next|react|react-dom|@prisma|express)(/|$)|^(@nestjs|next|react|react-dom|@prisma|express)(/|$)",
+      },
+    },
+    {
       name: "domain-sem-framework",
       comment:
         "A camada domain de apps/api não importa framework nem pacote externo (ADR-005). Nenhum pacote está na lista permitida no LB-1.",
