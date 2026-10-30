@@ -70,7 +70,7 @@ Funcionalidade: Testes da API em três níveis
 - **Banco de teste:** conforme [[ADR-007-banco-de-teste]]. A conexão vem de uma variável própria (ex.: `TEST_DATABASE_URL`), listada sem valor no `.env.example`; o comando recusa rodar se ela apontar para o mesmo banco de `DATABASE_URL`.
 - **Isolamento:** cada teste de integração começa com o banco limpo (transação revertida ou limpeza das tabelas, a escolher na implementação).
 - **Factories** de dados de teste por módulo, para não repetir montagem de registros.
-- **Tokens de teste:** um helper gera JWT de cliente, de admin, expirado e de assinatura adulterada, assinados com uma chave só de teste, para os testes de [[guards-api]].
+- **Tokens de teste:** um helper gera JWT de cliente, de admin, expirado e de assinatura adulterada, assinados com uma chave assimétrica só de teste, publicada num JWKS falso, do mesmo tipo da chave do Supabase local, para os testes de [[guards-api]]. Um token HS256 entra nos testes como caso de recusa.
 - **Cobertura:** mínimo de 80% de linhas em `domain` e `application` da API, verificado no CI.
 - **CI:** um job de integração com Postgres como *service container*, na mesma versão major do Supabase CLI. Os E2E que precisam do Supabase Auth (cadastro, login, recuperação de senha) sobem o Supabase CLI no job de E2E do CI.
 
