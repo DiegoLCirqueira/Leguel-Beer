@@ -45,6 +45,17 @@ describe("GoTrue signUp", () => {
     expect(await auth.signUp(dados)).toEqual({ tipo: "email-ja-cadastrado" });
   });
 
+  it("reconhece o e-mail já registrado pelo erro user_already_exists (422) do Supabase", async () => {
+    const fetchFalso = vi
+      .fn()
+      .mockResolvedValue(
+        resposta(422, { error_code: "user_already_exists", msg: "User already registered" }),
+      );
+    const auth = createGoTrue({ ...config, fetch: fetchFalso });
+
+    expect(await auth.signUp(dados)).toEqual({ tipo: "email-ja-cadastrado" });
+  });
+
   it.each([
     ["erro do serviço", () => Promise.resolve(resposta(500, { msg: "falhou" }))],
     ["limite de tentativas", () => Promise.resolve(resposta(429, { msg: "limite" }))],
