@@ -20,7 +20,7 @@ describe("Button", () => {
         Entrar
       </Button>,
     );
-    const button = screen.getByRole("button", { name: "Entrar" });
+    const button = screen.getByRole("button", { name: /Entrar/ });
 
     await userEvent.click(button);
 
@@ -37,7 +37,18 @@ describe("Button", () => {
     );
 
     expect(screen.queryByTestId("icone")).not.toBeInTheDocument();
-    expect(screen.getByRole("status", { hidden: true })).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("Carregando");
+  });
+
+  it("com só ícone à direita, o indicador de carregamento fica no lugar dele", () => {
+    render(
+      <Button loading iconRight={<svg data-testid="seta" />}>
+        Entrar
+      </Button>,
+    );
+
+    expect(screen.queryByTestId("seta")).not.toBeInTheDocument();
+    expect(screen.getByRole("status")).toBeInTheDocument();
   });
 
   it("não marca aria-busy fora do carregamento", () => {
