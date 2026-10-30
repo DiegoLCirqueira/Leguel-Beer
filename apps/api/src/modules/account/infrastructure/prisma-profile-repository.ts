@@ -23,6 +23,7 @@ export class PrismaProfileRepository implements ProfileRepository {
       if ((error as { code?: string }).code === "P2002") {
         throw new Error(
           "Já existe um perfil com esse e-mail e outro id (a conta do Auth foi recriada?); resolva à mão",
+          { cause: error },
         );
       }
       throw error;
