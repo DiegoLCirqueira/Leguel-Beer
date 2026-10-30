@@ -6,3 +6,8 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+// prova descartável do db:check
+model ProvaDrift {
+  id Int @id @default(autoincrement())
+}
