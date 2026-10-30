@@ -141,7 +141,7 @@ Só tema escuro. Valores tirados da paleta de `estudio-garrafas.html` e conferid
 - **Badge de estilo:** pílula com o nome da categoria em maiúsculas, cor do token da categoria.
 - **Chip de categoria:** ícone em cima, rótulo e contador entre parênteses abaixo ("IPAs (4)"); selecionável, um por vez, com `aria-pressed`. Selecionado: borda e texto em verde-limão. O comportamento na página está em [[catalogo]].
 
-## Decisões do Diego (2026-10-29)
+### Decisões do Diego (2026-10-29)
 
 - **Pergunta 1:** fonte manuscrita dos títulos à escolha do Front, do Google Fonts, conferida pelo Diego nos portais. O Front escolheu Kaushan Script.
 - **Pergunta 2:** cores de estado em verde, vermelho e âmbar nos tons do tema escuro.
