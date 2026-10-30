@@ -26,19 +26,19 @@ Decisões do Diego aplicadas:
 
 | Grupo | Épicos | Cards | Pontos |
 | --- | --- | --- | --- |
-| MVP (núcleo) | 14 | 63 | 210 |
-| MVP (adiáveis) | — | 33 | 85 |
+| MVP (núcleo) | 14 | 64 | 212 |
+| MVP (adiáveis) | — | 32 | 83 |
 | Pós-MVP | 4 (+ 2 cards de épicos MVP) | 28 | 92 |
 | **Total** | **18** | **124** | **387** |
 
-Os 14 épicos MVP somam 98 cards (301 pontos): 63 no núcleo, 33 adiáveis e 2 que vão para o Pós-MVP por dependerem de filas ou WebSocket.
+Os 14 épicos MVP somam 98 cards (301 pontos): 64 no núcleo, 32 adiáveis e 2 que vão para o Pós-MVP por dependerem de filas ou WebSocket. Os números contam o LB-22 no núcleo, por decisão do Diego de 2026-10-29 (ver a nota em "Cards adiáveis").
 
 ## Milestones no GitHub
 
 | Milestone | O que entra | Issues |
 | --- | --- | --- |
-| **MVP** | Os 14 épicos MVP e os cards do núcleo | 77 (14 épicos + 63 cards) |
-| **MVP+** | Os cards adiáveis (também com a label `adiavel`) | 33 |
+| **MVP** | Os 14 épicos MVP e os cards do núcleo | 78 (14 épicos + 64 cards) |
+| **MVP+** | Os cards adiáveis (também com a label `adiavel`) | 32 |
 
 > [!important] Regra de trabalho
 > A banda só puxa trabalho do milestone **MVP+** depois que o milestone **MVP** estiver fechado. Os cards Pós-MVP não vão para o GitHub; continuam no Notion como banco de ideias.

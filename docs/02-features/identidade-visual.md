@@ -93,7 +93,7 @@ Funcionalidade: Tokens e componentes base da marca
 
 ### Tokens de cor
 
-Só tema escuro. Valores tirados da paleta de `estudio-garrafas.html` e conferidos por amostragem no print do Figma (o print tem gradientes e compressão; a amostra varia alguns tons). A vitrine dos tokens e componentes fica na home, para conferência visual nos portais (decisão do Orchestrator, 2026-10-29).
+Só tema escuro. Valores tirados da paleta de `estudio-garrafas.html` e conferidos por amostragem no print do Figma (o print tem gradientes e compressão; a amostra varia alguns tons). A vitrine dos tokens e componentes fica na home por enquanto, para conferência visual nos portais (decisão do Orchestrator, 2026-10-29). É provisória: quando o LB-24 ([[boas-vindas]]) entrar, a home volta a ser a da loja e a vitrine vai para `/dev/tokens`, disponível só no desenvolvimento, como pede o card LB-11.
 
 | Token | Valor | Uso no Figma |
 | --- | --- | --- |
