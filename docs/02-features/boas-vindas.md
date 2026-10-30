@@ -79,12 +79,12 @@ Funcionalidade: Tela de boas-vindas
 
 ## Textos
 
-Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os textos necessários; os acrescentados pelo Spec estão marcados com *.
+Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os textos necessários; os escritos pelo Spec estão marcados com *.
 
 | Lugar | Texto proposto |
 | --- | --- |
-| Dica do ícone (i) de "Manter-me conectado" | "Sua sessão continua ativa neste aparelho por até 30 dias, mesmo depois de fechar o navegador." |
-| Texto alternativo da imagem principal | "Garrafa de IPA Leguelé Beer ao lado de um copo cheio, entre folhas de lúpulo" |
+| Dica do ícone (i) de "Manter-me conectado" * | "Sua sessão continua ativa neste aparelho por até 30 dias, mesmo depois de fechar o navegador." |
+| Texto alternativo da imagem principal * | "Garrafa de IPA Leguelé Beer ao lado de um copo cheio, entre folhas de lúpulo" |
 
 ## Seams de teste
 
