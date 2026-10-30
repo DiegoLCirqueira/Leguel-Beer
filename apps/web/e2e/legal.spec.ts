@@ -4,10 +4,8 @@ import { expect, test } from "./support/maior-de-idade";
 test.use({ viewport: { width: 360, height: 780 } });
 semConfirmacao.use({ viewport: { width: 360, height: 780 } });
 
-test("o rodapé da boas-vindas aparece ao rolar até o fim, com avisos, links e dados fictícios", async ({
-  page,
-}) => {
-  await page.goto("/boas-vindas");
+test("o rodapé das páginas legais traz avisos, links e dados fictícios", async ({ page }) => {
+  await page.goto("/termos");
   const rodape = page.getByRole("contentinfo");
   await rodape.scrollIntoViewIfNeeded();
 
@@ -21,13 +19,18 @@ test("o rodapé da boas-vindas aparece ao rolar até o fim, com avisos, links e 
   ).toBeVisible();
 });
 
-test("os links do rodapé levam às páginas legais", async ({ page }) => {
-  await page.goto("/boas-vindas");
+test("os links do rodapé levam às outras páginas legais", async ({ page }) => {
+  await page.goto("/termos");
 
-  await page.getByRole("contentinfo").getByRole("link", { name: "Termos de Uso" }).click();
+  await page
+    .getByRole("contentinfo")
+    .getByRole("link", { name: "Política de Privacidade" })
+    .click();
 
-  await expect(page).toHaveURL(/\/termos$/);
-  await expect(page.getByRole("heading", { level: 1, name: "Termos de Uso" })).toBeVisible();
+  await expect(page).toHaveURL(/\/privacidade$/);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Política de Privacidade" }),
+  ).toBeVisible();
 });
 
 for (const [caminho, titulo] of [
