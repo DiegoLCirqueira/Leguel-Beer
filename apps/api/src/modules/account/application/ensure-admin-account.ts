@@ -1,0 +1,25 @@
+import type { AuthAdmin } from "../domain/auth-admin.js";
+import type { ProfileRepository } from "../domain/profile-repository.js";
+
+export interface EnsureAdminAccountInput {
+  email: string;
+  password: string;
+}
+
+export interface EnsureAdminAccountResult {
+  userId: string;
+  created: boolean;
+}
+
+export class EnsureAdminAccount {
+  constructor(
+    private readonly auth: AuthAdmin,
+    private readonly profiles: ProfileRepository,
+  ) {}
+
+  async execute({ email, password }: EnsureAdminAccountInput): Promise<EnsureAdminAccountResult> {
+    const user = await this.auth.createConfirmedUser(email, password);
+    await this.profiles.ensureRole({ id: user.id, email: user.email }, "admin");
+    return { userId: user.id, created: true };
+  }
+}
