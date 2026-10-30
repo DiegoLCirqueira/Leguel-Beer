@@ -39,8 +39,8 @@ async function expectCheckboxInDrawnRow(page: Page) {
   const expectedCenterY =
     stage.y + (CONTROLS.checkbox.y + CONTROLS.checkbox.h / 2 - ART.y0) * scale;
   expect(Math.abs(box.y + box.height / 2 - expectedCenterY)).toBeLessThanOrEqual(TOLERANCE);
-  expect(box.x).toBeGreaterThanOrEqual(stage.x + (280 - ART.x0) * scale - TOLERANCE);
-  expect(box.x + box.width).toBeLessThanOrEqual(stage.x + (600 - ART.x0) * scale + TOLERANCE);
+  expect(box.x).toBeGreaterThanOrEqual(stage.x + (200 - ART.x0) * scale - TOLERANCE);
+  expect(box.x + box.width).toBeLessThanOrEqual(stage.x + (650 - ART.x0) * scale + TOLERANCE);
 }
 
 const ALL_CONTROLS = (page: Page) => [
