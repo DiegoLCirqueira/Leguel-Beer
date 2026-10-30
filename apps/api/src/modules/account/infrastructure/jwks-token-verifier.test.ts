@@ -76,4 +76,17 @@ describe("JwksTokenVerifier", () => {
       ).rejects.toBeInstanceOf(InvalidTokenError);
     },
   );
+
+  it.each([
+    ["alg diferente do header", { alg: "RS256" }],
+    ["kty que não é EC", { kty: "RSA" }],
+    ["curva que não é P-256", { crv: "P-384" }],
+  ])("recusa o token quando a chave do JWKS tem %s", async (_caso, alteracao) => {
+    const tokens = createTestTokens();
+    const jwks = { keys: tokens.jwks.keys.map((key) => ({ ...key, ...alteracao })) };
+    const verifier = new JwksTokenVerifier(JWKS_URL, (() =>
+      Promise.resolve(new Response(JSON.stringify(jwks)))) as typeof fetch);
+
+    await expect(verifier.verify(tokens.customer())).rejects.toBeInstanceOf(InvalidTokenError);
+  });
 });
