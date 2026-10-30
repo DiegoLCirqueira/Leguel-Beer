@@ -44,3 +44,14 @@ export async function gravarSessao(sessao: Sessao, manterConectado: boolean) {
   jar.set(COOKIE_RENOVACAO, sessao.refreshToken, opcoes);
   jar.set(COOKIE_MANTER, manterConectado ? "1" : "0", opcoes);
 }
+
+/** Lê o token de acesso da sessão deste aparelho, se houver. */
+export async function lerTokenDeAcesso(): Promise<string | undefined> {
+  return (await cookies()).get(COOKIE_ACESSO)?.value;
+}
+
+/** Apaga os cookies de sessão deste aparelho. */
+export async function limparSessao() {
+  const jar = await cookies();
+  for (const nome of [COOKIE_ACESSO, COOKIE_RENOVACAO, COOKIE_MANTER]) jar.delete(nome);
+}
