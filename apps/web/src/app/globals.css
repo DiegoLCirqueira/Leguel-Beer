@@ -16,7 +16,11 @@
   --color-badge-malt: #9f6838;
   --color-badge-lager: #47610e;
   --color-badge-neutro: var(--color-superficie-elevada);
+  --color-sucesso: #6fd98a;
+  --color-erro: #ff8a80;
+  --color-aviso: #f5b74a;
 
+  --font-titulo: var(--font-kaushan), cursive;
   --font-texto: var(--font-outfit), system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --spacing: 4px;
