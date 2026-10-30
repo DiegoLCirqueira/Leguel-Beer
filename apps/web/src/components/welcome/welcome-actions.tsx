@@ -41,11 +41,14 @@ export function WelcomeActions() {
     <div className="flex w-full shrink-0 flex-col items-center gap-2">
       <Link
         href={`/entrar?manter-conectado=${keepConnected ? 1 : 0}`}
-        className={cn(buttonVariants({ variant: "primary" }), "w-[88%] text-[15px]")}
+        className={cn(buttonVariants({ variant: "primary" }), "relative w-[88%] text-[15px]")}
       >
         <UserRound aria-hidden="true" className="size-5" />
         Entrar
-        <ArrowRight aria-hidden="true" className="size-5" />
+        <ArrowRight
+          aria-hidden="true"
+          className="absolute right-5 top-1/2 size-5 -translate-y-1/2"
+        />
       </Link>
       <Link
         href="/criar-conta"
