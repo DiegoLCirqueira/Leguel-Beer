@@ -104,7 +104,7 @@ Funcionalidade: Base da API
 - **Logs** estruturados em JSON, com o id da requisição. A API usa o `x-request-id` recebido ou gera um, e devolve o mesmo valor no cabeçalho da resposta.
 - **Health:** `GET /health` informa a API e o banco; 200 com tudo no ar, 503 com o banco fora. Continua sem autenticação.
 - **Swagger** em `/docs`, com esquema de autenticação Bearer e tags por módulo. Todo endpoint novo aparece no Swagger.
-- **Segurança básica:** helmet; CORS só para a origem do web (no local, `http://localhost:3000`); limite global de 100 requisições por minuto por IP (rotas de acesso têm limite próprio em [[cadastro-login]]); desligamento limpo (`enableShutdownHooks`). Pendência do handoff do LB-1.
+- **Segurança básica:** helmet; CORS só para a origem do web (no local, `http://localhost:3000`); limite global de 100 requisições por minuto por IP (os limites das rotas de acesso ficam no Supabase Auth, com fonte única em [[cadastro-login]], "Limites de tentativa"); desligamento limpo (`enableShutdownHooks`). Pendência do handoff do LB-1.
 
 ### Camadas e template de módulo (LB-118)
 
