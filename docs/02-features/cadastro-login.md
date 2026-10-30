@@ -112,7 +112,8 @@ Funcionalidade: Cadastro e login com e-mail e senha
 
 - Campos E-mail e Senha, "Manter-me conectado", "Esqueci minha senha" (leva à [[recuperacao-senha]]), botão "Entrar" e o link "Criar conta". Mesmo visual de "Criar sua conta" ([[identidade-visual]]).
 - **"Manter-me conectado":** começa com o valor vindo da [[boas-vindas]], ou marcado quando a pessoa chega por outro caminho. Marcado: a sessão continua depois de fechar o navegador, por até 30 dias sem uso. Desmarcado: a sessão acaba ao fechar o navegador.
-- **"30 dias sem uso" no site:** com a opção marcada, os cookies de sessão têm validade de 30 dias, renovada a cada requisição ao site; depois de 30 dias sem abrir o site, o navegador descarta os cookies e a pessoa entra de novo. Com a opção desmarcada, os cookies não têm validade e somem ao fechar o navegador. O tempo de inatividade nativo do Supabase Auth exige o plano Pro (ver "Em aberto").
+- **"30 dias sem uso" no site:** com a opção marcada, os cookies de sessão têm validade de 30 dias, renovada a cada requisição ao site; depois de 30 dias sem abrir o site, o navegador descarta os cookies e a pessoa entra de novo. Com a opção desmarcada, os cookies não têm validade e somem ao fechar o navegador. O tempo de inatividade nativo do Supabase Auth exige o plano Pro, que fere a restrição "tudo gratuito" ([[ADR-001-stack]]); por isso os 30 dias ficam no site (decisão do Orchestrator, 2026-10-29).
+- **Risco aceito:** o refresh token não vence no Supabase. Um cookie copiado antes dos 30 dias continua valendo até a sessão ser renovada ou encerrada (por "Sair" ou pela troca de senha).
 - **Depois de entrar:** volta à página de onde a pessoa veio (só endereços do próprio site), ou à home.
 - **Erro de credencial:** sempre "E-mail ou senha inválidos", exista ou não a conta.
 - **Sair:** o botão "Sair" fica no fim da tela de perfil e, até ela existir, no menu da conta. Encerra a sessão deste aparelho no Supabase Auth (a renovação deixa de funcionar), apaga os cookies e leva à [[boas-vindas]]. O token de acesso já emitido continua aceito pela API até vencer, no máximo 1 hora (risco aceito, igual ao de [[recuperacao-senha]]).
@@ -161,13 +162,6 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 | Falha de rede ou erro inesperado * | "Não foi possível concluir agora. Tente de novo em instantes." |
 | Senha visível ou escondida (leitor de tela) * | "Mostrar senha" e "Esconder senha" |
 
-## Em aberto
-
-> [!todo] Preencher: pergunta ao Diego sobre os "30 dias sem uso". O tempo de inatividade e o prazo máximo de sessão nativos do Supabase Auth só existem no plano Pro. A spec segue a opção A até a resposta.
-> - **A (recomendada, gratuita):** os 30 dias ficam no site, pela validade dos cookies renovada a cada uso. Limitação: o refresh token não vence no Supabase; um cookie copiado antes dos 30 dias continuaria valendo até a sessão ser renovada ou encerrada.
-> - **B (paga):** plano Pro do Supabase (cerca de US$ 25 por mês), com o tempo de inatividade de 30 dias no próprio Supabase Auth. Sai dos planos gratuitos.
-> - **C (gratuita, mais simples):** "Manter-me conectado" sem prazo: a sessão dura até a pessoa sair; desmarcado, acaba ao fechar o navegador.
-
 ## Seams de teste
 
 > [!info] Proposta, ainda não combinada com o Diego
@@ -197,6 +191,10 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 - [[GLOSSARY]]: Cliente, Convidado, Perfil.
 - [[termos-privacidade]]: destino dos links do aceite.
 
+### Decisão do Orchestrator (2026-10-29)
+
+- **"30 dias sem uso":** contados no site, pela validade dos cookies renovada a cada uso (opção A). O plano Pro do Supabase (opção B) fere a restrição "tudo gratuito" do [[ADR-001-stack]] e do [[ADR-002-hospedagem-api]]; a opção A mantém os 30 dias já aprovados. O limite do cookie copiado é risco aceito.
+
 ### Decisões do Diego (2026-10-29)
 
 - **Pergunta 4:** textos propostos aprovados, com autorização para acrescentar os necessários.
@@ -209,7 +207,7 @@ Decisões pequenas e fáceis de reverter, pela política de autonomia. Qualquer 
 - **Todos os campos do Figma obrigatórios,** porque nenhum está marcado como opcional.
 - **Senha de 8 a 72 caracteres,** sem regra de tipos de caractere (recomendação atual de segurança; 72 é o limite do hash do Supabase Auth).
 - **Telefone com 10 ou 11 dígitos,** com DDD.
-- **"Manter-me conectado":** até 30 dias sem uso quando marcado; termina ao fechar o navegador quando desmarcado. A forma de contar os 30 dias está em "Em aberto".
+- **"Manter-me conectado":** até 30 dias sem uso quando marcado; termina ao fechar o navegador quando desmarcado.
 - **Cookies `HttpOnly`** e chamadas autenticadas pelo lado servidor do site. A documentação do Supabase diz que `HttpOnly` não é necessário porque o cliente do navegador precisa ler o token; aqui o cliente do navegador não é usado, e o token fica fora do alcance de scripts injetados na página.
 - **Limites de tentativa:** os valores da tabela, próximos dos padrões do Supabase Auth.
 - **"Sair" na fase 1,** pedido pelo Reviewer, com o token de acesso valendo até 1 hora depois.
