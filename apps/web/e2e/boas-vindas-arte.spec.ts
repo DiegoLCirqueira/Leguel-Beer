@@ -74,10 +74,14 @@ for (const viewport of LOW_VIEWPORTS) {
         expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
         expect(box.y + box.height).toBeLessThanOrEqual(viewport.height);
       }
-      const overflow = await page.evaluate(() => ({
-        x: document.documentElement.scrollWidth - window.innerWidth,
-        y: document.documentElement.scrollHeight - window.innerHeight,
-      }));
+      const overflow = await page.evaluate(() => {
+        const main = document.querySelector("main")!;
+        return {
+          x: document.documentElement.scrollWidth - window.innerWidth,
+          // Primeira tela: a arte (main) cabe na altura; o rodapé fica abaixo da dobra.
+          y: main.getBoundingClientRect().height - window.innerHeight,
+        };
+      });
       expect(overflow.x).toBeLessThanOrEqual(0);
       expect(overflow.y).toBeLessThanOrEqual(0);
     });
@@ -177,10 +181,14 @@ for (const viewport of VIEWPORTS) {
       );
       await expectCheckboxInDrawnRow(page);
 
-      const overflow = await page.evaluate(() => ({
-        x: document.documentElement.scrollWidth - window.innerWidth,
-        y: document.documentElement.scrollHeight - window.innerHeight,
-      }));
+      const overflow = await page.evaluate(() => {
+        const main = document.querySelector("main")!;
+        return {
+          x: document.documentElement.scrollWidth - window.innerWidth,
+          // Primeira tela: a arte (main) cabe na altura; o rodapé fica abaixo da dobra.
+          y: main.getBoundingClientRect().height - window.innerHeight,
+        };
+      });
       expect(overflow.x).toBeLessThanOrEqual(0);
       expect(overflow.y).toBeLessThanOrEqual(0);
     });
