@@ -4,7 +4,7 @@ import { InvalidTokenError, type TokenVerifier } from "../domain/token-verifier.
 import { InMemoryProfileRepository } from "../testing/in-memory.js";
 import { AuthorizeRequest } from "./authorize-request.js";
 
-const ana = { id: "ana-id", email: "ana@exemplo.com" };
+const ana = { id: "ana-id", email: "ana@exemplo.com", emailVerified: true };
 
 function setup() {
   const verifier: TokenVerifier = {
