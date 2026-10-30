@@ -111,8 +111,7 @@ Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adic
 1. **Projeto de portfólio.** Nenhum pedido é entregue de verdade; esta página descreve como a entrega funcionaria.
 2. **Área de entrega.** Só Maceió e região.
 3. **Frete.** Calculado pela distância até a cervejaria, com frete grátis para pedidos acima de R$ 150.
-4. **Prazo.** Estimado como num delivery: tempo de preparo mais o deslocamento.
-5. **Retirada.** Não há retirada no local.
+4. **Retirada.** Não há retirada no local.
 
 ## Em aberto
 
