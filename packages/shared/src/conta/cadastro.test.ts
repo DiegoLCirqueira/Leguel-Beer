@@ -12,10 +12,12 @@ const valido = {
 
 function primeiroErro(alteracao: Partial<Record<keyof typeof valido, unknown>>) {
   const result = cadastroFormSchema.safeParse({ ...valido, ...alteracao });
-  return result.error?.issues[0] && {
-    campo: result.error.issues[0].path.join("."),
-    mensagem: result.error.issues[0].message,
-  };
+  return (
+    result.error?.issues[0] && {
+      campo: result.error.issues[0].path.join("."),
+      mensagem: result.error.issues[0].message,
+    }
+  );
 }
 
 describe("cadastroFormSchema", () => {
@@ -30,7 +32,11 @@ describe("cadastroFormSchema", () => {
     [{ nome: "" }, "nome", "Informe seu nome completo."],
     [{ email: "ana@" }, "email", "Informe um e-mail válido."],
     [{ telefone: "(82) 1234" }, "telefone", "Informe um telefone com DDD."],
-    [{ senha: "abc123", confirmacao: "abc123" }, "senha", "A senha precisa ter pelo menos 8 caracteres."],
+    [
+      { senha: "abc123", confirmacao: "abc123" },
+      "senha",
+      "A senha precisa ter pelo menos 8 caracteres.",
+    ],
     [{ confirmacao: "outra-senha-1" }, "confirmacao", "As senhas não conferem."],
     [{ aceite: false }, "aceite", "Aceite os termos para criar sua conta."],
   ])("recusa %j no campo %s", (alteracao, campo, mensagem) => {

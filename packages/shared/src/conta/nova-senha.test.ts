@@ -10,8 +10,16 @@ describe("novaSenhaSchema", () => {
   });
 
   it.each([
-    [{ senha: "abc123", confirmacao: "abc123" }, "senha", "A senha precisa ter pelo menos 8 caracteres."],
-    [{ senha: "senha-nova-1", confirmacao: "outra-1234" }, "confirmacao", "As senhas não conferem."],
+    [
+      { senha: "abc123", confirmacao: "abc123" },
+      "senha",
+      "A senha precisa ter pelo menos 8 caracteres.",
+    ],
+    [
+      { senha: "senha-nova-1", confirmacao: "outra-1234" },
+      "confirmacao",
+      "As senhas não conferem.",
+    ],
   ])("recusa %j", (dados, campo, mensagem) => {
     const issue = novaSenhaSchema.safeParse(dados).error?.issues[0];
 
