@@ -82,7 +82,7 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 | --- | --- |
 | Botão "sim" (primário) | "Sim, tenho 18 anos ou mais" |
 | Botão "não" (contorno) | "Não" |
-| Aviso abaixo dos botões | "Aprecie com moderação. Venda proibida para menores de 18 anos." (mesmos avisos do rodapé do LB-22, [[termos-privacidade]]) |
+| Aviso abaixo dos botões | Os avisos do rodapé, com o texto definido em [[termos-privacidade]] ("Textos", linha "Rodapé, avisos") |
 | Texto de apoio em "Acesso não permitido" | "Este site é só para maiores de 18 anos." |
 | Texto de apoio da pergunta * | "Para entrar, confirme sua idade." |
 

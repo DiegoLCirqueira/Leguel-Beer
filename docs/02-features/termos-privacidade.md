@@ -68,10 +68,10 @@ Funcionalidade: Termos, privacidade e aviso de portfólio
 
 - **Páginas:** `/termos` (Termos de Uso), `/privacidade` (Política de Privacidade) e `/entregas` (Entregas). Conteúdo estático, versionado no repositório, com a data da última atualização.
 - **Faixa de portfólio:** fixa no topo de todas as páginas do site, incluindo a pergunta de maioridade e as páginas legais; não pode ser fechada.
-- **Rodapé:** em todas as páginas, menos na pergunta de maioridade: "Aprecie com moderação", "Venda proibida para menores de 18 anos", links para as três páginas e os dados fictícios da empresa.
+- **Rodapé:** em todas as páginas, menos na pergunta de maioridade: os avisos (texto em "Textos", linha "Rodapé, avisos", fonte única também para a pergunta de maioridade e o checkout), links para as três páginas e os dados fictícios da empresa.
 - **Sem pergunta de maioridade** em `/termos` e `/privacidade`, para quem quer ler antes de entrar ([[maioridade-entrada]]). `/entregas` segue a regra normal.
 - **Links do cadastro** abrem em nova aba.
-- **Checkout:** o resumo do pedido mostra "Aprecie com moderação" e o link dos Termos de Uso. Vale quando o checkout existir; o teste entra com o LB-55 (#31, [[checkout]]).
+- **Checkout:** o resumo do pedido mostra o primeiro aviso do rodapé e o link dos Termos de Uso. Vale quando o checkout existir; o teste entra com o LB-55 (#31, [[checkout]]).
 - **Revisão jurídica:** fora do escopo, como no card. Os textos são de um projeto de portfólio.
 
 ## Textos
