@@ -6,14 +6,21 @@ const AGORA = new Date("2026-10-30T12:00:00.000Z");
 const ana = { id: "ana-id", email: "ana@exemplo.com", emailVerified: true };
 const dados = { nome: "Ana Souza", telefone: "82912345678", aceite: true as const };
 
-function setup(adminEmail?: string) {
+function setup(adminEmail?: string, confirmedIds: string[] = ["ana-id"]) {
   const profiles = new InMemoryProfileRepository();
-  const useCase = new CreateProfile(profiles, {
+  const consultas: string[] = [];
+  const confirmation = {
+    isConfirmed: (id: string) => {
+      consultas.push(id);
+      return Promise.resolve(confirmedIds.includes(id));
+    },
+  };
+  const useCase = new CreateProfile(profiles, confirmation, {
     now: () => AGORA,
     legal: { termosVersao: "2026-10-30", privacidadeVersao: "2026-10-29" },
     adminEmail,
   });
-  return { profiles, useCase };
+  return { profiles, useCase, consultas };
 }
 
 describe("CreateProfile", () => {
@@ -69,15 +76,20 @@ describe("CreateProfile", () => {
     expect(second).toEqual({ profile: first.profile, created: false });
   });
 
-  it("não concede admin quando o token não prova o e-mail verificado: cria como cliente", async () => {
-    const { useCase } = setup("ana@exemplo.com");
+  it("não concede admin quando o servidor não confirma o e-mail: cria como cliente", async () => {
+    const { useCase } = setup("ana@exemplo.com", []);
 
-    const result = await useCase.execute({
-      user: { ...ana, emailVerified: false },
-      ...dados,
-    });
+    const result = await useCase.execute({ user: ana, ...dados });
 
     expect(result.profile.role).toBe("customer");
     expect(result.created).toBe(true);
+  });
+
+  it("só consulta a confirmação quando o e-mail é o do admin", async () => {
+    const { useCase, consultas } = setup("admin@exemplo.com");
+
+    await useCase.execute({ user: ana, ...dados });
+
+    expect(consultas).toEqual([]);
   });
 });

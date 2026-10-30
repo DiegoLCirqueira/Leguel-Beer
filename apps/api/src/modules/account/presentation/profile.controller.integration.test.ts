@@ -41,7 +41,10 @@ describe("POST e GET /me/profile (banco real)", () => {
     prisma = app.get(PrismaService);
   });
 
-  beforeEach(() => resetDatabase(prisma));
+  beforeEach(async () => {
+    await resetDatabase(prisma);
+    await prisma.$executeRaw`DELETE FROM auth.users`;
+  });
   afterAll(() => app.close());
 
   const post = (token: string | undefined, body: unknown) =>
@@ -89,21 +92,24 @@ describe("POST e GET /me/profile (banco real)", () => {
     expect(await prisma.profile.count()).toBe(1);
   });
 
-  it("grava o papel admin para o e-mail do ADMIN_EMAIL", async () => {
+  it("grava o papel admin para o e-mail do ADMIN_EMAIL com e-mail confirmado em auth.users", async () => {
+    await prisma.$executeRaw`INSERT INTO auth.users (id, email, email_confirmed_at) VALUES (${tokens.adminId}::uuid, 'admin@leguele.test', now())`;
+
     const response = await post(tokens.admin(), valido);
 
     expect(response.status).toBe(201);
     expect(response.body.papel).toBe("admin");
   });
 
-  it("o e-mail do admin sem prova de verificação no token vira cliente", async () => {
-    const naoVerificado = tokens.custom({
+  it("o e-mail do admin com email_confirmed_at nulo em auth.users vira cliente, mesmo com user_metadata dizendo o contrário", async () => {
+    await prisma.$executeRaw`INSERT INTO auth.users (id, email, email_confirmed_at) VALUES (${tokens.adminId}::uuid, 'admin@leguele.test', NULL)`;
+    const forjado = tokens.custom({
       sub: tokens.adminId,
       email: "admin@leguele.test",
-      user_metadata: { email_verified: false },
+      user_metadata: { email_verified: true },
     });
 
-    const response = await post(naoVerificado, valido);
+    const response = await post(forjado, valido);
 
     expect(response.status).toBe(201);
     expect(response.body.papel).toBe("cliente");
