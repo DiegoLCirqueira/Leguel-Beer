@@ -4,7 +4,7 @@ modulo: design
 card-notion: https://app.notion.com/p/3fd490a7ac7d818bbd1ef6ebfb609310
 prioridade: P0
 criado: 2026-10-29
-atualizado: 2026-10-29
+atualizado: 2026-10-30
 issues:
   - "#63 LB-11"
   - "#64 LB-12"
@@ -40,11 +40,13 @@ Funcionalidade: Tokens e componentes base da marca
       | texto             | superficie       |
       | texto-suave       | superficie       |
       | primaria          | fundo            |
+      | primaria          | superficie       |
       | texto-na-primaria | primaria         |
       | texto-badge       | badge-ipa        |
       | texto-badge       | badge-malt       |
       | texto-badge       | badge-lager      |
       | texto-na-primaria | badge-frutas     |
+      | texto             | arte-vidro       |
       | sucesso           | superficie       |
       | erro              | superficie       |
       | aviso             | superficie       |
@@ -93,7 +95,7 @@ Funcionalidade: Tokens e componentes base da marca
 
 ### Tokens de cor
 
-Só tema escuro. Valores tirados da paleta de `estudio-garrafas.html` e conferidos por amostragem no print do Figma (o print tem gradientes e compressão; a amostra varia alguns tons). A vitrine dos tokens e componentes fica na home por enquanto, para conferência visual nos portais (decisão do Orchestrator, 2026-10-29). É provisória: quando o LB-24 ([[boas-vindas]]) entrar, a home volta a ser a da loja e a vitrine vai para `/dev/tokens`, disponível só no desenvolvimento, como pede o card LB-11.
+Só tema escuro. O verde da marca, o texto sobre ele e o texto principal são os valores medidos no Figma pelo Front na tela de [[boas-vindas]] (decisão do Diego, 2026-10-30: valem no site inteiro). Os demais vêm da paleta de `estudio-garrafas.html`, conferidos por amostragem no print do Figma (o print tem gradientes e compressão; a amostra varia alguns tons). A vitrine dos tokens e componentes fica na home por enquanto, para conferência visual nos portais (decisão do Orchestrator, 2026-10-29). É provisória: quando o LB-24 ([[boas-vindas]]) entrar, a home volta a ser a da loja e a vitrine vai para `/dev/tokens`, disponível só no desenvolvimento, como pede o card LB-11.
 
 | Token | Valor | Uso no Figma |
 | --- | --- | --- |
@@ -101,10 +103,10 @@ Só tema escuro. Valores tirados da paleta de `estudio-garrafas.html` e conferid
 | `superficie` | `#10261A` | Cards, campos de formulário, caixas de aviso |
 | `superficie-elevada` | `#163021` | Chips não selecionados, badge neutro |
 | `borda` | `#24452F` | Contorno de cards, campos e chips |
-| `texto` | `#EEF5E6` | Títulos, rótulos e texto principal |
+| `texto` | `#F7FBF5` | Títulos, rótulos e texto principal |
 | `texto-suave` | `#A9BFA0` | Placeholders, legendas, preço riscado |
-| `primaria` | `#B7E86A` | Verde-limão: botão primário, links, ícones dos campos, chip selecionado |
-| `texto-na-primaria` | `#0C1C11` | Texto e ícone sobre o verde-limão |
+| `primaria` | `#95DC50` | Verde da marca: botão primário, links, ícones dos campos, chip selecionado |
+| `texto-na-primaria` | `#000A00` | Texto e ícone sobre o verde da marca |
 | `texto-badge` | `#FFFFFF` | Texto dos badges IPA, MALT e LAGER |
 | `badge-ipa` | `#177E26` | Badge "IPA" |
 | `badge-frutas` | `#EB9725` | Badge "FRUTAS" |
@@ -114,19 +116,30 @@ Só tema escuro. Valores tirados da paleta de `estudio-garrafas.html` e conferid
 | `sucesso` | `#6FD98A` | Texto e ícone de confirmação (ex.: "Senha alterada") |
 | `erro` | `#FF8A80` | Mensagens de erro dos campos e borda do campo inválido |
 | `aviso` | `#F5B74A` | Avisos que pedem atenção (ex.: e-mail não confirmado) |
+| `arte-vidro` | `#0B1C0D` | Fundo translúcido dos controles sobre a arte (ex.: "Continuar como convidado" na [[boas-vindas]]) |
+| `arte-borda` | `#2D3D2F` | Contorno dos controles translúcidos sobre a arte |
+| `arte-linha` | `#A3A698` | Linhas do separador "ou" sobre a arte |
 
-- O verde-limão nunca é fundo de texto claro nem aparece sobre fundo branco (o card avisa que não passa contraste).
+- **Tokens `arte-*`:** os medidos na arte da [[boas-vindas]] que coincidem com tokens da marca deixam de existir à parte: `arte-botao` vira `primaria`, `arte-tinta` vira `texto-na-primaria` e `arte-texto` vira `texto`. Ficam só os três acima, próprios dos controles translúcidos sobre a arte.
+
+- O verde da marca nunca é fundo de texto claro nem aparece sobre fundo branco (o card avisa que não passa contraste).
 - Badge: a cor sai do token da categoria pelo identificador (slug) da categoria. Categoria cadastrada depois, sem token, usa `badge-neutro`. O Stout aparece no Figma, mas saiu do catálogo ([[catalogo]]) e não ganha token.
 
+- **Contraste refeito (2026-10-30)** para os pares que mudaram, com os valores do Figma: `texto` sobre `fundo` 18,2:1 (antes 17,1), `texto` sobre `superficie` 15,3:1 (antes 14,3), `primaria` sobre `fundo` 11,5:1 (antes 13,4), `primaria` sobre `superficie` 9,6:1, `texto-na-primaria` sobre `primaria` 12,1:1 (antes 12,4), `texto-na-primaria` sobre `badge-frutas` 8,6:1 (antes 7,5) e `texto` sobre `arte-vidro` 16,9:1. Todos passam AA (4,5:1).
 - **Estados:** verde, vermelho e âmbar nos tons do tema escuro, usados como texto e ícone sobre `fundo` e `superficie` (decisão do Diego, 2026-10-29). Os valores acima são os implementados e testados pelo Front no LB-11 (passam AA sobre `superficie`, no teste de contraste).
-- **Badge "FRUTAS":** texto `texto-na-primaria` (escuro), cerca de 7,5:1 (decisão do Diego, 2026-10-29). Texto claro daria cerca de 2,3:1.
+- **Badge "FRUTAS":** texto `texto-na-primaria` (escuro), cerca de 8,6:1 com os valores do Figma (decisão do Diego, 2026-10-29). Texto claro daria cerca de 2,3:1.
 
 ### Tipografia
 
-- **Texto:** Outfit (Google Fonts, carregada pelo `next/font`), pesos 400, 500 e 600. É a fonte de `estudio-garrafas.html` e bate com os botões e formulários do Figma.
-- **Títulos de destaque** ("Criar sua conta", "Recuperar senha", "Sabor de verdade em cada gole!"): fonte manuscrita em pincel, com a segunda linha em verde-limão.
+- **Texto:** Figtree (Google Fonts, carregada pelo `next/font`), pesos 400, 500, 600 e 700, no site inteiro: textos, botões, campos e formulários. É a fonte medida no Figma pelo Front na [[boas-vindas]] (decisão do Diego, 2026-10-30). Substitui a Outfit, que sai do site.
+- **Títulos de destaque** ("Criar sua conta", "Recuperar senha", "Sabor de verdade em cada gole!"): fonte manuscrita em pincel, com a segunda linha no verde da marca.
 
 - **Fonte dos títulos:** **Kaushan Script** (Google Fonts, pelo `next/font`), escolhida pelo Front como a mais próxima do print; o Diego confere nos portais (decisão do Diego, 2026-10-29: "use a que preferir").
+
+### Telas e layout
+
+- **Mobile-first:** o site é desenhado para celular (a partir de 360 px). Os tokens desta spec valem em qualquer largura.
+- **Desktop:** o layout próprio de desktop fica para quando o design de web (tela de computador) existir no Figma (decisão do Diego, 2026-10-30). Até lá, em telas largas o site só não pode quebrar: sem rolagem horizontal, sem conteúdo cortado ou sobreposto e com os controles utilizáveis.
 
 ### Espaçamento, raios e sombras
 
@@ -137,15 +150,19 @@ Só tema escuro. Valores tirados da paleta de `estudio-garrafas.html` e conferid
 
 ### Componentes
 
-- **Botão:** variantes primária (fundo verde-limão, ex.: "Entrar", "Criar conta" do formulário), contorno (borda verde-limão, fundo transparente, ex.: "Criar conta" da tela inicial) e discreta (fundo `superficie`, borda `borda`, ex.: "Continuar como convidado"). Ícone opcional à esquerda e/ou à direita (seta). Tamanhos: pequeno (ex.: "Adicionar" no card) e grande (largura total, nos formulários). Estados: carregando e desabilitado. Área de toque mínima de 44 × 44 px.
+- **Botão:** variantes primária (fundo verde da marca, ex.: "Entrar", "Criar conta" do formulário), contorno (borda verde da marca, fundo transparente, ex.: "Criar conta" da tela inicial) e discreta (fundo `superficie`, borda `borda`, ex.: "Continuar como convidado"). Ícone opcional à esquerda e/ou à direita (seta). Tamanhos: pequeno (ex.: "Adicionar" no card) e grande (largura total, nos formulários). Estados: carregando e desabilitado. Área de toque mínima de 44 × 44 px.
 - **Badge de estilo:** pílula com o nome da categoria em maiúsculas, cor do token da categoria.
-- **Chip de categoria:** ícone em cima, rótulo e contador entre parênteses abaixo ("IPAs (4)"); selecionável, um por vez, com `aria-pressed`. Selecionado: borda e texto em verde-limão. O comportamento na página está em [[catalogo]].
+- **Chip de categoria:** ícone em cima, rótulo e contador entre parênteses abaixo ("IPAs (4)"); selecionável, um por vez, com `aria-pressed`. Selecionado: borda e texto no verde da marca. O comportamento na página está em [[catalogo]].
 
 ### Decisões do Diego (2026-10-29)
 
 - **Pergunta 1:** fonte manuscrita dos títulos à escolha do Front, do Google Fonts, conferida pelo Diego nos portais. O Front escolheu Kaushan Script.
 - **Pergunta 2:** cores de estado em verde, vermelho e âmbar nos tons do tema escuro.
 - **Pergunta 3:** badge "FRUTAS" com texto escuro.
+
+### Decisões do Diego (2026-10-30)
+
+- **Cores e fonte do Figma no site inteiro:** "1- A, qnd o design pra web estiver pronto (tamnaho de tela de pc) a gente organiza direito a visualização de desktop". O verde `#95DC50` e a Figtree, medidos na [[boas-vindas]], valem em todas as telas, não só no acesso; o layout de desktop espera o design de web.
 
 ## Seams de teste
 
@@ -174,8 +191,9 @@ Só tema escuro. Valores tirados da paleta de `estudio-garrafas.html` e conferid
 
 Decisões pequenas e fáceis de reverter, pela política de autonomia. Qualquer uma pode ser vetada.
 
-- **Paleta:** valores de `estudio-garrafas.html`, conferidos no print do Figma, em vez de amostrar só o print (que tem gradiente e compressão).
-- **Fonte de texto:** Outfit, a fonte declarada em `estudio-garrafas.html`.
+- **Paleta:** fora os valores medidos no Figma (`primaria`, `texto-na-primaria`, `texto`), valores de `estudio-garrafas.html`, conferidos no print do Figma, em vez de amostrar só o print (que tem gradiente e compressão).
+- **`superficie` e `borda` mantidos (2026-10-30):** o vidro e a borda medidos na [[boas-vindas]] são de controles translúcidos sobre a arte e ficam como `arte-vidro` e `arte-borda`. Trocar `superficie` por `#0B1C0D` deixaria cards e campos quase da cor do `fundo`.
+- **Kaushan Script mantida nos títulos (2026-10-30):** o título da [[boas-vindas]] faz parte da arte (imagem), então o Figma não mostra outra fonte.
 - **Badge de categoria nova:** usa `badge-neutro`; a cor não fica no cadastro da categoria.
 - **Texto dos badges em branco puro (`texto-badge`):** com `texto` (`#EEF5E6`) o badge MALT fica em cerca de 4,2:1 e não passa AA; com branco puro fica em cerca de 4,7:1.
 - **Nomes dos tokens em português:** seguem o [[GLOSSARY]] e o resto do vault.
@@ -187,5 +205,5 @@ Reconciliação com as issues migradas, a aplicar depois do merge desta spec (ap
 
 | Issue | Ajuste proposto | Motivo |
 | --- | --- | --- |
-| #63 LB-11 | Link para esta spec; critérios: os cenários de contraste e de cor fixa; tabela de tokens; Outfit como fonte de texto | A issue só aponta para o Notion |
+| #63 LB-11 | Link para esta spec; critérios: os cenários de contraste e de cor fixa; tabela de tokens; Figtree como fonte de texto | A issue só aponta para o Notion |
 | #64 LB-12 | Link para esta spec; critérios: os cenários de botão, chip, badge e acessibilidade; badge de categoria nova com `badge-neutro`; Stout sem token | O card cita o Stout e não define a cor de categoria nova |
