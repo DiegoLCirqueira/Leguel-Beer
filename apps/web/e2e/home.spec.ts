@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./support/maior-de-idade";
 
 test("a home sem sessão leva para a boas-vindas e mostra os caminhos de acesso", async ({
   page,
