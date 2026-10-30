@@ -94,7 +94,11 @@ export class JwksTokenVerifier implements TokenVerifier {
     if (claims.role !== "authenticated" || typeof claims.sub !== "string")
       throw new InvalidTokenError("não é de uma conta autenticada");
 
-    return { id: claims.sub, email: typeof claims.email === "string" ? claims.email : "" };
+    // O produto só tem conta de e-mail e senha: token sem e-mail não é de uma conta nossa.
+    if (typeof claims.email !== "string" || claims.email === "")
+      throw new InvalidTokenError("sem e-mail");
+
+    return { id: claims.sub, email: claims.email };
   }
 
   private async findKey(kid: string | undefined): Promise<Jwk | undefined> {
