@@ -21,6 +21,11 @@ const BY_STATUS: Record<number, { code: string; message: string }> = {
   429: { code: "TOO_MANY_REQUESTS", message: "Muitas requisições. Tente novamente em instantes." },
 };
 
+const GENERIC_HTTP: ErrorBody = {
+  code: "HTTP_ERROR",
+  message: "Não foi possível processar a requisição.",
+};
+
 const INTERNAL: ErrorBody = {
   code: "INTERNAL_ERROR",
   message: "Erro interno. Tente novamente mais tarde.",
@@ -35,7 +40,9 @@ export function toErrorResponse(error: unknown): ErrorResponse {
   }
   if (error instanceof HttpException) {
     const mapped = BY_STATUS[error.getStatus()];
-    if (mapped) return { status: error.getStatus(), body: mapped };
+    const status = error.getStatus();
+    if (mapped) return { status, body: mapped };
+    return { status, body: status >= 500 ? INTERNAL : GENERIC_HTTP };
   }
   return { status: 500, body: INTERNAL };
 }
