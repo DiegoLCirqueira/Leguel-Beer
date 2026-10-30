@@ -2,8 +2,10 @@ import { Controller, Get, HttpStatus, Inject, Res } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import type { Response } from "express";
 import { CheckHealth, type HealthReport } from "../application/check-health.js";
+import { Public } from "../../account/presentation/access.decorators.js";
 import { DATABASE_HEALTH, type DatabaseHealth } from "../application/database-health.js";
 
+@Public()
 @ApiTags("health")
 @Controller("health")
 export class HealthController {

@@ -6,12 +6,14 @@ import { PrismaModule } from "./common/prisma/prisma.module.js";
 import { AllExceptionsFilter } from "./common/http/all-exceptions.filter.js";
 import { requestIdMiddleware } from "./common/http/request-id.middleware.js";
 import { ZodValidationPipe } from "./common/validation/zod-validation.pipe.js";
+import { AccountModule } from "./modules/account/account.module.js";
 import { HealthModule } from "./modules/health/health.module.js";
 
 @Module({
   imports: [
     CommonModule,
     PrismaModule,
+    AccountModule,
     HealthModule,
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
   ],
