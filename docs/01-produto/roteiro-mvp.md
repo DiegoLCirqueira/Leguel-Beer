@@ -45,7 +45,7 @@ Agrupado por dependência. Dentro de cada grupo, a ordem da lista.
 
 | Grupo | Cards | Observação |
 | --- | --- | --- |
-| A. Base técnica | LB-2 (#11), LB-5 (#14), LB-6 (#15), LB-7 (#16), LB-8 (#17), LB-121 (#7), LB-122 (#8) | LB-2, LB-5, LB-6 e LB-7 foram em parte entregues pelo LB-1 ([[base-monorepo]]): reconciliar antes. LB-121 já foi respondido pelo [[ADR-002-hospedagem-api]]. LB-8 traz o Supabase na nuvem, o envio de e-mails, a réplica dos "Limites de tentativa" de [[cadastro-login]], da chave assimétrica de JWT de [[guards-api]] e da confirmação de e-mail obrigatória (`enable_confirmations = true`, sem ela quem cadastrar o e-mail do admin vira admin) e a conferência de que o papel do `DATABASE_URL` na nuvem lê `auth.users` (SELECT em `id` e `email_confirmed_at`; a API usa isso para conceder admin), e a decisão "merge = deploy" do Diego |
+| A. Base técnica | LB-2 (#11), LB-5 (#14), LB-6 (#15), LB-7 (#16), LB-8 (#17), LB-121 (#7), LB-122 (#8) | LB-2, LB-5, LB-6 e LB-7 foram em parte entregues pelo LB-1 ([[base-monorepo]]): reconciliar antes. LB-121 já foi respondido pelo [[ADR-002-hospedagem-api]]. LB-8 traz o Supabase na nuvem, o envio de e-mails e a decisão "merge = deploy" do Diego; o que conferir na nuvem está no "Checklist do LB-8", abaixo |
 | B. Catálogo | LB-4 (#13), LB-13 (#65), LB-14 (#66, P1), LB-15 (#67), LB-33 (#22), LB-36 (#25), LB-34 (#23) | [[catalogo]], [[destaques-home]]. LB-14 sobe por ser dependência do LB-36 (bottom sheet dos filtros). Faixas de filtro ainda em aberto com o Diego |
 | C. Geladeira | LB-124 (#61), LB-47 (#54), LB-49 (#56), LB-50 (#57), LB-51 (#58), LB-52 (#59), LB-35 (#24) | [[geladeira]], [[adicionar-do-card]]. LB-35 depende do LB-47 |
 | D. Página de produto | LB-40 (#82), LB-41 (#83), LB-42 (#84) | LB-42 depende do LB-47 |
@@ -55,6 +55,17 @@ Agrupado por dependência. Dentro de cada grupo, a ordem da lista.
 | H. Pedidos do cliente | LB-67 (#108) | Depende do checkout |
 | I. Admin | LB-72 (#72), LB-73 (#73), LB-75 (#75), LB-76 (#76), LB-77 (#77) | LB-72 usa o papel admin do [[guards-api]]; LB-76 depende de pedidos |
 | J. Qualidade | LB-111 (#90), LB-112 (#91) | Fecham o MVP: checklist de segurança e E2E da compra de ponta a ponta |
+
+### Checklist do LB-8
+
+O que a nuvem precisa repetir do Supabase local. Vem das specs e das revisões dos PRs #153 (tela de criar conta) e #154 (perfil em `/me/profile`).
+
+- [ ] **Limites de tentativa:** replicar na nuvem os "Limites de tentativa" de [[cadastro-login]].
+- [ ] **Limite por IP do cadastro:** a Server Action do cadastro repassa o IP do visitante (`X-Forwarded-For`) ao Supabase Auth. Confirmar na nuvem que o GoTrue confia nesse cabeçalho e testar com 31 cadastros seguidos do mesmo IP.
+- [ ] **Chave assimétrica de JWT:** replicar a de [[guards-api]].
+- [ ] **Confirmação de e-mail obrigatória:** `enable_confirmations = true` na nuvem. Sem ela, quem cadastrar o e-mail do admin vira admin.
+- [ ] **Leitura de `auth.users`:** a API lê `id` e `email_confirmed_at` para conceder admin. Se o papel do `DATABASE_URL` de produção não for o `postgres`, dar `GRANT SELECT (id, email_confirmed_at) ON auth.users` a esse papel.
+- [ ] **Endereço do site:** `SITE_URL` obrigatório em produção, e `site_url` e `additional_redirect_urls` do Supabase na nuvem iguais ao domínio do site.
 
 ## Ver também
 
