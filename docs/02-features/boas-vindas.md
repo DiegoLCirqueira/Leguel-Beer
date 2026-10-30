@@ -4,7 +4,7 @@ modulo: acesso
 card-notion: https://app.notion.com/p/3fd490a7ac7d8172b935df8e794f5411
 prioridade: P0
 criado: 2026-10-29
-atualizado: 2026-10-29
+atualizado: 2026-10-30
 issues:
   - "#39 LB-24"
 tags:
@@ -31,7 +31,8 @@ Funcionalidade: Tela de boas-vindas
   Cenário: Tela inicial como no Figma
     Dado que confirmei a maioridade e não entrei numa conta
     Quando abro o site num celular de 360 px de largura
-    Então vejo o logo, "Cervejas artesanais e muito mais!" e "Sabor Qualidade Tradição"
+    Então vejo o logo e "Cervejas artesanais e muito mais!"
+    E não vejo "Sabor Qualidade Tradição"
     E vejo os botões "Entrar", "Criar conta" e "Continuar como convidado"
     E vejo "Manter-me conectado" marcado
     E a página não tem rolagem horizontal
@@ -71,7 +72,8 @@ Funcionalidade: Tela de boas-vindas
 - **Quem vê:** quem abre a home sem sessão ativa e sem ter escolhido "convidado" nesta sessão do navegador. Links diretos para outras páginas (ex.: um link do catálogo) abrem a página pedida, sem passar pela boas-vindas.
 - **Convidado:** a escolha vale até o navegador ser fechado. O convidado navega e monta a Geladeira, mas só finaliza a compra entrando numa conta ([[GLOSSARY]], [[adicionar-do-card]]).
 - **"Manter-me conectado":** começa marcado (como no Figma) e é levado para a tela de entrar. O efeito na sessão está em [[cadastro-login]].
-- **Textos do Figma** (decisão do Diego já tomada): "Cervejas artesanais e muito mais!", "Sabor Qualidade Tradição", "Entrar", "Criar conta", "ou", "Continuar como convidado", "Manter-me conectado".
+- **Textos do Figma** (decisão do Diego já tomada): "Cervejas artesanais e muito mais!", "Entrar", "Criar conta", "ou", "Continuar como convidado", "Manter-me conectado".
+- **Sem "Sabor Qualidade Tradição":** o texto que aparece no Figma sai da tela (decisão do Diego, 2026-10-30).
 - **Imagens:** logo, garrafa com copo, barril e folhagem de `Imagens/`, otimizadas para celular. A imagem principal tem texto alternativo.
 - **Componentes:** "Entrar" é o botão primário com ícone e seta; "Criar conta", o botão de contorno; "Continuar como convidado", o botão discreto ([[identidade-visual]]).
 
@@ -105,6 +107,10 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 
 - [[maioridade-entrada]], [[cadastro-login]], [[identidade-visual]]
 - [[GLOSSARY]]: Convidado, Cliente.
+
+### Decisões do Diego (2026-10-30)
+
+- **"Sabor Qualidade Tradição":** retirado da tela de boas-vindas, embora apareça no Figma.
 
 ## Decisões tomadas sem consulta
 
