@@ -45,7 +45,7 @@ Agrupado por dependência. Dentro de cada grupo, a ordem da lista.
 
 | Grupo | Cards | Observação |
 | --- | --- | --- |
-| A. Base técnica | LB-2 (#11), LB-5 (#14), LB-6 (#15), LB-7 (#16), LB-8 (#17), LB-121 (#7), LB-122 (#8) | LB-2, LB-5, LB-6 e LB-7 foram em parte entregues pelo LB-1 ([[base-monorepo]]): reconciliar antes. LB-121 já foi respondido pelo [[ADR-002-hospedagem-api]]. LB-8 traz o Supabase na nuvem, o envio de e-mails, a réplica dos "Limites de tentativa" de [[cadastro-login]] e da chave assimétrica de JWT de [[guards-api]], e a decisão "merge = deploy" do Diego |
+| A. Base técnica | LB-2 (#11), LB-5 (#14), LB-6 (#15), LB-7 (#16), LB-8 (#17), LB-121 (#7), LB-122 (#8) | LB-2, LB-5, LB-6 e LB-7 foram em parte entregues pelo LB-1 ([[base-monorepo]]): reconciliar antes. LB-121 já foi respondido pelo [[ADR-002-hospedagem-api]]. LB-8 traz o Supabase na nuvem, o envio de e-mails, a réplica dos "Limites de tentativa" de [[cadastro-login]], da chave assimétrica de JWT de [[guards-api]] e da confirmação de e-mail obrigatória (`enable_confirmations = true`, sem ela quem cadastrar o e-mail do admin vira admin), e a decisão "merge = deploy" do Diego |
 | B. Catálogo | LB-4 (#13), LB-13 (#65), LB-14 (#66, P1), LB-15 (#67), LB-33 (#22), LB-36 (#25), LB-34 (#23) | [[catalogo]], [[destaques-home]]. LB-14 sobe por ser dependência do LB-36 (bottom sheet dos filtros). Faixas de filtro ainda em aberto com o Diego |
 | C. Geladeira | LB-124 (#61), LB-47 (#54), LB-49 (#56), LB-50 (#57), LB-51 (#58), LB-52 (#59), LB-35 (#24) | [[geladeira]], [[adicionar-do-card]]. LB-35 depende do LB-47 |
 | D. Página de produto | LB-40 (#82), LB-41 (#83), LB-42 (#84) | LB-42 depende do LB-47 |
