@@ -12,6 +12,12 @@ const PRISMA_ROLE = { customer: "CUSTOMER", admin: "ADMIN" } as const satisfies 
 export class PrismaProfileRepository implements ProfileRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findRole(id: string): Promise<Role | null> {
+    const profile = await this.prisma.profile.findUnique({ where: { id }, select: { role: true } });
+    if (!profile) return null;
+    return profile.role === "ADMIN" ? "admin" : "customer";
+  }
+
   async ensureRole(profile: { id: string; email: string }, role: Role): Promise<void> {
     try {
       await this.prisma.profile.upsert({
