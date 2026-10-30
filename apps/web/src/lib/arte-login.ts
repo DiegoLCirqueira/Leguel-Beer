@@ -12,7 +12,11 @@ export const CONTROLS = {
   checkbox: { x: 305, y: 1757, w: 26, h: 25 },
 } satisfies Record<string, ArtRect>;
 
-export const OR_ROW = { centerY: 1631, left: { x: 205, w: 190 }, right: { x: 457, w: 188 } } as const;
+export const OR_ROW = {
+  centerY: 1631,
+  left: { x: 205, w: 190 },
+  right: { x: 457, w: 188 },
+} as const;
 
 export const pctX = (x: number) => `${(((x - ART.x0) / ART.width) * 100).toFixed(3)}%`;
 export const pctY = (y: number) => `${(((y - ART.y0) / ART.height) * 100).toFixed(3)}%`;
