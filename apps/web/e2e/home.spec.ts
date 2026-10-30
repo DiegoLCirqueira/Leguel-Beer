@@ -95,16 +95,29 @@ for (const { width, height } of [
   { width: 360, height: 780 },
   { width: 390, height: 844 },
 ]) {
-  test(`a dica do (i) não cobre o botão de convidado em ${width}x${height}`, async ({ page }) => {
+  test(`a dica do (i) fica entre o convidado e o checkbox em ${width}x${height}`, async ({
+    page,
+  }) => {
     await page.setViewportSize({ width, height });
     await page.goto("/boas-vindas");
+    const info = page.getByRole("button", { name: "Saiba mais sobre Manter-me conectado" });
+    const hintText = page.getByText(/Sua sessão continua ativa/);
 
-    await page.getByRole("button", { name: "Saiba mais sobre Manter-me conectado" }).click();
-    const hint = await page.getByText(/Sua sessão continua ativa/).boundingBox();
+    await info.click();
+    const hint = await hintText.boundingBox();
     const guest = await page.getByRole("link", { name: "Continuar como convidado" }).boundingBox();
+    const checkbox = await page
+      .getByRole("checkbox", { name: "Manter-me conectado" })
+      .boundingBox();
 
     expect(hint).not.toBeNull();
-    expect(guest).not.toBeNull();
     expect(hint!.y).toBeGreaterThanOrEqual(guest!.y + guest!.height);
+    expect(hint!.y + hint!.height).toBeLessThanOrEqual(checkbox!.y);
+
+    await page.getByRole("checkbox", { name: "Manter-me conectado" }).uncheck();
+    await expect(page.getByRole("checkbox", { name: "Manter-me conectado" })).not.toBeChecked();
+
+    await info.click();
+    await expect(hintText).toBeHidden();
   });
 }
