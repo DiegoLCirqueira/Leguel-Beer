@@ -1,15 +1,24 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, type LoggerService } from "@nestjs/common";
 
 type LogContext = Record<string, unknown>;
 
 @Injectable()
-export class AppLogger {
+export class AppLogger implements LoggerService {
   info(message: string, context: LogContext = {}): void {
     this.write("info", message, context);
   }
 
   error(message: string, context: LogContext = {}): void {
     this.write("error", message, context);
+  }
+
+  // Interface LoggerService do Nest, usada nos logs internos do framework.
+  log(message: unknown, context?: string): void {
+    this.info(String(message), context ? { context } : {});
+  }
+
+  warn(message: unknown, context?: string): void {
+    this.info(String(message), context ? { context } : {});
   }
 
   private write(level: "info" | "error", message: string, context: LogContext): void {
