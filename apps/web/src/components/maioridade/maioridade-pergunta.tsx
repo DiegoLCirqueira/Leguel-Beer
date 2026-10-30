@@ -23,6 +23,14 @@ export function MaioridadePergunta({ retorno, confirmar }: Props) {
   return (
     <main className="relative isolate flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-fundo px-6 py-10 text-center">
       <Image
+        src="/maioridade/fundo.webp"
+        alt=""
+        fill
+        sizes="100vw"
+        priority
+        className="pointer-events-none -z-20 select-none object-cover brightness-75"
+      />
+      <Image
         src="/maioridade/folhagem-topo.webp"
         alt=""
         width={420}
@@ -36,7 +44,7 @@ export function MaioridadePergunta({ retorno, confirmar }: Props) {
         width={420}
         height={389}
         priority
-        className="pointer-events-none absolute bottom-0 right-0 -z-10 w-48 max-w-[55%] select-none"
+        className="pointer-events-none absolute bottom-0 right-0 -z-10 w-40 max-w-[45%] select-none"
       />
       <div className="flex w-full max-w-sm flex-col items-center gap-6">
         <Image
@@ -45,7 +53,7 @@ export function MaioridadePergunta({ retorno, confirmar }: Props) {
           width={320}
           height={320}
           priority
-          className="size-32 rounded-full"
+          className="size-32"
         />
         {negado ? (
           <>
