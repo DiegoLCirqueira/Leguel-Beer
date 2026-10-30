@@ -2,6 +2,8 @@
 
 /* Tokens da marca (tema escuro). Único lugar com valores de cor; componentes usam só as classes geradas. */
 @theme {
+  --color-*: initial;
+
   --color-fundo: #07120b;
   --color-superficie: #10261a;
   --color-superficie-elevada: #163021;
