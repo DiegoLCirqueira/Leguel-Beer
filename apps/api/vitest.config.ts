@@ -8,5 +8,11 @@ export default defineConfig({
     environment: "node",
     include: ["src/**/*.test.ts", "test/**/*.test.ts"],
     exclude: ["src/**/*.integration.test.ts"],
+    coverage: {
+      provider: "v8",
+      include: ["src/modules/*/{domain,application}/**/*.ts"],
+      exclude: ["**/*.test.ts"],
+      thresholds: { lines: 80 },
+    },
   },
 });
