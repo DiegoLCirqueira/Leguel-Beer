@@ -33,9 +33,6 @@ export function SiteFooter() {
         Leguelé Beer Cervejaria Artesanal Ltda. (empresa fictícia) · CNPJ 00.000.000/0001-00
         (fictício) · Maceió, AL
       </p>
-      <p className="max-w-sm text-xs">
-        Leguelé Beer é um projeto de portfólio. Nenhuma venda é real e nenhum valor é cobrado.
-      </p>
     </footer>
   );
 }

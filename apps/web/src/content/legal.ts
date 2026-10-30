@@ -1,13 +1,13 @@
 import type { SecaoLegal } from "@/components/legal/legal-page";
 
 // Data da versão dos textos legais (AAAA-MM-DD). Atualize ao mudar qualquer texto abaixo.
-export const ATUALIZADO_EM = "2026-10-30";
+export const ATUALIZADO_EM = "2026-10-31";
 
 export const TERMOS: SecaoLegal[] = [
   {
     titulo: "Sobre este site.",
     texto:
-      "A Leguelé Beer é um projeto de portfólio de desenvolvimento de software. A cervejaria, os produtos, os preços e os dados da empresa são fictícios. Nenhum pedido é entregue e nenhum valor é cobrado: os pagamentos usam o ambiente de teste do provedor.",
+      "A cervejaria, os produtos, os preços e os dados da empresa são fictícios. Nenhum pedido é entregue e nenhum valor é cobrado: os pagamentos usam o ambiente de teste do provedor.",
   },
   {
     titulo: "Maioridade.",
@@ -73,8 +73,9 @@ export const PRIVACIDADE: SecaoLegal[] = [
 
 export const ENTREGAS: SecaoLegal[] = [
   {
-    titulo: "Projeto de portfólio.",
-    texto: "Nenhum pedido é entregue de verdade; esta página descreve como a entrega funcionaria.",
+    titulo: "Como funciona.",
+    texto:
+      "Os pedidos feitos neste site não são entregues; esta página descreve como a entrega funcionaria.",
   },
   { titulo: "Área de entrega.", texto: "Só Maceió e região." },
   {

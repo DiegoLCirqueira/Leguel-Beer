@@ -13,12 +13,19 @@ type Props = {
 
 export function MaioridadePergunta({ retorno, confirmar }: Props) {
   const [negado, setNegado] = useState(false);
+  const [voltou, setVoltou] = useState(false);
   const tituloNegado = useRef<HTMLHeadingElement>(null);
+  const tituloPergunta = useRef<HTMLHeadingElement>(null);
 
   // O botão "Não" some ao negar: o foco vai para o novo título, para não se perder.
   useEffect(() => {
     if (negado) tituloNegado.current?.focus();
   }, [negado]);
+
+  // O botão de voltar some ao voltar para a pergunta: o foco vai para o título dela.
+  useEffect(() => {
+    if (voltou && !negado) tituloPergunta.current?.focus();
+  }, [voltou, negado]);
 
   return (
     <main className="relative isolate flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-fundo px-6 py-10 text-center">
@@ -68,10 +75,22 @@ export function MaioridadePergunta({ retorno, confirmar }: Props) {
               Acesso não permitido
             </h1>
             <p className="text-texto-suave">Este site é só para maiores de 18 anos.</p>
+            <Button
+              onClick={() => {
+                setVoltou(true);
+                setNegado(false);
+              }}
+            >
+              Voltar para a página inicial
+            </Button>
           </>
         ) : (
           <>
-            <h1 className="font-titulo text-balance text-3xl text-texto">
+            <h1
+              ref={tituloPergunta}
+              tabIndex={-1}
+              className="font-titulo text-balance text-3xl text-texto outline-none"
+            >
               Você tem 18 anos ou mais?
             </h1>
             <p className="text-texto-suave">Para entrar, confirme sua idade.</p>

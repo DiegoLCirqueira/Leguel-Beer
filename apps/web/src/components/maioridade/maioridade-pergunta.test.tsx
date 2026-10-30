@@ -80,4 +80,22 @@ describe("MaioridadePergunta", () => {
     expect(logo.getAttribute("srcset")).toMatch(/ 384w/);
     expect(logo).toHaveAttribute("sizes", "128px");
   });
+
+  it("no acesso não permitido, o botão Voltar para a página inicial leva de volta à pergunta", async () => {
+    renderizar();
+    await userEvent.click(screen.getByRole("button", { name: "Não" }));
+
+    await userEvent.click(screen.getByRole("button", { name: "Voltar para a página inicial" }));
+
+    const pergunta = screen.getByRole("heading", { level: 1, name: "Você tem 18 anos ou mais?" });
+    expect(pergunta).toBeInTheDocument();
+    expect(pergunta).toHaveFocus();
+    expect(screen.queryByText("Acesso não permitido")).not.toBeInTheDocument();
+  });
+
+  it("a pergunta não mostra o botão de voltar", () => {
+    renderizar();
+
+    expect(screen.queryByRole("button", { name: "Voltar para a página inicial" })).toBeNull();
+  });
 });

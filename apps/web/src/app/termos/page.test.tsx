@@ -17,8 +17,11 @@ describe("/termos", () => {
       "6. Mudanças nestes termos.",
     ]);
     expect(
-      screen.getByText(/A Leguelé Beer é um projeto de portfólio de desenvolvimento de software\./),
+      screen.getByText(
+        /A cervejaria, os produtos, os preços e os dados da empresa são fictícios\./,
+      ),
     ).toBeInTheDocument();
+    expect(screen.queryByText(/portfólio/i)).not.toBeInTheDocument();
     expect(screen.getByRole("contentinfo")).toBeInTheDocument();
   });
 });
