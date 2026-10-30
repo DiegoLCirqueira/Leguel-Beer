@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Check, Eye, EyeOff, Lock, Mail, Phone, UserRound } from "lucide-react";
+import { ArrowRight, Check, Lock, Mail, Phone, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import {
 } from "@/lib/auth/criar-conta";
 import { mascararTelefone } from "@/lib/mascara-telefone";
 import { Campo } from "./campo";
+import { OlhoDaSenha } from "./olho-da-senha";
 
 type Props = { criar: (entrada: EntradaCadastro) => Promise<ResultadoCriarConta> };
 
@@ -37,20 +38,6 @@ const VAZIO: EntradaCadastro = {
   confirmacao: "",
   aceite: false,
 };
-
-function OlhoDaSenha({ visivel, alternar }: { visivel: boolean; alternar: () => void }) {
-  const Icone = visivel ? EyeOff : Eye;
-  return (
-    <button
-      type="button"
-      onClick={alternar}
-      aria-label={visivel ? "Esconder senha" : "Mostrar senha"}
-      className="-mr-2 flex size-11 shrink-0 items-center justify-center rounded-full text-texto-suave transition-colors hover:text-texto focus-visible:outline-2 focus-visible:outline-primaria"
-    >
-      <Icone aria-hidden="true" className="size-6" />
-    </button>
-  );
-}
 
 export function CriarContaForm({ criar }: Props) {
   const [valores, setValores] = useState<EntradaCadastro>(VAZIO);
