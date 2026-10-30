@@ -93,7 +93,7 @@ Funcionalidade: Tokens e componentes base da marca
 
 ### Tokens de cor
 
-Só tema escuro. Valores tirados da paleta de `estudio-garrafas.html` e conferidos por amostragem no print do Figma (o print tem gradientes e compressão; a amostra varia alguns tons). A página `/dev/tokens` mostra todos para conferência visual.
+Só tema escuro. Valores tirados da paleta de `estudio-garrafas.html` e conferidos por amostragem no print do Figma (o print tem gradientes e compressão; a amostra varia alguns tons). A vitrine dos tokens e componentes fica na home, para conferência visual nos portais (decisão do Orchestrator, 2026-10-29).
 
 | Token | Valor | Uso no Figma |
 | --- | --- | --- |
@@ -111,14 +111,14 @@ Só tema escuro. Valores tirados da paleta de `estudio-garrafas.html` e conferid
 | `badge-malt` | `#9F6838` | Badge "MALT" |
 | `badge-lager` | `#47610E` | Badge "LAGER" |
 | `badge-neutro` | igual a `superficie-elevada` | Categoria sem cor própria |
-| `sucesso` | `#6FCF97` | Texto e ícone de confirmação (ex.: "Senha alterada") |
-| `erro` | `#FF7A70` | Mensagens de erro dos campos e borda do campo inválido |
-| `aviso` | `#F5B94A` | Avisos que pedem atenção (ex.: e-mail não confirmado) |
+| `sucesso` | `#6FD98A` | Texto e ícone de confirmação (ex.: "Senha alterada") |
+| `erro` | `#FF8A80` | Mensagens de erro dos campos e borda do campo inválido |
+| `aviso` | `#F5B74A` | Avisos que pedem atenção (ex.: e-mail não confirmado) |
 
 - O verde-limão nunca é fundo de texto claro nem aparece sobre fundo branco (o card avisa que não passa contraste).
 - Badge: a cor sai do token da categoria pelo identificador (slug) da categoria. Categoria cadastrada depois, sem token, usa `badge-neutro`. O Stout aparece no Figma, mas saiu do catálogo ([[catalogo]]) e não ganha token.
 
-- **Estados:** verde, vermelho e âmbar nos tons do tema escuro, usados como texto e ícone sobre `fundo` e `superficie` (decisão do Diego, 2026-10-29). Os valores acima foram escolhidos pelo Spec para passar AA (de 6:1 a 9:1 sobre `superficie`) e não se confundir com o verde-limão.
+- **Estados:** verde, vermelho e âmbar nos tons do tema escuro, usados como texto e ícone sobre `fundo` e `superficie` (decisão do Diego, 2026-10-29). Os valores acima são os implementados e testados pelo Front no LB-11 (passam AA sobre `superficie`, no teste de contraste).
 - **Badge "FRUTAS":** texto `texto-na-primaria` (escuro), cerca de 7,5:1 (decisão do Diego, 2026-10-29). Texto claro daria cerca de 2,3:1.
 
 ### Tipografia
@@ -126,7 +126,7 @@ Só tema escuro. Valores tirados da paleta de `estudio-garrafas.html` e conferid
 - **Texto:** Outfit (Google Fonts, carregada pelo `next/font`), pesos 400, 500 e 600. É a fonte de `estudio-garrafas.html` e bate com os botões e formulários do Figma.
 - **Títulos de destaque** ("Criar sua conta", "Recuperar senha", "Sabor de verdade em cada gole!"): fonte manuscrita em pincel, com a segunda linha em verde-limão.
 
-- **Fonte dos títulos:** o Front escolhe a fonte manuscrita do Google Fonts mais próxima do print e o Diego confere nos portais (decisão do Diego, 2026-10-29: "use a que preferir"). A escolha vai para a daily note do dia em que for feita.
+- **Fonte dos títulos:** **Kaushan Script** (Google Fonts, pelo `next/font`), escolhida pelo Front como a mais próxima do print; o Diego confere nos portais (decisão do Diego, 2026-10-29: "use a que preferir").
 
 ### Espaçamento, raios e sombras
 
@@ -143,7 +143,7 @@ Só tema escuro. Valores tirados da paleta de `estudio-garrafas.html` e conferid
 
 ## Decisões do Diego (2026-10-29)
 
-- **Pergunta 1:** fonte manuscrita dos títulos à escolha do Front, do Google Fonts, conferida pelo Diego nos portais.
+- **Pergunta 1:** fonte manuscrita dos títulos à escolha do Front, do Google Fonts, conferida pelo Diego nos portais. O Front escolheu Kaushan Script.
 - **Pergunta 2:** cores de estado em verde, vermelho e âmbar nos tons do tema escuro.
 - **Pergunta 3:** badge "FRUTAS" com texto escuro.
 
