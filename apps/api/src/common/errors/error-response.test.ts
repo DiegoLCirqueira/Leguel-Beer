@@ -38,6 +38,30 @@ describe("toErrorResponse", () => {
     expect(toErrorResponse(error)).toEqual({ status, body: { code, message } });
   });
 
+  it("mapeia 409 para CONFLICT", () => {
+    expect(toErrorResponse(new HttpException("x", 409))).toEqual({
+      status: 409,
+      body: { code: "CONFLICT", message: "Conflito com o estado atual do recurso." },
+    });
+  });
+
+  it.each([405, 413, 415, 422])(
+    "mantém o status %i fora do mapa com um code genérico",
+    (status) => {
+      expect(toErrorResponse(new HttpException("x", status))).toEqual({
+        status,
+        body: { code: "HTTP_ERROR", message: "Não foi possível processar a requisição." },
+      });
+    },
+  );
+
+  it("mantém o status 5xx de HttpException com INTERNAL_ERROR genérico", () => {
+    expect(toErrorResponse(new HttpException("detalhe interno", 503))).toEqual({
+      status: 503,
+      body: { code: "INTERNAL_ERROR", message: "Erro interno. Tente novamente mais tarde." },
+    });
+  });
+
   it("transforma erro desconhecido em 500 INTERNAL_ERROR sem vazar a mensagem original", () => {
     const result = toErrorResponse(new Error("select * from users falhou: senha=123"));
 
