@@ -44,7 +44,7 @@ export function MaioridadePergunta({ retorno, confirmar }: Props) {
           width={320}
           height={320}
           priority
-          className="size-32"
+          className="size-32 rounded-full"
         />
         {negado ? (
           <>
