@@ -34,7 +34,11 @@ export function createApiClient(config: ApiClientConfig) {
   }
 
   async function request<T = unknown>(path: string, options: RequestOptions<T> = {}): Promise<T> {
-    const response = await send(path, await config.getToken(), options);
+    let response = await send(path, await config.getToken(), options);
+    if (response.status === 401) {
+      const token = await config.refreshSession();
+      if (token) response = await send(path, token, options);
+    }
     if (!response.ok) throw ApiError.fromBody(response.status, await readBody(response));
     const data = await readBody(response);
     return options.schema ? options.schema.parse(data) : (data as T);
