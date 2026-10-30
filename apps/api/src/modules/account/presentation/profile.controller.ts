@@ -75,7 +75,7 @@ export class ProfileController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<PerfilResponse> {
     const { profile, created } = await this.createProfile.execute({
-      user: { id: user.id, email: user.email, emailVerified: user.emailVerified },
+      user: { id: user.id, email: user.email },
       ...body,
     });
     if (!created) res.status(200);

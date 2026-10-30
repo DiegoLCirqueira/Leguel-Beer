@@ -82,14 +82,4 @@ describe("createTestTokens", () => {
     expect(outro.payload["sub"]).toBe(tokens.customerId);
     expect(signatureIsValid(tokens.custom({ aud: "anon" }), tokens.jwks)).toBe(true);
   });
-
-  it("emite user_metadata.email_verified verdadeiro, como o Supabase faz depois da confirmação", () => {
-    const tokens = createTestTokens();
-
-    expect(decode(tokens.customer()).payload["user_metadata"]).toEqual({ email_verified: true });
-    expect(decode(tokens.admin()).payload["user_metadata"]).toEqual({ email_verified: true });
-    expect(
-      decode(tokens.custom({ user_metadata: { email_verified: false } })).payload["user_metadata"],
-    ).toEqual({ email_verified: false });
-  });
 });

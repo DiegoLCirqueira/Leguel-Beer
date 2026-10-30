@@ -24,7 +24,6 @@ export function createTestTokens(issuer = "http://127.0.0.1:54321/auth/v1") {
       role: "authenticated",
       aud: "authenticated",
       iss: issuer,
-      user_metadata: { email_verified: true },
       exp: now() + 3600,
       ...claims,
     })}`;
@@ -40,7 +39,6 @@ export function createTestTokens(issuer = "http://127.0.0.1:54321/auth/v1") {
       role: "authenticated",
       aud: "authenticated",
       iss: issuer,
-      user_metadata: { email_verified: true },
       exp: now() + 3600,
       ...claims,
     })}`;
@@ -68,7 +66,6 @@ export function createTestTokens(issuer = "http://127.0.0.1:54321/auth/v1") {
         role: "authenticated",
         aud: "authenticated",
         iss: issuer,
-        user_metadata: { email_verified: true },
         exp: now() + 3600,
         sub: adminId,
       });

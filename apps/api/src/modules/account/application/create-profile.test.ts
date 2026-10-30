@@ -3,7 +3,7 @@ import { InMemoryProfileRepository } from "../testing/in-memory.js";
 import { CreateProfile } from "./create-profile.js";
 
 const AGORA = new Date("2026-10-30T12:00:00.000Z");
-const ana = { id: "ana-id", email: "ana@exemplo.com", emailVerified: true };
+const ana = { id: "ana-id", email: "ana@exemplo.com" };
 const dados = { nome: "Ana Souza", telefone: "82912345678", aceite: true as const };
 
 function setup(adminEmail?: string, confirmedIds: string[] = ["ana-id"]) {
@@ -46,7 +46,7 @@ describe("CreateProfile", () => {
     const { useCase } = setup(" Ana@Exemplo.com ");
 
     const result = await useCase.execute({
-      user: { id: "ana-id", email: "ANA@exemplo.com", emailVerified: true },
+      user: { id: "ana-id", email: "ANA@exemplo.com" },
       ...dados,
     });
 
