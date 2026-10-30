@@ -40,7 +40,7 @@ Funcionalidade: Tela de boas-vindas
     Dado que estou na tela de boas-vindas
     Quando toco em "Continuar como convidado"
     Então vou para a home e posso abrir o catálogo
-    E, ao abrir a home de novo na mesma sessão do navegador, a tela de boas-vindas não aparece
+    E ao abrir a home de novo na mesma sessão do navegador a tela de boas-vindas não aparece
 
   Esquema do Cenário: Entrar levando a escolha de "Manter-me conectado"
     Dado que estou na tela de boas-vindas

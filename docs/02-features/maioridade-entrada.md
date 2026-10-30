@@ -33,7 +33,7 @@ Funcionalidade: Confirmação de maioridade na entrada
     E vejo a pergunta "Você tem 18 anos ou mais?"
     Quando confirmo que tenho 18 anos ou mais
     Então vejo a tela de boas-vindas
-    E, ao voltar ao site 29 dias depois, a pergunta não aparece
+    E ao voltar ao site 29 dias depois a pergunta não aparece
 
   Cenário: Menor de idade não acessa o site
     Dado que abro o site pela primeira vez neste navegador
