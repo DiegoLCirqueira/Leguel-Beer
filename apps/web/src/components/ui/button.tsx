@@ -40,6 +40,11 @@ export function Button({
   type = "button",
   ...props
 }: ButtonProps) {
+  const spinnerOnRight = Boolean(iconRight) && !iconLeft;
+  const spinner = (
+    <Loader2 aria-hidden="true" className="size-5 animate-spin motion-reduce:animate-none" />
+  );
+
   return (
     <button
       type={type}
@@ -49,16 +54,13 @@ export function Button({
       {...props}
     >
       {loading ? (
-        <Loader2
-          role="status"
-          aria-hidden="true"
-          className="size-5 animate-spin motion-reduce:animate-none"
-        />
-      ) : (
-        iconLeft
-      )}
+        <span role="status" className="sr-only">
+          Carregando
+        </span>
+      ) : null}
+      {loading && !spinnerOnRight ? spinner : iconLeft}
       {children}
-      {iconRight}
+      {loading && spinnerOnRight ? spinner : iconRight}
     </button>
   );
 }
