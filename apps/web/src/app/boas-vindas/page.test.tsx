@@ -7,8 +7,8 @@ describe("Boas-vindas", () => {
     render(<BoasVindas />);
 
     expect(screen.getByRole("heading", { level: 1, name: "Leguelé Beer" })).toBeInTheDocument();
-    expect(screen.getByText("Sabor Qualidade e Tradição")).toBeInTheDocument();
-    expect(screen.queryByText("Cervejas artesanais e muito mais!")).not.toBeInTheDocument();
+    expect(screen.getByText("Cervejas artesanais")).toBeInTheDocument();
+    expect(screen.queryByText(/muito mais/)).not.toBeInTheDocument();
     expect(
       screen.getByRole("img", {
         name: "Garrafa de IPA Leguelé Beer ao lado de um copo cheio, entre folhas de lúpulo",
@@ -18,14 +18,12 @@ describe("Boas-vindas", () => {
     expect(screen.getByRole("link", { name: "Entrar" })).toBeInTheDocument();
   });
 
-  it("as palavras do slogan só aparecem no slogan, nunca como texto lateral", () => {
+  it("o slogan é um elemento só para leitor de tela e o texto lateral Sabor Qualidade Tradição não existe", () => {
     render(<BoasVindas />);
 
-    // O slogan é o único elemento com "Sabor"; um texto lateral seria outro elemento com essas palavras.
-    const comSabor = screen.getAllByText(/Sabor/);
+    const slogan = screen.getByText("Cervejas artesanais");
 
-    expect(comSabor).toHaveLength(1);
-    expect(comSabor[0]).toBe(screen.getByText("Sabor Qualidade e Tradição"));
-    expect(comSabor[0]).toHaveClass("sr-only");
+    expect(slogan).toHaveClass("sr-only");
+    expect(screen.queryByText(/Sabor|Qualidade|Tradição/)).not.toBeInTheDocument();
   });
 });
