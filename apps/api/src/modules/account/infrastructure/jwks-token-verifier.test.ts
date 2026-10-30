@@ -23,6 +23,7 @@ describe("JwksTokenVerifier", () => {
     await expect(verifier.verify(tokens.customer())).resolves.toEqual({
       id: tokens.customerId,
       email: "cliente@leguele.test",
+      emailVerified: true,
     });
   });
 
@@ -110,5 +111,18 @@ describe("JwksTokenVerifier", () => {
     const { tokens, verifier } = setup();
 
     await expect(verifier.verify(tokens.custom(claims))).rejects.toBeInstanceOf(InvalidTokenError);
+  });
+
+  it.each([
+    ["sem user_metadata", { user_metadata: undefined }],
+    ["com user_metadata nulo", { user_metadata: null }],
+    ["com email_verified falso", { user_metadata: { email_verified: false } }],
+    ['com email_verified "true" em texto', { user_metadata: { email_verified: "true" } }],
+  ])("marca o e-mail como não verificado no token %s", async (_caso, claims) => {
+    const { tokens, verifier } = setup();
+
+    const user = await verifier.verify(tokens.custom(claims));
+
+    expect(user.emailVerified).toBe(false);
   });
 });
