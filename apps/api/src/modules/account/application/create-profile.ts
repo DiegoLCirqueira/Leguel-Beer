@@ -33,7 +33,8 @@ export class CreateProfile {
       email,
       nome: input.nome,
       telefone: input.telefone,
-      role: adminEmail && email === adminEmail ? "admin" : "customer",
+      // Admin só com a prova de e-mail verificado: sem ela, quem cadastrasse o e-mail do admin viraria admin.
+      role: adminEmail && email === adminEmail && input.user.emailVerified ? "admin" : "customer",
       aceite: { ...this.options.legal, aceitoEm: this.options.now() },
     });
   }
