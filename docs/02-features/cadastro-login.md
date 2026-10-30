@@ -97,7 +97,7 @@ Funcionalidade: Cadastro e login com e-mail e senha
 - **Textos do Figma** (decisão do Diego já tomada): "Criar sua conta", "Faça parte do nosso clube e viva experiências exclusivas!", os rótulos e placeholders dos campos ("Digite seu nome completo", "Digite seu e-mail", "(00) 00000-0000", "Digite sua senha", "Confirme sua senha"), "Eu aceito os Termos de Uso e a Política de Privacidade", "Criar conta", "Já tem uma conta?" e "Entrar".
 - **Texto do card:** "Este e-mail já tem conta. Entrar?". Isso revela que o e-mail tem conta; o card aceita esse risco no cadastro, e o login continua sem revelar.
 
-> [!todo] Preencher: para onde apontam "Termos de Uso" e "Política de Privacidade". As páginas são do LB-22 (MVP+). Ver pergunta ao Diego.
+- **Termos de Uso e Política de Privacidade:** os links abrem `/termos` e `/privacidade` ([[termos-privacidade]]). O LB-22 entrou no MVP, na fase 1 do acesso, antes deste card (decisão do Diego, 2026-10-29).
 
 ### Entrar (`/entrar`)
 
@@ -112,9 +112,9 @@ Funcionalidade: Cadastro e login com e-mail e senha
 - Modelos de confirmação em português, versionados com a configuração do Supabase local.
 - No desenvolvimento e nos testes, os e-mails são lidos no visualizador de e-mails do Supabase local; nenhum e-mail sai para fora.
 
-## Textos propostos
+## Textos
 
-Aguardam aprovação do Diego. As mensagens dos campos estão no cenário "Formulário de cadastro inválido".
+Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os textos necessários; os acrescentados pelo Spec estão marcados com *. As mensagens dos campos estão no cenário "Formulário de cadastro inválido".
 
 | Lugar | Texto proposto |
 | --- | --- |
@@ -126,6 +126,10 @@ Aguardam aprovação do Diego. As mensagens dos campos estão no cenário "Formu
 | Aviso depois do cadastro | "Enviamos um link de confirmação para {e-mail}. Abra o e-mail para ativar sua conta." |
 | Aviso de e-mail não confirmado | "Confirme seu e-mail para entrar. Não recebeu?" e a ação "Reenviar link" |
 | Assunto do e-mail de confirmação | "Confirme sua conta na Leguelé Beer" |
+| Corpo do e-mail de confirmação * | "Olá, {nome}! Toque no botão abaixo para ativar sua conta na Leguelé Beer." e o botão "Confirmar minha conta" |
+| Depois de reenviar o link * | "Enviamos um novo link para {e-mail}." |
+| Falha de rede ou erro inesperado * | "Não foi possível concluir agora. Tente de novo em instantes." |
+| Senha visível ou escondida (leitor de tela) * | "Mostrar senha" e "Esconder senha" |
 
 ## Seams de teste
 
@@ -153,6 +157,12 @@ Aguardam aprovação do Diego. As mensagens dos campos estão no cenário "Formu
 - [[api-base]]: formato de erro e template de módulo (a conta é o primeiro módulo).
 - [[boas-vindas]], [[recuperacao-senha]], [[guards-api]], [[identidade-visual]]
 - [[GLOSSARY]]: Cliente, Convidado, Perfil.
+- [[termos-privacidade]]: destino dos links do aceite.
+
+### Decisões do Diego (2026-10-29)
+
+- **Pergunta 4:** textos propostos aprovados, com autorização para acrescentar os necessários.
+- **Pergunta 5:** o LB-22 (Termos de Uso e Política de Privacidade) entra no MVP, na fase 1, antes deste card.
 
 ## Decisões tomadas sem consulta
 

@@ -74,18 +74,17 @@ Funcionalidade: Confirmação de maioridade na entrada
 - **Sem documento:** não há validação de documento nem de data de nascimento na entrada.
 - **Textos do card:** "Você tem 18 anos ou mais?" e "Acesso não permitido".
 
-> [!todo] Preencher: os textos dos botões de resposta e o texto de apoio da tela de "Acesso não permitido". A tela não está no Figma. Ver "Textos propostos".
+## Textos
 
-## Textos propostos
-
-Aguardam aprovação do Diego (textos do site são decisão dele). A tela segue o visual da [[boas-vindas]]: logo, folhagem e botões de [[identidade-visual]].
+Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os textos necessários; os acrescentados pelo Spec estão marcados com *. A tela segue o visual da [[boas-vindas]]: logo, folhagem e botões de [[identidade-visual]].
 
 | Lugar | Texto proposto |
 | --- | --- |
 | Botão "sim" (primário) | "Sim, tenho 18 anos ou mais" |
 | Botão "não" (contorno) | "Não" |
-| Aviso abaixo dos botões | "Beba com moderação. Venda proibida para menores de 18 anos." |
+| Aviso abaixo dos botões | "Aprecie com moderação. Venda proibida para menores de 18 anos." (mesmos avisos do rodapé do LB-22, [[termos-privacidade]]) |
 | Texto de apoio em "Acesso não permitido" | "Este site é só para maiores de 18 anos." |
+| Texto de apoio da pergunta * | "Para entrar, confirme sua idade." |
 
 ## Seams de teste
 

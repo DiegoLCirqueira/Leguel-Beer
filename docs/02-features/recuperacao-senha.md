@@ -82,11 +82,11 @@ Funcionalidade: Recuperação de senha
 - **Pedidos repetidos:** um novo pedido para o mesmo e-mail só é aceito 60 segundos depois do anterior; antes disso, o aviso genérico aparece igual e nenhum e-mail novo sai.
 - **Textos do Figma** (decisão do Diego já tomada): "Recuperar senha", "Digite seu e-mail e enviaremos um link para você redefinir sua senha.", "E-mail", "Digite seu e-mail cadastrado", "Verifique sua caixa de entrada", "Enviaremos um link seguro para redefinir sua senha. Não se esqueça de checar a pasta de spam, se necessário.", "O link tem validade", "O link expira em 1 hora por questões de segurança.", "Precisa de ajuda?", "Se não receber o e-mail, entre em contato com nosso suporte.", "Enviar link" e "Voltar para o login".
 
-> [!todo] Preencher: qual é o canal de "nosso suporte" e se o texto vira link. O Figma só mostra o texto; nesta spec ele fica sem link. Ver pergunta ao Diego.
+- **"Nosso suporte":** texto sem link (decisão do Diego, 2026-10-29).
 
-## Textos propostos
+## Textos
 
-Aguardam aprovação do Diego.
+Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os textos necessários; os acrescentados pelo Spec estão marcados com *.
 
 | Lugar | Texto proposto |
 | --- | --- |
@@ -96,6 +96,9 @@ Aguardam aprovação do Diego.
 | Botão | "Salvar nova senha" |
 | Link inválido | "Este link expirou ou já foi usado." e a ação "Pedir novo link" |
 | Assunto do e-mail | "Redefina sua senha da Leguelé Beer" |
+| Corpo do e-mail * | "Recebemos um pedido para redefinir sua senha. O link vale por 1 hora." e o botão "Redefinir senha"; abaixo, "Se não foi você, ignore este e-mail." |
+| Depois de salvar a nova senha * | "Senha alterada. Você já está na sua conta." |
+| Falha de rede ou erro inesperado * | "Não foi possível concluir agora. Tente de novo em instantes." |
 
 ## Seams de teste
 
@@ -124,7 +127,6 @@ Decisões pequenas e fáceis de reverter, pela política de autonomia. Qualquer 
 - **Link de uso único** e invalidado por um pedido novo.
 - **Outras sessões encerradas** depois de trocar a senha.
 - **Intervalo de 60 segundos** entre pedidos para o mesmo e-mail.
-- **"Precisa de ajuda?" sem link** até o canal de suporte ser definido.
 
 ## Tickets propostos
 

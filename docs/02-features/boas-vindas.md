@@ -75,11 +75,11 @@ Funcionalidade: Tela de boas-vindas
 - **Imagens:** logo, garrafa com copo, barril e folhagem de `Imagens/`, otimizadas para celular. A imagem principal tem texto alternativo.
 - **Componentes:** "Entrar" é o botão primário com ícone e seta; "Criar conta", o botão de contorno; "Continuar como convidado", o botão discreto ([[identidade-visual]]).
 
-> [!todo] Preencher: o que o ícone (i) ao lado de "Manter-me conectado" mostra ao ser tocado. Ver "Textos propostos".
+- **Ícone (i) de "Manter-me conectado":** ao ser tocado, mostra a dica da tabela abaixo.
 
-## Textos propostos
+## Textos
 
-Aguardam aprovação do Diego.
+Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os textos necessários; os acrescentados pelo Spec estão marcados com *.
 
 | Lugar | Texto proposto |
 | --- | --- |
