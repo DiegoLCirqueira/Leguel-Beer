@@ -1,4 +1,5 @@
 import type { AuthAdmin, AuthUser } from "../domain/auth-admin.js";
+import type { Profile } from "../domain/profile.js";
 import type { ProfileRepository, ProfileRecord } from "../domain/profile-repository.js";
 import type { Role } from "../domain/role.js";
 
@@ -29,6 +30,8 @@ export class InMemoryAuthAdmin implements AuthAdmin {
 
 export class InMemoryProfileRepository implements ProfileRepository {
   readonly profiles = new Map<string, ProfileRecord>();
+  /** Perfis completos (com nome, telefone e aceite), como no banco. */
+  readonly complete = new Map<string, Profile>();
 
   ensureRole(profile: { id: string; email: string }, role: Role): Promise<void> {
     this.profiles.set(profile.id, { ...profile, role });
@@ -37,5 +40,19 @@ export class InMemoryProfileRepository implements ProfileRepository {
 
   findRole(id: string): Promise<Role | null> {
     return Promise.resolve(this.profiles.get(id)?.role ?? null);
+  }
+
+  findProfile(id: string): Promise<Profile | null> {
+    return Promise.resolve(this.complete.get(id) ?? null);
+  }
+
+  createProfile(profile: Profile): Promise<{ profile: Profile; created: boolean }> {
+    const existing = this.complete.get(profile.id);
+    if (existing) return Promise.resolve({ profile: existing, created: false });
+    const role = this.profiles.get(profile.id)?.role ?? profile.role;
+    const stored = { ...profile, role };
+    this.complete.set(profile.id, stored);
+    this.profiles.set(profile.id, { id: profile.id, email: profile.email, role });
+    return Promise.resolve({ profile: stored, created: true });
   }
 }
