@@ -25,6 +25,9 @@ interface Claims {
   role?: unknown;
 }
 
+const isObject = (value: unknown): boolean =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
 const decode = <T>(part: string): T => JSON.parse(Buffer.from(part, "base64url").toString()) as T;
 
 /**
@@ -54,6 +57,7 @@ export class JwksTokenVerifier implements TokenVerifier {
     } catch {
       throw new InvalidTokenError("formato");
     }
+    if (!isObject(header) || !isObject(claims)) throw new InvalidTokenError("formato");
     if (header.alg !== "ES256" && header.alg !== "RS256") throw new InvalidTokenError("algoritmo");
 
     const jwk = await this.findKey(header.kid);
