@@ -11,6 +11,9 @@ type Pedido = {
 export type Decisao =
   { tipo: "seguir" } | { tipo: "perguntar"; retorno: string } | { tipo: "liberar-robo" };
 
+// Termos e privacidade podem ser lidos antes de confirmar a maioridade; /entregas segue a regra normal.
+const PAGINAS_LEGAIS_LIVRES = new Set(["/termos", "/privacidade"]);
+
 const ROBOS_DE_BUSCA = /googlebot|bingbot|duckduckbot|baiduspider|yandexbot|slurp/i;
 
 // O cookie guarda a data da confirmação em ms; vale por 30 dias e não pode estar no futuro.
@@ -28,6 +31,7 @@ export function decidirAcesso({
   agora,
 }: Pedido): Decisao {
   if (caminho === "/maioridade") return { tipo: "seguir" };
+  if (PAGINAS_LEGAIS_LIVRES.has(caminho)) return { tipo: "seguir" };
   if (confirmacaoValida(cookie, agora)) return { tipo: "seguir" };
   if (ROBOS_DE_BUSCA.test(userAgent)) return { tipo: "liberar-robo" };
   return { tipo: "perguntar", retorno: `${caminho}${busca}` };

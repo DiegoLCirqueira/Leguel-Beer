@@ -47,4 +47,17 @@ describe("decidirAcesso", () => {
   ])("libera o robô de busca sem a pergunta (%s)", (userAgent) => {
     expect(pedido({ userAgent })).toEqual({ tipo: "liberar-robo" });
   });
+
+  it.each(["/termos", "/privacidade"])(
+    "libera a página legal %s sem a pergunta, para quem quer ler antes de entrar",
+    (caminho) => {
+      expect(pedido({ caminho, busca: "" })).toEqual({ tipo: "seguir" });
+    },
+  );
+
+  it("continua perguntando em /entregas e em caminhos que só começam como uma página legal", () => {
+    expect(pedido({ caminho: "/entregas", busca: "" }).tipo).toBe("perguntar");
+    expect(pedido({ caminho: "/termos-extra", busca: "" }).tipo).toBe("perguntar");
+    expect(pedido({ caminho: "/privacidade/outra", busca: "" }).tipo).toBe("perguntar");
+  });
 });

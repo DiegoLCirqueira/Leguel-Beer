@@ -63,10 +63,14 @@ for (const { width, height } of [
     await page.setViewportSize({ width, height });
     await page.goto("/boas-vindas");
 
-    const overflow = await page.evaluate(() => ({
-      x: document.documentElement.scrollWidth - window.innerWidth,
-      y: document.documentElement.scrollHeight - window.innerHeight,
-    }));
+    const overflow = await page.evaluate(() => {
+      const main = document.querySelector("main")!;
+      return {
+        x: document.documentElement.scrollWidth - window.innerWidth,
+        // Primeira tela: a arte (main) cabe na altura; o rodapé fica abaixo da dobra.
+        y: main.getBoundingClientRect().height - window.innerHeight,
+      };
+    });
 
     expect(overflow.x).toBeLessThanOrEqual(0);
     expect(overflow.y).toBeLessThanOrEqual(0);

@@ -1,0 +1,125 @@
+import { test as semConfirmacao } from "@playwright/test";
+import { expect, test } from "./support/maior-de-idade";
+
+const FAIXA = "Projeto de portfólio · pagamentos em modo de teste";
+
+test.use({ viewport: { width: 360, height: 780 } });
+semConfirmacao.use({ viewport: { width: 360, height: 780 } });
+
+for (const caminho of ["/boas-vindas", "/termos", "/privacidade", "/entregas"]) {
+  test(`a faixa de portfólio fica no topo de ${caminho}`, async ({ page }) => {
+    await page.goto(caminho);
+
+    const faixa = page.getByText(FAIXA);
+    await expect(faixa).toBeVisible();
+    const caixa = await faixa.boundingBox();
+    expect(caixa?.y).toBeLessThanOrEqual(1);
+    await expect(page.getByRole("button", { name: /fechar/i })).toHaveCount(0);
+  });
+}
+
+test("a faixa continua no topo depois de rolar a página", async ({ page }) => {
+  await page.goto("/termos");
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+
+  const caixa = await page.getByText(FAIXA).boundingBox();
+
+  expect(caixa?.y).toBeLessThanOrEqual(1);
+});
+
+test("o rodapé da boas-vindas aparece ao rolar até o fim, com avisos, links e dados fictícios", async ({
+  page,
+}) => {
+  await page.goto("/boas-vindas");
+  const rodape = page.getByRole("contentinfo");
+  await rodape.scrollIntoViewIfNeeded();
+
+  await expect(rodape.getByText("Aprecie com moderação.")).toBeVisible();
+  await expect(rodape.getByText("Venda proibida para menores de 18 anos.")).toBeVisible();
+  await expect(rodape.getByRole("link", { name: "Termos de Uso" })).toBeVisible();
+  await expect(rodape.getByRole("link", { name: "Política de Privacidade" })).toBeVisible();
+  await expect(rodape.getByRole("link", { name: "Entregas" })).toBeVisible();
+  await expect(
+    rodape.getByText(/empresa fictícia.*CNPJ 00\.000\.000\/0001-00 \(fictício\)/),
+  ).toBeVisible();
+});
+
+test("os links do rodapé levam às páginas legais", async ({ page }) => {
+  await page.goto("/boas-vindas");
+
+  await page.getByRole("contentinfo").getByRole("link", { name: "Termos de Uso" }).click();
+
+  await expect(page).toHaveURL(/\/termos$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Termos de Uso" })).toBeVisible();
+});
+
+for (const [caminho, titulo] of [
+  ["/termos", "Termos de Uso"],
+  ["/privacidade", "Política de Privacidade"],
+  ["/entregas", "Entregas"],
+] as const) {
+  test(`${caminho} mostra a data da última atualização e não tem rolagem horizontal`, async ({
+    page,
+  }) => {
+    await page.goto(caminho);
+
+    await expect(page.getByRole("heading", { level: 1, name: titulo })).toBeVisible();
+    await expect(page.getByText(/^Última atualização: \d{1,2} de \w+ de \d{4}$/)).toBeVisible();
+    const excesso = await page.evaluate(
+      () => document.documentElement.scrollWidth - window.innerWidth,
+    );
+    expect(excesso).toBeLessThanOrEqual(0);
+  });
+}
+
+for (const [caminho, titulo] of [
+  ["/termos", "Termos de Uso"],
+  ["/privacidade", "Política de Privacidade"],
+] as const) {
+  semConfirmacao(`${caminho} abre sem a pergunta de maioridade`, async ({ page }) => {
+    await page.goto(caminho);
+
+    await expect(page).toHaveURL(new RegExp(`${caminho}$`));
+    await expect(page.getByRole("heading", { level: 1, name: titulo })).toBeVisible();
+    await expect(page.getByText("Você tem 18 anos ou mais?")).toHaveCount(0);
+  });
+}
+
+semConfirmacao("/entregas continua perguntando a maioridade", async ({ page }) => {
+  await page.goto("/entregas");
+
+  await expect(page).toHaveURL(/\/maioridade\?retorno=%2Fentregas$/);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Você tem 18 anos ou mais?" }),
+  ).toBeVisible();
+});
+
+for (const viewport of [
+  { width: 360, height: 780 },
+  { width: 360, height: 640 },
+]) {
+  semConfirmacao(
+    `a faixa não cobre o logo nem os botões da maioridade em ${viewport.width}x${viewport.height}`,
+    async ({ page }) => {
+      await page.setViewportSize(viewport);
+      await page.goto("/maioridade");
+
+      const faixa = await page.getByText(FAIXA).boundingBox();
+      const logo = await page.getByRole("img", { name: "Leguelé Beer" }).boundingBox();
+      const sim = await page
+        .getByRole("button", { name: "Sim, tenho 18 anos ou mais" })
+        .boundingBox();
+      const nao = await page.getByRole("button", { name: "Não" }).boundingBox();
+      if (!faixa || !logo || !sim || !nao) throw new Error("elemento sem caixa");
+      const baseDaFaixa = faixa.y + faixa.height;
+      expect(logo.y).toBeGreaterThanOrEqual(baseDaFaixa);
+      expect(sim.y).toBeGreaterThanOrEqual(baseDaFaixa);
+      expect(nao.y + nao.height).toBeLessThanOrEqual(viewport.height);
+
+      const rolagem = await page.evaluate(
+        () => document.documentElement.scrollHeight - window.innerHeight,
+      );
+      expect(rolagem).toBeLessThanOrEqual(0);
+    },
+  );
+}
