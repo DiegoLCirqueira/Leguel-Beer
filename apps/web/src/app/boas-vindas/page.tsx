@@ -113,7 +113,7 @@ export default function BoasVindas() {
               alt=""
               width={900}
               height={515}
-              sizes="(min-width: 768px) 440px, 98vw"
+              sizes="(min-width: 768px) 290px, 65vw"
               className="pointer-events-none absolute left-[43%] top-[37%] h-[46%] w-auto max-w-none brightness-[0.7] saturate-[0.9] blur-[0.5px]"
             />
             <div
