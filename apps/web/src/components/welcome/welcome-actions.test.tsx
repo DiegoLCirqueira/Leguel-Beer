@@ -7,9 +7,18 @@ describe("WelcomeActions", () => {
   it("mostra os três caminhos como links de navegação", () => {
     render(<WelcomeActions />);
 
-    expect(screen.getByRole("link", { name: "Entrar" })).toHaveAttribute("href", "/entrar?manter-conectado=1");
-    expect(screen.getByRole("link", { name: "Criar conta" })).toHaveAttribute("href", "/criar-conta");
-    expect(screen.getByRole("link", { name: "Continuar como convidado" })).toHaveAttribute("href", "/");
+    expect(screen.getByRole("link", { name: "Entrar" })).toHaveAttribute(
+      "href",
+      "/entrar?manter-conectado=1",
+    );
+    expect(screen.getByRole("link", { name: "Criar conta" })).toHaveAttribute(
+      "href",
+      "/criar-conta",
+    );
+    expect(screen.getByRole("link", { name: "Continuar como convidado" })).toHaveAttribute(
+      "href",
+      "/",
+    );
     expect(screen.getByText("ou")).toBeInTheDocument();
   });
 
@@ -21,7 +30,10 @@ describe("WelcomeActions", () => {
     await userEvent.click(checkbox);
 
     expect(checkbox).not.toBeChecked();
-    expect(screen.getByRole("link", { name: "Entrar" })).toHaveAttribute("href", "/entrar?manter-conectado=0");
+    expect(screen.getByRole("link", { name: "Entrar" })).toHaveAttribute(
+      "href",
+      "/entrar?manter-conectado=0",
+    );
   });
 
   it("o ícone (i) mostra e esconde a dica de Manter-me conectado", async () => {
@@ -33,12 +45,22 @@ describe("WelcomeActions", () => {
 
     expect(info).toHaveAttribute("aria-expanded", "true");
     expect(
-      screen.getByText("Sua sessão continua ativa neste aparelho por até 30 dias, mesmo depois de fechar o navegador."),
+      screen.getByText(
+        "Sua sessão continua ativa neste aparelho por até 30 dias, mesmo depois de fechar o navegador.",
+      ),
     ).toBeInTheDocument();
 
     await userEvent.click(info);
 
     expect(info).toHaveAttribute("aria-expanded", "false");
     expect(screen.queryByText(/Sua sessão continua ativa/)).not.toBeInTheDocument();
+  });
+
+  it("Continuar como convidado guarda a escolha até fechar o navegador", async () => {
+    render(<WelcomeActions />);
+
+    await userEvent.click(screen.getByRole("link", { name: "Continuar como convidado" }));
+
+    expect(document.cookie).toContain("leguele_convidado=1");
   });
 });
