@@ -87,6 +87,8 @@ Estas regras têm prioridade sobre os caminhos padrão descritos nos SKILL.md em
 - Rascunhos e arquivos temporários: `docs/00-inbox/` (nunca `.scratch/` ou pastas novas).
 - Handoff (skill `/handoff`): `docs/00-inbox/handoff.md`, nunca no diretório temporário do sistema.
 - Revisão de código contra a spec: usar `/review-spec`.
+- Revisão de UI (skill `web-design-guidelines`, da Vercel): usa a cópia local e fixada das regras em `.claude/skills/web-design-guidelines/guidelines.md` (commit de origem no SKILL.md), sem baixar da internet. Atualizar as regras só em PR próprio.
+- Automação de navegador (skill `playwright-cli`, da Microsoft): o binário vem do `@playwright/cli`, devDependency fixada na raiz (`pnpm exec playwright-cli`). Serve para explorar e depurar páginas; os testes E2E continuam em `@playwright/test`.
 - Issue tracker: GitHub Issues é o tracker do MVP.
   - `to-spec` e `to-tickets` gravam a spec em `docs/02-features/` e só publicam issues depois que a migração do backlog tiver sido feita. Enquanto não existirem issues migradas no repositório (issues com o marcador `notion-id` no corpo), apenas listam os tickets propostos no fim da spec.
   - O Notion guarda as ideias do Pós-MVP e não deve ser alterado pelos agentes.
