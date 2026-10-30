@@ -1,3 +1,4 @@
+import type { EmailConfirmation } from "../domain/email-confirmation.js";
 import type { LegalVersions } from "../domain/legal-versions.js";
 import type { Profile } from "../domain/profile.js";
 import type { ProfileRepository } from "../domain/profile-repository.js";
@@ -21,6 +22,7 @@ export interface CreateProfileOptions {
 export class CreateProfile {
   constructor(
     private readonly profiles: ProfileRepository,
+    private readonly confirmation: EmailConfirmation,
     private readonly options: CreateProfileOptions,
   ) {}
 
@@ -28,13 +30,16 @@ export class CreateProfile {
   async execute(input: CreateProfileInput): Promise<{ profile: Profile; created: boolean }> {
     const email = input.user.email.trim().toLowerCase();
     const adminEmail = this.options.adminEmail?.trim().toLowerCase();
+    // Admin só com o e-mail confirmado segundo o servidor (auth.users): sem isso, quem cadastrasse o
+    // e-mail do admin viraria admin. A prova não vem do token, cujo user_metadata o usuário edita.
+    const isAdmin =
+      !!adminEmail && email === adminEmail && (await this.confirmation.isConfirmed(input.user.id));
     return this.profiles.createProfile({
       id: input.user.id,
       email,
       nome: input.nome,
       telefone: input.telefone,
-      // Admin só com a prova de e-mail verificado: sem ela, quem cadastrasse o e-mail do admin viraria admin.
-      role: adminEmail && email === adminEmail && input.user.emailVerified ? "admin" : "customer",
+      role: isAdmin ? "admin" : "customer",
       aceite: { ...this.options.legal, aceitoEm: this.options.now() },
     });
   }
