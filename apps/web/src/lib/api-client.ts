@@ -36,7 +36,7 @@ export function createApiClient(config: ApiClientConfig) {
   async function request<T = unknown>(path: string, options: RequestOptions<T> = {}): Promise<T> {
     let response = await send(path, await config.getToken(), options);
     if (response.status === 401) {
-      const token = await config.refreshSession();
+      const token = await config.refreshSession().catch(() => null);
       if (token) response = await send(path, token, options);
     }
     if (!response.ok) throw ApiError.fromBody(response.status, await readBody(response));
