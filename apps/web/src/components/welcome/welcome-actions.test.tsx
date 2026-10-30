@@ -63,4 +63,28 @@ describe("WelcomeActions", () => {
 
     expect(document.cookie).toContain("leguele_convidado=1");
   });
+
+  it("a dica do (i) fecha com Escape e devolve o foco ao ícone", async () => {
+    render(<WelcomeActions />);
+    const info = screen.getByRole("button", { name: "Saiba mais sobre Manter-me conectado" });
+    await userEvent.click(info);
+    expect(screen.getByText(/Sua sessão continua ativa/)).toBeInTheDocument();
+
+    await userEvent.keyboard("{Escape}");
+
+    expect(screen.queryByText(/Sua sessão continua ativa/)).not.toBeInTheDocument();
+    expect(info).toHaveFocus();
+  });
+
+  it("a dica do (i) fecha ao clicar fora dela", async () => {
+    render(<WelcomeActions />);
+    await userEvent.click(
+      screen.getByRole("button", { name: "Saiba mais sobre Manter-me conectado" }),
+    );
+    expect(screen.getByText(/Sua sessão continua ativa/)).toBeInTheDocument();
+
+    await userEvent.click(document.body);
+
+    expect(screen.queryByText(/Sua sessão continua ativa/)).not.toBeInTheDocument();
+  });
 });

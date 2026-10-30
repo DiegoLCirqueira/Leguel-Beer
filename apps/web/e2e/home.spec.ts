@@ -90,3 +90,21 @@ for (const { width, height } of [
     expect(overflow.y).toBeLessThanOrEqual(0);
   });
 }
+
+for (const { width, height } of [
+  { width: 360, height: 780 },
+  { width: 390, height: 844 },
+]) {
+  test(`a dica do (i) não cobre o botão de convidado em ${width}x${height}`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await page.goto("/boas-vindas");
+
+    await page.getByRole("button", { name: "Saiba mais sobre Manter-me conectado" }).click();
+    const hint = await page.getByText(/Sua sessão continua ativa/).boundingBox();
+    const guest = await page.getByRole("link", { name: "Continuar como convidado" }).boundingBox();
+
+    expect(hint).not.toBeNull();
+    expect(guest).not.toBeNull();
+    expect(hint!.y).toBeGreaterThanOrEqual(guest!.y + guest!.height);
+  });
+}
