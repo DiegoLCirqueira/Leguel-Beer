@@ -10,13 +10,20 @@ export class InMemoryAuthAdmin implements AuthAdmin {
 
   findByEmail(email: string): Promise<AuthUser | null> {
     const user = this.users.find((u) => u.email === email);
-    return Promise.resolve(user ? { id: user.id, email: user.email } : null);
+    return Promise.resolve(
+      user ? { id: user.id, email: user.email, emailConfirmed: user.emailConfirmed } : null,
+    );
   }
 
   createConfirmedUser(email: string, password: string): Promise<AuthUser> {
-    const user = { id: this.newId(this.users.length + 1), email, password };
+    const user = {
+      id: this.newId(this.users.length + 1),
+      email,
+      emailConfirmed: true,
+      password,
+    };
     this.users.push(user);
-    return Promise.resolve({ id: user.id, email });
+    return Promise.resolve({ id: user.id, email, emailConfirmed: true });
   }
 }
 

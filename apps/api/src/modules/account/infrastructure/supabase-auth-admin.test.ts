@@ -22,16 +22,35 @@ const KEY = "chave-de-servico-local";
 describe("SupabaseAuthAdmin", () => {
   it("encontra o usuário pelo e-mail, sem diferenciar maiúsculas", async () => {
     const { fetch, calls } = fakeFetch([
-      { status: 200, body: { users: [{ id: "u1", email: "Admin@Leguele.test" }] } },
+      {
+        status: 200,
+        body: {
+          users: [
+            { id: "u1", email: "Admin@Leguele.test", email_confirmed_at: "2026-10-30T10:00:00Z" },
+          ],
+        },
+      },
     ]);
 
     const user = await new SupabaseAuthAdmin(URL_BASE, KEY, fetch).findByEmail(
       "admin@leguele.test",
     );
 
-    expect(user).toEqual({ id: "u1", email: "admin@leguele.test" });
+    expect(user).toEqual({ id: "u1", email: "admin@leguele.test", emailConfirmed: true });
     expect(calls[0]?.url).toBe(`${URL_BASE}/auth/v1/admin/users?page=1&per_page=200`);
     expect(calls[0]?.init.headers).toMatchObject({ apikey: KEY, Authorization: `Bearer ${KEY}` });
+  });
+
+  it("marca como não confirmada a conta sem email_confirmed_at", async () => {
+    const { fetch } = fakeFetch([
+      { status: 200, body: { users: [{ id: "u2", email: "admin@leguele.test" }] } },
+    ]);
+
+    const user = await new SupabaseAuthAdmin(URL_BASE, KEY, fetch).findByEmail(
+      "admin@leguele.test",
+    );
+
+    expect(user).toEqual({ id: "u2", email: "admin@leguele.test", emailConfirmed: false });
   });
 
   it("devolve null quando não há usuário com o e-mail, percorrendo as páginas", async () => {
@@ -65,7 +84,7 @@ describe("SupabaseAuthAdmin", () => {
       "senha-forte-123456",
     );
 
-    expect(user).toEqual({ id: "u9", email: "admin@leguele.test" });
+    expect(user).toEqual({ id: "u9", email: "admin@leguele.test", emailConfirmed: true });
     expect(calls[0]?.url).toBe(`${URL_BASE}/auth/v1/admin/users`);
     expect(calls[0]?.init.method).toBe("POST");
     expect(JSON.parse(String(calls[0]?.init.body))).toEqual({
