@@ -41,4 +41,15 @@ describe("seedAdmin (banco real)", () => {
     await expect(attempt).rejects.toThrow(/ADMIN_SEED_PASSWORD/);
     await expect(attempt).rejects.not.toThrow(/senha-de-teste-123456/);
   });
+
+  it("recusa rodar contra um Supabase que não é local, sem criar nada", async () => {
+    const auth = new InMemoryAuthAdmin();
+    const attempt = seedAdmin(
+      { ...env, SUPABASE_URL: "https://abc.supabase.co" },
+      { auth, profiles: new PrismaProfileRepository(prisma) },
+    );
+
+    await expect(attempt).rejects.toThrow(/SUPABASE_URL.*local/);
+    expect(auth.users).toHaveLength(0);
+  });
 });
