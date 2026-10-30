@@ -1,6 +1,6 @@
 ---
 tipo: glossario
-atualizado: 2026-10-28
+atualizado: 2026-10-29
 tags:
   - glossario
 ---
@@ -18,6 +18,20 @@ _Evite_: usuário, comprador
 **Convidado**:
 Pessoa que usa a loja sem ter entrado numa conta. Pode montar a Geladeira, mas precisa entrar numa conta para finalizar a compra.
 _Evite_: visitante, anônimo
+
+**Admin**:
+Pessoa que opera a loja (cervejas, estoque e pedidos). É uma conta com o papel admin. Ver [[guards-api]].
+_Evite_: administrador do sistema, superusuário
+
+**Perfil**:
+Dados do cliente guardados pela loja (nome e telefone, no cadastro), criados no primeiro acesso à conta. Ver [[cadastro-login]].
+_Evite_: usuário, cadastro (quando se quer dizer os dados)
+
+## Acesso
+
+**Confirmação de maioridade**:
+Resposta "tenho 18 anos ou mais" dada na entrada do site, lembrada por 30 dias no navegador. Não valida documento. Ver [[maioridade-entrada]].
+_Evite_: age gate, verificação de idade
 
 ## Catálogo
 

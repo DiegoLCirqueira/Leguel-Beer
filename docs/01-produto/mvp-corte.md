@@ -92,6 +92,9 @@ Cards de épicos MVP que dependem de BullMQ, Redis ou WebSocket:
 
 Cards de épicos MVP que podem ficar para depois sem quebrar a compra de ponta a ponta:
 
+> [!info] Mudança de 2026-10-29
+> O LB-22 (Publicar termos, privacidade e aviso de projeto de portfólio, E12) saiu desta lista e entrou no MVP por decisão do Diego: os links do cadastro precisam de destino. Agora são 32 cards adiáveis. Ver [[termos-privacidade]] e [[roteiro-mvp]].
+
 | Épico | Card | Pontos | Motivo |
 | --- | --- | --- | --- |
 | E2 | LB-9 Validar variáveis de ambiente com Zod | 1 | Útil, mas não bloqueia. |
@@ -119,7 +122,6 @@ Cards de épicos MVP que podem ficar para depois sem quebrar a compra de ponta a
 | E11 | LB-115 Preparar README de portfólio com prints, GIF e decisões | 3 | Fora do escopo reduzido de E11. |
 | E11 | LB-116 Criar dados de demonstração e conta de teste para recrutadores | 2 | Fora do escopo reduzido de E11. |
 | E12 | LB-21 Implementar banner de consentimento de cookies | 3 | Fora do escopo reduzido de E12. |
-| E12 | LB-22 Publicar termos, privacidade e aviso de projeto de portfólio | 2 | Fora do escopo reduzido de E12. |
 | E12 | LB-23 Permitir exportar e excluir os dados da conta | 3 | Fora do escopo reduzido de E12. |
 | E13 | LB-82 Pesquisar envio gratuito de notificação por WhatsApp | 2 | Fora do escopo reduzido de E13. |
 | E13 | LB-83 Notificar o admin no WhatsApp a cada pedido pago | 3 | Fora do escopo reduzido de E13. |
