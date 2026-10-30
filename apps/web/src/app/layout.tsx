@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Kaushan_Script, Outfit } from "next/font/google";
+import { Figtree, Kaushan_Script, Outfit } from "next/font/google";
 import type { ReactNode } from "react";
 import "./globals.css";
 
@@ -7,6 +7,13 @@ const outfit = Outfit({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
   variable: "--font-outfit",
+  display: "swap",
+});
+
+const figtree = Figtree({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-figtree",
   display: "swap",
 });
 
@@ -28,7 +35,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${outfit.variable} ${kaushan.variable}`}>
+    <html lang="pt-BR" className={`${outfit.variable} ${kaushan.variable} ${figtree.variable}`}>
       <body>{children}</body>
     </html>
   );
