@@ -52,6 +52,7 @@ describe("regra do pacote compartilhado: sem Node nem framework", () => {
     ["usa-node", "shared-sem-node-nem-framework"],
     ["usa-nest", "shared-sem-framework"],
     ["usa-prisma", "shared-sem-framework"],
+    ["contest", "shared-sem-node-nem-framework"],
   ])("reprova %s.ts em packages/shared", async (arquivo, regra) => {
     const encontradas = await violacoes();
 
