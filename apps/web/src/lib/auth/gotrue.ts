@@ -15,6 +15,37 @@ export interface DadosCadastro {
 export type ResultadoCadastro =
   { tipo: "enviado" } | { tipo: "email-ja-cadastrado" } | { tipo: "erro" };
 
+export interface Sessao {
+  accessToken: string;
+  refreshToken: string;
+  user: { id: string; email: string; metadata: Record<string, unknown> };
+}
+
+export type ResultadoEntrada =
+  | { tipo: "ok"; sessao: Sessao }
+  | { tipo: "credenciais" }
+  | { tipo: "nao-confirmado" }
+  | { tipo: "erro" };
+
+interface CorpoSessao {
+  access_token?: string;
+  refresh_token?: string;
+  user?: { id: string; email?: string; user_metadata?: Record<string, unknown> };
+}
+
+function lerSessao(corpo: CorpoSessao): Sessao | null {
+  if (!corpo.access_token || !corpo.refresh_token || !corpo.user) return null;
+  return {
+    accessToken: corpo.access_token,
+    refreshToken: corpo.refresh_token,
+    user: {
+      id: corpo.user.id,
+      email: corpo.user.email ?? "",
+      metadata: corpo.user.user_metadata ?? {},
+    },
+  };
+}
+
 /** Cliente mínimo do Supabase Auth (GoTrue) por HTTP, para o lado servidor do site. */
 export function createGoTrue(config: GoTrueConfig) {
   const fetchFn = config.fetch ?? fetch;
@@ -43,5 +74,85 @@ export function createGoTrue(config: GoTrueConfig) {
     }
   }
 
-  return { signUp };
+  async function chamar(caminho: string, corpo: unknown, cabecalhos: Record<string, string> = {}) {
+    return fetchFn(`${config.url}${caminho}`, {
+      method: "POST",
+      headers: { apikey: config.anonKey, "Content-Type": "application/json", ...cabecalhos },
+      body: JSON.stringify(corpo),
+    });
+  }
+
+  async function lerSessaoDaResposta(resposta: Response): Promise<Sessao | null> {
+    if (!resposta.ok) return null;
+    return lerSessao((await resposta.json()) as CorpoSessao);
+  }
+
+  async function signInPassword(email: string, senha: string): Promise<ResultadoEntrada> {
+    try {
+      const resposta = await chamar("/auth/v1/token?grant_type=password", {
+        email,
+        password: senha,
+      });
+      if (resposta.ok) {
+        const sessao = lerSessao((await resposta.json()) as CorpoSessao);
+        return sessao ? { tipo: "ok", sessao } : { tipo: "erro" };
+      }
+      const corpo = (await resposta.json().catch(() => ({}))) as { error_code?: string };
+      if (corpo.error_code === "invalid_credentials") return { tipo: "credenciais" };
+      if (corpo.error_code === "email_not_confirmed") return { tipo: "nao-confirmado" };
+      return { tipo: "erro" };
+    } catch {
+      return { tipo: "erro" };
+    }
+  }
+
+  async function refresh(refreshToken: string): Promise<Sessao | null> {
+    try {
+      const resposta = await chamar("/auth/v1/token?grant_type=refresh_token", {
+        refresh_token: refreshToken,
+      });
+      return await lerSessaoDaResposta(resposta);
+    } catch {
+      return null;
+    }
+  }
+
+  async function verify(dados: { tokenHash: string; type: "signup" }): Promise<Sessao | null> {
+    try {
+      const resposta = await chamar("/auth/v1/verify", {
+        type: dados.type,
+        token_hash: dados.tokenHash,
+      });
+      return await lerSessaoDaResposta(resposta);
+    } catch {
+      return null;
+    }
+  }
+
+  async function resend(email: string, redirectTo: string): Promise<"enviado" | "erro"> {
+    try {
+      const resposta = await chamar("/auth/v1/resend", {
+        type: "signup",
+        email,
+        options: { email_redirect_to: redirectTo },
+      });
+      return resposta.ok ? "enviado" : "erro";
+    } catch {
+      return "erro";
+    }
+  }
+
+  /** Encerra só a sessão deste aparelho: a renovação deixa de funcionar. */
+  async function signOut(accessToken: string): Promise<boolean> {
+    try {
+      const resposta = await chamar("/auth/v1/logout?scope=local", undefined, {
+        Authorization: `Bearer ${accessToken}`,
+      });
+      return resposta.ok;
+    } catch {
+      return false;
+    }
+  }
+
+  return { signUp, signInPassword, refresh, verify, resend, signOut };
 }
