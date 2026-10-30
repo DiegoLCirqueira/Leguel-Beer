@@ -52,4 +52,15 @@ describe("seedAdmin (banco real)", () => {
     await expect(attempt).rejects.toThrow(/SUPABASE_URL.*local/);
     expect(auth.users).toHaveLength(0);
   });
+
+  it("recusa rodar contra um banco que não é local, sem criar nada", async () => {
+    const auth = new InMemoryAuthAdmin();
+    const attempt = seedAdmin(
+      { ...env, DATABASE_URL: "postgresql://u:p@db.abc.supabase.co:5432/postgres" },
+      { auth, profiles: new PrismaProfileRepository(prisma) },
+    );
+
+    await expect(attempt).rejects.toThrow(/DATABASE_URL.*local/);
+    expect(auth.users).toHaveLength(0);
+  });
 });
