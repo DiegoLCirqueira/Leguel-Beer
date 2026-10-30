@@ -23,3 +23,6 @@ test-results/
 next-env.d.ts
 **/src/generated/
 apps/web/AGENTS.md
+
+# saída da automação de navegador (playwright-cli)
+.playwright-cli/
