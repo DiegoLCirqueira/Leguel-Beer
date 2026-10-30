@@ -45,4 +45,12 @@ describe("MaioridadePergunta", () => {
     expect(screen.queryByRole("button", { name: "Sim, tenho 18 anos ou mais" })).toBeNull();
     expect(confirmar).not.toHaveBeenCalled();
   });
+
+  it("responder não leva o foco para o título do acesso negado", async () => {
+    renderizar();
+
+    await userEvent.click(screen.getByRole("button", { name: "Não" }));
+
+    expect(screen.getByRole("heading", { level: 1, name: "Acesso não permitido" })).toHaveFocus();
+  });
 });
