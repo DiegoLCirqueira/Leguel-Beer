@@ -1,4 +1,4 @@
-import { generateKeyPairSync, randomUUID, sign } from "node:crypto";
+import { createHmac, generateKeyPairSync, randomUUID, sign } from "node:crypto";
 
 interface Claims {
   sub: string;
@@ -36,11 +36,31 @@ export function createTestTokens() {
     return `${signedPart}.${signature.toString("base64url")}`;
   }
 
+  function hs256(claims: Claims): string {
+    const signedPart = `${encode({ alg: "HS256", typ: "JWT" })}.${encode({
+      role: "authenticated",
+      exp: now() + 3600,
+      ...claims,
+    })}`;
+    const signature = createHmac("sha256", randomUUID()).update(signedPart).digest("base64url");
+    return `${signedPart}.${signature}`;
+  }
+
   return {
     jwks,
     customerId,
     adminId,
     customer: () => es256({ sub: customerId, email: "cliente@leguele.test" }),
     admin: () => es256({ sub: adminId, email: "admin@leguele.test" }),
+    expired: () => es256({ sub: customerId, email: "cliente@leguele.test", exp: now() - 60 }),
+    // Corpo de admin com a assinatura de outro token: a verificação tem que recusar.
+    tampered: () => {
+      const [header, , signature] = es256({ sub: customerId, email: "cliente@leguele.test" }).split(
+        ".",
+      ) as [string, string, string];
+      const payload = encode({ role: "authenticated", exp: now() + 3600, sub: adminId });
+      return `${header}.${payload}.${signature}`;
+    },
+    hs256: () => hs256({ sub: customerId, email: "cliente@leguele.test" }),
   };
 }
