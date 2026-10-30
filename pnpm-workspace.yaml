@@ -5,6 +5,3 @@ packages:
 allowBuilds:
   "@swc/core": false
   unrs-resolver: false
-
-minimumReleaseAgeExclude:
-  - lucide-react@1.64.0
