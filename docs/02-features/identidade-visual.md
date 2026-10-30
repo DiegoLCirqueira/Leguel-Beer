@@ -95,7 +95,7 @@ Funcionalidade: Tokens e componentes base da marca
 
 ### Tokens de cor
 
-Só tema escuro. O verde da marca, o texto sobre ele e o texto principal são os valores medidos no Figma pelo Front na tela de [[boas-vindas]] (decisão do Diego, 2026-10-30: valem no site inteiro). Os demais vêm da paleta de `estudio-garrafas.html`, conferidos por amostragem no print do Figma (o print tem gradientes e compressão; a amostra varia alguns tons). A vitrine dos tokens e componentes fica na home por enquanto, para conferência visual nos portais (decisão do Orchestrator, 2026-10-29). É provisória: quando o LB-24 ([[boas-vindas]]) entrar, a home volta a ser a da loja e a vitrine vai para `/dev/tokens`, disponível só no desenvolvimento, como pede o card LB-11.
+Só tema escuro. O verde da marca, o texto sobre ele e o texto principal são os valores medidos no Figma pelo Front na tela de [[boas-vindas]] (decisão do Diego, 2026-10-30: valem no site inteiro). Os demais vêm da paleta de `estudio-garrafas.html`, conferidos por amostragem no print do Figma (o print tem gradientes e compressão; a amostra varia alguns tons). A vitrine dos tokens e componentes fica em `/dev/tokens`, disponível só no desenvolvimento, como pede o card LB-11 (saiu da home quando o LB-24, [[boas-vindas]], entrou).
 
 | Token | Valor | Uso no Figma |
 | --- | --- | --- |
@@ -125,9 +125,9 @@ Só tema escuro. O verde da marca, o texto sobre ele e o texto principal são os
 - O verde da marca nunca é fundo de texto claro nem aparece sobre fundo branco (o card avisa que não passa contraste).
 - Badge: a cor sai do token da categoria pelo identificador (slug) da categoria. Categoria cadastrada depois, sem token, usa `badge-neutro`. O Stout aparece no Figma, mas saiu do catálogo ([[catalogo]]) e não ganha token.
 
-- **Contraste refeito (2026-10-30)** para os pares que mudaram, com os valores do Figma: `texto` sobre `fundo` 18,2:1 (antes 17,1), `texto` sobre `superficie` 15,3:1 (antes 14,3), `primaria` sobre `fundo` 11,5:1 (antes 13,4), `primaria` sobre `superficie` 9,6:1, `texto-na-primaria` sobre `primaria` 12,1:1 (antes 12,4), `texto-na-primaria` sobre `badge-frutas` 8,6:1 (antes 7,5) e `texto` sobre `arte-vidro` 16,9:1. Todos passam AA (4,5:1).
+- **Contraste refeito (2026-10-30)** para os pares que mudaram, com os valores do Figma: `texto` sobre `fundo` 18,2:1 (antes 17,1), `texto` sobre `superficie` 15,3:1 (antes 14,3), `primaria` sobre `fundo` 11,5:1 (antes 13,4), `primaria` sobre `superficie` 9,6:1, `texto-na-primaria` sobre `primaria` 12,1:1 (antes 12,4), `texto-na-primaria` sobre `badge-frutas` 8,6:1 (antes 7,5) e `texto` sobre `arte-vidro` 16,9:1 (valor do vidro opaco; na tela o vidro tem 80% de opacidade sobre a arte, e o contraste real é conferido no ponto mais claro da arte atrás do controle, ver Seams de teste). Todos passam AA (4,5:1).
 - **Estados:** verde, vermelho e âmbar nos tons do tema escuro, usados como texto e ícone sobre `fundo` e `superficie` (decisão do Diego, 2026-10-29). Os valores acima são os implementados e testados pelo Front no LB-11 (passam AA sobre `superficie`, no teste de contraste).
-- **Badge "FRUTAS":** texto `texto-na-primaria` (escuro), cerca de 8,6:1 com os valores do Figma (decisão do Diego, 2026-10-29). Texto claro daria cerca de 2,3:1.
+- **Badge "FRUTAS":** texto `texto-na-primaria` (escuro), cerca de 8,6:1 com os valores do Figma (decisão do Diego, 2026-10-29). Texto claro daria cerca de 2,2:1.
 
 ### Tipografia
 
@@ -150,7 +150,7 @@ Só tema escuro. O verde da marca, o texto sobre ele e o texto principal são os
 
 ### Componentes
 
-- **Botão:** variantes primária (fundo verde da marca, ex.: "Entrar", "Criar conta" do formulário), contorno (borda verde da marca, fundo transparente, ex.: "Criar conta" da tela inicial) e discreta (fundo `superficie`, borda `borda`, ex.: "Continuar como convidado"). Ícone opcional à esquerda e/ou à direita (seta). Tamanhos: pequeno (ex.: "Adicionar" no card) e grande (largura total, nos formulários). Estados: carregando e desabilitado. Área de toque mínima de 44 × 44 px.
+- **Botão:** variantes primária (fundo verde da marca, ex.: "Entrar", "Criar conta" do formulário), contorno (borda verde da marca, fundo transparente, ex.: "Criar conta" da tela inicial) e discreta (fundo `superficie`, borda `borda`; sobre a arte da [[boas-vindas]], "Continuar como convidado" usa `arte-vidro` e `arte-borda`). Ícone opcional à esquerda e/ou à direita (seta). Tamanhos: pequeno (ex.: "Adicionar" no card) e grande (largura total, nos formulários). Estados: carregando e desabilitado. Área de toque mínima de 44 × 44 px.
 - **Badge de estilo:** pílula com o nome da categoria em maiúsculas, cor do token da categoria.
 - **Chip de categoria:** ícone em cima, rótulo e contador entre parênteses abaixo ("IPAs (4)"); selecionável, um por vez, com `aria-pressed`. Selecionado: borda e texto no verde da marca. O comportamento na página está em [[catalogo]].
 
@@ -170,6 +170,7 @@ Só tema escuro. O verde da marca, o texto sobre ele e o texto principal são os
 > Tirada dos planos de teste dos cards LB-11 e LB-12.
 
 - **Contraste:** função pura que calcula a razão de contraste de cada par de tokens (teste unitário, sem navegador).
+- **Vidro sobre a arte:** o contraste de `texto` sobre `arte-vidro` a 80% é medido na cor composta com o ponto mais claro da arte atrás do controle (E2E ou captura de tela), não só com o vidro opaco.
 - **Cor fixa:** regra de lint provada com um arquivo de exemplo que deve falhar (red antes da regra).
 - **Botão, badge e chip:** testes de componente (Vitest + Testing Library) para variantes, estados e atributos ARIA, mais verificação com axe.
 - **Área de toque e tela de 360 px:** E2E com viewport de celular, quando as telas de acesso usarem os componentes.
@@ -195,7 +196,7 @@ Decisões pequenas e fáceis de reverter, pela política de autonomia. Qualquer 
 - **`superficie` e `borda` mantidos (2026-10-30):** o vidro e a borda medidos na [[boas-vindas]] são de controles translúcidos sobre a arte e ficam como `arte-vidro` e `arte-borda`. Trocar `superficie` por `#0B1C0D` deixaria cards e campos quase da cor do `fundo`.
 - **Kaushan Script mantida nos títulos (2026-10-30):** o título da [[boas-vindas]] faz parte da arte (imagem), então o Figma não mostra outra fonte.
 - **Badge de categoria nova:** usa `badge-neutro`; a cor não fica no cadastro da categoria.
-- **Texto dos badges em branco puro (`texto-badge`):** com `texto` (`#EEF5E6`) o badge MALT fica em cerca de 4,2:1 e não passa AA; com branco puro fica em cerca de 4,7:1.
+- **Texto dos badges em branco puro (`texto-badge`):** com `texto` (`#F7FBF5`) o badge MALT fica em cerca de 4,45:1 e não passa AA; com branco puro fica em cerca de 4,7:1.
 - **Nomes dos tokens em português:** seguem o [[GLOSSARY]] e o resto do vault.
 - **Escala de espaçamento e raios:** medidos no print das telas de acesso e da home.
 
