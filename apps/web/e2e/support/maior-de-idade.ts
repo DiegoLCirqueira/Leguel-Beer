@@ -5,7 +5,7 @@ export const MAIORIDADE_COOKIE = "leguele_maioridade";
 
 // `test` das telas que vêm depois da pergunta: abre o navegador com a maioridade já confirmada.
 export const test = base.extend({
-  context: async ({ context, baseURL }, use) => {
+  context: async ({ context, baseURL }, entregar) => {
     await context.addCookies([
       {
         name: MAIORIDADE_COOKIE,
@@ -13,7 +13,7 @@ export const test = base.extend({
         url: baseURL ?? "http://localhost:3000",
       },
     ]);
-    await use(context);
+    await entregar(context);
   },
 });
 
