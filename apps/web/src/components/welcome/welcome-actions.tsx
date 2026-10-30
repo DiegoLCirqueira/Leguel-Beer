@@ -4,6 +4,7 @@ import { ArrowRight, Info, Link2, UserPlus, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useId, useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
+import { markGuest } from "@/lib/guest";
 
 const HINT =
   "Sua sessão continua ativa neste aparelho por até 30 dias, mesmo depois de fechar o navegador.";
@@ -29,7 +30,7 @@ export function WelcomeActions() {
         Criar conta
       </Link>
       <p className="text-sm text-texto-suave">ou</p>
-      <Link href="/" className={buttonVariants({ variant: "ghost" })}>
+      <Link href="/" onClick={markGuest} className={buttonVariants({ variant: "ghost" })}>
         <Link2 aria-hidden="true" className="size-5" />
         Continuar como convidado
       </Link>
