@@ -36,14 +36,15 @@ describe("configuração do Supabase Auth local (cadastro-login)", () => {
     expect(valor("auth.email.template.confirmation", "subject")).toBe(
       '"Confirme sua conta na Leguelé Beer"',
     );
+    // O Supabase CLI resolve o caminho a partir da raiz do projeto, não da pasta supabase.
     const caminho = valor("auth.email.template.confirmation", "content_path").replaceAll('"', "");
-    const modelo = readFileSync(resolve(raiz, "supabase", caminho), "utf8");
+    const modelo = readFileSync(resolve(raiz, caminho), "utf8");
     expect(modelo).toContain("{{ .Data.nome }}");
     expect(modelo).toContain("Confirmar minha conta");
     expect(modelo).toContain(
       "{{ .SiteURL }}/auth/confirmar?token_hash={{ .TokenHash }}&type=signup",
     );
-    expect(existsSync(resolve(raiz, "supabase", caminho))).toBe(true);
+    expect(existsSync(resolve(raiz, caminho))).toBe(true);
   });
 
   it("o site local é localhost:3000, que recebe o retorno da confirmação", () => {
