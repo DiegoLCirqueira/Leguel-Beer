@@ -65,6 +65,17 @@ Funcionalidade: Tela de boas-vindas
     Dado que entrei na minha conta e a sessão está ativa
     Quando abro a home
     Então vejo a home direto, sem a tela de boas-vindas
+
+  Esquema do Cenário: Boas-vindas cabe na tela sem rolagem
+    Dado que estou na tela de boas-vindas num celular de <tamanho>
+    Quando tento rolar a página na vertical e na horizontal
+    Então a página não rola
+    E não vejo o rodapé
+
+    Exemplos:
+      | tamanho   |
+      | 360 × 780 |
+      | 390 × 844 |
 ```
 
 ## Regras de negócio
@@ -74,7 +85,9 @@ Funcionalidade: Tela de boas-vindas
 - **Convidado:** a escolha vale até o navegador ser fechado. O convidado navega e monta a Geladeira, mas só finaliza a compra entrando numa conta ([[GLOSSARY]], [[adicionar-do-card]]).
 - **"Manter-me conectado":** começa marcado (como no Figma) e é levado para a tela de entrar. O efeito na sessão está em [[cadastro-login]].
 - **Textos do Figma** (decisão do Diego já tomada): "Entrar", "Criar conta", "ou", "Continuar como convidado", "Manter-me conectado".
-- **Slogan:** "Sabor Qualidade e Tradição", exatamente assim, no lugar de "Cervejas artesanais e muito mais!" do Figma (decisão do Diego, 2026-10-30). Fica na mesma posição e com o mesmo estilo do texto original na arte; como fazer isso na arte é decisão do Front.
+- **Slogan:** "Sabor Qualidade e Tradição", exatamente assim, no lugar de "Cervejas artesanais e muito mais!" do Figma (decisão do Diego, 2026-10-30). Fica na mesma posição e segue o estilo de pincel do texto original na arte; o Front recria o texto nesse estilo.
+  - **Alternativa autorizada:** se o resultado não ficar fiel à arte, a tela volta à arte original do Figma, com "Cervejas artesanais e muito mais!". O Diego escolhe entre as duas depois de ver o resultado; se escolher a alternativa, o cenário "Tela inicial como no Figma" volta a esperar esse texto.
+- **Sem rolagem:** a boas-vindas cabe inteira na tela do celular e não rola (decisão do Diego, 2026-10-30). Por isso não mostra o rodapé de [[termos-privacidade]], como a pergunta de maioridade. Os links legais continuam nas outras páginas e no cadastro ([[cadastro-login]]).
 - **Sem o texto lateral "Sabor Qualidade Tradição":** o texto lateral do Figma sai da tela (decisão do Diego, 2026-10-30, #136). Não é contradição com o slogan: as palavras voltam só como slogan, no lugar de "Cervejas artesanais e muito mais!", e não na lateral.
 - **Imagens:** logo, garrafa com copo, barril e folhagem de `Imagens/`, otimizadas para celular. A imagem principal tem texto alternativo.
 - **Componentes:** "Entrar" é o botão primário com ícone e seta; "Criar conta", o botão de contorno; "Continuar como convidado", o botão discreto ([[identidade-visual]]).
@@ -114,6 +127,8 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 
 - **"Sabor Qualidade Tradição":** o texto lateral foi retirado da tela de boas-vindas, embora apareça no Figma (#136).
 - **Slogan:** "mude o "Cervejas artesanais e muito mais" por "Sabor Qualidade e Tradição"". O slogan da tela passa a ser "Sabor Qualidade e Tradição", na posição e no estilo do slogan original da arte. Retoma as palavras do texto lateral retirado, agora como slogan.
+- **Estilo do slogan:** "melhorar a fonte que ficou escrito 'Sabor Qualidad e Tradição' (ficou péssimo) pode deixar igual na imagem do figma se ficar mais fácil". Duas possibilidades, com a escolha final depois que o Diego vir o resultado: (1) "Sabor Qualidade e Tradição" recriado no estilo de pincel da arte original; (2) se não ficar fiel, voltar à arte original do Figma, com "Cervejas artesanais e muito mais!".
+- **Sem rolagem:** "Retirar rolagem da página principal". A boas-vindas não rola e fica sem o rodapé.
 
 ## Decisões tomadas sem consulta
 
@@ -127,4 +142,4 @@ Decisões pequenas e fáceis de reverter, pela política de autonomia. Qualquer 
 
 | Issue | Ajuste proposto | Motivo |
 | --- | --- | --- |
-| #39 LB-24 | Link para esta spec; critérios: os 5 cenários; só a home leva à boas-vindas; "Manter-me conectado" levado à tela de entrar; sem botões de login social no MVP | O card não diz o que fazer com "Manter-me conectado" nem com links diretos |
+| #39 LB-24 | Link para esta spec; critérios: os 6 cenários; só a home leva à boas-vindas; "Manter-me conectado" levado à tela de entrar; sem botões de login social no MVP | O card não diz o que fazer com "Manter-me conectado" nem com links diretos |
