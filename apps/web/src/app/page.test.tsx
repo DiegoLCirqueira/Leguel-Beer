@@ -13,7 +13,10 @@ describe("Home", () => {
     render(<Home />);
 
     expect(screen.getByRole("button", { name: "Entrar" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Todas (16)" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Todas (16)" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
     expect(screen.getByText("IPA")).toBeInTheDocument();
   });
 });
