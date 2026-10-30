@@ -6,13 +6,15 @@ import type { Role } from "../domain/role.js";
 export class InMemoryAuthAdmin implements AuthAdmin {
   readonly users: (AuthUser & { password: string })[] = [];
 
+  constructor(private readonly newId: (position: number) => string = (n) => `user-${n}`) {}
+
   findByEmail(email: string): Promise<AuthUser | null> {
     const user = this.users.find((u) => u.email === email);
     return Promise.resolve(user ? { id: user.id, email: user.email } : null);
   }
 
   createConfirmedUser(email: string, password: string): Promise<AuthUser> {
-    const user = { id: `user-${this.users.length + 1}`, email, password };
+    const user = { id: this.newId(this.users.length + 1), email, password };
     this.users.push(user);
     return Promise.resolve({ id: user.id, email });
   }

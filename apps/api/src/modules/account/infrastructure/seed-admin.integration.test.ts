@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
 import { PrismaService } from "../../../common/prisma/prisma.service.js";
 import { InMemoryAuthAdmin } from "../application/in-memory.js";
@@ -20,7 +21,7 @@ describe("seedAdmin (banco real)", () => {
   });
 
   it("cria a conta e grava o perfil admin; rodar de novo não duplica", async () => {
-    const auth = new InMemoryAuthAdmin();
+    const auth = new InMemoryAuthAdmin(() => randomUUID());
     const deps = { auth, profiles: new PrismaProfileRepository(prisma) };
 
     const first = await seedAdmin(env, deps);
