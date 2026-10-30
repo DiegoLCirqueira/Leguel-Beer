@@ -23,22 +23,31 @@ interface Dependencias {
   redirectTo: string;
 }
 
-/** Valida com o schema compartilhado (o mesmo do formulário) e cadastra no Supabase Auth. */
+type ValidacaoCadastro =
+  | { ok: true; dados: ReturnType<typeof cadastroFormSchema.parse> }
+  | { ok: false; erros: Partial<Record<CampoCadastro, string>> };
+
+/** Valida com o schema compartilhado, o mesmo no formulário e no servidor: uma mensagem por campo. */
+export function validarCadastro(entrada: EntradaCadastro): ValidacaoCadastro {
+  const validacao = cadastroFormSchema.safeParse(entrada);
+  if (validacao.success) return { ok: true, dados: validacao.data };
+  const erros: Partial<Record<CampoCadastro, string>> = {};
+  for (const problema of validacao.error.issues) {
+    const campo = problema.path[0] as CampoCadastro | undefined;
+    if (campo && !erros[campo]) erros[campo] = problema.message;
+  }
+  return { ok: false, erros };
+}
+
+/** Cadastra no Supabase Auth depois de validar. */
 export async function criarConta(
   entrada: EntradaCadastro,
   { auth, redirectTo }: Dependencias,
 ): Promise<ResultadoCriarConta> {
-  const validacao = cadastroFormSchema.safeParse(entrada);
-  if (!validacao.success) {
-    const erros: Partial<Record<CampoCadastro, string>> = {};
-    for (const problema of validacao.error.issues) {
-      const campo = problema.path[0] as CampoCadastro | undefined;
-      if (campo && !erros[campo]) erros[campo] = problema.message;
-    }
-    return { tipo: "invalido", erros };
-  }
+  const validacao = validarCadastro(entrada);
+  if (!validacao.ok) return { tipo: "invalido", erros: validacao.erros };
 
-  const { email, senha, nome, telefone, aceite } = validacao.data;
+  const { email, senha, nome, telefone, aceite } = validacao.dados;
   const resultado = await auth.signUp({
     email,
     senha,
