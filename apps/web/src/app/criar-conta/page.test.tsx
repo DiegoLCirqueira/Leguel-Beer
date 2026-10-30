@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import CriarConta from "./page";
 
@@ -20,5 +20,16 @@ describe("/criar-conta", () => {
     render(<CriarConta />);
 
     expect(screen.getAllByRole("img")).toHaveLength(1);
+  });
+
+  it("termina com o rodapé do site, com os links das páginas legais", () => {
+    render(<CriarConta />);
+
+    const rodape = screen.getByRole("contentinfo");
+
+    expect(within(rodape).getByRole("link", { name: "Termos de Uso" })).toHaveAttribute(
+      "href",
+      "/termos",
+    );
   });
 });

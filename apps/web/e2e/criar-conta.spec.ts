@@ -61,7 +61,7 @@ test.describe("criar conta em 360x780", () => {
 
     const [aba] = await Promise.all([
       page.context().waitForEvent("page"),
-      page.getByRole("link", { name: "Termos de Uso" }).click(),
+      page.locator("main").getByRole("link", { name: "Termos de Uso" }).click(),
     ]);
     await aba.waitForLoadState();
 
