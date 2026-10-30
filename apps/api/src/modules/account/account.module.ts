@@ -1,6 +1,10 @@
 import { Module } from "@nestjs/common";
 import { APP_GUARD } from "@nestjs/core";
 import { PrismaService } from "../../common/prisma/prisma.service.js";
+import { CreateProfile } from "./application/create-profile.js";
+import { GetProfile } from "./application/get-profile.js";
+import { LEGAL_VERSIONS } from "./domain/legal-versions.js";
+import { ProfileController } from "./presentation/profile.controller.js";
 import { AuthorizeRequest } from "./application/authorize-request.js";
 import type { ProfileRepository } from "./domain/profile-repository.js";
 import type { TokenVerifier } from "./domain/token-verifier.js";
@@ -16,6 +20,7 @@ function authUrl(): string {
 }
 
 @Module({
+  controllers: [ProfileController],
   providers: [
     {
       provide: TOKEN_VERIFIER,
@@ -31,6 +36,21 @@ function authUrl(): string {
       useFactory: (verifier: TokenVerifier, profiles: ProfileRepository) =>
         new AuthorizeRequest(verifier, profiles),
       inject: [TOKEN_VERIFIER, PROFILE_REPOSITORY],
+    },
+    {
+      provide: CreateProfile,
+      useFactory: (profiles: ProfileRepository) =>
+        new CreateProfile(profiles, {
+          now: () => new Date(),
+          legal: LEGAL_VERSIONS,
+          adminEmail: process.env["ADMIN_EMAIL"],
+        }),
+      inject: [PROFILE_REPOSITORY],
+    },
+    {
+      provide: GetProfile,
+      useFactory: (profiles: ProfileRepository) => new GetProfile(profiles),
+      inject: [PROFILE_REPOSITORY],
     },
     { provide: APP_GUARD, useClass: AccessGuard },
   ],
