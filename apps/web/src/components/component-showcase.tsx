@@ -42,7 +42,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-// Vitrine provisória para conferência visual dos componentes; sai quando a tela de boas-vindas entrar (LB-24).
+// Vitrine para conferência visual dos componentes; usada só em /dev/tokens.
 export function ComponentShowcase() {
   const [category, setCategory] = useState("todas");
 
