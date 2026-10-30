@@ -7,15 +7,34 @@ export const metadata: Metadata = {
 };
 
 const foliage = [
-  { name: "topo-esquerda", width: 420, height: 351, position: "left-0 top-0" },
-  { name: "topo-direita", width: 420, height: 411, position: "right-0 top-0" },
-  { name: "base-esquerda", width: 420, height: 364, position: "bottom-0 left-0" },
-  { name: "base-direita", width: 420, height: 389, position: "bottom-0 right-0" },
+  { name: "topo-esquerda", width: 420, height: 351, className: "left-0 top-0 w-[44%]" },
+  { name: "topo-direita", width: 420, height: 411, className: "right-0 top-0 w-[30%]" },
+  { name: "base-esquerda", width: 420, height: 364, className: "bottom-0 left-0 w-[34%]" },
+  { name: "base-direita", width: 420, height: 389, className: "bottom-0 right-0 w-[26%]" },
+];
+
+const depthFoliage = [
+  {
+    name: "base-esquerda",
+    width: 420,
+    height: 364,
+    className: "-left-[12%] top-[30%] w-[34%] -scale-y-100",
+  },
+  {
+    name: "base-direita",
+    width: 420,
+    height: 389,
+    className: "-right-[10%] top-[24%] w-[30%] -scale-y-100",
+  },
 ];
 
 export default function BoasVindas() {
   return (
-    <main className="relative isolate flex min-h-dvh flex-col items-center overflow-x-clip bg-linear-to-b from-superficie via-fundo to-fundo">
+    <main className="relative isolate h-dvh min-h-[560px] overflow-hidden bg-[radial-gradient(ellipse_at_50%_38%,var(--color-superficie-elevada),var(--color-superficie)_55%,var(--color-fundo)_100%)]">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_50%_42%,color-mix(in_oklab,var(--color-primaria)_16%,transparent),transparent_62%)]"
+      />
       {foliage.map((leaf) => (
         <Image
           key={leaf.name}
@@ -24,42 +43,78 @@ export default function BoasVindas() {
           width={leaf.width}
           height={leaf.height}
           sizes="(min-width: 768px) 360px, 45vw"
-          className={`pointer-events-none absolute -z-10 w-[45vw] max-w-[360px] opacity-90 ${leaf.position}`}
+          className={`pointer-events-none absolute -z-10 max-w-[360px] ${leaf.className}`}
         />
       ))}
-      <div className="flex w-full max-w-md flex-1 flex-col items-center justify-between gap-4 px-4 pb-6 pt-10">
-        <div className="flex flex-col items-center gap-3 text-center">
-          <h1>
-            <Image
-              src="/boas-vindas/logo-leguele-beer.webp"
-              alt="Leguelé Beer"
-              width={640}
-              height={673}
-              sizes="(min-width: 768px) 288px, 64vw"
-              priority
-              className="w-[64vw] max-w-72"
-            />
-          </h1>
-          <p className="font-titulo text-3xl leading-tight text-texto">
-            Cervejas artesanais{" "}
-            <span className="inline-block underline decoration-primaria decoration-2 underline-offset-4">
-              e <span className="text-primaria">muito mais!</span>
-            </span>
-          </p>
-        </div>
-        <div className="relative w-full">
-          <p className="absolute left-[2%] top-[34%] w-[26%] -rotate-12 font-titulo text-sm leading-snug text-primaria">
-            Sabor Qualidade Tradição
-          </p>
+      {depthFoliage.map((leaf) => (
+        <Image
+          key={leaf.name}
+          src={`/boas-vindas/folhagem-${leaf.name}.webp`}
+          alt=""
+          width={leaf.width}
+          height={leaf.height}
+          sizes="35vw"
+          className={`pointer-events-none absolute -z-10 max-w-none opacity-50 blur-[2px] ${leaf.className}`}
+        />
+      ))}
+      <div className="mx-auto flex h-full w-full max-w-md flex-col items-center px-4 pb-[2dvh] pt-[3dvh]">
+        <h1 className="h-[23dvh] shrink-0">
           <Image
-            src="/boas-vindas/garrafa-e-copo-ipa.webp"
-            alt="Garrafa de IPA Leguelé Beer ao lado de um copo cheio, entre folhas de lúpulo"
-            width={748}
-            height={724}
-            sizes="(min-width: 768px) 448px, 100vw"
+            src="/boas-vindas/logo-leguele-beer.webp"
+            alt="Leguelé Beer"
+            width={640}
+            height={673}
+            sizes="(min-width: 768px) 288px, 64vw"
             priority
-            className="ml-auto h-auto w-[78%]"
+            className="h-full w-auto"
           />
+        </h1>
+        <p className="mt-[1.5dvh] -rotate-6 text-center font-titulo text-[clamp(1.1rem,3.2dvh,1.5rem)] leading-tight text-texto">
+          Cervejas artesanais{" "}
+          <span className="block underline decoration-primaria decoration-2 underline-offset-4">
+            e <span className="text-primaria">muito mais!</span>
+          </span>
+        </p>
+        <div className="mt-[1dvh] flex min-h-0 w-full flex-1 justify-center">
+          <div className="relative aspect-[775/615] h-full max-w-full">
+            <Image
+              src="/boas-vindas/tampo-de-madeira.webp"
+              alt=""
+              width={1000}
+              height={99}
+              sizes="(min-width: 768px) 448px, 100vw"
+              className="pointer-events-none absolute -inset-x-[6%] bottom-0 h-[19%] w-[112%] max-w-none object-cover brightness-75 [mask-composite:intersect] [mask-image:linear-gradient(to_bottom,transparent,black_45%,black_80%,transparent),linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]"
+            />
+            <Image
+              src="/boas-vindas/barril-com-lupulo.webp"
+              alt=""
+              width={900}
+              height={515}
+              sizes="(min-width: 768px) 440px, 98vw"
+              className="pointer-events-none absolute left-[40%] top-[24%] h-[56%] w-auto max-w-none brightness-[0.7] saturate-[0.9] blur-[0.5px]"
+            />
+            <div
+              aria-hidden="true"
+              className="absolute bottom-[9%] left-[24%] h-[6%] w-[50%] rounded-full bg-fundo/80 blur-md"
+            />
+            <Image
+              src="/boas-vindas/garrafa-e-copo.webp"
+              alt="Garrafa de IPA Leguelé Beer ao lado de um copo cheio, entre folhas de lúpulo"
+              width={520}
+              height={808}
+              sizes="(min-width: 768px) 200px, 45vw"
+              priority
+              className="absolute left-[27%] top-[0.5%] h-[90%] w-auto max-w-none drop-shadow-[0_6px_8px_var(--color-fundo)]"
+            />
+            <Image
+              src="/boas-vindas/lupulo-esquerda.webp"
+              alt=""
+              width={260}
+              height={291}
+              sizes="(min-width: 768px) 120px, 30vw"
+              className="pointer-events-none absolute bottom-[6%] left-[16%] h-[24%] w-auto max-w-none"
+            />
+          </div>
         </div>
         <WelcomeActions />
       </div>
