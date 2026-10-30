@@ -10,3 +10,7 @@ allowBuilds:
   prisma: false
   supabase: true
   unrs-resolver: false
+
+permissions:
+  "@playwright/cli":
+    skills: false
