@@ -33,7 +33,7 @@ export default function BoasVindas() {
         <h1 translate="no" className="sr-only">
           Leguelé Beer
         </h1>
-        <p className="sr-only">Cervejas artesanais e muito mais!</p>
+        <p className="sr-only">Sabor Qualidade e Tradição</p>
         <WelcomeActions />
       </div>
     </main>
