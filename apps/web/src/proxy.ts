@@ -18,5 +18,6 @@ export function proxy(request: NextRequest) {
   return NextResponse.redirect(destino);
 }
 
-// Páginas do site: ficam de fora a API, os arquivos do Next e os estáticos (qualquer caminho com extensão).
-export const config = { matcher: ["/((?!api|_next|.*[.].*).*)"] };
+// Páginas do site: ficam de fora a API (/api/), os arquivos do Next (/_next/) e os estáticos, que
+// terminam em extensão com letra (.webp, .ico), para não pegar páginas como /produto/v1.0.
+export const config = { matcher: ["/((?!api/|_next/|.*\\.[a-z][a-z0-9]*$).*)"] };
