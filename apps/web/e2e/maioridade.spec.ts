@@ -76,7 +76,7 @@ test("endereço de retorno externo é ignorado", async ({ page }) => {
 
   await page.getByRole("button", { name: "Sim, tenho 18 anos ou mais" }).click();
 
-  await expect(page).toHaveURL(/localhost:3000\/boas-vindas$/);
+  await expect(page).toHaveURL(/localhost:\d+\/boas-vindas$/);
 });
 
 test("robô de busca abre o catálogo sem a pergunta", async ({ browser }) => {
