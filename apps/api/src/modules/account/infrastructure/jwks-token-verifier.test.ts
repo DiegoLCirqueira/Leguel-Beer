@@ -59,4 +59,21 @@ describe("JwksTokenVerifier", () => {
 
     await expect(verifier.verify(tokens.customer())).rejects.toBeInstanceOf(InvalidTokenError);
   });
+
+  it.each([
+    ["header", "null", '{"sub":"x"}'],
+    ["payload", '{"alg":"ES256"}', "null"],
+    ["header", "[]", "{}"],
+    ["payload", '{"alg":"ES256"}', '"texto"'],
+  ])(
+    "recusa o token cujo %s não é um objeto JSON, sem erro interno",
+    async (_parte, header, payload) => {
+      const { verifier } = setup();
+      const b64 = (valor: string) => Buffer.from(valor).toString("base64url");
+
+      await expect(
+        verifier.verify(`${b64(header)}.${b64(payload)}.assinatura`),
+      ).rejects.toBeInstanceOf(InvalidTokenError);
+    },
+  );
 });
