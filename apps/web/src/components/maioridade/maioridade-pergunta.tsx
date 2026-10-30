@@ -35,6 +35,7 @@ export function MaioridadePergunta({ retorno, confirmar }: Props) {
         alt=""
         width={420}
         height={389}
+        priority
         className="pointer-events-none absolute bottom-0 right-0 -z-10 w-48 max-w-[55%] select-none"
       />
       <div className="flex w-full max-w-sm flex-col items-center gap-6">
