@@ -69,4 +69,17 @@ describe("createTestTokens", () => {
 
     expect(decode(tokens.hs256()).header["alg"]).toBe("HS256");
   });
+
+  it("emite iss e aud do Supabase e aceita sobrescrever claims para os casos de recusa", () => {
+    const tokens = createTestTokens("http://127.0.0.1:54321/auth/v1");
+
+    expect(decode(tokens.customer()).payload).toMatchObject({
+      iss: "http://127.0.0.1:54321/auth/v1",
+      aud: "authenticated",
+    });
+    const outro = decode(tokens.custom({ iss: "https://outro.test/auth/v1", aud: "anon" }));
+    expect(outro.payload).toMatchObject({ iss: "https://outro.test/auth/v1", aud: "anon" });
+    expect(outro.payload["sub"]).toBe(tokens.customerId);
+    expect(signatureIsValid(tokens.custom({ aud: "anon" }), tokens.jwks)).toBe(true);
+  });
 });
