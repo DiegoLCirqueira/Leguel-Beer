@@ -7,8 +7,20 @@ export const metadata: Metadata = {
 };
 
 const foliage = [
-  { name: "topo-esquerda", width: 420, height: 351, className: "left-0 top-0 w-[44%]" },
-  { name: "topo-direita", width: 420, height: 411, className: "right-0 top-0 w-[30%]" },
+  {
+    name: "topo-esquerda",
+    width: 420,
+    height: 351,
+    className: "left-0 top-0 w-[44%]",
+    priority: true,
+  },
+  {
+    name: "topo-direita",
+    width: 420,
+    height: 411,
+    className: "right-0 top-0 w-[30%]",
+    priority: true,
+  },
   { name: "base-esquerda", width: 420, height: 364, className: "bottom-0 left-0 w-[34%]" },
   { name: "base-direita", width: 420, height: 389, className: "bottom-0 right-0 w-[26%]" },
 ];
@@ -43,6 +55,7 @@ export default function BoasVindas() {
           width={leaf.width}
           height={leaf.height}
           sizes="(min-width: 768px) 360px, 45vw"
+          priority={leaf.priority}
           className={`pointer-events-none absolute -z-10 max-w-[360px] ${leaf.className}`}
         />
       ))}
