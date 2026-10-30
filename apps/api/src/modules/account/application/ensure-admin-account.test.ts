@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { EnsureAdminAccount } from "./ensure-admin-account.js";
-import { InMemoryAuthAdmin, InMemoryProfileRepository } from "./in-memory.js";
+import { InMemoryAuthAdmin, InMemoryProfileRepository } from "../testing/in-memory.js";
 
 function setup() {
   const auth = new InMemoryAuthAdmin();

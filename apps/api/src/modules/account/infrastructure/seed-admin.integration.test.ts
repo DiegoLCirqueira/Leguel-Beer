@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
 import { PrismaService } from "../../../common/prisma/prisma.service.js";
-import { InMemoryAuthAdmin } from "../application/in-memory.js";
+import { InMemoryAuthAdmin } from "../testing/in-memory.js";
 import { PrismaProfileRepository } from "./prisma-profile-repository.js";
 import { seedAdmin } from "./seed-admin.js";
 
