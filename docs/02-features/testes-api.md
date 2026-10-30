@@ -102,6 +102,8 @@ Decisões pequenas e fáceis de reverter, pela política de autonomia. Qualquer 
 - **Recusar `TEST_DATABASE_URL` igual a `DATABASE_URL`:** protege o banco de desenvolvimento.
 - **Supabase CLI no job de E2E do CI:** os fluxos de acesso precisam do Supabase Auth de verdade; os runners do GitHub Actions têm Docker.
 - **Cobertura por linhas:** o card diz só "80%".
+- **Vitest 5 esconde a mensagem de erro do `globalSetup`** quando o stack passa pelo source map do SWC; o setup troca o stack pela mensagem nos erros de recusa e de banco parado.
+- **Dependência nova:** `@vitest/coverage-v8` 5.0.5 (mesma versão do Vitest) para medir a cobertura.
 
 ## Tickets propostos
 

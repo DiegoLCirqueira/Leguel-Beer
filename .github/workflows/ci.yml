@@ -79,8 +79,14 @@ jobs:
       - name: Migrations em sincronia com o schema
         run: pnpm db:check
 
-      - name: Testes
+      - name: Testes de unidade
         run: pnpm test
+
+      - name: Cobertura de domain e application (mínimo 80% de linhas)
+        run: pnpm test:coverage
+
+      - name: Testes de integração (banco leguele_test)
+        run: pnpm test:integration
 
       - name: Build
         run: pnpm build

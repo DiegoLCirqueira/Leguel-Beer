@@ -13,7 +13,7 @@ A Data API (PostgREST) do Supabase fica desligada (`[api] enabled = false` em `s
 
 ### Banco de teste
 
-Os testes de integração (`*.integration.test.ts`) usam o banco `leguele_test`, separado do de desenvolvimento, no mesmo Postgres. O `test/global-setup.ts` cria o banco se faltar e aplica as migrations. Ajuste com `TEST_DATABASE_URL`; o nome do banco deve terminar em `_test`. `pnpm test` roda unidade e integração; `pnpm --filter @leguele/api test:unit` roda só as de unidade (sem Docker).
+Os testes de integração (`*.integration.test.ts`) usam o banco `leguele_test`, separado do de desenvolvimento, no mesmo Postgres. O `test/global-setup.ts` cria o banco se faltar e aplica as migrations. Ajuste com `TEST_DATABASE_URL`; o nome do banco deve terminar em `_test`. `pnpm test` roda só a unidade (sem Docker); `pnpm test:integration` roda a integração; `pnpm test:coverage` mede as linhas de `domain` e `application` (mínimo de 80%, o CI falha abaixo). O setup recusa um `TEST_DATABASE_URL` igual ao `DATABASE_URL` e, com o banco parado, falha dizendo como subi-lo (`pnpm db:start`). Entre os testes, `resetDatabase` (`src/common/testing/database.ts`) esvazia as tabelas; `createTestTokens` (`src/common/testing/tokens.ts`) gera os JWT de teste e o JWKS falso para os guards.
 
 ## Contrato de erro
 
