@@ -1,31 +1,8 @@
 import { test as semConfirmacao } from "@playwright/test";
 import { expect, test } from "./support/maior-de-idade";
 
-const FAIXA = "Projeto de portfólio · pagamentos em modo de teste";
-
 test.use({ viewport: { width: 360, height: 780 } });
 semConfirmacao.use({ viewport: { width: 360, height: 780 } });
-
-for (const caminho of ["/boas-vindas", "/termos", "/privacidade", "/entregas"]) {
-  test(`a faixa de portfólio fica no topo de ${caminho}`, async ({ page }) => {
-    await page.goto(caminho);
-
-    const faixa = page.getByText(FAIXA);
-    await expect(faixa).toBeVisible();
-    const caixa = await faixa.boundingBox();
-    expect(caixa?.y).toBeLessThanOrEqual(1);
-    await expect(page.getByRole("button", { name: /fechar/i })).toHaveCount(0);
-  });
-}
-
-test("a faixa continua no topo depois de rolar a página", async ({ page }) => {
-  await page.goto("/termos");
-  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-
-  const caixa = await page.getByText(FAIXA).boundingBox();
-
-  expect(caixa?.y).toBeLessThanOrEqual(1);
-});
 
 test("o rodapé da boas-vindas aparece ao rolar até o fim, com avisos, links e dados fictícios", async ({
   page,
@@ -99,23 +76,14 @@ for (const viewport of [
   { width: 360, height: 640 },
 ]) {
   semConfirmacao(
-    `a faixa não cobre o logo nem os botões da maioridade em ${viewport.width}x${viewport.height}`,
+    `a pergunta da maioridade cabe sem rolagem em ${viewport.width}x${viewport.height}`,
     async ({ page }) => {
       await page.setViewportSize(viewport);
       await page.goto("/maioridade");
 
-      const faixa = await page.getByText(FAIXA).boundingBox();
-      const logo = await page.getByRole("img", { name: "Leguelé Beer" }).boundingBox();
-      const sim = await page
-        .getByRole("button", { name: "Sim, tenho 18 anos ou mais" })
-        .boundingBox();
       const nao = await page.getByRole("button", { name: "Não" }).boundingBox();
-      if (!faixa || !logo || !sim || !nao) throw new Error("elemento sem caixa");
-      const baseDaFaixa = faixa.y + faixa.height;
-      expect(logo.y).toBeGreaterThanOrEqual(baseDaFaixa);
-      expect(sim.y).toBeGreaterThanOrEqual(baseDaFaixa);
+      if (!nao) throw new Error("botão sem caixa");
       expect(nao.y + nao.height).toBeLessThanOrEqual(viewport.height);
-
       const rolagem = await page.evaluate(
         () => document.documentElement.scrollHeight - window.innerHeight,
       );
