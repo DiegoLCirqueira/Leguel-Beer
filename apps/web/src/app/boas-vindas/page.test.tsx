@@ -7,7 +7,7 @@ describe("Boas-vindas", () => {
     render(<BoasVindas />);
 
     expect(screen.getByRole("heading", { level: 1, name: "Leguelé Beer" })).toBeInTheDocument();
-    expect(screen.getByText(/^Cervejas artesanais e/)).toHaveTextContent(
+    expect(screen.getByText(/^Cervejas artesanais/)).toHaveTextContent(
       "Cervejas artesanais e muito mais!",
     );
     expect(screen.getByText("Sabor Qualidade Tradição")).toBeInTheDocument();

@@ -34,21 +34,21 @@ export default function BoasVindas() {
               src="/boas-vindas/logo-leguele-beer.webp"
               alt="Leguelé Beer"
               width={640}
-              height={621}
+              height={673}
               sizes="(min-width: 768px) 288px, 64vw"
               priority
               className="w-[64vw] max-w-72"
             />
           </h1>
-          <p className="font-titulo text-2xl leading-tight text-texto">
-            Cervejas artesanais e{" "}
-            <span className="text-primaria underline decoration-primaria decoration-2 underline-offset-4">
-              muito mais!
+          <p className="font-titulo text-3xl leading-tight text-texto">
+            Cervejas artesanais{" "}
+            <span className="inline-block underline decoration-primaria decoration-2 underline-offset-4">
+              e <span className="text-primaria">muito mais!</span>
             </span>
           </p>
         </div>
         <div className="relative w-full">
-          <p className="absolute left-0 top-[22%] -rotate-12 font-titulo text-sm leading-snug text-primaria">
+          <p className="absolute left-[2%] top-[34%] w-[26%] -rotate-12 font-titulo text-sm leading-snug text-primaria">
             Sabor Qualidade Tradição
           </p>
           <Image
@@ -58,7 +58,7 @@ export default function BoasVindas() {
             height={724}
             sizes="(min-width: 768px) 448px, 100vw"
             priority
-            className="mx-auto h-auto w-full"
+            className="ml-auto h-auto w-[78%]"
           />
         </div>
         <WelcomeActions />
