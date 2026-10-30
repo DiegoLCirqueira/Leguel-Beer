@@ -6,4 +6,4 @@ const MENSAGEM = "Informe um telefone com DDD.";
 export const telefoneSchema = z
   .string(MENSAGEM)
   .transform((valor) => valor.replace(/\D/g, ""))
-  .pipe(z.string().regex(/^[1-9]\d{9,10}$/, MENSAGEM));
+  .pipe(z.string().regex(/^[1-9][1-9]\d{8,9}$/, MENSAGEM));
