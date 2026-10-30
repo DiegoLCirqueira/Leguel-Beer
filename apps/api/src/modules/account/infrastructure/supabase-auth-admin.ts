@@ -5,6 +5,7 @@ const PAGE_SIZE = 200;
 interface AdminUser {
   id: string;
   email?: string | null;
+  email_confirmed_at?: string | null;
 }
 
 /** Administra contas pela API admin do Supabase Auth (GoTrue), com a chave de serviço. */
@@ -22,7 +23,8 @@ export class SupabaseAuthAdmin implements AuthAdmin {
         `/admin/users?page=${page}&per_page=${PAGE_SIZE}`,
       );
       const found = body.users.find((u) => u.email?.toLowerCase() === wanted);
-      if (found) return { id: found.id, email: wanted };
+      if (found)
+        return { id: found.id, email: wanted, emailConfirmed: Boolean(found.email_confirmed_at) };
       if (body.users.length < PAGE_SIZE) return null;
     }
   }
@@ -32,7 +34,7 @@ export class SupabaseAuthAdmin implements AuthAdmin {
       method: "POST",
       body: JSON.stringify({ email, password, email_confirm: true }),
     });
-    return { id: user.id, email };
+    return { id: user.id, email, emailConfirmed: true };
   }
 
   private async request<T>(path: string, init: RequestInit = {}): Promise<T> {
