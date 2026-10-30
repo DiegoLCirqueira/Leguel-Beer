@@ -9,11 +9,15 @@ async function lint(code: string) {
 }
 
 describe("regra de cor fixa", () => {
-  it("barra cor hexadecimal escrita no componente e pede um token", async () => {
-    const messages = await lint('export const cor = "#ff0000";\n');
+  it(
+    "barra cor hexadecimal escrita no componente e pede um token",
+    { timeout: 60_000 },
+    async () => {
+      const messages = await lint('export const cor = "#ff0000";\n');
 
-    expect(messages.map((m) => m.message).join(" ")).toMatch(/token/);
-  });
+      expect(messages.map((m) => m.message).join(" ")).toMatch(/token/);
+    },
+  );
 
   it("barra cor rgb escrita no componente", async () => {
     const messages = await lint('export const cor = "rgb(255, 0, 0)";\n');

@@ -24,7 +24,9 @@ describe("acessibilidade dos componentes base", () => {
       </div>,
     );
 
-    const { violations } = await axe.run(container, { rules: { "color-contrast": { enabled: false } } });
+    const { violations } = await axe.run(container, {
+      rules: { "color-contrast": { enabled: false } },
+    });
 
     expect(violations).toEqual([]);
   });

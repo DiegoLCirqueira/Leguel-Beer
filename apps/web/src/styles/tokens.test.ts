@@ -6,7 +6,7 @@ import { contrastRatio } from "@/lib/contrast";
 const css = readFileSync(resolve(process.cwd(), "src/app/globals.css"), "utf8");
 
 function token(name: string): string {
-  const match = css.match(new RegExp(`--color-${name}:\s*([^;]+);`));
+  const match = css.match(new RegExp(`--color-${name}: *([^;]+);`));
   if (!match?.[1]) throw new Error(`token ${name} não definido`);
   const value = match[1].trim();
   const alias = value.match(/^var\(--color-([\w-]+)\)$/);
