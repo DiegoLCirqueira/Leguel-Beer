@@ -45,6 +45,9 @@ Funcionalidade: Tokens e componentes base da marca
       | texto-badge       | badge-malt       |
       | texto-badge       | badge-lager      |
       | texto-na-primaria | badge-frutas     |
+      | sucesso           | superficie       |
+      | erro              | superficie       |
+      | aviso             | superficie       |
 
   Cenário: Cor fixa num componente é barrada pelo lint
     Dado um componente de apps/web com uma cor hexadecimal ou rgb escrita direto no código
@@ -108,20 +111,22 @@ Só tema escuro. Valores tirados da paleta de `estudio-garrafas.html` e conferid
 | `badge-malt` | `#9F6838` | Badge "MALT" |
 | `badge-lager` | `#47610E` | Badge "LAGER" |
 | `badge-neutro` | igual a `superficie-elevada` | Categoria sem cor própria |
+| `sucesso` | `#6FCF97` | Texto e ícone de confirmação (ex.: "Senha alterada") |
+| `erro` | `#FF7A70` | Mensagens de erro dos campos e borda do campo inválido |
+| `aviso` | `#F5B94A` | Avisos que pedem atenção (ex.: e-mail não confirmado) |
 
 - O verde-limão nunca é fundo de texto claro nem aparece sobre fundo branco (o card avisa que não passa contraste).
 - Badge: a cor sai do token da categoria pelo identificador (slug) da categoria. Categoria cadastrada depois, sem token, usa `badge-neutro`. O Stout aparece no Figma, mas saiu do catálogo ([[catalogo]]) e não ganha token.
 
-> [!todo] Preencher: cores dos estados de sucesso, erro e aviso (não aparecem nas telas do Figma). Ver pergunta 2.
-
-> [!todo] Preencher: cor do texto do badge "FRUTAS". Texto claro sobre `#EB9725` dá cerca de 2,3:1 e não passa AA; texto `texto-na-primaria` dá cerca de 7,5:1. Ver pergunta 3.
+- **Estados:** verde, vermelho e âmbar nos tons do tema escuro, usados como texto e ícone sobre `fundo` e `superficie` (decisão do Diego, 2026-10-29). Os valores acima foram escolhidos pelo Spec para passar AA (de 6:1 a 9:1 sobre `superficie`) e não se confundir com o verde-limão.
+- **Badge "FRUTAS":** texto `texto-na-primaria` (escuro), cerca de 7,5:1 (decisão do Diego, 2026-10-29). Texto claro daria cerca de 2,3:1.
 
 ### Tipografia
 
 - **Texto:** Outfit (Google Fonts, carregada pelo `next/font`), pesos 400, 500 e 600. É a fonte de `estudio-garrafas.html` e bate com os botões e formulários do Figma.
 - **Títulos de destaque** ("Criar sua conta", "Recuperar senha", "Sabor de verdade em cada gole!"): fonte manuscrita em pincel, com a segunda linha em verde-limão.
 
-> [!todo] Preencher: qual é a fonte manuscrita dos títulos. Não foi possível identificá-la pelo print. Ver pergunta 1.
+- **Fonte dos títulos:** o Front escolhe a fonte manuscrita do Google Fonts mais próxima do print e o Diego confere nos portais (decisão do Diego, 2026-10-29: "use a que preferir"). A escolha vai para a daily note do dia em que for feita.
 
 ### Espaçamento, raios e sombras
 
@@ -136,9 +141,11 @@ Só tema escuro. Valores tirados da paleta de `estudio-garrafas.html` e conferid
 - **Badge de estilo:** pílula com o nome da categoria em maiúsculas, cor do token da categoria.
 - **Chip de categoria:** ícone em cima, rótulo e contador entre parênteses abaixo ("IPAs (4)"); selecionável, um por vez, com `aria-pressed`. Selecionado: borda e texto em verde-limão. O comportamento na página está em [[catalogo]].
 
-## Em aberto
+## Decisões do Diego (2026-10-29)
 
-> [!todo] Preencher: fonte dos títulos, cores de estado e texto do badge "FRUTAS" (perguntas 1 a 3).
+- **Pergunta 1:** fonte manuscrita dos títulos à escolha do Front, do Google Fonts, conferida pelo Diego nos portais.
+- **Pergunta 2:** cores de estado em verde, vermelho e âmbar nos tons do tema escuro.
+- **Pergunta 3:** badge "FRUTAS" com texto escuro.
 
 ## Seams de teste
 
