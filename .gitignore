@@ -21,3 +21,4 @@ test-results/
 
 # gerado pelo Next (alterna entre dev e build)
 next-env.d.ts
+**/src/generated/

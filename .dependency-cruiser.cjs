@@ -39,6 +39,6 @@ module.exports = {
   options: {
     doNotFollow: { path: "node_modules" },
     tsPreCompilationDeps: true,
-    exclude: { path: "(^|/)(dist|\\.next|\\.turbo)/" },
+    exclude: { path: "(^|/)(dist|\\.next|\\.turbo|src/generated)/" },
   },
 };

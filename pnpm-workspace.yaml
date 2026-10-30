@@ -5,5 +5,8 @@ packages:
 allowBuilds:
   "@swc/core": false
   "@scarf/scarf": false
+  "@prisma/engines": false
+  esbuild: false
+  prisma: false
   supabase: true
   unrs-resolver: false

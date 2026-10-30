@@ -1,11 +1,9 @@
 import { execFileSync } from "node:child_process";
 import pg from "pg";
-
-const DATABASE_URL = process.env["DATABASE_URL"];
+import { TEST_DATABASE_URL as DATABASE_URL } from "./test-database-url.js";
 
 /** Cria o banco de teste, separado do de desenvolvimento, e aplica as migrations nele (ADR-007). */
 export default async function setup(): Promise<void> {
-  if (!DATABASE_URL) throw new Error("DATABASE_URL de teste não definida");
   const url = new URL(DATABASE_URL);
   const database = url.pathname.slice(1);
   if (!database.endsWith("_test"))
@@ -24,6 +22,6 @@ export default async function setup(): Promise<void> {
   execFileSync("pnpm", ["exec", "prisma", "migrate", "deploy"], {
     stdio: "inherit",
     shell: true,
-    env: process.env,
+    env: { ...process.env, DATABASE_URL, DIRECT_URL: DATABASE_URL },
   });
 }
