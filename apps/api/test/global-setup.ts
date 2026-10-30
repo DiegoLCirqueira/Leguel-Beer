@@ -8,7 +8,13 @@ import { TEST_DATABASE_URL as DATABASE_URL } from "./test-database-url.js";
 export default async function setup(): Promise<void> {
   const url = new URL(DATABASE_URL);
   const database = url.pathname.slice(1);
-  assertTestDatabase(DATABASE_URL, [process.env["DATABASE_URL"], process.env["DIRECT_URL"]]);
+  try {
+    assertTestDatabase(DATABASE_URL, [process.env["DATABASE_URL"], process.env["DIRECT_URL"]]);
+  } catch (error) {
+    // Vitest 5 esconde a mensagem quando o stack do globalSetup passa pelo source map do SWC.
+    (error as Error).stack = (error as Error).message;
+    throw error;
+  }
 
   url.pathname = "/postgres";
   const admin = new pg.Client({ connectionString: url.toString() });
