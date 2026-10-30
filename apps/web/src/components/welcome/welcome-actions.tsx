@@ -87,7 +87,7 @@ export function WelcomeActions() {
           aria-expanded={showHint}
           aria-controls={hintId}
           onClick={() => setShowHint((shown) => !shown)}
-          className="inline-flex size-11 items-center justify-center rounded-full text-texto-suave focus-visible:outline-2 focus-visible:outline-primaria"
+          className="inline-flex size-11 items-center justify-center rounded-full text-texto-suave transition-colors hover:text-texto focus-visible:outline-2 focus-visible:outline-primaria"
         >
           <Info aria-hidden="true" className="size-4" />
         </button>
