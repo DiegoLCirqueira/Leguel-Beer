@@ -8,6 +8,7 @@ Registro dos erros da banda e da regra que cada um gerou. Todo agente lê esta n
 
 | Data | Quem | O que aconteceu | Causa | Regra |
 | --- | --- | --- | --- | --- |
+| 2026-10-30 | Front | Entre o red 6ad8bea e o green 8d03521 entraram mudança do teste, asset e tokens. | Lição de 29/10 não aplicada pela 3ª vez. | Preparar assets e tokens ANTES do red, em commits próprios. |
 | 2026-10-30 | Back | No LB-28, schema + migration entre red e green (edd2498) e green que alterou teste e fake (ded27ec). | Lição de 29/10 não aplicada. | Antes de cada commit, conferir que nada além do mínimo do green entrou entre red e green. |
 | 2026-10-29 | Orchestrator | Repetiu o erro da daily de 28/10: o handoff não foi gravado (Write sem Read) e o commit foi pedido na mesma rodada. | Pedido de commit enviado sem conferir o git status. | Antes de pedir commit, rodar git status no worktree e conferir cada arquivo esperado. |
 | 2026-10-29 | Back | Na base da API, feats sem red (5d825ee, 8df11a2), um chore com vários assuntos entre red e green (5d234af), E2E ajustado depois do green (214ecd5) e reds/greens em lote. | Pressa na fundação. | Um red por fatia, nada entre red e green, E2E junto da fatia. |

@@ -1,14 +1,24 @@
 "use client";
 
-import { ArrowRight, Info, Link2, UserPlus, UserRound } from "lucide-react";
+import { ArrowRight, Check, Info, Link as LinkIcon, UserPlus, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
-import { buttonVariants } from "@/components/ui/button";
+import { ART, CONTROLS, OR_ROW, cq, fl, pctH, pctW, pctX, pctY, rectStyle } from "@/lib/arte-login";
 import { markGuest } from "@/lib/guest";
 import { cn } from "@/lib/utils";
 
 const HINT =
   "Sua sessão continua ativa neste aparelho por até 30 dias, mesmo depois de fechar o navegador.";
+
+// Área de toque de pelo menos 44 px de altura mesmo quando o controle desenhado é menor.
+const TOUCH_AREA =
+  "before:absolute before:inset-x-0 before:-inset-y-[max(0px,calc((44px_-_100%)/2))] before:content-['']";
+
+const CONTROL_BASE =
+  "absolute flex items-center justify-center rounded-full font-controles transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-arte-botao";
+
+const OR_ROW_WIDTH = OR_ROW.right.x + OR_ROW.right.w - OR_ROW.left.x;
+const pctOfOrRow = (part: number) => `${((part / OR_ROW_WIDTH) * 100).toFixed(3)}%`;
 
 export function WelcomeActions() {
   const [keepConnected, setKeepConnected] = useState(true);
@@ -37,58 +47,139 @@ export function WelcomeActions() {
     };
   }, [showHint]);
 
+  const enterTopPct = ((CONTROLS.enter.y - ART.y0) / ART.height) * 100;
+
   return (
-    <div className="flex w-full shrink-0 flex-col items-center gap-2">
+    <>
       <Link
         href={`/entrar?manter-conectado=${keepConnected ? 1 : 0}`}
-        className={cn(buttonVariants({ variant: "primary" }), "relative w-[88%] text-[15px]")}
+        style={{
+          ...rectStyle(CONTROLS.enter),
+          fontSize: fl(14, 26.1),
+          gap: cq(21.7),
+          paddingLeft: cq(256.3),
+        }}
+        className={cn(
+          CONTROL_BASE,
+          TOUCH_AREA,
+          "justify-start bg-arte-botao font-bold text-arte-tinta hover:brightness-105",
+        )}
       >
-        <UserRound aria-hidden="true" className="size-5" />
+        <UserRound
+          aria-hidden="true"
+          strokeWidth={1.6}
+          style={{ width: fl(20, 52), height: fl(20, 52) }}
+        />
         Entrar
         <ArrowRight
           aria-hidden="true"
-          className="absolute right-5 top-1/2 size-5 -translate-y-1/2"
+          strokeWidth={1.8}
+          style={{ width: fl(20, 51), height: fl(20, 51), right: cq(36) }}
+          className="absolute top-1/2 -translate-y-1/2"
         />
       </Link>
       <Link
         href="/criar-conta"
-        className={cn(buttonVariants({ variant: "outline" }), "w-[88%] text-[15px]")}
+        style={{
+          ...rectStyle(CONTROLS.signUp),
+          fontSize: fl(14, 24.1),
+          gap: cq(23.1),
+          paddingLeft: cq(233.4),
+          borderWidth: cq(2.5),
+        }}
+        className={cn(
+          CONTROL_BASE,
+          TOUCH_AREA,
+          "justify-start border-arte-botao font-bold text-arte-texto hover:bg-arte-botao/10",
+        )}
       >
-        <UserPlus aria-hidden="true" className="size-5" />
+        <UserPlus
+          aria-hidden="true"
+          strokeWidth={1.6}
+          style={{ width: fl(20, 49), height: fl(20, 49) }}
+          className="text-arte-botao"
+        />
         Criar conta
       </Link>
-      <div className="flex w-[88%] items-center gap-3 text-xs text-texto-suave">
-        <span aria-hidden="true" className="h-px flex-1 bg-borda" />
+      <div
+        style={{
+          left: pctX(OR_ROW.left.x),
+          width: pctW(OR_ROW_WIDTH),
+          top: pctY(OR_ROW.centerY),
+          fontSize: fl(12, 21.9),
+        }}
+        className="absolute flex -translate-y-1/2 items-center justify-between font-controles text-arte-texto/80"
+      >
+        <span
+          aria-hidden="true"
+          style={{ width: pctOfOrRow(OR_ROW.left.w) }}
+          className="h-px bg-arte-linha/60"
+        />
         <p>ou</p>
-        <span aria-hidden="true" className="h-px flex-1 bg-borda" />
+        <span
+          aria-hidden="true"
+          style={{ width: pctOfOrRow(OR_ROW.right.w) }}
+          className="h-px bg-arte-linha/60"
+        />
       </div>
       <Link
         href="/"
         onClick={markGuest}
+        style={{
+          ...rectStyle(CONTROLS.guest),
+          left: pctX(CONTROLS.guest.x + CONTROLS.guest.w / 2),
+          transform: "translateX(-50%)",
+          minWidth: "max-content",
+          paddingInline: cq(24),
+          fontSize: fl(12, 19.3),
+          gap: cq(18.7),
+          borderWidth: cq(1.5),
+        }}
         className={cn(
-          buttonVariants({ variant: "ghost" }),
-          "w-[72%] whitespace-nowrap text-[13px]",
+          CONTROL_BASE,
+          TOUCH_AREA,
+          "whitespace-nowrap border-arte-borda bg-arte-vidro/80 text-arte-texto hover:border-arte-botao",
         )}
       >
-        <Link2 aria-hidden="true" className="size-5" />
+        <LinkIcon
+          aria-hidden="true"
+          strokeWidth={1.6}
+          style={{ width: fl(18, 34), height: fl(18, 34) }}
+        />
         Continuar como convidado
       </Link>
       <div
-        ref={hintRef}
-        id={hintId}
-        aria-live="polite"
-        className="w-[88%] rounded-campo border border-borda bg-superficie px-3 py-1.5 text-center text-xs leading-snug text-texto-suave empty:hidden"
+        style={{
+          left: pctX(430.5),
+          top: pctY(CONTROLS.checkbox.y),
+          height: pctH(CONTROLS.checkbox.h),
+          transform: "translateX(-50%)",
+          fontSize: fl(12, 17.4),
+          gap: cq(11),
+        }}
+        className="absolute flex items-center font-controles text-arte-texto"
       >
-        {showHint ? HINT : null}
-      </div>
-      <div className="flex items-center gap-1 text-xs">
-        <label className="flex min-h-11 cursor-pointer items-center gap-2">
-          <input
-            type="checkbox"
-            checked={keepConnected}
-            onChange={(event) => setKeepConnected(event.target.checked)}
-            className="size-5 accent-primaria focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaria"
-          />
+        <label
+          style={{ gap: cq(17) }}
+          className="relative flex cursor-pointer items-center whitespace-nowrap before:absolute before:inset-x-0 before:-bottom-[26px] before:-top-[2px] before:content-['']"
+        >
+          <span
+            style={{ width: fl(16, CONTROLS.checkbox.w), height: fl(16, CONTROLS.checkbox.h) }}
+            className="relative block shrink-0"
+          >
+            <input
+              type="checkbox"
+              checked={keepConnected}
+              onChange={(event) => setKeepConnected(event.target.checked)}
+              style={{ borderRadius: cq(6), borderWidth: cq(2) }}
+              className="peer absolute inset-0 size-full cursor-pointer appearance-none border-arte-botao checked:bg-arte-botao focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-arte-botao"
+            />
+            <Check
+              aria-hidden="true"
+              strokeWidth={3}
+              className="pointer-events-none absolute inset-[12%] hidden size-[76%] text-arte-tinta peer-checked:block"
+            />
+          </span>
           Manter-me conectado
         </label>
         <button
@@ -98,11 +189,25 @@ export function WelcomeActions() {
           aria-expanded={showHint}
           aria-controls={hintId}
           onClick={() => setShowHint((shown) => !shown)}
-          className="inline-flex size-11 items-center justify-center rounded-full text-texto-suave transition-colors hover:text-texto focus-visible:outline-2 focus-visible:outline-primaria"
+          style={{ width: fl(16, 22), height: fl(16, 22) }}
+          className="relative flex items-center justify-center rounded-full text-arte-texto/75 transition-colors before:absolute before:-inset-[max(0px,calc((46px_-_100%)/2))] before:content-[''] hover:text-arte-texto focus-visible:outline-2 focus-visible:outline-arte-botao"
         >
-          <Info aria-hidden="true" className="size-4" />
+          <Info aria-hidden="true" className="size-full" />
         </button>
       </div>
-    </div>
+      <div
+        ref={hintRef}
+        id={hintId}
+        aria-live="polite"
+        style={{
+          left: pctX(CONTROLS.enter.x),
+          width: pctW(CONTROLS.enter.w),
+          bottom: `calc(${(100 - enterTopPct).toFixed(3)}% + 0.5rem)`,
+        }}
+        className="absolute z-30 rounded-campo border border-arte-borda bg-arte-vidro px-3 py-2 text-center font-controles text-xs leading-snug text-arte-texto empty:hidden"
+      >
+        {showHint ? HINT : null}
+      </div>
+    </>
   );
 }

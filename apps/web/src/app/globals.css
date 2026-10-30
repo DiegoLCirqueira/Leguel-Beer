@@ -18,16 +18,48 @@
   --color-badge-malt: #9f6838;
   --color-badge-lager: #47610e;
   --color-badge-neutro: var(--color-superficie-elevada);
+  /* Cores medidas na arte da tela de boas-vindas (Figma) */
+  --color-arte-botao: #95dc50;
+  --color-arte-tinta: #000a00;
+  --color-arte-texto: #f7fbf5;
+  --color-arte-vidro: #0b1c0d;
+  --color-arte-borda: #2d3d2f;
+  --color-arte-linha: #a3a698;
   --color-sucesso: #6fd98a;
   --color-erro: #ff8a80;
   --color-aviso: #f5b74a;
 
   --font-titulo: var(--font-kaushan), cursive;
+  --font-controles: var(--font-figtree), system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-texto: var(--font-outfit), system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --spacing: 4px;
 
   --radius-campo: 12px;
+}
+
+@layer components {
+  /* Palco da arte do Figma (818 x 1765): contém a arte inteira sem cortar a faixa dos controles. */
+  .palco-arte {
+    position: absolute;
+    left: 50%;
+    bottom: env(safe-area-inset-bottom, 0px);
+    width: min(calc((100dvh - env(safe-area-inset-bottom, 0px)) * 818 / 1765), 108vw);
+    aspect-ratio: 818 / 1765;
+    transform: translateX(-50%);
+    container-type: inline-size;
+  }
+  /* Telas baixas (paisagem, zoom alto): coluna legível com rolagem vertical. */
+  @media (max-height: 599px) {
+    .palco-arte {
+      position: relative;
+      left: auto;
+      bottom: auto;
+      width: max(min(100vw, 440px), 320px);
+      margin-inline: auto;
+      transform: none;
+    }
+  }
 }
 
 @layer base {
