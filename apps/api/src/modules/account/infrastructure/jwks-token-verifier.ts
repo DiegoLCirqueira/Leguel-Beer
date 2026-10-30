@@ -24,6 +24,7 @@ interface Claims {
   exp?: unknown;
   nbf?: unknown;
   role?: unknown;
+  user_metadata?: unknown;
   iss?: unknown;
   aud?: unknown;
 }
@@ -98,7 +99,10 @@ export class JwksTokenVerifier implements TokenVerifier {
     if (typeof claims.email !== "string" || claims.email === "")
       throw new InvalidTokenError("sem e-mail");
 
-    return { id: claims.sub, email: claims.email };
+    const metadata = claims.user_metadata;
+    const emailVerified =
+      isObject(metadata) && (metadata as { email_verified?: unknown }).email_verified === true;
+    return { id: claims.sub, email: claims.email, emailVerified };
   }
 
   private async findKey(kid: string | undefined): Promise<Jwk | undefined> {
