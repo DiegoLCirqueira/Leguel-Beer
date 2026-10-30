@@ -21,8 +21,6 @@ const foliage = [
     className: "right-0 top-0 w-[30%]",
     priority: true,
   },
-  { name: "base-esquerda", width: 420, height: 364, className: "bottom-0 left-0 w-[34%]" },
-  { name: "base-direita", width: 420, height: 389, className: "bottom-0 right-0 w-[26%]" },
 ];
 
 const depthFoliage = [
@@ -46,6 +44,10 @@ export default function BoasVindas() {
       <div
         aria-hidden="true"
         className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_50%_42%,color-mix(in_oklab,var(--color-primaria)_16%,transparent),transparent_62%)]"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 bottom-0 -z-10 h-[30%] bg-linear-to-t from-fundo via-fundo/80 to-transparent"
       />
       {foliage.map((leaf) => (
         <Image
