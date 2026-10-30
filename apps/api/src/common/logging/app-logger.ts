@@ -1,0 +1,33 @@
+import { Injectable, type LoggerService } from "@nestjs/common";
+
+type LogContext = Record<string, unknown>;
+
+@Injectable()
+export class AppLogger implements LoggerService {
+  info(message: string, context: LogContext = {}): void {
+    this.write("info", message, context);
+  }
+
+  // Aceita error(message, contexto) e a forma do Nest, error(message, stack, context).
+  error(message: unknown, detail: LogContext | string = {}, nestContext?: string): void {
+    const context: LogContext =
+      typeof detail === "string"
+        ? { stack: detail, ...(nestContext ? { context: nestContext } : {}) }
+        : detail;
+    this.write("error", String(message), context);
+  }
+
+  // Interface LoggerService do Nest, usada nos logs internos do framework.
+  log(message: unknown, context?: string): void {
+    this.info(String(message), context ? { context } : {});
+  }
+
+  warn(message: unknown, context?: string): void {
+    this.info(String(message), context ? { context } : {});
+  }
+
+  private write(level: "info" | "error", message: string, context: LogContext): void {
+    const line = JSON.stringify({ level, time: new Date().toISOString(), message, ...context });
+    (level === "error" ? process.stderr : process.stdout).write(`${line}\n`);
+  }
+}

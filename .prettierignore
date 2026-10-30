@@ -9,3 +9,4 @@ docs
 .maestri
 skills-lock.json
 *.md
+apps/api/src/generated
