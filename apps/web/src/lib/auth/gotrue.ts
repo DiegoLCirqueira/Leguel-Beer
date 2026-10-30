@@ -64,10 +64,16 @@ export function createGoTrue(config: GoTrueConfig) {
           }),
         },
       );
-      if (!resposta.ok) return { tipo: "erro" };
+      if (!resposta.ok) {
+        // O Supabase local responde 422 user_already_exists para a conta já registrada.
+        const erro = (await resposta.json().catch(() => ({}))) as { error_code?: string };
+        return erro.error_code === "user_already_exists"
+          ? { tipo: "email-ja-cadastrado" }
+          : { tipo: "erro" };
+      }
       const corpo = (await resposta.json()) as { identities?: unknown[] };
-      // Com confirmação de e-mail ligada, o Supabase responde 200 para um e-mail que já tem conta,
-      // mas sem identidades.
+      // Em outras configurações o Supabase responde 200 para um e-mail que já tem conta, mas sem
+      // identidades.
       return corpo.identities?.length === 0 ? { tipo: "email-ja-cadastrado" } : { tipo: "enviado" };
     } catch {
       return { tipo: "erro" };
