@@ -10,7 +10,7 @@ import { createTestTokens } from "../../../common/testing/tokens.js";
 import { JwksTokenVerifier } from "../infrastructure/jwks-token-verifier.js";
 import { InMemoryProfileRepository } from "../testing/in-memory.js";
 import { AccountModule } from "../account.module.js";
-import { PROFILE_REPOSITORY, TOKEN_VERIFIER } from "../account.tokens.js";
+import { EMAIL_CONFIRMATION, PROFILE_REPOSITORY, TOKEN_VERIFIER } from "../account.tokens.js";
 import { CurrentUser, Public, Roles } from "./access.decorators.js";
 
 const coisas = [{ id: "coisa-do-bruno", ownerId: "bruno" }];
@@ -61,6 +61,8 @@ describe("proteção das rotas por token e papel", () => {
       .useValue(verifier)
       .overrideProvider(PROFILE_REPOSITORY)
       .useValue(profiles)
+      .overrideProvider(EMAIL_CONFIRMATION)
+      .useValue({ isConfirmed: () => Promise.resolve(true) })
       .compile();
     app = moduleRef.createNestApplication();
     await app.init();

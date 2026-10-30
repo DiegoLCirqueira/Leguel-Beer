@@ -31,4 +31,17 @@ export default async function setup(): Promise<void> {
     shell: true,
     env: { ...process.env, DATABASE_URL, DIRECT_URL: DATABASE_URL },
   });
+
+  // No Supabase o schema auth já existe; no banco de teste, um Postgres comum, entra só o mínimo
+  // que a API lê (id e email_confirmed_at de auth.users).
+  const testDb = new pg.Client({ connectionString: DATABASE_URL });
+  await testDb.connect();
+  try {
+    await testDb.query("CREATE SCHEMA IF NOT EXISTS auth");
+    await testDb.query(
+      "CREATE TABLE IF NOT EXISTS auth.users (id uuid PRIMARY KEY, email text, email_confirmed_at timestamptz)",
+    );
+  } finally {
+    await testDb.end();
+  }
 }
