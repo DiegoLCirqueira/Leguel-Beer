@@ -17,6 +17,16 @@ const REQUIRED = [
 
 type SeedEnv = Partial<Record<(typeof REQUIRED)[number], string | undefined>>;
 
+const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
+
+function isLocal(url: string): boolean {
+  try {
+    return LOCAL_HOSTS.has(new URL(url).hostname);
+  } catch {
+    return false;
+  }
+}
+
 export interface SeedAdminDeps {
   auth?: AuthAdmin;
   profiles?: ProfileRepository;
@@ -29,6 +39,9 @@ export async function seedAdmin(
 ): Promise<EnsureAdminAccountResult> {
   for (const key of REQUIRED) {
     if (!env[key]) throw new Error(`Variável de ambiente ${key} não definida`);
+  }
+  if (!isLocal(env.SUPABASE_URL as string)) {
+    throw new Error("O seed do admin só roda contra o Supabase local: SUPABASE_URL não é local");
   }
   const email = env.ADMIN_EMAIL as string;
   const password = env.ADMIN_SEED_PASSWORD as string;
