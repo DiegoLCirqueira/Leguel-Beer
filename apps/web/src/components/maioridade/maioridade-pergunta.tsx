@@ -2,7 +2,7 @@
 
 import { Check } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AVISOS_RODAPE } from "@/lib/avisos";
 
@@ -13,6 +13,12 @@ type Props = {
 
 export function MaioridadePergunta({ retorno, confirmar }: Props) {
   const [negado, setNegado] = useState(false);
+  const tituloNegado = useRef<HTMLHeadingElement>(null);
+
+  // O botão "Não" some ao negar: o foco vai para o novo título, para não se perder.
+  useEffect(() => {
+    if (negado) tituloNegado.current?.focus();
+  }, [negado]);
 
   return (
     <main className="relative isolate flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-fundo px-6 py-10 text-center">
@@ -42,7 +48,13 @@ export function MaioridadePergunta({ retorno, confirmar }: Props) {
         />
         {negado ? (
           <>
-            <h1 className="font-titulo text-3xl text-texto">Acesso não permitido</h1>
+            <h1
+              ref={tituloNegado}
+              tabIndex={-1}
+              className="font-titulo text-3xl text-texto outline-none"
+            >
+              Acesso não permitido
+            </h1>
             <p className="text-texto-suave">Este site é só para maiores de 18 anos.</p>
           </>
         ) : (
