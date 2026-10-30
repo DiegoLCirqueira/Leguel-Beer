@@ -20,6 +20,21 @@ module.exports = {
         ],
       },
     },
+    {
+      name: "domain-so-depende-de-domain",
+      comment: "domain não importa application, infrastructure nem presentation (ADR-005).",
+      severity: "error",
+      from: { path: "^apps/api/src/modules/([^/]+)/domain/" },
+      to: { path: "^apps/api/src/modules/[^/]+/(application|infrastructure|presentation)/" },
+    },
+    {
+      name: "application-so-depende-de-domain",
+      comment:
+        "application importa só domain; infrastructure e presentation dependem dela, não o contrário (ADR-005).",
+      severity: "error",
+      from: { path: "^apps/api/src/modules/[^/]+/application/" },
+      to: { path: "^apps/api/src/modules/[^/]+/(infrastructure|presentation)/" },
+    },
   ],
   options: {
     doNotFollow: { path: "node_modules" },
