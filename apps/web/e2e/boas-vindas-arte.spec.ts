@@ -80,16 +80,22 @@ for (const viewport of VIEWPORTS) {
         if (!box) throw new Error("controle não encontrado");
         const centerX = box.x + box.width / 2;
         const centerY = box.y + box.height / 2;
-        for (const dy of [-21, 21]) {
-          const hit = await page.evaluate(
+        const expected =
+          (
+            (await control.evaluate((el) => (el.closest("label") ?? el).textContent)) ?? ""
+          ).trim() || "(i)";
+        const probe = (dy: number) =>
+          page.evaluate(
             ({ x, y }) =>
               document.elementFromPoint(x, y)?.closest("a,button,label")?.textContent ?? "",
             { x: centerX, y: centerY + dy },
           );
-          const expected =
-            (await control.evaluate((el) => (el.closest("label") ?? el).textContent)) ?? "";
-          expect(hit.trim() || "(i)").toBe(expected.trim() || "(i)");
-        }
+        let top = 0;
+        while (top > -60 && ((await probe(top - 1)).trim() || "(i)") === expected) top--;
+        let bottom = 0;
+        while (bottom < 60 && ((await probe(bottom + 1)).trim() || "(i)") === expected) bottom++;
+
+        expect(bottom - top + 1).toBeGreaterThanOrEqual(43);
       }
     });
 
