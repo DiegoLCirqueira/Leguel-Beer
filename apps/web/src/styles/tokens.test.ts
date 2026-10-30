@@ -30,6 +30,12 @@ describe("pares de tokens", () => {
     ["texto-badge", "badge-malt"],
     ["texto-badge", "badge-lager"],
     ["texto-na-primaria", "badge-frutas"],
+    ["sucesso", "fundo"],
+    ["sucesso", "superficie"],
+    ["erro", "fundo"],
+    ["erro", "superficie"],
+    ["aviso", "fundo"],
+    ["aviso", "superficie"],
   ])("%s sobre %s atinge contraste AA (4,5:1)", (texto, fundo) => {
     expect(contrastRatio(token(texto), token(fundo))).toBeGreaterThanOrEqual(4.5);
   });
