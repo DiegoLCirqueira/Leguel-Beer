@@ -39,7 +39,10 @@ describe("configuração do Supabase Auth local (cadastro-login)", () => {
     // O Supabase CLI resolve o caminho a partir da raiz do projeto, não da pasta supabase.
     const caminho = valor("auth.email.template.confirmation", "content_path").replaceAll('"', "");
     const modelo = readFileSync(resolve(raiz, caminho), "utf8");
+    // O nome vem do cadastro (texto livre): o Supabase renderiza o e-mail com html/template, do Go,
+    // que escapa o valor no HTML. Por isso o modelo usa o campo direto, sem "safeHtml" nem similar.
     expect(modelo).toContain("{{ .Data.nome }}");
+    expect(modelo).not.toMatch(/safeHtml|\| *html/i);
     expect(modelo).toContain("Confirmar minha conta");
     expect(modelo).toContain(
       "{{ .SiteURL }}/auth/confirmar?token_hash={{ .TokenHash }}&type=signup",

@@ -29,7 +29,7 @@ Todos na raiz, com Node do `.nvmrc` e pnpm do `packageManager`.
 - Fluxo red → green em commits separados (ver Documentação).
 
 ### Variáveis de ambiente
-Na API, em `apps/api/.env` (fora do git; chaves em `apps/api/.env.example`, sem valores). No site, só as duas do Supabase Auth, em `apps/web/.env.local` (fora do git; chaves em `apps/web/.env.example`), lidas no servidor do site e nunca em `NEXT_PUBLIC_*`: `SUPABASE_URL` e `SUPABASE_ANON_KEY` (chave anon; no local: `pnpm exec supabase status -o env`). No local o Supabase CLI gera as chaves de desenvolvimento.
+Na API, em `apps/api/.env` (fora do git; chaves em `apps/api/.env.example`, sem valores). No site, só as duas do Supabase Auth, em `apps/web/.env.local` (fora do git; chaves em `apps/web/.env.example`), lidas no servidor do site e nunca em `NEXT_PUBLIC_*`: `SUPABASE_URL` e `SUPABASE_ANON_KEY` (chave anon; no local: `pnpm exec supabase status -o env`), mais `SITE_URL` (endereço público do site, usado no link de confirmação do e-mail; obrigatório em produção, padrão `http://localhost:3000` no desenvolvimento). No local o Supabase CLI gera as chaves de desenvolvimento.
 - `DATABASE_URL`: conexão da aplicação com o Postgres.
 - `DIRECT_URL`: conexão das migrations (no local, a mesma).
 - `WEB_ORIGIN`: origem do web liberada no CORS (padrão `http://localhost:3000`).
