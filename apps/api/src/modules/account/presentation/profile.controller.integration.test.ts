@@ -96,6 +96,30 @@ describe("POST e GET /me/profile (banco real)", () => {
     expect(response.body.papel).toBe("admin");
   });
 
+  it("o e-mail do admin sem prova de verificação no token vira cliente", async () => {
+    const naoVerificado = tokens.custom({
+      sub: tokens.adminId,
+      email: "admin@leguele.test",
+      user_metadata: { email_verified: false },
+    });
+
+    const response = await post(naoVerificado, valido);
+
+    expect(response.status).toBe(201);
+    expect(response.body.papel).toBe("cliente");
+  });
+
+  it("recusa com 401 o token sem e-mail, sem criar perfil", async () => {
+    const semEmail = tokens.custom({ email: undefined });
+
+    const criar = await post(semEmail, valido);
+    const ler = await get(semEmail);
+
+    expect(criar.status).toBe(401);
+    expect(ler.status).toBe(401);
+    expect(await prisma.profile.count()).toBe(0);
+  });
+
   it.each([
     ["telefone inválido", { ...valido, telefone: "(82) 1234" }, "telefone"],
     ["aceite falso", { ...valido, aceite: false }, "aceite"],
