@@ -36,7 +36,34 @@ describe("pares de tokens", () => {
     ["erro", "superficie"],
     ["aviso", "fundo"],
     ["aviso", "superficie"],
+    ["primaria", "superficie"],
+    ["texto", "arte-vidro"],
   ])("%s sobre %s atinge contraste AA (4,5:1)", (texto, fundo) => {
     expect(contrastRatio(token(texto), token(fundo))).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
+describe("cores e fonte do Figma no site inteiro", () => {
+  it.each([
+    ["primaria", "#95dc50"],
+    ["texto-na-primaria", "#000a00"],
+    ["texto", "#f7fbf5"],
+  ])("o token %s vale %s", (nome, valor) => {
+    expect(token(nome).toLowerCase()).toBe(valor);
+  });
+
+  it.each(["arte-botao", "arte-tinta", "arte-texto"])(
+    "o token %s deixou de existir, pois coincide com um token da marca",
+    (nome) => {
+      expect(css).not.toMatch(new RegExp(`--color-${nome}:`));
+    },
+  );
+
+  it("a fonte de texto é a Figtree e a Outfit saiu do site", () => {
+    const layout = readFileSync(resolve(process.cwd(), "src/app/layout.tsx"), "utf8");
+
+    expect(css).toMatch(/--font-texto: *var\(--font-figtree\)/);
+    expect(css).not.toMatch(/outfit/i);
+    expect(layout).not.toMatch(/outfit/i);
   });
 });

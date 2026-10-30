@@ -15,7 +15,7 @@ const TOUCH_AREA =
   "before:absolute before:inset-x-0 before:-inset-y-[max(0px,calc((44px_-_100%)/2))] before:content-['']";
 
 const CONTROL_BASE =
-  "absolute flex items-center justify-center rounded-full font-controles transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-arte-botao";
+  "absolute flex items-center justify-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaria";
 
 const OR_ROW_WIDTH = OR_ROW.right.x + OR_ROW.right.w - OR_ROW.left.x;
 const pctOfOrRow = (part: number) => `${((part / OR_ROW_WIDTH) * 100).toFixed(3)}%`;
@@ -62,7 +62,7 @@ export function WelcomeActions() {
         className={cn(
           CONTROL_BASE,
           TOUCH_AREA,
-          "justify-start bg-arte-botao font-bold text-arte-tinta hover:brightness-105",
+          "justify-start bg-primaria font-bold text-texto-na-primaria hover:brightness-105",
         )}
       >
         <UserRound
@@ -90,14 +90,14 @@ export function WelcomeActions() {
         className={cn(
           CONTROL_BASE,
           TOUCH_AREA,
-          "justify-start border-arte-botao font-bold text-arte-texto hover:bg-arte-botao/10",
+          "justify-start border-primaria font-bold text-texto hover:bg-primaria/10",
         )}
       >
         <UserPlus
           aria-hidden="true"
           strokeWidth={1.6}
           style={{ width: fl(20, 49), height: fl(20, 49) }}
-          className="text-arte-botao"
+          className="text-primaria"
         />
         Criar conta
       </Link>
@@ -108,7 +108,7 @@ export function WelcomeActions() {
           top: pctY(OR_ROW.centerY),
           fontSize: fl(12, 21.9),
         }}
-        className="absolute flex -translate-y-1/2 items-center justify-between font-controles text-arte-texto/80"
+        className="absolute flex -translate-y-1/2 items-center justify-between text-texto/80"
       >
         <span
           aria-hidden="true"
@@ -138,7 +138,7 @@ export function WelcomeActions() {
         className={cn(
           CONTROL_BASE,
           TOUCH_AREA,
-          "whitespace-nowrap border-arte-borda bg-arte-vidro/80 text-arte-texto hover:border-arte-botao",
+          "whitespace-nowrap border-arte-borda bg-arte-vidro/80 text-texto hover:border-primaria",
         )}
       >
         <LinkIcon
@@ -157,7 +157,7 @@ export function WelcomeActions() {
           fontSize: fl(12, 17.4),
           gap: cq(11),
         }}
-        className="absolute flex items-center font-controles text-arte-texto"
+        className="absolute flex items-center text-texto"
       >
         <label
           style={{ gap: cq(17) }}
@@ -172,12 +172,12 @@ export function WelcomeActions() {
               checked={keepConnected}
               onChange={(event) => setKeepConnected(event.target.checked)}
               style={{ borderRadius: cq(6), borderWidth: cq(2) }}
-              className="peer absolute inset-0 size-full cursor-pointer appearance-none border-arte-botao checked:bg-arte-botao focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-arte-botao"
+              className="peer absolute inset-0 size-full cursor-pointer appearance-none border-primaria checked:bg-primaria focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaria"
             />
             <Check
               aria-hidden="true"
               strokeWidth={3}
-              className="pointer-events-none absolute inset-[12%] hidden size-[76%] text-arte-tinta peer-checked:block"
+              className="pointer-events-none absolute inset-[12%] hidden size-[76%] text-texto-na-primaria peer-checked:block"
             />
           </span>
           Manter-me conectado
@@ -190,7 +190,7 @@ export function WelcomeActions() {
           aria-controls={hintId}
           onClick={() => setShowHint((shown) => !shown)}
           style={{ width: fl(16, 22), height: fl(16, 22) }}
-          className="relative flex items-center justify-center rounded-full text-arte-texto/75 transition-colors before:absolute before:-inset-[max(0px,calc((46px_-_100%)/2))] before:content-[''] hover:text-arte-texto focus-visible:outline-2 focus-visible:outline-arte-botao"
+          className="relative flex items-center justify-center rounded-full text-texto/75 transition-colors before:absolute before:-inset-[max(0px,calc((46px_-_100%)/2))] before:content-[''] hover:text-texto focus-visible:outline-2 focus-visible:outline-primaria"
         >
           <Info aria-hidden="true" className="size-full" />
         </button>
@@ -204,7 +204,7 @@ export function WelcomeActions() {
           width: pctW(CONTROLS.enter.w),
           bottom: `calc(${(100 - enterTopPct).toFixed(3)}% + 0.5rem)`,
         }}
-        className="absolute z-30 rounded-campo border border-arte-borda bg-arte-vidro px-3 py-2 text-center font-controles text-xs leading-snug text-arte-texto empty:hidden"
+        className="absolute z-30 rounded-campo border border-arte-borda bg-arte-vidro px-3 py-2 text-center text-xs leading-snug text-texto empty:hidden"
       >
         {showHint ? HINT : null}
       </div>
