@@ -9,7 +9,8 @@ export function retornoInterno(retorno: string | undefined, padrao: string): str
   const interno = retorno.startsWith("/") && !retorno.startsWith("//") && !retorno.includes("\\");
   // eslint-disable-next-line no-control-regex
   if (!interno || /[\u0000-\u001f]/.test(retorno)) return padrao;
-  const caminho = retorno.split(/[?#]/)[0] ?? retorno;
+  // Sem a barra final: "/entrar/" é a mesma tela.
+  const caminho = (retorno.split(/[?#]/)[0] ?? retorno).replace(/\/+$/, "");
   if (TELAS_DE_ACESSO.includes(caminho)) return padrao;
   return retorno;
 }
