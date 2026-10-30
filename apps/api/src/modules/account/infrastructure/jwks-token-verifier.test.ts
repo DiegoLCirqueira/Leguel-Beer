@@ -3,6 +3,7 @@ import { createTestTokens } from "../../../common/testing/tokens.js";
 import { InvalidTokenError } from "../domain/token-verifier.js";
 import { JwksTokenVerifier } from "./jwks-token-verifier.js";
 
+const ISSUER = "http://127.0.0.1:54321/auth/v1";
 const JWKS_URL = "http://127.0.0.1:54321/auth/v1/.well-known/jwks.json";
 
 function setup(tokens = createTestTokens()) {
@@ -11,7 +12,7 @@ function setup(tokens = createTestTokens()) {
     fetches++;
     return Promise.resolve(new Response(JSON.stringify(tokens.jwks), { status: 200 }));
   };
-  const verifier = new JwksTokenVerifier(JWKS_URL, fetchFake as typeof fetch);
+  const verifier = new JwksTokenVerifier(JWKS_URL, ISSUER, fetchFake as typeof fetch);
   return { tokens, verifier, fetches: () => fetches };
 }
 
@@ -54,7 +55,7 @@ describe("JwksTokenVerifier", () => {
 
   it("falha fechado, como token inválido, quando o JWKS não responde", async () => {
     const tokens = createTestTokens();
-    const verifier = new JwksTokenVerifier(JWKS_URL, (() =>
+    const verifier = new JwksTokenVerifier(JWKS_URL, ISSUER, (() =>
       Promise.resolve(new Response("{}", { status: 503 }))) as typeof fetch);
 
     await expect(verifier.verify(tokens.customer())).rejects.toBeInstanceOf(InvalidTokenError);
@@ -84,9 +85,20 @@ describe("JwksTokenVerifier", () => {
   ])("recusa o token quando a chave do JWKS tem %s", async (_caso, alteracao) => {
     const tokens = createTestTokens();
     const jwks = { keys: tokens.jwks.keys.map((key) => ({ ...key, ...alteracao })) };
-    const verifier = new JwksTokenVerifier(JWKS_URL, (() =>
+    const verifier = new JwksTokenVerifier(JWKS_URL, ISSUER, (() =>
       Promise.resolve(new Response(JSON.stringify(jwks)))) as typeof fetch);
 
     await expect(verifier.verify(tokens.customer())).rejects.toBeInstanceOf(InvalidTokenError);
+  });
+
+  it.each([
+    ["iss de outro projeto", { iss: "https://outro.supabase.co/auth/v1" }],
+    ["iss ausente", { iss: undefined }],
+    ["aud diferente de authenticated", { aud: "anon" }],
+    ["aud ausente", { aud: undefined }],
+  ])("recusa o token com %s", async (_caso, claims) => {
+    const { tokens, verifier } = setup();
+
+    await expect(verifier.verify(tokens.custom(claims))).rejects.toBeInstanceOf(InvalidTokenError);
   });
 });

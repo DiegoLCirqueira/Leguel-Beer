@@ -50,7 +50,7 @@ describe("proteção das rotas por token e papel", () => {
 
   beforeAll(async () => {
     await profiles.ensureRole({ id: tokens.adminId, email: "admin@leguele.test" }, "admin");
-    const verifier = new JwksTokenVerifier("http://jwks.test", (() =>
+    const verifier = new JwksTokenVerifier("http://jwks.test", tokens.issuer, (() =>
       Promise.resolve(new Response(JSON.stringify(tokens.jwks)))) as typeof fetch);
     const moduleRef = await Test.createTestingModule({
       imports: [CommonModule, AccountModule],
