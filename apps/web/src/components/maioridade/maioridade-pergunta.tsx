@@ -50,8 +50,9 @@ export function MaioridadePergunta({ retorno, confirmar }: Props) {
         <Image
           src="/maioridade/logo.webp"
           alt="Leguelé Beer"
-          width={320}
-          height={320}
+          width={768}
+          height={768}
+          sizes="128px"
           priority
           className="size-32"
         />
