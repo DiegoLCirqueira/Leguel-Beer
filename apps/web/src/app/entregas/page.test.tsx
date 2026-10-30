@@ -8,6 +8,13 @@ describe("/entregas", () => {
 
     expect(screen.getByRole("heading", { level: 1, name: "Entregas" })).toBeInTheDocument();
     expect(screen.getByText(/Última atualização:/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "1. Como funciona." })).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Os pedidos feitos neste site não são entregues; esta página descreve como a entrega funcionaria.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/portfólio/i)).not.toBeInTheDocument();
     expect(screen.getByText("Só Maceió e região.")).toBeInTheDocument();
     expect(
       screen.getByText(
