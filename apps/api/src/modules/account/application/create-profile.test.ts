@@ -3,7 +3,7 @@ import { InMemoryProfileRepository } from "../testing/in-memory.js";
 import { CreateProfile } from "./create-profile.js";
 
 const AGORA = new Date("2026-10-30T12:00:00.000Z");
-const ana = { id: "ana-id", email: "ana@exemplo.com" };
+const ana = { id: "ana-id", email: "ana@exemplo.com", emailVerified: true };
 const dados = { nome: "Ana Souza", telefone: "82912345678", aceite: true as const };
 
 function setup(adminEmail?: string) {
@@ -39,7 +39,7 @@ describe("CreateProfile", () => {
     const { useCase } = setup(" Ana@Exemplo.com ");
 
     const result = await useCase.execute({
-      user: { id: "ana-id", email: "ANA@exemplo.com" },
+      user: { id: "ana-id", email: "ANA@exemplo.com", emailVerified: true },
       ...dados,
     });
 
@@ -67,5 +67,17 @@ describe("CreateProfile", () => {
     });
 
     expect(second).toEqual({ profile: first.profile, created: false });
+  });
+
+  it("não concede admin quando o token não prova o e-mail verificado: cria como cliente", async () => {
+    const { useCase } = setup("ana@exemplo.com");
+
+    const result = await useCase.execute({
+      user: { ...ana, emailVerified: false },
+      ...dados,
+    });
+
+    expect(result.profile.role).toBe("customer");
+    expect(result.created).toBe(true);
   });
 });
