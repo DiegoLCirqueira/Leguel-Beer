@@ -13,10 +13,19 @@ export class PrismaProfileRepository implements ProfileRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async ensureRole(profile: { id: string; email: string }, role: Role): Promise<void> {
-    await this.prisma.profile.upsert({
-      where: { id: profile.id },
-      create: { id: profile.id, email: profile.email, role: PRISMA_ROLE[role] },
-      update: { role: PRISMA_ROLE[role] },
-    });
+    try {
+      await this.prisma.profile.upsert({
+        where: { id: profile.id },
+        create: { id: profile.id, email: profile.email, role: PRISMA_ROLE[role] },
+        update: { role: PRISMA_ROLE[role] },
+      });
+    } catch (error) {
+      if ((error as { code?: string }).code === "P2002") {
+        throw new Error(
+          "Já existe um perfil com esse e-mail e outro id (a conta do Auth foi recriada?); resolva à mão",
+        );
+      }
+      throw error;
+    }
   }
 }
