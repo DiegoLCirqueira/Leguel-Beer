@@ -101,4 +101,14 @@ describe("JwksTokenVerifier", () => {
 
     await expect(verifier.verify(tokens.custom(claims))).rejects.toBeInstanceOf(InvalidTokenError);
   });
+
+  it.each([
+    ["sem a claim email", { email: undefined }],
+    ["com e-mail vazio", { email: "" }],
+    ["com e-mail que não é texto", { email: 42 }],
+  ])("recusa o token %s: a conta de e-mail e senha sempre tem e-mail", async (_caso, claims) => {
+    const { tokens, verifier } = setup();
+
+    await expect(verifier.verify(tokens.custom(claims))).rejects.toBeInstanceOf(InvalidTokenError);
+  });
 });
