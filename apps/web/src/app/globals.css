@@ -38,6 +38,30 @@
   --radius-campo: 12px;
 }
 
+@layer components {
+  /* Palco da arte do Figma (818 x 1765): contém a arte inteira sem cortar a faixa dos controles. */
+  .palco-arte {
+    position: absolute;
+    left: 50%;
+    bottom: env(safe-area-inset-bottom, 0px);
+    width: min(calc((100dvh - env(safe-area-inset-bottom, 0px)) * 818 / 1765), 108vw);
+    aspect-ratio: 818 / 1765;
+    transform: translateX(-50%);
+    container-type: inline-size;
+  }
+  /* Telas baixas (paisagem, zoom alto): coluna legível com rolagem vertical. */
+  @media (max-height: 599px) {
+    .palco-arte {
+      position: relative;
+      left: auto;
+      bottom: auto;
+      width: max(min(100vw, 440px), 320px);
+      margin-inline: auto;
+      transform: none;
+    }
+  }
+}
+
 @layer base {
   body {
     @apply bg-fundo font-texto text-texto;
