@@ -20,6 +20,15 @@ type Aviso =
   | { tipo: "email-ja-cadastrado"; email: string }
   | { tipo: "erro" };
 
+const ORDEM_DOS_CAMPOS: CampoCadastro[] = [
+  "nome",
+  "email",
+  "telefone",
+  "senha",
+  "confirmacao",
+  "aceite",
+];
+
 const VAZIO: EntradaCadastro = {
   nome: "",
   email: "",
@@ -61,6 +70,8 @@ export function CriarContaForm({ criar }: Props) {
     const validacao = validarCadastro(valores);
     if (!validacao.ok) {
       setErros(validacao.erros);
+      const primeiro = ORDEM_DOS_CAMPOS.find((campo) => validacao.erros[campo]);
+      if (primeiro) document.getElementById(primeiro)?.focus();
       return;
     }
     setErros({});
@@ -91,6 +102,7 @@ export function CriarContaForm({ criar }: Props) {
     <form onSubmit={enviar} noValidate className="flex flex-col gap-4">
       <Campo
         id="nome"
+        name="nome"
         rotulo="Nome completo"
         icone={UserRound}
         placeholder="Digite seu nome completo"
@@ -101,6 +113,7 @@ export function CriarContaForm({ criar }: Props) {
       />
       <Campo
         id="email"
+        name="email"
         rotulo="E-mail"
         icone={Mail}
         type="email"
@@ -113,6 +126,7 @@ export function CriarContaForm({ criar }: Props) {
       />
       <Campo
         id="telefone"
+        name="telefone"
         rotulo="Telefone"
         icone={Phone}
         type="tel"
@@ -125,6 +139,7 @@ export function CriarContaForm({ criar }: Props) {
       />
       <Campo
         id="senha"
+        name="senha"
         rotulo="Senha"
         icone={Lock}
         type={verSenha ? "text" : "password"}
@@ -137,6 +152,7 @@ export function CriarContaForm({ criar }: Props) {
       />
       <Campo
         id="confirmacao"
+        name="confirmacao"
         rotulo="Confirmar senha"
         icone={Lock}
         type={verConfirmacao ? "text" : "password"}
@@ -154,6 +170,8 @@ export function CriarContaForm({ criar }: Props) {
         <label className="relative flex cursor-pointer items-center gap-3 text-sm text-texto">
           <span className="relative block size-6 shrink-0">
             <input
+              id="aceite"
+              name="aceite"
               type="checkbox"
               checked={valores.aceite}
               onChange={(e) => alterar("aceite", e.target.checked)}
