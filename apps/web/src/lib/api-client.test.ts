@@ -92,4 +92,41 @@ describe("createApiClient", () => {
     expect(calls).toHaveLength(2);
     expect(calls[1]?.init.headers).toMatchObject({ Authorization: "Bearer token-novo" });
   });
+
+  it.each([
+    ["devolve null", () => Promise.resolve<string | null>(null)],
+    ["falha", () => Promise.reject(new Error("refresh token vencido"))],
+  ])("se a renovação %s, lança UNAUTHORIZED sem repetir a chamada", async (_caso, refresh) => {
+    const { client, calls } = clientWith(
+      [{ status: 401, body: { code: "UNAUTHORIZED", message: "Não autenticado." } }],
+      refresh,
+    );
+
+    const error = await client.request("/perfil").catch((e) => e);
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect(error).toMatchObject({ status: 401, code: "UNAUTHORIZED" });
+    expect(calls).toHaveLength(1);
+  });
+
+  it("renova no máximo uma vez: um segundo 401 lança UNAUTHORIZED", async () => {
+    let renovacoes = 0;
+    const unauthorized = { code: "UNAUTHORIZED", message: "Não autenticado." };
+    const { client, calls } = clientWith(
+      [
+        { status: 401, body: unauthorized },
+        { status: 401, body: unauthorized },
+      ],
+      () => {
+        renovacoes++;
+        return Promise.resolve("token-novo");
+      },
+    );
+
+    const error = await client.request("/perfil").catch((e) => e);
+
+    expect(error).toMatchObject({ status: 401, code: "UNAUTHORIZED" });
+    expect(renovacoes).toBe(1);
+    expect(calls).toHaveLength(2);
+  });
 });
