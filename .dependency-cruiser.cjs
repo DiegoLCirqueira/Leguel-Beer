@@ -28,6 +28,20 @@ module.exports = {
       to: { path: "^apps/api/src/modules/[^/]+/(application|infrastructure|presentation)/" },
     },
     {
+      name: "application-sem-framework",
+      comment:
+        "application não importa @nestjs, @prisma nem a infraestrutura comum (common/prisma, common/http, common/logging); ela fala com o mundo por portas (ADR-005).",
+      severity: "error",
+      from: { path: "^apps/api/src/modules/[^/]+/application/" },
+      to: {
+        path: [
+          "(^|/)node_modules/@nestjs/",
+          "(^|/)node_modules/@prisma/",
+          "^apps/api/src/common/(prisma|http|logging)/",
+        ],
+      },
+    },
+    {
       name: "application-so-depende-de-domain",
       comment:
         "application importa só domain; infrastructure e presentation dependem dela, não o contrário (ADR-005).",
