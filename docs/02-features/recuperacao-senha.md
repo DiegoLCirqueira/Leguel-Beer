@@ -79,6 +79,7 @@ Funcionalidade: Recuperação de senha
 - **Validade do link:** 1 hora, como diz a tela do Figma. O link vale uma única vez; um pedido novo invalida o anterior.
 - **Nova senha:** mesmas regras do cadastro (8 a 72 caracteres), com confirmação ([[cadastro-login]]).
 - **Depois de trocar:** a pessoa entra na conta e vai para a home; as outras sessões abertas da conta são encerradas.
+- **Token já emitido (risco aceito):** encerrar as outras sessões impede que elas sejam renovadas, mas o token de acesso que elas já têm continua aceito pela API até vencer, no máximo 1 hora (validade padrão do Supabase Auth). O mesmo vale para "Sair" ([[cadastro-login]]). Revogar na hora exigiria a API consultar o Supabase a cada requisição.
 - **Pedidos repetidos:** um novo pedido para o mesmo e-mail só é aceito 60 segundos depois do anterior; antes disso, o aviso genérico aparece igual e nenhum e-mail novo sai.
 - **Textos do Figma** (decisão do Diego já tomada): "Recuperar senha", "Digite seu e-mail e enviaremos um link para você redefinir sua senha.", "E-mail", "Digite seu e-mail cadastrado", "Verifique sua caixa de entrada", "Enviaremos um link seguro para redefinir sua senha. Não se esqueça de checar a pasta de spam, se necessário.", "O link tem validade", "O link expira em 1 hora por questões de segurança.", "Precisa de ajuda?", "Se não receber o e-mail, entre em contato com nosso suporte.", "Enviar link" e "Voltar para o login".
 
