@@ -14,11 +14,17 @@ enum Role {
 
 /// Perfil da conta. O id é o id do usuário no Supabase Auth; o papel mora aqui, não no Auth.
 model Profile {
-  id        String   @id @db.Uuid
-  email     String   @unique
-  role      Role     @default(CUSTOMER)
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  id              String    @id @db.Uuid
+  email           String    @unique
+  role            Role      @default(CUSTOMER)
+  /// Dados do cadastro e aceite dos termos; nulos no perfil que o seed do admin cria só com o papel.
+  nome            String?
+  telefone        String?
+  termsVersion    String?   @map("terms_version")
+  privacyVersion  String?   @map("privacy_version")
+  termsAcceptedAt DateTime? @map("terms_accepted_at") @db.Timestamptz(3)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@map("profiles")
 }
