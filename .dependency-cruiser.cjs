@@ -18,7 +18,7 @@ module.exports = {
       severity: "error",
       from: { path: "^packages/shared/src/", pathNot: "\.test\.ts$" },
       to: {
-        path: "(^|/node_modules/)(@nestjs|next|react|react-dom|@prisma|express)(/|$)",
+        path: "(^|/)node_modules/(@nestjs|next|react|react-dom|@prisma|express)(/|$)|^(@nestjs|next|react|react-dom|@prisma|express)(/|$)",
       },
     },
     {
