@@ -23,4 +23,22 @@ describe("WelcomeActions", () => {
     expect(checkbox).not.toBeChecked();
     expect(screen.getByRole("link", { name: "Entrar" })).toHaveAttribute("href", "/entrar?manter-conectado=0");
   });
+
+  it("o ícone (i) mostra e esconde a dica de Manter-me conectado", async () => {
+    render(<WelcomeActions />);
+    const info = screen.getByRole("button", { name: "Saiba mais sobre Manter-me conectado" });
+    expect(info).toHaveAttribute("aria-expanded", "false");
+
+    await userEvent.click(info);
+
+    expect(info).toHaveAttribute("aria-expanded", "true");
+    expect(
+      screen.getByText("Sua sessão continua ativa neste aparelho por até 30 dias, mesmo depois de fechar o navegador."),
+    ).toBeInTheDocument();
+
+    await userEvent.click(info);
+
+    expect(info).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByText(/Sua sessão continua ativa/)).not.toBeInTheDocument();
+  });
 });
