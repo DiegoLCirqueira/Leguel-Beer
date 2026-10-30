@@ -73,6 +73,14 @@ export function WelcomeActions() {
         <Link2 aria-hidden="true" className="size-5" />
         Continuar como convidado
       </Link>
+      <div
+        ref={hintRef}
+        id={hintId}
+        aria-live="polite"
+        className="w-[88%] rounded-campo border border-borda bg-superficie px-3 py-1.5 text-center text-xs leading-snug text-texto-suave empty:hidden"
+      >
+        {showHint ? HINT : null}
+      </div>
       <div className="flex items-center gap-1 text-xs">
         <label className="flex min-h-11 cursor-pointer items-center gap-2">
           <input
@@ -94,14 +102,6 @@ export function WelcomeActions() {
         >
           <Info aria-hidden="true" className="size-4" />
         </button>
-      </div>
-      <div
-        ref={hintRef}
-        id={hintId}
-        aria-live="polite"
-        className="fixed inset-x-4 bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-30 mx-auto max-w-xs rounded-campo border border-borda bg-superficie px-3 py-2 text-center text-xs leading-snug text-texto-suave empty:hidden"
-      >
-        {showHint ? HINT : null}
       </div>
     </div>
   );
