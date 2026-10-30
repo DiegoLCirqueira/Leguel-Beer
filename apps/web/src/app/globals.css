@@ -33,5 +33,12 @@
 @layer base {
   body {
     @apply bg-fundo font-texto text-texto;
+    -webkit-tap-highlight-color: transparent;
+  }
+  a,
+  button,
+  label,
+  input {
+    touch-action: manipulation;
   }
 }

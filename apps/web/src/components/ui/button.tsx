@@ -3,14 +3,15 @@ import { Loader2 } from "lucide-react";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-const buttonVariants = cva(
+export const buttonVariants = cva(
   "inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaria disabled:opacity-60",
   {
     variants: {
       variant: {
-        primary: "border-primaria bg-primaria font-semibold text-texto-na-primaria",
-        outline: "border-primaria bg-transparent text-texto",
-        ghost: "border-borda bg-superficie text-texto",
+        primary:
+          "border-primaria bg-primaria font-semibold text-texto-na-primaria hover:bg-primaria/85",
+        outline: "border-primaria bg-transparent text-texto hover:bg-primaria/10",
+        ghost: "border-borda bg-superficie text-texto hover:border-primaria",
       },
       size: {
         sm: "px-4 text-sm",
