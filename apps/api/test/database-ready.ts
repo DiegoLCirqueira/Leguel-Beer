@@ -3,9 +3,12 @@ export async function ensureDatabaseReachable(connect: () => Promise<void>): Pro
   try {
     await connect();
   } catch (error) {
-    throw new Error(
+    const failure = new Error(
       "O banco de teste não respondeu. Suba o Supabase local com `pnpm db:start` (Docker rodando) ou confira TEST_DATABASE_URL.",
       { cause: error },
     );
+    // O Vitest 5 trava ao interpretar o stack de erros do globalSetup (source map do SWC) e esconde a mensagem.
+    failure.stack = failure.message;
+    throw failure;
   }
 }
