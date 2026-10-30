@@ -19,6 +19,7 @@
   "devDependencies": {
     "dependency-cruiser": "18.7.0",
     "prettier": "3.9.10",
+    "supabase": "2.122.0",
     "turbo": "2.11.10",
     "typescript": "6.0.3"
   }
