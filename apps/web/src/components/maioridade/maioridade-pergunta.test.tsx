@@ -27,7 +27,7 @@ describe("MaioridadePergunta", () => {
     await userEvent.click(screen.getByRole("button", { name: "Sim, tenho 18 anos ou mais" }));
 
     expect(confirmar).toHaveBeenCalledTimes(1);
-    const dados = confirmar.mock.calls[0][0] as FormData;
+    const dados = confirmar.mock.calls[0]?.[0] as FormData;
     expect(dados.get("retorno")).toBe("/catalogo?categoria=ipa");
   });
 
