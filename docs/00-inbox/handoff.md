@@ -7,32 +7,32 @@ atualizado: 2026-10-29
 
 Sobrescrito pelo Orchestrator ao fim de cada ordem. A próxima conversa começa lendo este arquivo, a daily note mais recente em `docs/05-diario/` e [[licoes-aprendidas]].
 
-## Última ordem: LB-1, criar o monorepo (29/10)
+## Última ordem: fundação da entrega de acesso (29/10)
 
-Encerrada. #123 mergeado (8205a95), issue #10 fechada. Spec: [[base-monorepo]]. Resumo em [[2026-10-29]].
+Encerrada. Resumo em [[2026-10-29]]. Roteiro em [[roteiro-mvp]] (fase 1: acesso, decisão do Diego; depois a ordem do Notion).
+
+- Mergeados: #128 (10 specs, [[ADR-007-banco-de-teste]], roteiro), #130 ([[identidade-visual]], LB-11 e LB-12) e #129 ([[api-base]], LB-3, LB-117 e LB-118).
 
 ## Estado
 
-- `main` limpa. O stash `obsidian` (docs/.obsidian/) é do Diego: não aplicar nem descartar.
-- Servidores de desenvolvimento rodando em segundo plano: site em `localhost:3000` (subido pelo Front) e API em `localhost:3333` (subida pelo Back). A API caiu uma vez na troca de branch depois do merge e foi religada. Os portais "Leguelé Desktop", "Leguelé iPhone" e "Leguelé Android" mostram o site.
-- O Devops tem `gh pr merge` liberado. Merge segue o [[ADR-006-merge-por-agentes]].
-- pnpm 12.16.1 foi instalado globalmente com `npm -g` no PC do Diego.
+- Site em `localhost:3000` (working copy principal, `main`) e API em `localhost:3333` (subida do worktree `../leguele-back`, cuja branch já foi mergeada: religar a API a partir da `main` na próxima ordem e remover o worktree).
+- Supabase local no Docker com `project_id = "leguele-beer"`. Os containers do InvestPro não são do projeto.
+- Portais "Leguelé Desktop", "Leguelé iPhone" e "Leguelé Android" no canvas; nota "Status da banda" atualizada pelo Orchestrator.
+- O stash `obsidian` é do Diego: não aplicar nem descartar.
 
-## Follow-ups técnicos (da revisão do #123)
+## Antes da próxima ordem
 
-- `apps/api/src/main.ts`: helmet e `enableShutdownHooks` antes do primeiro endpoint de negócio.
-- `.dependency-cruiser.cjs`: barrar `domain` → `application`/`infrastructure`/`presentation` quando entrar o primeiro caso de uso.
-- Partes de LB-2 (#11), LB-5 (#14), LB-6 (#15) e LB-7 (#16) que o LB-1 só esboçou estão em "Fora de escopo" de [[base-monorepo]]; reconciliar essas issues (aprovação permanente).
+- O Diego pediu a análise de 14 plugins/skills (CLAUDE-MEM, HEADROOM, CLAUDE CODE SETUP, TASK OBSERVER, GRAPHIFY, TASTE SKILL, WEB DESIGN GUIDELINES, AWESOME DESIGN, IMAGE TO CODE, PLAYWRIGHT CLI, PONYTAIL, CODE REVIEW, OBSIDIAN SKILL, SUPERPOWERS) antes de iniciar qualquer outra coisa.
 
-## Pendências com o Diego
+## Próximo no roteiro (fase 1)
 
-1. Valores das faixas de teor alcoólico, IBU e preço (LB-36), em aberto em [[catalogo]].
-2. Cadastro de papéis do Maestri desatualizado em relação a [[maestri-banda]], se ainda não foi atualizado pela interface.
-3. Merge = deploy em produção ([[ADR-006-merge-por-agentes]], [[ADR-005-monorepo-camadas]]): decidir no LB-8.
+LB-119 e LB-120 ([[testes-api]], [[contratos-compartilhados]]), depois LB-19, LB-24, LB-28, LB-22, LB-25 e LB-27, conforme [[roteiro-mvp]].
 
-## Próxima ordem provável
+## Follow-ups técnicos
 
-LB-2 a LB-8 do épico "Base técnica" (qualidade, banco/Prisma no LB-3, Vercel no LB-8) ou o catálogo (LB-4, LB-33 a LB-38). Ao citar um card, dizer o que ele é.
+- API: pendências conhecidas no `apps/api/README.md` (trust proxy no LB-8, timeout do pool, log sem query string, x-request-id, CSP só fora de /docs, contexto do logger, `z.config` no setup).
+- Web: testes extras de contraste, regex do lint de cor fixa, `role="group"` nos chips e status do botão sempre montado.
+- Favicon, ícones e manifest (originais em `Imagens/favicon-leguele`) ficam para o LB-16.
 
 ## Skills sugeridas
 

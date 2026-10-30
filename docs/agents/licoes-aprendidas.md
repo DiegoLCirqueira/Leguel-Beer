@@ -8,6 +8,7 @@ Registro dos erros da banda e da regra que cada um gerou. Todo agente lê esta n
 
 | Data | Quem | O que aconteceu | Causa | Regra |
 | --- | --- | --- | --- | --- |
+| 2026-10-29 | Orchestrator | Repetiu o erro da daily de 28/10: o handoff não foi gravado (Write sem Read) e o commit foi pedido na mesma rodada. | Pedido de commit enviado sem conferir o git status. | Antes de pedir commit, rodar git status no worktree e conferir cada arquivo esperado. |
 | 2026-10-29 | Back | Na base da API, feats sem red (5d825ee, 8df11a2), um chore com vários assuntos entre red e green (5d234af), E2E ajustado depois do green (214ecd5) e reds/greens em lote. | Pressa na fundação. | Um red por fatia, nada entre red e green, E2E junto da fatia. |
 | 2026-10-29 | Front | Arquivos do Obsidian e arquivos gerados entraram em commit de teste; títulos de commit não batiam com o `--stat`. | `git add` amplo (`git add -A .`, `commit -a`). | `git add` só com caminhos explícitos e conferir `git show --stat` antes do push. |
 | 2026-10-29 | Devops | A API em :3333 caiu depois do merge do #123, na troca da working copy para a main. | Servidor de desenvolvimento rodando na mesma working copy em que se troca de branch. | Depois de merge ou troca de branch, conferir :3000 e :3333 e religar o que caiu. |
