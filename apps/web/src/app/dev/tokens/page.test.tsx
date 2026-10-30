@@ -17,7 +17,10 @@ describe("/dev/tokens", () => {
   it("em desenvolvimento mostra a vitrine dos componentes", () => {
     render(<DevTokens />);
 
-    expect(screen.getByRole("button", { name: "Todas (16)" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Todas (16)" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
   });
 
   it("em produção não existe", () => {

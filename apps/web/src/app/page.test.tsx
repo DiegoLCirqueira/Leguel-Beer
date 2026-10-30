@@ -5,7 +5,8 @@ const cookieStore = vi.hoisted(() => ({ guest: false }));
 
 vi.mock("next/headers", () => ({
   cookies: async () => ({
-    get: (name: string) => (cookieStore.guest && name === "leguele_convidado" ? { value: "1" } : undefined),
+    get: (name: string) =>
+      cookieStore.guest && name === "leguele_convidado" ? { value: "1" } : undefined,
   }),
 }));
 vi.mock("next/navigation", () => ({
