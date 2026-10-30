@@ -41,4 +41,17 @@ describe("AppLogger", () => {
     });
     expect(write).toHaveBeenCalledTimes(2);
   });
+
+  it("aceita a assinatura error(message, stack, context) que o Nest usa", () => {
+    const write = vi.spyOn(process.stderr, "write").mockReturnValue(true);
+
+    new AppLogger().error("falhou", "Error: x\n  at y", "ExceptionsHandler");
+
+    expect(JSON.parse(String(write.mock.calls[0]?.[0]))).toMatchObject({
+      level: "error",
+      message: "falhou",
+      stack: "Error: x\n  at y",
+      context: "ExceptionsHandler",
+    });
+  });
 });
