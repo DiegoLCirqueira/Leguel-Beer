@@ -15,7 +15,7 @@ const REQUIRED = [
   "SUPABASE_SERVICE_ROLE_KEY",
 ] as const;
 
-type SeedEnv = Partial<Record<(typeof REQUIRED)[number], string | undefined>>;
+type SeedEnv = Partial<Record<(typeof REQUIRED)[number] | "DATABASE_URL", string | undefined>>;
 
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
 
@@ -42,6 +42,9 @@ export async function seedAdmin(
   }
   if (!isLocal(env.SUPABASE_URL as string)) {
     throw new Error("O seed do admin só roda contra o Supabase local: SUPABASE_URL não é local");
+  }
+  if (env.DATABASE_URL && !isLocal(env.DATABASE_URL)) {
+    throw new Error("O seed do admin só roda contra o banco local: DATABASE_URL não é local");
   }
   const email = env.ADMIN_EMAIL as string;
   const password = env.ADMIN_SEED_PASSWORD as string;
