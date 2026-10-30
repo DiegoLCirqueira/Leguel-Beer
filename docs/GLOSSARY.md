@@ -27,6 +27,8 @@ _Evite_: administrador do sistema, superusuário
 Dados do cliente guardados pela loja (nome e telefone, no cadastro), criados no primeiro acesso à conta. Ver [[cadastro-login]].
 _Evite_: usuário, cadastro (quando se quer dizer os dados)
 
+## Acesso
+
 **Confirmação de maioridade**:
 Resposta "tenho 18 anos ou mais" dada na entrada do site, lembrada por 30 dias no navegador. Não valida documento. Ver [[maioridade-entrada]].
 _Evite_: age gate, verificação de idade
