@@ -43,4 +43,18 @@ describe("EnsureAdminAccount", () => {
     expect(auth.users[0]?.password).toBe("senha-original-123");
     expect(profiles.profiles.get("user-1")?.role).toBe("admin");
   });
+
+  it("compara o e-mail sem diferenciar maiúsculas e minúsculas, e repetir não duplica", async () => {
+    const { auth, profiles, useCase } = setup();
+
+    await useCase.execute({ email: " Admin@Leguele.Test ", password: "senha-forte-123456" });
+    const second = await useCase.execute({
+      email: "admin@leguele.test",
+      password: "senha-forte-123456",
+    });
+
+    expect(second.created).toBe(false);
+    expect(auth.users.map((u) => u.email)).toEqual(["admin@leguele.test"]);
+    expect(profiles.profiles.size).toBe(1);
+  });
 });
