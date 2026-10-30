@@ -57,8 +57,8 @@ export default function BoasVindas() {
           className={`pointer-events-none absolute -z-10 max-w-none opacity-50 blur-[2px] ${leaf.className}`}
         />
       ))}
-      <div className="mx-auto flex h-full w-full max-w-md flex-col items-center px-4 pb-[2dvh] pt-[3dvh]">
-        <h1 className="h-[23dvh] shrink-0">
+      <div className="mx-auto flex h-full w-full max-w-md flex-col items-center px-[max(1rem,env(safe-area-inset-left))] pb-[max(2dvh,env(safe-area-inset-bottom))] pt-[max(3dvh,env(safe-area-inset-top))]">
+        <h1 translate="no" className="h-[23dvh] shrink-0">
           <Image
             src="/boas-vindas/logo-leguele-beer.webp"
             alt="Leguelé Beer"
@@ -69,7 +69,7 @@ export default function BoasVindas() {
             className="h-full w-auto"
           />
         </h1>
-        <p className="mt-[1.5dvh] -rotate-6 text-center font-titulo text-[clamp(1.1rem,3.2dvh,1.5rem)] leading-tight text-texto">
+        <p className="mt-[1.5dvh] -rotate-6 text-balance text-center font-titulo text-[clamp(1.1rem,3.2dvh,1.5rem)] leading-tight text-texto">
           Cervejas artesanais{" "}
           <span className="block underline decoration-primaria decoration-2 underline-offset-4">
             e <span className="text-primaria">muito mais!</span>
@@ -91,7 +91,7 @@ export default function BoasVindas() {
               width={900}
               height={515}
               sizes="(min-width: 768px) 440px, 98vw"
-              className="pointer-events-none absolute left-[40%] top-[24%] h-[56%] w-auto max-w-none brightness-[0.7] saturate-[0.9] blur-[0.5px]"
+              className="pointer-events-none absolute left-[43%] top-[37%] h-[46%] w-auto max-w-none brightness-[0.7] saturate-[0.9] blur-[0.5px]"
             />
             <div
               aria-hidden="true"
