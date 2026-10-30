@@ -8,20 +8,17 @@
   --color-superficie: #10261a;
   --color-superficie-elevada: #163021;
   --color-borda: #24452f;
-  --color-texto: #eef5e6;
+  --color-texto: #f7fbf5;
   --color-texto-suave: #a9bfa0;
-  --color-primaria: #b7e86a;
-  --color-texto-na-primaria: #0c1c11;
+  --color-primaria: #95dc50;
+  --color-texto-na-primaria: #000a00;
   --color-texto-badge: #ffffff;
   --color-badge-ipa: #177e26;
   --color-badge-frutas: #eb9725;
   --color-badge-malt: #9f6838;
   --color-badge-lager: #47610e;
   --color-badge-neutro: var(--color-superficie-elevada);
-  /* Cores medidas na arte da tela de boas-vindas (Figma) */
-  --color-arte-botao: #95dc50;
-  --color-arte-tinta: #000a00;
-  --color-arte-texto: #f7fbf5;
+  /* Controles translúcidos sobre a arte da tela de boas-vindas (Figma) */
   --color-arte-vidro: #0b1c0d;
   --color-arte-borda: #2d3d2f;
   --color-arte-linha: #a3a698;
@@ -30,8 +27,7 @@
   --color-aviso: #f5b74a;
 
   --font-titulo: var(--font-kaushan), cursive;
-  --font-controles: var(--font-figtree), system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-texto: var(--font-outfit), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-texto: var(--font-figtree), system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --spacing: 4px;
 
