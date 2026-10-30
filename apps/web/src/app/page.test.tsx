@@ -8,4 +8,15 @@ describe("Home", () => {
 
     expect(screen.getByRole("heading", { level: 1, name: "Leguelé Beer" })).toBeInTheDocument();
   });
+
+  it("exibe a vitrine dos componentes base", () => {
+    render(<Home />);
+
+    expect(screen.getByRole("button", { name: "Entrar" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Todas (16)" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByText("IPA")).toBeInTheDocument();
+  });
 });
