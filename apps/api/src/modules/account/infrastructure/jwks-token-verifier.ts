@@ -10,6 +10,7 @@ const REFETCH_COOLDOWN_MS = 30_000;
 
 interface Jwk extends JsonWebKey {
   kid?: string;
+  alg?: string;
 }
 
 interface Header {
@@ -27,6 +28,12 @@ interface Claims {
 
 const isObject = (value: unknown): boolean =>
   typeof value === "object" && value !== null && !Array.isArray(value);
+
+/** A chave tem de servir ao algoritmo do header: ES256 pede EC P-256, RS256 pede RSA, e um `alg` na chave tem de ser o mesmo. */
+function matchesAlgorithm(jwk: Jwk, alg: string): boolean {
+  if (jwk.alg !== undefined && jwk.alg !== alg) return false;
+  return alg === "ES256" ? jwk.kty === "EC" && jwk.crv === "P-256" : jwk.kty === "RSA";
+}
 
 const decode = <T>(part: string): T => JSON.parse(Buffer.from(part, "base64url").toString()) as T;
 
@@ -62,6 +69,7 @@ export class JwksTokenVerifier implements TokenVerifier {
 
     const jwk = await this.findKey(header.kid);
     if (!jwk) throw new InvalidTokenError("chave desconhecida");
+    if (!matchesAlgorithm(jwk, header.alg)) throw new InvalidTokenError("chave incompatível");
 
     const valid = verify(
       "sha256",
