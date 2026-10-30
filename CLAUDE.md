@@ -7,6 +7,7 @@ Hospedagem da API: docs/03-decisoes/ADR-002-hospedagem-api.md. No MVP não há p
 Monorepo pnpm + Turborepo (spec: docs/02-features/base-monorepo.md).
 - `apps/web` (`@leguele/web`): Next.js, porta 3000. E2E em `apps/web/e2e`.
 - `apps/api` (`@leguele/api`): NestJS, porta 3333. Código em `src/modules/<contexto>/{domain,application,infrastructure,presentation}`.
+- `apps/api/prisma` (schema, migrations, seed) e `supabase/` (config do Supabase local); ver `apps/api/README.md`.
 - `packages/shared` (`@leguele/shared`): código puro compartilhado, compilado com `tsc` (`dist/`).
 - `packages/config` (`@leguele/config`): ESLint flat, `tsconfig.base.json` e Prettier.
 - Na raiz: `turbo.json`, `pnpm-workspace.yaml`, `.dependency-cruiser.cjs` (domain não importa framework) e `.github/workflows/ci.yml`.
@@ -19,6 +20,7 @@ Todos na raiz, com Node do `.nvmrc` e pnpm do `packageManager`.
 - `pnpm lint`: ESLint + dependency-cruiser. `pnpm arch`: só o dependency-cruiser.
 - `pnpm format:check` / `pnpm format`: Prettier.
 - `pnpm typecheck` e `pnpm build`.
+- `pnpm db:start`/`db:stop` (Supabase local, Docker), `db:migrate`, `db:reset`, `db:seed` e `db:check` (schema sem migration).
 
 ### Convenções de teste
 - Vitest para unidade e componente (Testing Library no web); Supertest para HTTP na API; Playwright para E2E (viewport de celular).
@@ -27,7 +29,12 @@ Todos na raiz, com Node do `.nvmrc` e pnpm do `packageManager`.
 - Fluxo red → green em commits separados (ver Documentação).
 
 ### Variáveis de ambiente
-Nenhuma ainda. As portas (3000 e 3333) são fixas no código. Quando houver variáveis, listar as chaves em `.env.example` (sem valores) e descrevê-las aqui.
+Só na API, em `apps/api/.env` (fora do git; chaves em `apps/api/.env.example`, sem valores). No local o Supabase CLI gera as chaves de desenvolvimento.
+- `DATABASE_URL`: conexão da aplicação com o Postgres.
+- `DIRECT_URL`: conexão das migrations (no local, a mesma).
+- `WEB_ORIGIN`: origem do web liberada no CORS (padrão `http://localhost:3000`).
+- `TEST_DATABASE_URL` (opcional): banco de testes de integração; padrão `leguele_test` no mesmo Postgres local. O nome deve terminar em `_test`.
+Detalhes e banco local: `apps/api/README.md`.
 
 ### Convenção de commits
 Padrão de https://github.com/iuricode/padroes-de-commits (vale para os commits novos; o histórico antigo não é reescrito). O título do PR segue o mesmo formato, já que o squash usa o título como mensagem.
