@@ -6,6 +6,8 @@ export default defineConfig({
   plugins: [swc.vite({ module: { type: "es6" } })],
   test: {
     environment: "node",
+    // Os testes que sobem o AppModule não falam com o Supabase; a URL só precisa existir.
+    env: { SUPABASE_URL: "http://127.0.0.1:54321" },
     include: ["src/**/*.test.ts", "test/**/*.test.ts"],
     exclude: ["src/**/*.integration.test.ts"],
     coverage: {

@@ -1,4 +1,5 @@
 import { HttpException } from "@nestjs/common";
+import { NotFoundError } from "./not-found-error.js";
 import { ValidationError, type FieldIssue } from "./validation-error.js";
 
 export interface ErrorBody {
@@ -37,6 +38,9 @@ export function toErrorResponse(error: unknown): ErrorResponse {
       status: 400,
       body: { code: "VALIDATION_ERROR", message: error.message, details: error.issues },
     };
+  }
+  if (error instanceof NotFoundError) {
+    return { status: 404, body: BY_STATUS[404] as ErrorBody };
   }
   if (error instanceof HttpException) {
     const mapped = BY_STATUS[error.getStatus()];

@@ -26,3 +26,6 @@ apps/web/AGENTS.md
 
 # saída da automação de navegador (playwright-cli)
 .playwright-cli/
+
+# Chave privada de assinatura do Supabase Auth local (gerada por `pnpm db:signing-key`)
+supabase/signing_keys.json

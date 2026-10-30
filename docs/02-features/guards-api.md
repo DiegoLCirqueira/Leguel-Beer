@@ -117,6 +117,10 @@ Decisões pequenas e fáceis de reverter, pela política de autonomia. Qualquer 
 - **Os três papéis do card** ("só 3 papéis") são público, cliente e admin.
 - **Conta sem papel registrado é cliente;** só o admin é gravado.
 - **Cenários com rotas genéricas,** já que as rotas do card (pedidos, endereços, admin de cervejas) ainda não existem.
+- **Validação do JWT sem biblioteca nova:** `node:crypto` com o JWKS em cache de 10 minutos (releitura se a chave for desconhecida, no máximo a cada 30 s); só ES256 e RS256, `role` "authenticated" e `exp` válido. JWKS fora do ar recusa o token (falha fechada).
+- **`SUPABASE_URL` obrigatória no boot da API,** para montar a URL do JWKS; sem ela a API não sobe.
+- **Chave de assinatura local:** `pnpm db:signing-key` cria `supabase/signing_keys.json` (ES256, fora do git) antes do primeiro `pnpm db:start`; quem já tem o Supabase rodando precisa de `db:stop` e `db:start`.
+- **Redirecionamento do site** (`/conta`, `/checkout`, `/admin`) fica com o Front, junto das sessões do LB-25.
 - **"Não encontrada" em `/admin`** para quem não é admin, como no card.
 - **O seed de desenvolvimento também cria a conta admin** no Supabase Auth local, com a senha de `ADMIN_SEED_PASSWORD` (só local, nunca em commit, PR, log ou nota). O seed recusa rodar se `SUPABASE_URL` ou `DATABASE_URL` não forem locais (`localhost`, `127.0.0.1`) e só promove a admin uma conta com e-mail confirmado; conta não confirmada com o `ADMIN_EMAIL` é recusada, contra pré-sequestro.
 

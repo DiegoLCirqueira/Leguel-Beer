@@ -34,4 +34,8 @@ export class InMemoryProfileRepository implements ProfileRepository {
     this.profiles.set(profile.id, { ...profile, role });
     return Promise.resolve();
   }
+
+  findRole(id: string): Promise<Role | null> {
+    return Promise.resolve(this.profiles.get(id)?.role ?? null);
+  }
 }

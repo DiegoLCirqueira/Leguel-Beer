@@ -1,0 +1,2 @@
+export const TOKEN_VERIFIER = Symbol("TOKEN_VERIFIER");
+export const PROFILE_REPOSITORY = Symbol("PROFILE_REPOSITORY");

@@ -5,10 +5,13 @@ import { z } from "zod";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { AppModule } from "../../app.module.js";
 import { AppLogger } from "../logging/app-logger.js";
+import { Public } from "../../modules/account/presentation/access.decorators.js";
 import { zodDto } from "../validation/zod-dto.js";
 
 class QuantidadeDto extends zodDto(z.object({ quantidade: z.number() })) {}
 
+// Rotas de sonda do teste: públicas, porque o guard global fecha as rotas por padrão.
+@Public()
 @Controller("exemplo")
 class ExemploController {
   @Post("validacao")

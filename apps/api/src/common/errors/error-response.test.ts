@@ -6,10 +6,16 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { describe, expect, it } from "vitest";
+import { NotFoundError } from "./not-found-error.js";
 import { ValidationError } from "./validation-error.js";
 import { toErrorResponse } from "./error-response.js";
 
 describe("toErrorResponse", () => {
+  it("transforma NotFoundError em 404 NOT_FOUND, igual ao NotFoundException", () => {
+    expect(toErrorResponse(new NotFoundError())).toEqual(toErrorResponse(new NotFoundException()));
+    expect(toErrorResponse(new NotFoundError()).status).toBe(404);
+  });
+
   it("transforma ValidationError em 400 VALIDATION_ERROR com os campos em details", () => {
     const error = new ValidationError([{ field: "quantidade", message: "Esperado número" }]);
 
