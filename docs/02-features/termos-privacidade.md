@@ -4,14 +4,14 @@ modulo: acesso
 card-notion: https://app.notion.com/p/3fd490a7ac7d815c9785f1be8cd09271
 prioridade: P1
 criado: 2026-10-29
-atualizado: 2026-10-29
+atualizado: 2026-10-30
 issues:
   - "#100 LB-22"
 tags:
   - feature
 ---
 
-# Termos, privacidade e aviso de projeto de portfólio
+# Termos, privacidade e entregas
 
 > [!info] Origem
 > Derivada do card do Notion **LB-22** (#100), que o Diego puxou do MVP+ para o MVP em 2026-10-29, na fase 1 do acesso, antes do cadastro ([[roteiro-mvp]]): os links "Termos de Uso" e "Política de Privacidade" de "Criar sua conta" ([[cadastro-login]]) precisam de destino. A página do projeto no Notion registra que os dados da empresa (CNPJ, endereço) são fictícios e que os pagamentos rodam em modo de teste ([[visao]]).
@@ -19,26 +19,14 @@ tags:
 ## História de usuário
 
 - **Como** pessoa que visita a Leguelé Beer (cliente, convidado ou recrutador)
-- **Quero** ver que o site é um projeto de portfólio e ler os termos e a política de privacidade
-- **Para** saber que nada é vendido de verdade e o que acontece com os dados que eu informo
+- **Quero** ler os termos de uso, a política de privacidade e as regras de entrega
+- **Para** saber as regras do site e o que acontece com os dados que eu informo
 
 ## Cenários
 
 ```gherkin
 # language: pt
-Funcionalidade: Termos, privacidade e aviso de portfólio
-
-  Esquema do Cenário: Aviso de portfólio em todas as páginas
-    Dado que abro <página> num celular de 360 px
-    Quando a página carrega
-    Então vejo a faixa "Projeto de portfólio · pagamentos em modo de teste" no topo
-
-    Exemplos:
-      | página                      |
-      | a pergunta de maioridade    |
-      | /boas-vindas                |
-      | /criar-conta                |
-      | /termos                     |
+Funcionalidade: Termos, privacidade e entregas
 
   Cenário: Rodapé com avisos e links
     Dado que confirmei a maioridade
@@ -67,7 +55,7 @@ Funcionalidade: Termos, privacidade e aviso de portfólio
 ## Regras de negócio
 
 - **Páginas:** `/termos` (Termos de Uso), `/privacidade` (Política de Privacidade) e `/entregas` (Entregas). Conteúdo estático, versionado no repositório, com a data da última atualização.
-- **Faixa de portfólio:** fixa no topo de todas as páginas do site, incluindo a pergunta de maioridade e as páginas legais; não pode ser fechada.
+- **Sem aviso de portfólio:** nenhuma página do site mostra faixa, nota ou texto dizendo que o site é um projeto de portfólio (decisão do Diego, 2026-10-30).
 - **Rodapé:** em todas as páginas, menos na pergunta de maioridade: os avisos (texto em "Textos", linha "Rodapé, avisos", fonte única também para a pergunta de maioridade e o checkout), links para as três páginas e os dados fictícios da empresa.
 - **Sem pergunta de maioridade** em `/termos` e `/privacidade`, para quem quer ler antes de entrar ([[maioridade-entrada]]). `/entregas` segue a regra normal.
 - **Links do cadastro** abrem em nova aba.
@@ -78,18 +66,16 @@ Funcionalidade: Termos, privacidade e aviso de portfólio
 
 Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adicione/crie o que for necessário").
 
-### Faixa e rodapé
+### Rodapé
 
 | Lugar | Texto |
 | --- | --- |
-| Faixa | "Projeto de portfólio · pagamentos em modo de teste" |
 | Rodapé, avisos | "Aprecie com moderação." e "Venda proibida para menores de 18 anos." |
 | Rodapé, empresa | "Leguelé Beer Cervejaria Artesanal Ltda. (empresa fictícia) · CNPJ 00.000.000/0001-00 (fictício) · Maceió, AL" |
-| Rodapé, nota | "Leguelé Beer é um projeto de portfólio. Nenhuma venda é real e nenhum valor é cobrado." |
 
 ### Termos de Uso (`/termos`)
 
-1. **Sobre este site.** A Leguelé Beer é um projeto de portfólio de desenvolvimento de software. A cervejaria, os produtos, os preços e os dados da empresa são fictícios. Nenhum pedido é entregue e nenhum valor é cobrado: os pagamentos usam o ambiente de teste do provedor.
+1. **Sobre este site.** A cervejaria, os produtos, os preços e os dados da empresa são fictícios. Nenhum pedido é entregue e nenhum valor é cobrado: os pagamentos usam o ambiente de teste do provedor.
 2. **Maioridade.** O site é destinado a maiores de 18 anos. Ao confirmar a maioridade na entrada, você declara ter 18 anos ou mais.
 3. **Conta.** Para simular uma compra é preciso criar uma conta com nome, e-mail, telefone e senha. Você é responsável pelos dados que informa e pela guarda da sua senha. Não use dados de cartão reais.
 4. **Uso permitido.** É proibido usar o site para fins ilegais, tentar acessar contas de outras pessoas ou atrapalhar o funcionamento do serviço.
@@ -108,7 +94,7 @@ Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adic
 
 ### Entregas (`/entregas`)
 
-1. **Projeto de portfólio.** Nenhum pedido é entregue de verdade; esta página descreve como a entrega funcionaria.
+1. **Como funciona.** Os pedidos feitos neste site não são entregues; esta página descreve como a entrega funcionaria.
 2. **Área de entrega.** Só Maceió e região.
 3. **Frete.** Calculado pela distância até a cervejaria, com frete grátis para pedidos acima de R$ 150.
 4. **Retirada.** Não há retirada no local.
@@ -118,7 +104,7 @@ Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adic
 > [!info] Proposta, ainda não combinada com o Diego
 > Tirada do plano de testes do card.
 
-- **Faixa e rodapé:** testes de componente com os textos e os links.
+- **Rodapé:** teste de componente com os textos e os links.
 - **Liberação das páginas legais na pergunta de maioridade:** caso a mais na função pura de decisão de acesso de [[maioridade-entrada]] (teste unitário).
 - **Cenários desta spec:** E2E com viewport de celular.
 
@@ -139,17 +125,20 @@ Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adic
 - **LGPD:** Diego Lins Cirqueira é o responsável pelos dados (controlador), com o contato diegopantanalstudio@gmail.com na Política de Privacidade.
 - **Pergunta 8:** razão social "Leguelé Beer Cervejaria Artesanal Ltda. (empresa fictícia)" e CNPJ 00.000.000/0001-00 (fictício), sempre marcados como fictícios.
 
+### Decisões do Diego (2026-10-30)
+
+- **Sem aviso de portfólio:** "quero que retire o 'Projeto de portfóio pagamentos em modo de teste', isso não deve aparecer em lugar algum já que é desnecessário". Saem a faixa do topo, a nota do rodapé e o item "Projeto de portfólio." de Entregas. O rodapé e as páginas legais continuam, e a empresa segue marcada como fictícia.
+
 ## Decisões tomadas sem consulta
 
 Decisões pequenas e fáceis de reverter, pela política de autonomia. Qualquer uma pode ser vetada.
 
-- **Faixa sem botão de fechar.**
 - **Páginas legais sem a pergunta de maioridade.**
 - **Links do cadastro em nova aba,** para não perder o formulário.
-- **Texto da faixa** com "·" no lugar do travessão do card.
+- **Termos e Entregas sem citar o portfólio (2026-10-30):** o item 1 dos Termos perde só a frase do portfólio e continua dizendo que a empresa e os produtos são fictícios, que nada é entregue e que os pagamentos são de teste, para o texto seguir verdadeiro. Em Entregas, o item 1 vira "Como funciona.", com o mesmo aviso de que os pedidos não são entregues.
 
 ## Tickets propostos
 
 | Issue | Ajuste proposto | Motivo |
 | --- | --- | --- |
-| #100 LB-22 | Milestone movido para MVP em 2026-10-29 (decisão do Diego). Depois do merge desta spec: link para ela e critérios com os 5 cenários | O Diego puxou o card para a fase 1 do acesso |
+| #100 LB-22 | Milestone movido para MVP em 2026-10-29 (decisão do Diego). Depois do merge desta spec: título "[LB-22] Publicar termos, privacidade e entregas", link para ela e critérios com os 4 cenários, sem aviso de portfólio | O Diego puxou o card para a fase 1 do acesso e depois retirou o aviso de portfólio (2026-10-30) |
