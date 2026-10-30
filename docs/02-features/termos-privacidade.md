@@ -76,7 +76,7 @@ Funcionalidade: Termos, privacidade e aviso de portfólio
 
 ## Textos
 
-Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adicione/crie o que for necessário"). O item marcado em "Em aberto" depende do Diego.
+Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adicione/crie o que for necessário").
 
 ### Faixa e rodapé
 
@@ -98,12 +98,12 @@ Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adic
 
 ### Política de Privacidade (`/privacidade`)
 
-1. **Quais dados coletamos.** Os que você informa ao criar a conta (nome, e-mail, telefone e senha) e, quando usar o checkout, endereço de entrega. A senha é guardada de forma cifrada pelo serviço de autenticação; ninguém do projeto tem acesso a ela.
+1. **Quais dados coletamos.** Os que você informa ao criar a conta (nome, e-mail, telefone e senha) e, quando usar o checkout, endereço de entrega. A senha é guardada pelo serviço de autenticação apenas como hash; ninguém do projeto tem acesso a ela.
 2. **Para que usamos.** Só para o funcionamento do site: entrar na conta, simular pedidos e enviar e-mails da conta (confirmação de cadastro e recuperação de senha).
 3. **Com quem compartilhamos.** Com os serviços que hospedam o site, o banco de dados, a autenticação e o envio de e-mails, só na medida necessária para o site funcionar. Não vendemos nem cedemos dados a terceiros.
 4. **Cookies.** Usamos cookies necessários: a confirmação de maioridade (30 dias) e a sessão da conta.
 5. **Seus direitos.** Pela Lei Geral de Proteção de Dados (LGPD), você pode pedir acesso, correção ou exclusão dos seus dados pelo contato do responsável, abaixo.
-6. **Responsável e contato.** Ver "Em aberto".
+6. **Responsável e contato.** O responsável pelos dados (controlador) é Diego Lins Cirqueira, autor do projeto. Pedidos sobre os seus dados vão para diegopantanalstudio@gmail.com.
 7. **Mudanças nesta política.** A data da última atualização fica no topo da página.
 
 ### Entregas (`/entregas`)
@@ -112,10 +112,6 @@ Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adic
 2. **Área de entrega.** Só Maceió e região.
 3. **Frete.** Calculado pela distância até a cervejaria, com frete grátis para pedidos acima de R$ 150.
 4. **Retirada.** Não há retirada no local.
-
-## Em aberto
-
-> [!todo] Preencher: quem aparece como responsável pelos dados na Política de Privacidade e qual contato recebe os pedidos da LGPD. O site guarda dados reais de quem cria conta (nome, e-mail e telefone), então o contato precisa funcionar. Pergunta ao Diego, via Orchestrator.
 
 ## Seams de teste
 
@@ -140,12 +136,13 @@ Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adic
 
 - **Pergunta 5:** o LB-22 entra no MVP, na fase 1 do acesso, antes do LB-25.
 - **Pergunta 4:** o Spec escreve os textos necessários.
+- **LGPD:** Diego Lins Cirqueira é o responsável pelos dados (controlador), com o contato diegopantanalstudio@gmail.com na Política de Privacidade.
+- **Pergunta 8:** razão social "Leguelé Beer Cervejaria Artesanal Ltda. (empresa fictícia)" e CNPJ 00.000.000/0001-00 (fictício), sempre marcados como fictícios.
 
 ## Decisões tomadas sem consulta
 
 Decisões pequenas e fáceis de reverter, pela política de autonomia. Qualquer uma pode ser vetada.
 
-- **Dados fictícios da empresa:** razão social "Leguelé Beer Cervejaria Artesanal Ltda. (empresa fictícia)" e CNPJ 00.000.000/0001-00, sempre marcados como fictícios.
 - **Faixa sem botão de fechar.**
 - **Páginas legais sem a pergunta de maioridade.**
 - **Links do cadastro em nova aba,** para não perder o formulário.
