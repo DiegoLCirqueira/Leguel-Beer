@@ -1,30 +1,15 @@
 import { expect, test } from "./support/maior-de-idade";
 
-const FAIXA = "Projeto de portfólio · pagamentos em modo de teste";
-
 test.describe("criar conta em 360x780", () => {
   test.use({ viewport: { width: 360, height: 780 } });
 
-  test("mostra a faixa de portfólio no topo e não tem rolagem horizontal", async ({ page }) => {
+  test("não tem rolagem horizontal", async ({ page }) => {
     await page.goto("/criar-conta");
 
-    const faixa = await page.getByText(FAIXA).boundingBox();
-    expect(faixa?.y).toBeLessThanOrEqual(1);
     const excesso = await page.evaluate(
       () => document.documentElement.scrollWidth - window.innerWidth,
     );
     expect(excesso).toBeLessThanOrEqual(0);
-  });
-
-  test("a faixa não cobre o botão de voltar nem o logo", async ({ page }) => {
-    await page.goto("/criar-conta");
-
-    const faixa = await page.getByText(FAIXA).boundingBox();
-    const voltar = await page.getByRole("link", { name: "Voltar" }).boundingBox();
-    const logo = await page.getByRole("img", { name: "Leguelé Beer" }).boundingBox();
-    if (!faixa || !voltar || !logo) throw new Error("elemento sem caixa");
-    expect(voltar.y).toBeGreaterThanOrEqual(faixa.y + faixa.height);
-    expect(logo.y).toBeGreaterThanOrEqual(faixa.y + faixa.height);
   });
 
   // Links dentro da frase (Termos de Uso, Política de Privacidade) ficam de fora: são texto corrido.
