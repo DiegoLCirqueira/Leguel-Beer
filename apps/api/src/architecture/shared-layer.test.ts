@@ -31,6 +31,8 @@ describe("regra do pacote compartilhado: sem Node nem framework", () => {
     writeFileSync(join(sharedDir, "puro.ts"), "export const valor = 1;\n");
     // Teste do pacote pode importar Node: a regra vale só para o código que vai ao navegador.
     writeFileSync(join(sharedDir, "usa-node.test.ts"), 'import "node:fs";\n');
+    // Só o sufixo ".test.ts" isenta: um nome parecido não pode escapar da regra.
+    writeFileSync(join(sharedDir, "contest.ts"), 'import "node:fs";\n');
   });
 
   afterAll(() => {
