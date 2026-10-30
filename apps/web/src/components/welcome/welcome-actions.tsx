@@ -3,7 +3,7 @@
 import { ArrowRight, Check, Info, Link as LinkIcon, UserPlus, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
-import { ART, CONTROLS, OR_ROW, cq, pctH, pctW, pctX, pctY, rectStyle } from "@/lib/arte-login";
+import { ART, CONTROLS, OR_ROW, cq, fl, pctH, pctW, pctX, pctY, rectStyle } from "@/lib/arte-login";
 import { markGuest } from "@/lib/guest";
 import { cn } from "@/lib/utils";
 
@@ -55,7 +55,7 @@ export function WelcomeActions() {
         href={`/entrar?manter-conectado=${keepConnected ? 1 : 0}`}
         style={{
           ...rectStyle(CONTROLS.enter),
-          fontSize: cq(26.1),
+          fontSize: fl(14, 26.1),
           gap: cq(21.7),
           paddingLeft: cq(256.3),
         }}
@@ -65,12 +65,16 @@ export function WelcomeActions() {
           "justify-start bg-arte-botao font-bold text-arte-tinta hover:brightness-105",
         )}
       >
-        <UserRound aria-hidden="true" strokeWidth={1.6} style={{ width: cq(52), height: cq(52) }} />
+        <UserRound
+          aria-hidden="true"
+          strokeWidth={1.6}
+          style={{ width: fl(20, 52), height: fl(20, 52) }}
+        />
         Entrar
         <ArrowRight
           aria-hidden="true"
           strokeWidth={1.8}
-          style={{ width: cq(51), height: cq(51), right: cq(36) }}
+          style={{ width: fl(20, 51), height: fl(20, 51), right: cq(36) }}
           className="absolute top-1/2 -translate-y-1/2"
         />
       </Link>
@@ -78,7 +82,7 @@ export function WelcomeActions() {
         href="/criar-conta"
         style={{
           ...rectStyle(CONTROLS.signUp),
-          fontSize: cq(24.1),
+          fontSize: fl(14, 24.1),
           gap: cq(23.1),
           paddingLeft: cq(233.4),
           borderWidth: cq(2.5),
@@ -92,7 +96,7 @@ export function WelcomeActions() {
         <UserPlus
           aria-hidden="true"
           strokeWidth={1.6}
-          style={{ width: cq(49), height: cq(49) }}
+          style={{ width: fl(20, 49), height: fl(20, 49) }}
           className="text-arte-botao"
         />
         Criar conta
@@ -102,7 +106,7 @@ export function WelcomeActions() {
           left: pctX(OR_ROW.left.x),
           width: pctW(OR_ROW_WIDTH),
           top: pctY(OR_ROW.centerY),
-          fontSize: cq(21.9),
+          fontSize: fl(12, 21.9),
         }}
         className="absolute flex -translate-y-1/2 items-center justify-between font-controles text-arte-texto/80"
       >
@@ -123,36 +127,44 @@ export function WelcomeActions() {
         onClick={markGuest}
         style={{
           ...rectStyle(CONTROLS.guest),
-          fontSize: cq(19.3),
+          left: pctX(CONTROLS.guest.x + CONTROLS.guest.w / 2),
+          transform: "translateX(-50%)",
+          minWidth: "max-content",
+          paddingInline: cq(24),
+          fontSize: fl(12, 19.3),
           gap: cq(18.7),
-          paddingLeft: cq(72.8),
           borderWidth: cq(1.5),
         }}
         className={cn(
           CONTROL_BASE,
           TOUCH_AREA,
-          "justify-start whitespace-nowrap border-arte-borda bg-arte-vidro/80 text-arte-texto hover:border-arte-botao",
+          "whitespace-nowrap border-arte-borda bg-arte-vidro/80 text-arte-texto hover:border-arte-botao",
         )}
       >
-        <LinkIcon aria-hidden="true" strokeWidth={1.6} style={{ width: cq(34), height: cq(34) }} />
+        <LinkIcon
+          aria-hidden="true"
+          strokeWidth={1.6}
+          style={{ width: fl(18, 34), height: fl(18, 34) }}
+        />
         Continuar como convidado
       </Link>
       <div
         style={{
-          left: pctX(CONTROLS.checkbox.x),
+          left: pctX(430.5),
           top: pctY(CONTROLS.checkbox.y),
           height: pctH(CONTROLS.checkbox.h),
-          fontSize: cq(17.4),
+          transform: "translateX(-50%)",
+          fontSize: fl(12, 17.4),
           gap: cq(11),
         }}
         className="absolute flex items-center font-controles text-arte-texto"
       >
         <label
           style={{ gap: cq(17) }}
-          className="relative flex cursor-pointer items-center whitespace-nowrap before:absolute before:inset-x-0 before:-bottom-[28px] before:-top-[5px] before:content-['']"
+          className="relative flex cursor-pointer items-center whitespace-nowrap before:absolute before:inset-x-0 before:-bottom-[26px] before:-top-[2px] before:content-['']"
         >
           <span
-            style={{ width: cq(CONTROLS.checkbox.w), height: cq(CONTROLS.checkbox.h) }}
+            style={{ width: fl(16, CONTROLS.checkbox.w), height: fl(16, CONTROLS.checkbox.h) }}
             className="relative block shrink-0"
           >
             <input
@@ -177,8 +189,8 @@ export function WelcomeActions() {
           aria-expanded={showHint}
           aria-controls={hintId}
           onClick={() => setShowHint((shown) => !shown)}
-          style={{ width: cq(22), height: cq(22) }}
-          className="relative flex items-center justify-center rounded-full text-arte-texto/75 transition-colors before:absolute before:-inset-[max(0px,calc((44px_-_100%)/2))] before:content-[''] hover:text-arte-texto focus-visible:outline-2 focus-visible:outline-arte-botao"
+          style={{ width: fl(16, 22), height: fl(16, 22) }}
+          className="relative flex items-center justify-center rounded-full text-arte-texto/75 transition-colors before:absolute before:-inset-[max(0px,calc((46px_-_100%)/2))] before:content-[''] hover:text-arte-texto focus-visible:outline-2 focus-visible:outline-arte-botao"
         >
           <Info aria-hidden="true" className="size-full" />
         </button>

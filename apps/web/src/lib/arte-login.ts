@@ -25,6 +25,9 @@ export const pctH = (h: number) => `${((h / ART.height) * 100).toFixed(3)}%`;
 // Unidade proporcional à largura do palco (container query): escala fontes e ícones com a arte.
 export const cq = (px: number) => `${((px / ART.width) * 100).toFixed(3)}cqw`;
 
+// Fonte/ícone com piso legível: nunca menor que minPx, cresce com a arte.
+export const fl = (minPx: number, px: number) => `max(${minPx}px, ${cq(px)})`;
+
 export function rectStyle(rect: ArtRect) {
   return { left: pctX(rect.x), top: pctY(rect.y), width: pctW(rect.w), height: pctH(rect.h) };
 }
