@@ -116,7 +116,10 @@ for (const { width, height } of [
 
     await page.getByRole("checkbox", { name: "Manter-me conectado" }).uncheck();
     await expect(page.getByRole("checkbox", { name: "Manter-me conectado" })).not.toBeChecked();
+    await expect(hintText).toBeHidden();
 
+    await info.click();
+    await expect(hintText).toBeVisible();
     await info.click();
     await expect(hintText).toBeHidden();
   });
