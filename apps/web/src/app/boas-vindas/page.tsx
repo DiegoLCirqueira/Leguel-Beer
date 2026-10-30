@@ -86,8 +86,16 @@ export default function BoasVindas() {
         </h1>
         <p className="mt-[1.5dvh] -rotate-6 text-balance text-center font-titulo text-[clamp(1.1rem,3.2dvh,1.5rem)] leading-tight text-texto">
           Cervejas artesanais{" "}
-          <span className="block underline decoration-primaria decoration-2 underline-offset-4">
+          <span className="relative mx-auto block w-fit">
             e <span className="text-primaria">muito mais!</span>
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 160 12"
+              preserveAspectRatio="none"
+              className="absolute inset-x-0 -bottom-1 h-2 w-full fill-primaria"
+            >
+              <path d="M1 7 Q80 2 159 1 Q80 8 1 11 Z" />
+            </svg>
           </span>
         </p>
         <div className="mt-[1dvh] flex min-h-0 w-full flex-1 justify-center">
