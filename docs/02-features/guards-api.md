@@ -118,6 +118,7 @@ Decisões pequenas e fáceis de reverter, pela política de autonomia. Qualquer 
 - **Conta sem papel registrado é cliente;** só o admin é gravado.
 - **Cenários com rotas genéricas,** já que as rotas do card (pedidos, endereços, admin de cervejas) ainda não existem.
 - **"Não encontrada" em `/admin`** para quem não é admin, como no card.
+- **O seed de desenvolvimento também cria a conta admin** no Supabase Auth local, com a senha de `ADMIN_SEED_PASSWORD` (só local, nunca em commit, PR, log ou nota). O seed recusa rodar se `SUPABASE_URL` ou `DATABASE_URL` não forem locais (`localhost`, `127.0.0.1`) e só promove a admin uma conta com e-mail confirmado; conta não confirmada com o `ADMIN_EMAIL` é recusada, contra pré-sequestro.
 
 ## Tickets propostos
 
