@@ -9,15 +9,18 @@ import { JwksTokenVerifier } from "./infrastructure/jwks-token-verifier.js";
 import { PrismaProfileRepository } from "./infrastructure/prisma-profile-repository.js";
 import { AccessGuard } from "./presentation/access.guard.js";
 
-function jwksUrl(): string {
+function authUrl(): string {
   const base = process.env["SUPABASE_URL"];
   if (!base) throw new Error("Variável de ambiente SUPABASE_URL não definida");
-  return `${base.replace(/\/$/, "")}/auth/v1/.well-known/jwks.json`;
+  return `${base.replace(/\/$/, "")}/auth/v1`;
 }
 
 @Module({
   providers: [
-    { provide: TOKEN_VERIFIER, useFactory: () => new JwksTokenVerifier(jwksUrl()) },
+    {
+      provide: TOKEN_VERIFIER,
+      useFactory: () => new JwksTokenVerifier(`${authUrl()}/.well-known/jwks.json`, authUrl()),
+    },
     {
       provide: PROFILE_REPOSITORY,
       useFactory: (prisma: PrismaService) => new PrismaProfileRepository(prisma),

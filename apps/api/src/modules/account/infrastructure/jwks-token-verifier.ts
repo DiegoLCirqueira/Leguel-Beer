@@ -24,6 +24,8 @@ interface Claims {
   exp?: unknown;
   nbf?: unknown;
   role?: unknown;
+  iss?: unknown;
+  aud?: unknown;
 }
 
 const isObject = (value: unknown): boolean =>
@@ -47,6 +49,7 @@ export class JwksTokenVerifier implements TokenVerifier {
 
   constructor(
     private readonly jwksUrl: string,
+    private readonly issuer: string,
     private readonly fetchFn: typeof fetch = fetch,
     private readonly now: () => number = Date.now,
   ) {}
@@ -86,6 +89,8 @@ export class JwksTokenVerifier implements TokenVerifier {
       throw new InvalidTokenError("expirado");
     if (typeof claims.nbf === "number" && claims.nbf > nowSeconds)
       throw new InvalidTokenError("ainda não válido");
+    if (claims.iss !== this.issuer || claims.aud !== "authenticated")
+      throw new InvalidTokenError("emissor ou audiência");
     if (claims.role !== "authenticated" || typeof claims.sub !== "string")
       throw new InvalidTokenError("não é de uma conta autenticada");
 
