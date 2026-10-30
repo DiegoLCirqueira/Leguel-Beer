@@ -7,10 +7,14 @@ describe("Boas-vindas", () => {
     render(<BoasVindas />);
 
     expect(screen.getByRole("heading", { level: 1, name: "Leguelé Beer" })).toBeInTheDocument();
-    expect(screen.getByText("Cervejas artesanais e muito mais!")).toBeInTheDocument();
+    expect(screen.getByText(/^Cervejas artesanais e/)).toHaveTextContent(
+      "Cervejas artesanais e muito mais!",
+    );
     expect(screen.getByText("Sabor Qualidade Tradição")).toBeInTheDocument();
     expect(
-      screen.getByRole("img", { name: "Garrafa de IPA Leguelé Beer ao lado de um copo cheio, entre folhas de lúpulo" }),
+      screen.getByRole("img", {
+        name: "Garrafa de IPA Leguelé Beer ao lado de um copo cheio, entre folhas de lúpulo",
+      }),
     ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Entrar" })).toBeInTheDocument();
   });
