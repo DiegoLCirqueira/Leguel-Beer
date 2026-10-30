@@ -1,8 +1,9 @@
-import { Controller, Get, type INestApplication } from "@nestjs/common";
+import { Controller, Get, Param, type INestApplication } from "@nestjs/common";
 import { APP_FILTER } from "@nestjs/core";
 import { Test } from "@nestjs/testing";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { ownedOrNotFound } from "../../../common/authorization/owned-or-not-found.js";
 import { CommonModule } from "../../../common/common.module.js";
 import { AllExceptionsFilter } from "../../../common/http/all-exceptions.filter.js";
 import { createTestTokens } from "../../../common/testing/tokens.js";
@@ -12,8 +13,18 @@ import { AccountModule } from "../account.module.js";
 import { PROFILE_REPOSITORY, TOKEN_VERIFIER } from "../account.tokens.js";
 import { CurrentUser, Public, Roles } from "./access.decorators.js";
 
+const coisas = [{ id: "coisa-do-bruno", ownerId: "bruno" }];
+
 @Controller()
 class RoutesController {
+  @Get("me/coisas/:id")
+  coisa(@Param("id") id: string, @CurrentUser() user: { id: string }) {
+    return ownedOrNotFound(
+      coisas.find((c) => c.id === id),
+      user.id,
+    );
+  }
+
   @Get("me/profile")
   customerRoute(@CurrentUser() user: { id: string; role: string }) {
     return { id: user.id, role: user.role };
@@ -98,5 +109,15 @@ describe("proteção das rotas por token e papel", () => {
     const response = await get("/aberta");
 
     expect(response.status).toBe(200);
+  });
+
+  it("o recurso de outro cliente responde 404 NOT_FOUND, igual ao de um id que não existe", async () => {
+    const doBruno = await get("/me/coisas/coisa-do-bruno", tokens.customer());
+    const inexistente = await get("/me/coisas/nao-existe", tokens.customer());
+
+    expect(doBruno.status).toBe(404);
+    expect(doBruno.body).toMatchObject({ code: "NOT_FOUND" });
+    expect(doBruno.body).toEqual(inexistente.body);
+    expect(inexistente.status).toBe(404);
   });
 });
