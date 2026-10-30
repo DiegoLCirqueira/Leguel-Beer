@@ -31,9 +31,9 @@ Funcionalidade: Tela de boas-vindas
   Cenário: Tela inicial como no Figma
     Dado que confirmei a maioridade e não entrei numa conta
     Quando abro o site num celular de 360 px de largura
-    Então vejo o logo e o slogan "Sabor Qualidade e Tradição"
-    E não vejo "Cervejas artesanais e muito mais!"
-    E não vejo o texto lateral "Sabor Qualidade Tradição"
+    Então vejo o logo e o slogan "Cervejas artesanais"
+    E não vejo "e muito mais!"
+    E não vejo "Sabor Qualidade e Tradição" nem o texto lateral "Sabor Qualidade Tradição"
     E vejo os botões "Entrar", "Criar conta" e "Continuar como convidado"
     E vejo "Manter-me conectado" marcado
     E a página não tem rolagem horizontal
@@ -85,10 +85,9 @@ Funcionalidade: Tela de boas-vindas
 - **Convidado:** a escolha vale até o navegador ser fechado. O convidado navega e monta a Geladeira, mas só finaliza a compra entrando numa conta ([[GLOSSARY]], [[adicionar-do-card]]).
 - **"Manter-me conectado":** começa marcado (como no Figma) e é levado para a tela de entrar. O efeito na sessão está em [[cadastro-login]].
 - **Textos do Figma** (decisão do Diego já tomada): "Entrar", "Criar conta", "ou", "Continuar como convidado", "Manter-me conectado".
-- **Slogan:** "Sabor Qualidade e Tradição", exatamente assim, no lugar de "Cervejas artesanais e muito mais!" do Figma (decisão do Diego, 2026-10-30). Fica na mesma posição e segue o estilo de pincel do texto original na arte; o Front recria o texto nesse estilo.
-  - **Alternativa autorizada:** se o resultado não ficar fiel à arte, a tela volta à arte original do Figma, com "Cervejas artesanais e muito mais!". O Diego escolhe entre as duas depois de ver o resultado; se escolher a alternativa, o cenário "Tela inicial como no Figma" volta a esperar esse texto.
+- **Slogan:** "Cervejas artesanais", da arte original do Figma, sem a linha "e muito mais!" (decisão final do Diego, 2026-10-30). Fica na posição e no estilo de pincel da arte original. "Sabor Qualidade e Tradição" não aparece na tela; as tentativas anteriores ficam só como histórico, em "Decisões do Diego".
 - **Sem rolagem:** a boas-vindas cabe inteira na tela do celular e não rola (decisão do Diego, 2026-10-30). Por isso não mostra o rodapé de [[termos-privacidade]], como a pergunta de maioridade. Os links legais continuam nas outras páginas e no cadastro ([[cadastro-login]]).
-- **Sem o texto lateral "Sabor Qualidade Tradição":** o texto lateral do Figma sai da tela (decisão do Diego, 2026-10-30, #136). Não é contradição com o slogan: as palavras voltam só como slogan, no lugar de "Cervejas artesanais e muito mais!", e não na lateral.
+- **Sem o texto lateral "Sabor Qualidade Tradição":** o texto lateral do Figma sai da tela (decisão do Diego, 2026-10-30, #136). Com o slogan final "Cervejas artesanais", essas palavras não aparecem em lugar nenhum da tela.
 - **Imagens:** logo, garrafa com copo, barril e folhagem de `Imagens/`, otimizadas para celular. A imagem principal tem texto alternativo.
 - **Componentes:** "Entrar" é o botão primário com ícone e seta; "Criar conta", o botão de contorno; "Continuar como convidado", o botão discreto ([[identidade-visual]]).
 
@@ -126,8 +125,9 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 ### Decisões do Diego (2026-10-30)
 
 - **"Sabor Qualidade Tradição":** o texto lateral foi retirado da tela de boas-vindas, embora apareça no Figma (#136).
-- **Slogan:** "mude o "Cervejas artesanais e muito mais" por "Sabor Qualidade e Tradição"". O slogan da tela passa a ser "Sabor Qualidade e Tradição", na posição e no estilo do slogan original da arte. Retoma as palavras do texto lateral retirado, agora como slogan.
-- **Estilo do slogan:** "melhorar a fonte que ficou escrito 'Sabor Qualidad e Tradição' (ficou péssimo) pode deixar igual na imagem do figma se ficar mais fácil". Duas possibilidades, com a escolha final depois que o Diego vir o resultado: (1) "Sabor Qualidade e Tradição" recriado no estilo de pincel da arte original; (2) se não ficar fiel, voltar à arte original do Figma, com "Cervejas artesanais e muito mais!".
+- **Slogan (histórico, substituído pela decisão final abaixo):** "mude o "Cervejas artesanais e muito mais" por "Sabor Qualidade e Tradição"". O slogan da tela passa a ser "Sabor Qualidade e Tradição", na posição e no estilo do slogan original da arte. Retoma as palavras do texto lateral retirado, agora como slogan.
+- **Estilo do slogan (histórico, substituído pela decisão final abaixo):** "melhorar a fonte que ficou escrito 'Sabor Qualidad e Tradição' (ficou péssimo) pode deixar igual na imagem do figma se ficar mais fácil". Duas possibilidades, com a escolha final depois que o Diego vir o resultado: (1) "Sabor Qualidade e Tradição" recriado no estilo de pincel da arte original; (2) se não ficar fiel, voltar à arte original do Figma, com "Cervejas artesanais e muito mais!".
+- **Slogan, decisão final:** 'deixe só "Cervejas artesanais"'. O slogan é "Cervejas artesanais", da arte original do Figma sem a linha "e muito mais!". As duas possibilidades acima ("Sabor Qualidade e Tradição" recriado e a arte original completa) ficam só como histórico.
 - **Sem rolagem:** "Retirar rolagem da página principal". A boas-vindas não rola e fica sem o rodapé.
 
 ## Decisões tomadas sem consulta
