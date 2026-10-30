@@ -52,4 +52,15 @@ describe("PrismaProfileRepository (banco real)", () => {
 
     expect(profile.role).toBe("CUSTOMER");
   });
+
+  it("falha com erro claro quando outro perfil já usa o e-mail com outro id", async () => {
+    const oldId = newId();
+    const email = `${oldId}@leguele.test`;
+    await prisma.profile.create({ data: { id: oldId, email } });
+
+    const attempt = repository.ensureRole({ id: newId(), email }, "admin");
+
+    await expect(attempt).rejects.toThrow(/outro id/);
+    await expect(attempt).rejects.not.toThrow(/P2002|Unique constraint/);
+  });
 });
