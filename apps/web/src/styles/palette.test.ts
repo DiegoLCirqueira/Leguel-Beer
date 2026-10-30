@@ -12,7 +12,8 @@ async function build(candidates: string[]): Promise<string> {
   const compiler = await compile(readFileSync(resolve(base, "globals.css"), "utf8"), {
     base,
     loadStylesheet: async (id, from) => {
-      const path = id === "tailwindcss" ? require.resolve("tailwindcss/index.css") : resolve(from, id);
+      const path =
+        id === "tailwindcss" ? require.resolve("tailwindcss/index.css") : resolve(from, id);
       return { path, base: dirname(path), content: readFileSync(path, "utf8") };
     },
   });
