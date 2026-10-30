@@ -70,17 +70,24 @@ Funcionalidade: Cadastro e login com e-mail e senha
       | marcado    | continuo na conta               |
       | desmarcado | preciso entrar de novo          |
 
-  Cenário: Senha errada não revela qual dado está errado
-    Dado uma conta confirmada com o e-mail "ana@exemplo.com"
-    Quando tento entrar com esse e-mail e uma senha errada
-    Então vejo "E-mail ou senha inválidos"
-    E ao tentar com um e-mail sem conta vejo a mesma mensagem
-
-  Cenário: E-mail ainda não confirmado
-    Dado uma conta criada com o e-mail "ana@exemplo.com" e ainda não confirmada
-    Quando tento entrar com o e-mail e a senha corretos
+  Esquema do Cenário: Entrar sem sucesso não revela qual dado está errado
+    Dado <conta>
+    Quando tento entrar com o e-mail "ana@exemplo.com" e <senha>
     Então não entro na conta
-    E vejo o aviso de que preciso confirmar o e-mail, com a ação de reenviar o link
+    E vejo <aviso>
+
+    Exemplos:
+      | conta                                                | senha            | aviso                                                              |
+      | uma conta confirmada com o e-mail "ana@exemplo.com"  | uma senha errada | "E-mail ou senha inválidos"                                        |
+      | nenhuma conta com o e-mail "ana@exemplo.com"         | qualquer senha   | "E-mail ou senha inválidos"                                        |
+      | uma conta com "ana@exemplo.com" ainda não confirmada | a senha correta  | "Confirme seu e-mail para entrar. Não recebeu?" e "Reenviar link" |
+
+  Cenário: Sair da conta
+    Dado que entrei na conta com "Manter-me conectado" marcado
+    Quando toco em "Sair"
+    Então vou para a tela de boas-vindas
+    E ao abrir /conta sou levado à tela de entrar
+    E a sessão encerrada não pode mais ser renovada
 ```
 
 ## Regras de negócio
@@ -93,19 +100,42 @@ Funcionalidade: Cadastro e login com e-mail e senha
 - **Telefone:** brasileiro, com DDD, 10 ou 11 dígitos, com a máscara "(00) 00000-0000" do Figma.
 - **Senha:** de 8 a 72 caracteres, sem exigência de tipos de caractere. O olho mostra e esconde a senha.
 - **Confirmação por e-mail:** obrigatória. Sem confirmar, a conta não entra.
-- **Perfil:** no primeiro acesso autenticado, a API cria o perfil do cliente com nome e telefone do cadastro. Criar o perfil é idempotente: repetir o pedido não cria outro nem muda o que existe.
+- **Perfil:** no primeiro acesso autenticado (depois de confirmar o e-mail), o site envia à API o nome, o telefone e o aceite dos termos guardados no cadastro, e a API cria o perfil do cliente. Criar o perfil é idempotente: repetir o pedido não cria outro nem muda o que existe.
+  - **A API não confia nesses dados:** valida nome, telefone e aceite com o mesmo schema compartilhado do formulário ([[contratos-compartilhados]]) e responde 400 `VALIDATION_ERROR` se forem inválidos. O e-mail e o id da conta vêm do token, nunca do corpo.
+  - **Aceite registrado no servidor:** o perfil grava a data e a hora do aceite (pelo relógio da API) e as versões dos Termos de Uso e da Política de Privacidade em vigor, que são as datas de "Última atualização" de [[termos-privacidade]]. A versão vem da API, não do site.
+  - **Admin:** se o e-mail confirmado da conta for o de `ADMIN_EMAIL`, a criação do perfil também grava o papel admin ([[guards-api]]).
 - **Textos do Figma** (decisão do Diego já tomada): "Criar sua conta", "Faça parte do nosso clube e viva experiências exclusivas!", os rótulos e placeholders dos campos ("Digite seu nome completo", "Digite seu e-mail", "(00) 00000-0000", "Digite sua senha", "Confirme sua senha"), "Eu aceito os Termos de Uso e a Política de Privacidade", "Criar conta", "Já tem uma conta?" e "Entrar".
 - **Texto do card:** "Este e-mail já tem conta. Entrar?". Isso revela que o e-mail tem conta; o card aceita esse risco no cadastro, e o login continua sem revelar.
-
 - **Termos de Uso e Política de Privacidade:** os links abrem `/termos` e `/privacidade` ([[termos-privacidade]]). O LB-22 entrou no MVP, na fase 1 do acesso, antes deste card (decisão do Diego, 2026-10-29).
 
 ### Entrar (`/entrar`)
 
 - Campos E-mail e Senha, "Manter-me conectado", "Esqueci minha senha" (leva à [[recuperacao-senha]]), botão "Entrar" e o link "Criar conta". Mesmo visual de "Criar sua conta" ([[identidade-visual]]).
 - **"Manter-me conectado":** começa com o valor vindo da [[boas-vindas]], ou marcado quando a pessoa chega por outro caminho. Marcado: a sessão continua depois de fechar o navegador, por até 30 dias sem uso. Desmarcado: a sessão acaba ao fechar o navegador.
+- **"30 dias sem uso" no site:** com a opção marcada, os cookies de sessão têm validade de 30 dias, renovada a cada requisição ao site; depois de 30 dias sem abrir o site, o navegador descarta os cookies e a pessoa entra de novo. Com a opção desmarcada, os cookies não têm validade e somem ao fechar o navegador. O tempo de inatividade nativo do Supabase Auth exige o plano Pro (ver "Em aberto").
 - **Depois de entrar:** volta à página de onde a pessoa veio (só endereços do próprio site), ou à home.
 - **Erro de credencial:** sempre "E-mail ou senha inválidos", exista ou não a conta.
-- **Tentativas:** os limites de tentativa do Supabase Auth ficam ligados, na configuração versionada do Supabase local.
+- **Sair:** o botão "Sair" fica no fim da tela de perfil e, até ela existir, no menu da conta. Encerra a sessão deste aparelho no Supabase Auth (a renovação deixa de funcionar), apaga os cookies e leva à [[boas-vindas]]. O token de acesso já emitido continua aceito pela API até vencer, no máximo 1 hora (risco aceito, igual ao de [[recuperacao-senha]]).
+
+### Sessão e cookies
+
+- **Onde fica o token:** só em cookies do site, nunca em `localStorage` nem em variável acessível ao JavaScript da página.
+- **Atributos dos cookies de sessão:** `HttpOnly`, `Secure` (menos em `http://localhost` no desenvolvimento), `SameSite=Lax` e `Path=/`.
+- **Consequência:** como o navegador não lê o token, o login, a renovação e as chamadas autenticadas à API saem do lado servidor do site (Server Components, Server Actions ou rotas do Next), que repassa o token à API em `Authorization: Bearer` ([[contratos-compartilhados]]).
+- **Validade do token de acesso:** 1 hora (padrão do Supabase Auth). A renovação usa o refresh token, que só pode ser usado uma vez.
+
+### Limites de tentativa
+
+Fonte única dos limites das rotas de acesso. Ficam na configuração versionada do Supabase local e precisam ser replicados no Supabase da nuvem no LB-8 (#17), como registra o [[roteiro-mvp]].
+
+| Ação | Limite |
+| --- | --- |
+| Entrar e criar conta | 30 tentativas a cada 5 minutos por IP |
+| Verificação de links (confirmação e recuperação) | 30 a cada 5 minutos por IP |
+| Envio de e-mails (confirmação, reenvio e recuperação) | 1 por minuto para o mesmo e-mail e 30 por hora no total |
+| Renovação de sessão | 150 a cada 5 minutos por IP |
+
+A API ([[api-base]]) não recebe login nem cadastro: o limite global dela (100 requisições por minuto por IP) vale para as outras rotas.
 
 ### E-mails
 
@@ -131,6 +161,13 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 | Falha de rede ou erro inesperado * | "Não foi possível concluir agora. Tente de novo em instantes." |
 | Senha visível ou escondida (leitor de tela) * | "Mostrar senha" e "Esconder senha" |
 
+## Em aberto
+
+> [!todo] Preencher: pergunta ao Diego sobre os "30 dias sem uso". O tempo de inatividade e o prazo máximo de sessão nativos do Supabase Auth só existem no plano Pro. A spec segue a opção A até a resposta.
+> - **A (recomendada, gratuita):** os 30 dias ficam no site, pela validade dos cookies renovada a cada uso. Limitação: o refresh token não vence no Supabase; um cookie copiado antes dos 30 dias continuaria valendo até a sessão ser renovada ou encerrada.
+> - **B (paga):** plano Pro do Supabase (cerca de US$ 25 por mês), com o tempo de inatividade de 30 dias no próprio Supabase Auth. Sai dos planos gratuitos.
+> - **C (gratuita, mais simples):** "Manter-me conectado" sem prazo: a sessão dura até a pessoa sair; desmarcado, acaba ao fechar o navegador.
+
 ## Seams de teste
 
 > [!info] Proposta, ainda não combinada com o Diego
@@ -139,6 +176,8 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 - **Schemas de cadastro e de entrar:** testes unitários em `packages/shared` (senha, e-mail, telefone, confirmação, aceite).
 - **Criar perfil idempotente:** caso de uso testado com repositório em memória; rota testada com Supertest e banco real (primeira chamada cria, a segunda não duplica).
 - **Formulários:** testes de componente com as mensagens de erro.
+- **Perfil com dados adulterados:** Supertest com nome ou telefone inválidos no corpo (400) e conferência de que a data e as versões do aceite vêm da API.
+- **Cookies:** teste unitário da função que monta as opções de cookie (com e sem "Manter-me conectado") e E2E conferindo `HttpOnly`, `SameSite` e a validade.
 - **Cenários desta spec:** E2E com o Supabase local, lendo o e-mail de confirmação no visualizador de e-mails.
 
 ## Fora de escopo
@@ -147,7 +186,6 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 - Recuperação de senha ([[recuperacao-senha]]).
 - Proteção das rotas da API e do site ([[guards-api]]).
 - Edição de perfil com nascimento e CPF (LB-29, #44).
-- Sair da conta: a ação "Sair" fica na tela de perfil, que vem depois no [[roteiro-mvp]].
 - Envio real de e-mails por um provedor (SMTP) e projeto Supabase na nuvem: LB-8 (#17). Criar conta num provedor de e-mail é decisão do Diego.
 - 2FA.
 
@@ -171,7 +209,10 @@ Decisões pequenas e fáceis de reverter, pela política de autonomia. Qualquer 
 - **Todos os campos do Figma obrigatórios,** porque nenhum está marcado como opcional.
 - **Senha de 8 a 72 caracteres,** sem regra de tipos de caractere (recomendação atual de segurança; 72 é o limite do hash do Supabase Auth).
 - **Telefone com 10 ou 11 dígitos,** com DDD.
-- **"Manter-me conectado":** até 30 dias sem uso quando marcado; termina ao fechar o navegador quando desmarcado.
+- **"Manter-me conectado":** até 30 dias sem uso quando marcado; termina ao fechar o navegador quando desmarcado. A forma de contar os 30 dias está em "Em aberto".
+- **Cookies `HttpOnly`** e chamadas autenticadas pelo lado servidor do site. A documentação do Supabase diz que `HttpOnly` não é necessário porque o cliente do navegador precisa ler o token; aqui o cliente do navegador não é usado, e o token fica fora do alcance de scripts injetados na página.
+- **Limites de tentativa:** os valores da tabela, próximos dos padrões do Supabase Auth.
+- **"Sair" na fase 1,** pedido pelo Reviewer, com o token de acesso valendo até 1 hora depois.
 - **Tela de entrar no visual de "Criar sua conta",** já que o Figma não tem essa tela.
 - **Conta sem confirmação não entra** (o card pede confirmação por e-mail).
 
@@ -179,5 +220,5 @@ Decisões pequenas e fáceis de reverter, pela política de autonomia. Qualquer 
 
 | Issue | Ajuste proposto | Motivo |
 | --- | --- | --- |
-| #40 LB-25 | Link para esta spec; critérios: os 6 cenários; campos do Figma (inclui telefone e aceite dos termos); senha de 8 a 72; "Manter-me conectado" com 30 dias; e-mails no Supabase local; envio real (Resend) movido para #17 | O card não tem telefone, aceite dos termos nem regras de senha, e cita o Resend, que depende de conta nova |
-| #17 LB-8 | Acrescentar: configurar o envio de e-mails do Supabase Auth na nuvem (provedor a decidir pelo Diego) | Saiu do LB-25 |
+| #40 LB-25 | Link para esta spec; critérios: os 6 cenários; campos do Figma (inclui telefone e aceite dos termos); senha de 8 a 72; "Manter-me conectado" com 30 dias; cookies `HttpOnly`; aceite gravado pela API; "Sair"; e-mails no Supabase local; envio real (Resend) movido para #17 | O card não tem telefone, aceite dos termos nem regras de senha, e cita o Resend, que depende de conta nova |
+| #17 LB-8 | Acrescentar: configurar o envio de e-mails do Supabase Auth na nuvem (provedor a decidir pelo Diego) e replicar a tabela "Limites de tentativa" | Saiu do LB-25 |
