@@ -45,4 +45,28 @@ describe("createTestTokens", () => {
     expect(tokens.adminId).not.toBe(tokens.customerId);
     expect(signatureIsValid(tokens.admin(), tokens.jwks)).toBe(true);
   });
+
+  it("gera um token expirado, com assinatura válida", () => {
+    const tokens = createTestTokens();
+
+    const { payload } = decode(tokens.expired());
+
+    expect(Number(payload["exp"])).toBeLessThan(Date.now() / 1000);
+    expect(signatureIsValid(tokens.expired(), tokens.jwks)).toBe(true);
+  });
+
+  it("gera um token adulterado, com a assinatura inválida", () => {
+    const tokens = createTestTokens();
+
+    const forged = decode(tokens.tampered());
+
+    expect(forged.payload["sub"]).toBe(tokens.adminId);
+    expect(signatureIsValid(tokens.tampered(), tokens.jwks)).toBe(false);
+  });
+
+  it("gera um token HS256 para o caso de recusa do segredo compartilhado", () => {
+    const tokens = createTestTokens();
+
+    expect(decode(tokens.hs256()).header["alg"]).toBe("HS256");
+  });
 });
