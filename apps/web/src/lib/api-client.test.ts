@@ -129,4 +129,13 @@ describe("createApiClient", () => {
     expect(renovacoes).toBe(1);
     expect(calls).toHaveLength(2);
   });
+
+  it("lança INVALID_RESPONSE quando um 2xx não bate com o schema, sem vazar o erro do Zod", async () => {
+    const { client } = clientWith([{ status: 200, body: { id: "não é uuid" } }]);
+
+    const error = await client.request("/perfil", { schema: perfilResponseSchema }).catch((e) => e);
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect(error).toMatchObject({ status: 200, code: "INVALID_RESPONSE" });
+  });
 });
