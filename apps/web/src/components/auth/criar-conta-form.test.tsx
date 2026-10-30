@@ -151,4 +151,23 @@ describe("CriarContaForm", () => {
     expect(screen.getByText("Já tem uma conta?")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Entrar" })).toHaveAttribute("href", "/entrar");
   });
+
+  it("leva o foco ao primeiro campo com erro ao enviar", async () => {
+    renderizar();
+    await userEvent.type(screen.getByLabelText("Nome completo"), "Ana Souza");
+
+    await userEvent.click(screen.getByRole("button", { name: "Criar conta" }));
+
+    expect(screen.getByLabelText("E-mail")).toHaveFocus();
+  });
+
+  it("dá um nome a cada campo, para o navegador e os gerenciadores de senha", () => {
+    renderizar();
+
+    expect(screen.getByLabelText("Nome completo")).toHaveAttribute("name", "nome");
+    expect(screen.getByLabelText("E-mail")).toHaveAttribute("name", "email");
+    expect(screen.getByLabelText("Telefone")).toHaveAttribute("name", "telefone");
+    expect(screen.getByLabelText("Senha", { exact: true })).toHaveAttribute("name", "senha");
+    expect(screen.getByLabelText("Confirmar senha")).toHaveAttribute("name", "confirmacao");
+  });
 });
