@@ -53,4 +53,13 @@ describe("MaioridadePergunta", () => {
 
     expect(screen.getByRole("heading", { level: 1, name: "Acesso não permitido" })).toHaveFocus();
   });
+
+  it("carrega com prioridade as imagens que aparecem na primeira tela", () => {
+    const { container } = renderizar();
+
+    // Com `priority` o next/image não põe loading="lazy" na imagem.
+    for (const imagem of container.querySelectorAll("img")) {
+      expect(imagem).not.toHaveAttribute("loading", "lazy");
+    }
+  });
 });
