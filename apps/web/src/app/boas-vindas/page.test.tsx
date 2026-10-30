@@ -10,7 +10,7 @@ describe("Boas-vindas", () => {
     expect(screen.getByText(/^Cervejas artesanais/)).toHaveTextContent(
       "Cervejas artesanais e muito mais!",
     );
-    expect(screen.getByText("Sabor Qualidade Tradição")).toBeInTheDocument();
+    expect(screen.queryByText("Sabor Qualidade Tradição")).not.toBeInTheDocument();
     expect(
       screen.getByRole("img", {
         name: "Garrafa de IPA Leguelé Beer ao lado de um copo cheio, entre folhas de lúpulo",

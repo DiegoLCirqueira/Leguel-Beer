@@ -72,3 +72,21 @@ test("Criar conta leva para /criar-conta", async ({ page }) => {
 
   await expect(page).toHaveURL(/\/criar-conta$/);
 });
+
+for (const [width, height] of [
+  [360, 780],
+  [390, 844],
+]) {
+  test(`a boas-vindas cabe em ${width}x${height} sem rolagem`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await page.goto("/boas-vindas");
+
+    const overflow = await page.evaluate(() => ({
+      x: document.documentElement.scrollWidth - window.innerWidth,
+      y: document.documentElement.scrollHeight - window.innerHeight,
+    }));
+
+    expect(overflow.x).toBeLessThanOrEqual(0);
+    expect(overflow.y).toBeLessThanOrEqual(0);
+  });
+}
