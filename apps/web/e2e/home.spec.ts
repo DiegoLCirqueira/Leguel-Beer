@@ -73,9 +73,9 @@ test("Criar conta leva para /criar-conta", async ({ page }) => {
   await expect(page).toHaveURL(/\/criar-conta$/);
 });
 
-for (const [width, height] of [
-  [360, 780],
-  [390, 844],
+for (const { width, height } of [
+  { width: 360, height: 780 },
+  { width: 390, height: 844 },
 ]) {
   test(`a boas-vindas cabe em ${width}x${height} sem rolagem`, async ({ page }) => {
     await page.setViewportSize({ width, height });
