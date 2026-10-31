@@ -35,6 +35,8 @@ describe("CriarContaForm", () => {
     expect(termos).toHaveAttribute("href", "/termos");
     expect(termos).toHaveAttribute("target", "_blank");
     expect(termos).toHaveAttribute("rel", expect.stringContaining("noopener"));
+    // Sem "noreferrer": o referrer diz à página dos termos que a pessoa veio do cadastro.
+    expect(termos.getAttribute("rel")).not.toContain("noreferrer");
     const privacidade = screen.getByRole("link", { name: "Política de Privacidade" });
     expect(privacidade).toHaveAttribute("href", "/privacidade");
     expect(privacidade).toHaveAttribute("target", "_blank");
