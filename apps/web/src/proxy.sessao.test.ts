@@ -154,6 +154,13 @@ describe("proxy: sessão e proteção das páginas", () => {
     expect(getRedirectUrl(resultado)).toBeNull();
   });
 
+  it("em produção sem API_URL o /admin falha de forma visível, em vez de fechar a porta em silêncio", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("API_URL", "");
+
+    await expect(proxy(pedido("/admin", sessaoValida))).rejects.toThrow(/API_URL/);
+  });
+
   it("API fora do ar em /admin fecha a porta: não encontrada", async () => {
     fetchFalso.mockRejectedValue(new TypeError("fora do ar"));
 
