@@ -34,6 +34,9 @@ jobs:
       DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
       TEST_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/leguele_test
       WEB_ORIGIN: http://localhost:3000
+      SITE_URL: http://localhost:3000
+      API_URL: http://localhost:3333
+      ADMIN_EMAIL: admin@ci.leguele.test
       SUPABASE_URL: http://127.0.0.1:54321
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -94,6 +97,30 @@ jobs:
 
       - name: Instalar o Chromium do Playwright
         run: pnpm --filter @leguele/web exec playwright install --with-deps chromium
+
+      # O Supabase CLI sobe só o Auth (gotrue, kong e mailpit) com o Postgres dele; a API do E2E
+      # continua no Postgres do service container, que o db:check acima já deixou migrado.
+      - name: Subir o Supabase local para os E2E de acesso
+        run: |
+          pnpm db:signing-key
+          pnpm db:start -x realtime,storage-api,imgproxy,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+
+      # As chaves são as de desenvolvimento do Supabase CLI, não são segredos.
+      - name: Exportar as chaves do Supabase local
+        run: |
+          status="$(pnpm exec supabase status -o env)"
+          echo "SUPABASE_ANON_KEY=$(echo "$status" | grep '^ANON_KEY=' | cut -d= -f2- | tr -d '"')" >> "$GITHUB_ENV"
+          echo "SUPABASE_EMAILS_URL=$(echo "$status" | grep '^MAILPIT_URL=' | cut -d= -f2- | tr -d '"')" >> "$GITHUB_ENV"
+
+      # Senha gerada neste job, mascarada antes de qualquer uso e nunca impressa. O e-mail é fictício.
+      - name: Criar o admin do E2E com o seed
+        run: |
+          senha="$(openssl rand -hex 16)"
+          echo "::add-mask::$senha"
+          echo "ADMIN_SEED_PASSWORD=$senha" >> "$GITHUB_ENV"
+          status="$(pnpm exec supabase status -o env)"
+          export SUPABASE_SERVICE_ROLE_KEY="$(echo "$status" | grep '^SERVICE_ROLE_KEY=' | cut -d= -f2- | tr -d '"')"
+          ADMIN_SEED_PASSWORD="$senha" pnpm db:seed
 
       - name: E2E
         run: pnpm test:e2e

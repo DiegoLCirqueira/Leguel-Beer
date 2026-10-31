@@ -8,6 +8,7 @@ const apiCommand = process.env.CI
 
 export default defineConfig({
   testDir: "./e2e",
+  testIgnore: "**/support/**",
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",

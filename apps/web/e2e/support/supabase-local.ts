@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { modoSupabase } from "./modo-supabase";
 
 // Lê apps/web/.env.local (fora do git), como o servidor do site; o que já está no ambiente vale mais.
 const arquivo = resolve(process.cwd(), ".env.local");
@@ -20,8 +21,8 @@ export const SUPABASE_URL = process.env.SUPABASE_URL;
 export const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 const EMAILS_URL = process.env.SUPABASE_EMAILS_URL ?? "http://127.0.0.1:54324";
 
-/** Os cenários com o Supabase local só rodam onde ele existe (o CI não tem). */
-export const supabaseDisponivel = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+/** Fora do CI os cenários com o Supabase local pulam sem ele; no CI a falta dele é falha. */
+export const modo = modoSupabase(process.env);
 
 export const emailUnico = (prefixo = "ana") =>
   `${prefixo}.${Date.now()}.${Math.floor(Math.random() * 1e6)}@exemplo.com`;
@@ -84,4 +85,26 @@ export async function criarContaConfirmada(email: string, senha: string) {
     headers: cabecalhos,
     body: JSON.stringify({ type: "signup", token_hash: tokenHash }),
   });
+}
+
+/**
+ * Credenciais da conta admin criada pelo seed de desenvolvimento (ADMIN_EMAIL e ADMIN_SEED_PASSWORD).
+ * Vêm do ambiente ou de apps/api/.env, que fica fora do git; a senha nunca entra em código, log ou nota.
+ */
+export function credenciaisDoAdmin(): { email: string; senha: string } | undefined {
+  const lido: Record<string, string> = {};
+  const arquivo = resolve(process.cwd(), "../api/.env");
+  if (existsSync(arquivo)) {
+    for (const linha of readFileSync(arquivo, "utf8").split("\n")) {
+      const posicao = linha.indexOf("=");
+      if (posicao < 1 || linha.trim().startsWith("#")) continue;
+      lido[linha.slice(0, posicao).trim()] = linha
+        .slice(posicao + 1)
+        .trim()
+        .replace(/^"|"$/g, "");
+    }
+  }
+  const email = process.env.ADMIN_EMAIL ?? lido.ADMIN_EMAIL;
+  const senha = process.env.ADMIN_SEED_PASSWORD ?? lido.ADMIN_SEED_PASSWORD;
+  return email && senha ? { email, senha } : undefined;
 }

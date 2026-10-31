@@ -21,6 +21,9 @@ export interface Sessao {
   user: { id: string; email: string; metadata: Record<string, unknown> };
 }
 
+export type ResultadoRenovacao =
+  { tipo: "ok"; sessao: Sessao } | { tipo: "recusada" } | { tipo: "indisponivel" };
+
 export type ResultadoEntrada =
   | { tipo: "ok"; sessao: Sessao }
   | { tipo: "credenciais" }
@@ -112,14 +115,20 @@ export function createGoTrue(config: GoTrueConfig) {
     }
   }
 
-  async function refresh(refreshToken: string): Promise<Sessao | null> {
+  /**
+   * Renova a sessão. 400 e 401 são a recusa do Supabase (a sessão acabou); qualquer outra falha
+   * (5xx, rede, tempo esgotado) deixa a dúvida: a sessão pode estar boa, só o serviço não respondeu.
+   */
+  async function refresh(refreshToken: string): Promise<ResultadoRenovacao> {
     try {
       const resposta = await chamar("/auth/v1/token?grant_type=refresh_token", {
         refresh_token: refreshToken,
       });
-      return await lerSessaoDaResposta(resposta);
+      if (resposta.status === 400 || resposta.status === 401) return { tipo: "recusada" };
+      const sessao = await lerSessaoDaResposta(resposta);
+      return sessao ? { tipo: "ok", sessao } : { tipo: "indisponivel" };
     } catch {
-      return null;
+      return { tipo: "indisponivel" };
     }
   }
 

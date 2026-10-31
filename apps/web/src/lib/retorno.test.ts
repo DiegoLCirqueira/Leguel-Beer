@@ -22,10 +22,15 @@ describe("retornoInterno", () => {
     expect(retornoInterno(retorno, "/")).toBe("/");
   });
 
-  it.each(["/entrar", "/entrar?retorno=/conta", "/criar-conta", "/maioridade?retorno=/"])(
-    "não volta para uma tela de acesso (%s), para não entrar em laço",
-    (retorno) => {
-      expect(retornoInterno(retorno, "/")).toBe("/");
-    },
-  );
+  it.each([
+    "/entrar",
+    "/entrar?retorno=/conta",
+    "/entrar/",
+    "/criar-conta/?x=1",
+    "/criar-conta",
+    "/maioridade?retorno=/",
+    "/maioridade/#topo",
+  ])("não volta para uma tela de acesso (%s), para não entrar em laço", (retorno) => {
+    expect(retornoInterno(retorno, "/")).toBe("/");
+  });
 });

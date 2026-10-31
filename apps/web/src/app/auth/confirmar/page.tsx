@@ -44,7 +44,7 @@ export default async function Confirmar({ searchParams }: Props) {
             priority
             className="w-36"
           />
-          <h1 className="sr-only">Confirmar sua conta</h1>
+          <h1 className="sr-only">Confirmar minha conta</h1>
           <p className="text-texto">Toque no botão abaixo para ativar sua conta na Leguelé Beer.</p>
           <form action={confirmarContaAction} className="w-full">
             <input type="hidden" name="token_hash" value={tokenHash} />
