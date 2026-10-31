@@ -122,16 +122,32 @@ describe("GoTrue refresh, verify, resend e signOut", () => {
     const fetchFalso = vi.fn().mockResolvedValue(resposta(200, sessaoGoTrue));
     const auth = createGoTrue({ ...config, fetch: fetchFalso });
 
-    expect(await auth.refresh("renovacao-0")).toEqual(sessaoEsperada);
+    expect(await auth.refresh("renovacao-0")).toEqual({ tipo: "ok", sessao: sessaoEsperada });
     const [url, init] = fetchFalso.mock.calls[0] as [string, RequestInit];
     expect(url).toBe("http://auth.local/auth/v1/token?grant_type=refresh_token");
     expect(JSON.parse(init.body as string)).toEqual({ refresh_token: "renovacao-0" });
   });
 
-  it("devolve null quando a renovação falha", async () => {
-    const auth = createGoTrue({ ...config, fetch: vi.fn().mockResolvedValue(resposta(400, {})) });
+  it.each([400, 401])(
+    "devolve recusada quando o Supabase recusa a renovação (%i): a sessão acabou",
+    async (status) => {
+      const auth = createGoTrue({
+        ...config,
+        fetch: vi.fn().mockResolvedValue(resposta(status, {})),
+      });
 
-    expect(await auth.refresh("vencido")).toBeNull();
+      expect(await auth.refresh("vencido")).toEqual({ tipo: "recusada" });
+    },
+  );
+
+  it.each([
+    ["erro 503 do serviço", () => Promise.resolve(resposta(503, {}))],
+    ["erro 500 do serviço", () => Promise.resolve(resposta(500, {}))],
+    ["falha de rede ou tempo esgotado", () => Promise.reject(new TypeError("timeout"))],
+  ])("devolve indisponivel em %s: não dá para saber se a sessão acabou", async (_, simular) => {
+    const auth = createGoTrue({ ...config, fetch: vi.fn().mockImplementation(simular) });
+
+    expect(await auth.refresh("qualquer")).toEqual({ tipo: "indisponivel" });
   });
 
   it("confirma o e-mail pelo token do link e devolve a sessão", async () => {
