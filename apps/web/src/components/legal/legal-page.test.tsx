@@ -28,4 +28,12 @@ describe("LegalPage", () => {
 
     expect(container.querySelector("time")).toHaveAttribute("datetime", "2026-10-30");
   });
+
+  it("tem o botão Voltar no topo, antes do título", () => {
+    render(<LegalPage titulo="Termos de Uso" atualizadoEm="2026-10-30" secoes={secoes} />);
+
+    const voltar = screen.getByRole("link", { name: "Voltar" });
+    const titulo = screen.getByRole("heading", { level: 1, name: "Termos de Uso" });
+    expect(voltar.compareDocumentPosition(titulo) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
 });
