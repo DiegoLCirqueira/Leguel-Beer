@@ -7,6 +7,7 @@ import {
   opcoesCookieSessao,
 } from "@/lib/auth/cookies";
 import { precisaRenovar } from "@/lib/auth/expiracao";
+import { urlDaApi } from "@/lib/auth/config";
 import { createGoTrue } from "@/lib/auth/gotrue";
 import { decidirProtecao } from "@/lib/auth/protecao";
 import { MAIORIDADE_COOKIE } from "@/lib/maioridade";
@@ -22,7 +23,7 @@ type EstadoDaSessao = {
 
 /** Papel da conta, consultado na API só para `/admin`; qualquer falha fecha a porta (cliente). */
 async function consultarPapel(token: string): Promise<"cliente" | "admin"> {
-  const base = process.env.API_URL ?? "http://localhost:3333";
+  const base = urlDaApi(); // fora do try: a falta de API_URL em produção precisa aparecer
   try {
     const resposta = await fetch(`${base}/me/profile`, {
       headers: { Authorization: `Bearer ${token}` },
