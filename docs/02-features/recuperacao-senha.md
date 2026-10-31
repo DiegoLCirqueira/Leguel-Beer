@@ -4,7 +4,7 @@ modulo: conta
 card-notion: https://app.notion.com/p/3fd490a7ac7d814fbeded6d8c0143a57
 prioridade: P0
 criado: 2026-10-29
-atualizado: 2026-10-29
+atualizado: 2026-10-31
 issues:
   - "#42 LB-27"
 tags:
@@ -51,7 +51,9 @@ Funcionalidade: Recuperação de senha
   Esquema do Cenário: Link que não vale mais
     Dado um link de recuperação <situação>
     Quando abro o link
-    Então vejo o aviso de que o link expirou ou já foi usado
+    Então vejo a tela de nova senha, sem nenhum aviso
+    E ao salvar uma nova senha válida vejo o aviso de que o link expirou ou já foi usado
+    E a senha da conta não muda
     E a ação "Pedir novo link" me leva a "Recuperar senha"
 
     Exemplos:
@@ -77,6 +79,7 @@ Funcionalidade: Recuperação de senha
 - **Endereços:** `/recuperar-senha` (pedir o link) e `/nova-senha` (definir a nova senha, aberta pelo link).
 - **Aviso genérico:** o mesmo para e-mail com ou sem conta; nunca revela se o e-mail está cadastrado.
 - **Validade do link:** 1 hora, como diz a tela do Figma. O link vale uma única vez; um pedido novo invalida o anterior.
+- **Quando o link é gasto:** abrir `/nova-senha` pelo link não gasta nada, para que scanners de e-mail que abrem links não o invalidem (como na confirmação do cadastro, #167). Só o POST de salvar a nova senha usa o link. Por isso o link vencido, já usado ou substituído só é detectado ao salvar: aí aparece "Este link expirou ou já foi usado." com "Pedir novo link" (decisão técnica do Orchestrator, 2026-10-31).
 - **Nova senha:** mesmas regras do cadastro (8 a 72 caracteres), com confirmação ([[cadastro-login]]).
 - **Depois de trocar:** a pessoa entra na conta e vai para a home; as outras sessões abertas da conta são encerradas.
 - **Token já emitido (risco aceito):** encerrar as outras sessões impede que elas sejam renovadas, mas o token de acesso que elas já têm continua aceito pela API até vencer, no máximo 1 hora (validade padrão do Supabase Auth). O mesmo vale para "Sair" ([[cadastro-login]]). Revogar na hora exigiria a API consultar o Supabase a cada requisição.
@@ -120,6 +123,10 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 
 - [[cadastro-login]]: regras de senha e tela de entrar.
 - [[identidade-visual]]
+
+### Decisão do Orchestrator (2026-10-31)
+
+- **Link gasto só ao salvar:** abrir a página do link não gasta nada, por segurança contra scanners de e-mail, como no #167. O link vencido ou já usado é detectado no POST de salvar a nova senha, e o aviso "Este link expirou ou já foi usado." com "Pedir novo link" aparece nessa hora.
 
 ## Decisões tomadas sem consulta
 
