@@ -155,7 +155,7 @@ Só tema escuro. O verde da marca, o texto sobre ele e o texto principal são os
 
 ### Telas e layout
 
-- **Mobile (320 a 767 px):** o site é desenhado para celular e se encaixa em qualquer aparelho dessa faixa, com layout fluido (decisão do Diego, 2026-10-31). Nenhuma página tem rolagem horizontal (cenário "Nenhuma página tem rolagem horizontal"). A [[boas-vindas]] e a pergunta de [[maioridade-entrada]] também não têm rolagem vertical: cabem inteiras na tela. Os tokens desta spec valem em qualquer largura.
+- **Mobile (320 a 767 px):** o site é desenhado para celular e se encaixa em qualquer aparelho dessa faixa, com layout fluido (decisão do Diego, 2026-10-31). Nenhuma página tem rolagem horizontal (cenário "Nenhuma página tem rolagem horizontal"). A [[boas-vindas]] e a pergunta de [[maioridade-entrada]] ficam sem rolagem vertical em retrato a partir de ~640 px de altura; na horizontal ou com zoom alto podem rolar, para os controles continuarem alcançáveis (WCAG 1.4.10, como aprovado no #138). Os tokens desta spec valem em qualquer largura.
 - **Tablet e desktop (768 px ou mais):** ganham uma versão própria, igual ou parecida com a de desktop, feita só depois de o mobile estar 100% pronto e quando o design de web existir no Figma (decisões do Diego, 2026-10-30 e 2026-10-31). Até lá, em 768 px ou mais o site só não pode quebrar: sem rolagem horizontal, sem conteúdo cortado ou sobreposto e com os controles utilizáveis.
 
 ### Espaçamento, raios e sombras

@@ -67,13 +67,14 @@ Funcionalidade: Tela de boas-vindas
     Então vejo a home direto, sem a tela de boas-vindas
 
   Esquema do Cenário: Boas-vindas cabe na tela sem rolagem
-    Dado que estou na tela de boas-vindas num celular de <tamanho>
+    Dado que estou na tela de boas-vindas num celular em retrato de <tamanho>
     Quando tento rolar a página na vertical e na horizontal
     Então a página não rola
     E não vejo o rodapé
 
     Exemplos:
       | tamanho   |
+      | 360 × 640 |
       | 360 × 780 |
       | 390 × 844 |
 ```
@@ -86,7 +87,7 @@ Funcionalidade: Tela de boas-vindas
 - **"Manter-me conectado":** começa marcado (como no Figma) e é levado para a tela de entrar. O efeito na sessão está em [[cadastro-login]].
 - **Textos do Figma** (decisão do Diego já tomada): "Entrar", "Criar conta", "ou", "Continuar como convidado", "Manter-me conectado".
 - **Slogan:** "Cervejas artesanais", da arte original do Figma, sem a linha "e muito mais!" (decisão final do Diego, 2026-10-30). Fica na posição e no estilo de pincel da arte original. "Sabor Qualidade e Tradição" não aparece na tela; as tentativas anteriores ficam só como histórico, em "Decisões do Diego".
-- **Sem rolagem:** a boas-vindas cabe inteira na tela do celular e não rola (decisão do Diego, 2026-10-30). Por isso não mostra o rodapé de [[termos-privacidade]], como a pergunta de maioridade. Os links legais continuam nas outras páginas e no cadastro ([[cadastro-login]]).
+- **Sem rolagem:** em retrato a partir de ~640 px de altura, a boas-vindas cabe inteira na tela do celular e não rola (decisão do Diego, 2026-10-30). Na horizontal ou com zoom alto ela pode rolar, para os controles continuarem alcançáveis (WCAG 1.4.10, como aprovado no #138). Por isso não mostra o rodapé de [[termos-privacidade]], como a pergunta de maioridade. Os links legais continuam nas outras páginas e no cadastro ([[cadastro-login]]).
 - **Sem o texto lateral "Sabor Qualidade Tradição":** o texto lateral do Figma sai da tela (decisão do Diego, 2026-10-30, #136). Com o slogan final "Cervejas artesanais", essas palavras não aparecem em lugar nenhum da tela.
 - **Imagens:** logo, garrafa com copo, barril e folhagem de `Imagens/`, otimizadas para celular. A imagem principal tem texto alternativo.
 - **Componentes:** "Entrar" é o botão primário com ícone e seta; "Criar conta", o botão de contorno; "Continuar como convidado", o botão discreto ([[identidade-visual]]).
