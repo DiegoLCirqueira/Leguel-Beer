@@ -107,6 +107,23 @@ describe("proxy: sessão e proteção das páginas", () => {
     }
   });
 
+  it.each([
+    ["erro 503 do Supabase", () => Promise.resolve(resposta(503, {}))],
+    ["tempo esgotado", () => Promise.reject(new TypeError("timeout"))],
+  ])(
+    "renovação indisponível (%s): segue sem sessão nesta requisição e não apaga os cookies",
+    async (_, simular) => {
+      fetchFalso.mockImplementation(simular);
+
+      const resultado = await proxy(pedido("/conta", { ...sessaoValida, lb_acesso: jwt(-5) }));
+
+      expect(getRedirectUrl(resultado)).toBe("http://localhost:3000/entrar?retorno=%2Fconta");
+      for (const nome of ["lb_acesso", "lb_renovacao", "lb_manter"]) {
+        expect(resultado.cookies.get(nome)).toBeUndefined();
+      }
+    },
+  );
+
   it("cliente comum em /admin vê a página não encontrada", async () => {
     fetchFalso.mockResolvedValue(resposta(200, { papel: "cliente" }));
 
