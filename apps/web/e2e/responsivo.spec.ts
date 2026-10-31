@@ -72,7 +72,9 @@ const PAGINAS: Pagina[] = [
   { nome: "entregas", caminho: "/entregas", precisaMaioridade: true },
 ];
 
-// Cookies de uma sessão com token de acesso ainda válido (só a validade é lida pelo proxy).
+// Cookies de uma sessão com token de acesso ainda válido, só para o proxy deixar abrir /conta.
+// O token é FALSO de propósito (sem assinatura, sem usuário no Supabase): serve apenas ao teste de
+// layout, que mede a página e não chama a API com ele. Quem autoriza de verdade é a API.
 async function entrarComSessao(page: Page, baseURL: string | undefined) {
   const token = `cab.${Buffer.from(
     JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 3000 }),
