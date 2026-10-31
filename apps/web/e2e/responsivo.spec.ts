@@ -65,6 +65,13 @@ const PAGINAS: Pagina[] = [
     precisaMaioridade: true,
   },
   { nome: "criar conta", caminho: "/criar-conta", precisaMaioridade: true },
+  { nome: "recuperar senha", caminho: "/recuperar-senha", precisaMaioridade: true },
+  {
+    nome: "nova senha",
+    caminho: "/nova-senha?token_hash=hash-de-teste&type=recovery",
+    precisaMaioridade: true,
+  },
+  { nome: "nova senha com link inválido", caminho: "/nova-senha", precisaMaioridade: true },
   { nome: "entrar", caminho: "/entrar", precisaMaioridade: true },
   { nome: "conta", caminho: "/conta", precisaMaioridade: true, comSessao: true },
   { nome: "termos", caminho: "/termos" },

@@ -45,4 +45,22 @@ describe("Home", () => {
 
     expect(screen.getByRole("heading", { level: 1, name: "Leguelé Beer" })).toBeInTheDocument();
   });
+
+  it("depois de trocar a senha mostra o aviso Senha alterada", async () => {
+    cookieStore.session = true;
+
+    render(await Home({ searchParams: Promise.resolve({ aviso: "senha-alterada" }) }));
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Senha alterada. Você já está na sua conta.",
+    );
+  });
+
+  it("sem o parâmetro não mostra aviso", async () => {
+    cookieStore.session = true;
+
+    render(await Home());
+
+    expect(screen.queryByRole("status")).toBeNull();
+  });
 });

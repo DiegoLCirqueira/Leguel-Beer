@@ -64,6 +64,23 @@ export function linkDeConfirmacao(html: string): string {
   return `${url.pathname}${url.search}`;
 }
 
+/** Caminho e parâmetros do botão "Redefinir senha" do e-mail de recuperação. */
+export function linkDeRecuperacao(html: string): string {
+  const achado = html.match(/href="([^"]*\/nova-senha\?[^"]*)"/);
+  if (!achado?.[1]) throw new Error("link de recuperação não encontrado no e-mail");
+  const url = new URL(achado[1].replaceAll("&amp;", "&"));
+  return `${url.pathname}${url.search}`;
+}
+
+/** Quantos e-mails o visualizador tem para o endereço (para provar que nenhum saiu). */
+export async function contarEmails(para: string): Promise<number> {
+  const busca = await fetch(
+    `${EMAILS_URL}/api/v1/search?query=${encodeURIComponent(`to:${para}`)}`,
+  );
+  const { messages } = (await busca.json()) as { messages: unknown[] };
+  return messages.length;
+}
+
 const cabecalhos = { apikey: SUPABASE_ANON_KEY ?? "", "Content-Type": "application/json" };
 
 /** Cria uma conta já confirmada, direto no Supabase local, sem passar pelo site. */

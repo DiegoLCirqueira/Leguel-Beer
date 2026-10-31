@@ -260,6 +260,11 @@ otp_expiry = 3600
 subject = "Confirme sua conta na Leguelé Beer"
 content_path = "./supabase/templates/confirmacao.html"
 
+# E-mail de recuperação de senha, em português (recuperacao-senha). O link vale 1 hora (otp_expiry).
+[auth.email.template.recovery]
+subject = "Redefina sua senha da Leguelé Beer"
+content_path = "./supabase/templates/recuperacao.html"
+
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.
 enable_signup = false

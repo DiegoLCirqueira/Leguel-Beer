@@ -53,4 +53,19 @@ describe("configuração do Supabase Auth local (cadastro-login)", () => {
   it("o site local é localhost:3000, que recebe o retorno da confirmação", () => {
     expect(valor("auth", "site_url")).toBe('"http://localhost:3000"');
   });
+
+  it("o e-mail de recuperação é em português, vale 1 hora e leva ao site com o token", () => {
+    expect(valor("auth.email", "otp_expiry")).toBe("3600");
+    expect(valor("auth.email.template.recovery", "subject")).toBe(
+      '"Redefina sua senha da Leguelé Beer"',
+    );
+    const caminho = valor("auth.email.template.recovery", "content_path").replaceAll('"', "");
+    const modelo = readFileSync(resolve(raiz, caminho), "utf8");
+    expect(modelo).toContain(
+      "Recebemos um pedido para redefinir sua senha. O link vale por 1 hora.",
+    );
+    expect(modelo).toContain("Redefinir senha");
+    expect(modelo).toContain("Se não foi você, ignore este e-mail.");
+    expect(modelo).toContain("{{ .SiteURL }}/nova-senha?token_hash={{ .TokenHash }}&type=recovery");
+  });
 });

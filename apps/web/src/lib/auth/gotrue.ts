@@ -132,7 +132,10 @@ export function createGoTrue(config: GoTrueConfig) {
     }
   }
 
-  async function verify(dados: { tokenHash: string; type: "signup" }): Promise<Sessao | null> {
+  async function verify(dados: {
+    tokenHash: string;
+    type: "signup" | "recovery";
+  }): Promise<Sessao | null> {
     try {
       const resposta = await chamar("/auth/v1/verify", {
         type: dados.type,
@@ -169,5 +172,66 @@ export function createGoTrue(config: GoTrueConfig) {
     }
   }
 
-  return { signUp, signInPassword, refresh, verify, resend, signOut };
+  /** Pede o e-mail de recuperação. O limite de pedidos (429) volta como "limite", sem erro. */
+  async function recover(
+    email: string,
+    redirectTo: string,
+  ): Promise<"enviado" | "limite" | "erro"> {
+    try {
+      const resposta = await fetchFn(
+        `${config.url}/auth/v1/recover?redirect_to=${encodeURIComponent(redirectTo)}`,
+        {
+          method: "POST",
+          headers: { apikey: config.anonKey, "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        },
+      );
+      if (resposta.status === 429) return "limite";
+      return resposta.ok ? "enviado" : "erro";
+    } catch {
+      return "erro";
+    }
+  }
+
+  /** Troca a senha da conta da sessão (PUT /user com o token de acesso). */
+  async function updatePassword(accessToken: string, senha: string): Promise<boolean> {
+    try {
+      const resposta = await fetchFn(`${config.url}/auth/v1/user`, {
+        method: "PUT",
+        headers: {
+          apikey: config.anonKey,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ password: senha }),
+      });
+      return resposta.ok;
+    } catch {
+      return false;
+    }
+  }
+
+  /** Encerra as outras sessões da conta e mantém a atual. */
+  async function signOutOthers(accessToken: string): Promise<boolean> {
+    try {
+      const resposta = await chamar("/auth/v1/logout?scope=others", undefined, {
+        Authorization: `Bearer ${accessToken}`,
+      });
+      return resposta.ok;
+    } catch {
+      return false;
+    }
+  }
+
+  return {
+    signUp,
+    signInPassword,
+    refresh,
+    verify,
+    resend,
+    signOut,
+    recover,
+    updatePassword,
+    signOutOthers,
+  };
 }

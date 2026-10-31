@@ -192,3 +192,80 @@ describe("GoTrue refresh, verify, resend e signOut", () => {
     expect(init.headers).toMatchObject({ Authorization: "Bearer acesso-1" });
   });
 });
+
+describe("GoTrue recuperação de senha", () => {
+  it("pede o e-mail de recuperação com o endereço de retorno", async () => {
+    const fetchFalso = vi.fn().mockResolvedValue(resposta(200, {}));
+    const auth = createGoTrue({ ...config, fetch: fetchFalso });
+
+    expect(await auth.recover("ana@exemplo.com", "http://localhost:3000/nova-senha")).toBe(
+      "enviado",
+    );
+    const [url, init] = fetchFalso.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(
+      "http://auth.local/auth/v1/recover?redirect_to=http%3A%2F%2Flocalhost%3A3000%2Fnova-senha",
+    );
+    expect(init.method).toBe("POST");
+    expect(JSON.parse(init.body as string)).toEqual({ email: "ana@exemplo.com" });
+  });
+
+  it("o limite de pedidos (429) aparece como limite, para a tela mostrar o mesmo aviso", async () => {
+    const auth = createGoTrue({
+      ...config,
+      fetch: vi.fn().mockResolvedValue(resposta(429, { error_code: "over_email_send_rate_limit" })),
+    });
+
+    expect(await auth.recover("ana@exemplo.com", "http://x")).toBe("limite");
+  });
+
+  it.each([
+    ["erro do serviço", () => Promise.resolve(resposta(500, {}))],
+    ["falha de rede", () => Promise.reject(new TypeError("rede"))],
+  ])("devolve erro quando há %s", async (_, simular) => {
+    const auth = createGoTrue({ ...config, fetch: vi.fn().mockImplementation(simular) });
+
+    expect(await auth.recover("ana@exemplo.com", "http://x")).toBe("erro");
+  });
+
+  it("confirma o link de recuperação pelo mesmo verify, com o tipo recovery", async () => {
+    const fetchFalso = vi.fn().mockResolvedValue(resposta(200, sessaoGoTrue));
+    const auth = createGoTrue({ ...config, fetch: fetchFalso });
+
+    expect(await auth.verify({ tokenHash: "hash-2", type: "recovery" })).toEqual(sessaoEsperada);
+    const [, init] = fetchFalso.mock.calls[0] as [string, RequestInit];
+    expect(JSON.parse(init.body as string)).toEqual({ type: "recovery", token_hash: "hash-2" });
+  });
+
+  it("troca a senha da sessão com PUT /user e o token de acesso", async () => {
+    const fetchFalso = vi.fn().mockResolvedValue(resposta(200, { id: "u1" }));
+    const auth = createGoTrue({ ...config, fetch: fetchFalso });
+
+    expect(await auth.updatePassword("acesso-1", "nova-senha-123")).toBe(true);
+    const [url, init] = fetchFalso.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe("http://auth.local/auth/v1/user");
+    expect(init.method).toBe("PUT");
+    expect(init.headers).toMatchObject({ Authorization: "Bearer acesso-1" });
+    expect(JSON.parse(init.body as string)).toEqual({ password: "nova-senha-123" });
+  });
+
+  it("devolve false quando a troca de senha é recusada ou falha", async () => {
+    const recusada = createGoTrue({
+      ...config,
+      fetch: vi.fn().mockResolvedValue(resposta(422, {})),
+    });
+    const rede = createGoTrue({ ...config, fetch: vi.fn().mockRejectedValue(new TypeError("x")) });
+
+    expect(await recusada.updatePassword("acesso-1", "x")).toBe(false);
+    expect(await rede.updatePassword("acesso-1", "x")).toBe(false);
+  });
+
+  it("encerra as outras sessões da conta (escopo others), mantendo a atual", async () => {
+    const fetchFalso = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
+    const auth = createGoTrue({ ...config, fetch: fetchFalso });
+
+    expect(await auth.signOutOthers("acesso-1")).toBe(true);
+    const [url, init] = fetchFalso.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe("http://auth.local/auth/v1/logout?scope=others");
+    expect(init.headers).toMatchObject({ Authorization: "Bearer acesso-1" });
+  });
+});
