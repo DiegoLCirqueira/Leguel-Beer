@@ -1,7 +1,6 @@
-import { ChevronLeft } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
+import { BotaoVoltar } from "@/components/auth/botao-voltar";
 import { SiteFooter } from "@/components/site/site-footer";
 import { CriarContaForm } from "@/components/auth/criar-conta-form";
 import { criarContaAction } from "./actions";
@@ -52,13 +51,7 @@ export default function CriarConta() {
           className="pointer-events-none absolute bottom-0 left-0 -z-10 w-40 max-w-[45%] -scale-x-100 select-none"
         />
 
-        <Link
-          href="/boas-vindas"
-          aria-label="Voltar"
-          className="absolute left-4 top-12 flex size-11 items-center justify-center rounded-full border border-primaria text-primaria transition-colors hover:bg-primaria/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaria"
-        >
-          <ChevronLeft aria-hidden="true" className="size-6" />
-        </Link>
+        <BotaoVoltar />
 
         <div className="flex w-full max-w-sm flex-col gap-6">
           <Image
