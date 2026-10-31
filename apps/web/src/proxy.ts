@@ -48,7 +48,8 @@ async function prepararSessao(request: NextRequest): Promise<EstadoDaSessao> {
 
   const url = process.env.SUPABASE_URL;
   const anonKey = process.env.SUPABASE_ANON_KEY;
-  if (!renovacao || !url || !anonKey) return { temSessao: false, manter, encerrada: true };
+  if (!renovacao) return { temSessao: false, manter, encerrada: true };
+  if (!url || !anonKey) return { temSessao: false, manter, encerrada: false };
 
   const renovada = await createGoTrue({ url, anonKey }).refresh(renovacao);
   // Só a recusa do Supabase (400 ou 401) encerra a sessão. Com o serviço fora do ar a pessoa fica
