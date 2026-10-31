@@ -4,7 +4,7 @@ modulo: design
 card-notion: https://app.notion.com/p/3fd490a7ac7d818bbd1ef6ebfb609310
 prioridade: P0
 criado: 2026-10-29
-atualizado: 2026-10-30
+atualizado: 2026-10-31
 issues:
   - "#63 LB-11"
   - "#64 LB-12"
@@ -84,6 +84,23 @@ Funcionalidade: Tokens e componentes base da marca
       | Lager              | badge-lager       |
       | categoria nova     | badge-neutro      |
 
+  Esquema do Cenário: Nenhuma página tem rolagem horizontal
+    Dado uma tela com <largura> px de largura
+    Quando abro cada página do site
+    Então a largura do conteúdo não passa da largura da tela
+    E não consigo rolar a página na horizontal
+
+    Exemplos:
+      | largura |
+      | 320     |
+      | 360     |
+      | 390     |
+      | 430     |
+      | 767     |
+      | 768     |
+      | 1024    |
+      | 1440    |
+
   Cenário: Componentes base sem violações de acessibilidade
     Dado o botão nas variantes primária, contorno e discreta, o badge e o chip
     Quando a verificação automática de acessibilidade roda sobre eles
@@ -138,8 +155,8 @@ Só tema escuro. O verde da marca, o texto sobre ele e o texto principal são os
 
 ### Telas e layout
 
-- **Mobile-first:** o site é desenhado para celular (a partir de 360 px). Os tokens desta spec valem em qualquer largura.
-- **Desktop:** o layout próprio de desktop fica para quando o design de web (tela de computador) existir no Figma (decisão do Diego, 2026-10-30). Até lá, em telas largas o site só não pode quebrar: sem rolagem horizontal, sem conteúdo cortado ou sobreposto e com os controles utilizáveis.
+- **Mobile (320 a 767 px):** o site é desenhado para celular e se encaixa em qualquer aparelho dessa faixa, com layout fluido (decisão do Diego, 2026-10-31). Nenhuma página tem rolagem horizontal (cenário "Nenhuma página tem rolagem horizontal"). A [[boas-vindas]] e a pergunta de [[maioridade-entrada]] ficam sem rolagem vertical em retrato a partir de ~640 px de altura; na horizontal ou com zoom alto podem rolar, para os controles continuarem alcançáveis (WCAG 1.4.10, como aprovado no #138). Os tokens desta spec valem em qualquer largura.
+- **Tablet e desktop (768 px ou mais):** ganham uma versão própria, igual ou parecida com a de desktop, feita só depois de o mobile estar 100% pronto e quando o design de web existir no Figma (decisões do Diego, 2026-10-30 e 2026-10-31). Até lá, em 768 px ou mais o site só não pode quebrar: sem rolagem horizontal, sem conteúdo cortado ou sobreposto e com os controles utilizáveis.
 
 ### Espaçamento, raios e sombras
 
@@ -164,6 +181,10 @@ Só tema escuro. O verde da marca, o texto sobre ele e o texto principal são os
 
 - **Cores e fonte do Figma no site inteiro:** "1- A, qnd o design pra web estiver pronto (tamnaho de tela de pc) a gente organiza direito a visualização de desktop". O verde `#95DC50` e a Figtree, medidos na [[boas-vindas]], valem em todas as telas, não só no acesso; o layout de desktop espera o design de web.
 
+### Decisões do Diego (2026-10-31)
+
+- **Telas responsivas:** "Verificar os tamanhos de tela, precisa que encaixe em qualquer dispositivo mobile, deve ser algo responsivo, quando chegar na resolução de tablet faremos igual/semelhante a versão de desktop". Mobile de 320 a 767 px, fluido e sem rolagem horizontal; de 768 px para cima, versão própria parecida com a de desktop, depois do mobile 100%.
+
 ## Seams de teste
 
 > [!info] Proposta, ainda não combinada com o Diego
@@ -174,6 +195,7 @@ Só tema escuro. O verde da marca, o texto sobre ele e o texto principal são os
 - **Cor fixa:** regra de lint provada com um arquivo de exemplo que deve falhar (red antes da regra).
 - **Botão, badge e chip:** testes de componente (Vitest + Testing Library) para variantes, estados e atributos ARIA, mais verificação com axe.
 - **Área de toque e tela de 360 px:** E2E com viewport de celular, quando as telas de acesso usarem os componentes.
+- **Rolagem horizontal:** E2E que abre as páginas existentes em cada largura do cenário e compara a largura do documento com a da tela.
 
 ## Fora de escopo
 
