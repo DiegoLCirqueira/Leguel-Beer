@@ -124,6 +124,15 @@ describe("proxy: sessão e proteção das páginas", () => {
     },
   );
 
+  it("sem a configuração do Supabase no servidor não apaga os cookies: o erro é nosso, não da sessão", async () => {
+    vi.stubEnv("SUPABASE_URL", "");
+
+    const resultado = await proxy(pedido("/conta", { ...sessaoValida, lb_acesso: jwt(-5) }));
+
+    expect(getRedirectUrl(resultado)).toBe("http://localhost:3000/entrar?retorno=%2Fconta");
+    expect(resultado.cookies.get("lb_acesso")).toBeUndefined();
+  });
+
   it("cliente comum em /admin vê a página não encontrada", async () => {
     fetchFalso.mockResolvedValue(resposta(200, { papel: "cliente" }));
 
