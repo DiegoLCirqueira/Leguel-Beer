@@ -11,7 +11,7 @@ vi.mock("next/headers", () => ({ cookies: async () => ({}) }));
 
 import Confirmar from "./page";
 
-const abrir = async (busca: Record<string, string>) =>
+const abrir = async (busca: { token_hash?: string; type?: string }) =>
   render(await Confirmar({ searchParams: Promise.resolve(busca) }));
 
 describe("/auth/confirmar (GET)", () => {
