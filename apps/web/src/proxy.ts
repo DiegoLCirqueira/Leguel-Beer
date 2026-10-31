@@ -1,3 +1,4 @@
+import { papelResponseSchema } from "@leguele/shared";
 import { NextResponse, type NextRequest } from "next/server";
 import { decidirAcesso } from "@/lib/acesso-maioridade";
 import {
@@ -21,16 +22,19 @@ type EstadoDaSessao = {
   encerrada: boolean;
 };
 
-/** Papel da conta, consultado na API só para `/admin`; qualquer falha fecha a porta (cliente). */
+/**
+ * Papel da conta em GET /me/role (não exige perfil, então vale também para o admin do seed),
+ * consultado só para `/admin`; qualquer falha fecha a porta (cliente).
+ */
 async function consultarPapel(token: string): Promise<"cliente" | "admin"> {
   const base = urlDaApi(); // fora do try: a falta de API_URL em produção precisa aparecer
   try {
-    const resposta = await fetch(`${base}/me/profile`, {
+    const resposta = await fetch(`${base}/me/role`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!resposta.ok) return "cliente";
-    const { papel } = (await resposta.json()) as { papel?: string };
-    return papel === "admin" ? "admin" : "cliente";
+    const corpo = papelResponseSchema.safeParse(await resposta.json());
+    return corpo.success && corpo.data.papel === "admin" ? "admin" : "cliente";
   } catch {
     return "cliente";
   }
