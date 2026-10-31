@@ -1,11 +1,11 @@
 import { cookies } from "next/headers";
 import { createApiClient } from "@/lib/api-client";
 import { COOKIE_ACESSO, COOKIE_MANTER, COOKIE_RENOVACAO, opcoesCookieSessao } from "./cookies";
+import { urlDaApi } from "./config";
 import { createGoTrue } from "./gotrue";
 import type { Sessao } from "./gotrue";
 
 const SITE_LOCAL = "http://localhost:3000";
-const API_LOCAL = "http://localhost:3333";
 
 const emProducao = () => process.env.NODE_ENV === "production";
 
@@ -28,10 +28,7 @@ export function origemDoSite(): string | undefined {
 
 /** Cliente da API com o token desta sessão (o servidor do site repassa em Authorization: Bearer). */
 export function criarClienteApi(sessao: Sessao) {
-  const baseUrl = process.env.API_URL || (emProducao() ? undefined : API_LOCAL);
-  // Em produção a falta de API_URL é erro de configuração: falha alto, sem criar o perfil em silêncio.
-  if (!baseUrl)
-    throw new Error("API_URL é obrigatória em produção (endereço da API do Leguelé Beer).");
+  const baseUrl = urlDaApi();
   return createApiClient({
     baseUrl,
     getToken: async () => sessao.accessToken,
