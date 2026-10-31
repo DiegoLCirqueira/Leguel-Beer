@@ -13,7 +13,7 @@ vi.mock("next/headers", () => ({
 }));
 vi.mock("next/navigation", () => ({ redirect }));
 
-const { GET } = await import("./route");
+const { confirmarContaAction } = await import("./actions");
 
 const resposta = (status: number, corpo: unknown) =>
   new Response(JSON.stringify(corpo), { status, headers: { "Content-Type": "application/json" } });
@@ -28,9 +28,13 @@ const sessaoGoTrue = {
   },
 };
 
-const pedido = (busca: string) => new Request(`https://leguele.exemplo/auth/confirmar${busca}`);
+const formulario = (campos: Record<string, string>) => {
+  const dados = new FormData();
+  for (const [nome, valor] of Object.entries(campos)) dados.set(nome, valor);
+  return dados;
+};
 
-describe("GET /auth/confirmar", () => {
+describe("confirmarContaAction", () => {
   const fetchFalso = vi.fn();
 
   beforeEach(() => {
@@ -47,12 +51,14 @@ describe("GET /auth/confirmar", () => {
     vi.unstubAllGlobals();
   });
 
-  it("confirma o e-mail, entra na conta (30 dias), cria o perfil com o nome e o telefone do cadastro e vai à home", async () => {
+  it("confirma o e-mail pelo POST, entra na conta (30 dias), cria o perfil e vai à home", async () => {
     fetchFalso.mockImplementation(async (url: string) =>
       url.includes("/auth/v1/verify") ? resposta(200, sessaoGoTrue) : resposta(201, {}),
     );
 
-    await expect(GET(pedido("?token_hash=hash-1&type=signup"))).rejects.toThrow("REDIRECT:/");
+    await expect(
+      confirmarContaAction(formulario({ token_hash: "hash-1", type: "signup" })),
+    ).rejects.toThrow("REDIRECT:/");
 
     expect(gravados.get("lb_acesso")?.valor).toBe("acesso-1");
     expect(gravados.get("lb_acesso")?.opcoes).toMatchObject({
@@ -69,16 +75,22 @@ describe("GET /auth/confirmar", () => {
     });
   });
 
-  it("link inválido ou vencido leva à tela de entrar, sem sessão", async () => {
+  it("link inválido ou vencido leva à tela de entrar com o aviso, sem sessão", async () => {
     fetchFalso.mockResolvedValue(resposta(403, {}));
 
-    await expect(GET(pedido("?token_hash=ruim&type=signup"))).rejects.toThrow("REDIRECT:/entrar");
+    await expect(
+      confirmarContaAction(formulario({ token_hash: "ruim", type: "signup" })),
+    ).rejects.toThrow("REDIRECT:/entrar?aviso=link-invalido");
     expect(gravados.size).toBe(0);
   });
 
   it("sem token ou com tipo desconhecido não chama o Supabase", async () => {
-    await expect(GET(pedido("?type=signup"))).rejects.toThrow("REDIRECT:/entrar");
-    await expect(GET(pedido("?token_hash=h&type=recovery"))).rejects.toThrow("REDIRECT:/entrar");
+    await expect(confirmarContaAction(formulario({ type: "signup" }))).rejects.toThrow(
+      "REDIRECT:/entrar?aviso=link-invalido",
+    );
+    await expect(
+      confirmarContaAction(formulario({ token_hash: "h", type: "recovery" })),
+    ).rejects.toThrow("REDIRECT:/entrar?aviso=link-invalido");
 
     expect(fetchFalso).not.toHaveBeenCalled();
   });

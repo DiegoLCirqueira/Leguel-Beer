@@ -57,7 +57,11 @@ test("cadastro válido: aviso, e-mail em português, link entra na conta e o per
   expect(html).toContain("Olá, Ana Souza!");
   expect(html).toContain("Confirmar minha conta");
 
+  // Abrir o link (como faria um scanner de e-mail) só mostra o botão: não gasta o token nem entra.
   await page.goto(linkDeConfirmacao(html));
+  await page.goto(linkDeConfirmacao(html));
+  expect((await context.cookies()).find((c) => c.name === "lb_acesso")).toBeUndefined();
+  await page.getByRole("button", { name: "Confirmar minha conta" }).click();
 
   await expect(page).toHaveURL(/\/$/);
   const acesso = (await context.cookies()).find((c) => c.name === "lb_acesso");
@@ -165,4 +169,35 @@ test("conta não confirmada pede a confirmação e reenvia o link", async ({ pag
   await expect(page.getByText(`Enviamos um novo link para ${email}.`)).toBeVisible();
   const { html } = await esperarEmail(email, antesDoReenvio);
   expect(linkDeConfirmacao(html)).toContain("/auth/confirmar?token_hash=");
+});
+
+test("link já usado, inválido ou sem token leva à tela de entrar com o aviso", async ({ page }) => {
+  const aviso =
+    "Este link de confirmação é inválido ou já venceu. Entre com seu e-mail e senha para receber um novo link.";
+  const email = emailUnico();
+  const antes = Date.now() - 2000;
+  await preencherCadastro(page, email);
+  const { html } = await esperarEmail(email, antes);
+  const link = linkDeConfirmacao(html);
+  await page.goto(link);
+  await page.getByRole("button", { name: "Confirmar minha conta" }).click();
+  await expect(page).toHaveURL(/\/$/);
+
+  // O mesmo link de novo: o token já foi gasto.
+  await page.context().clearCookies();
+  await page
+    .context()
+    .addCookies([{ name: "leguele_maioridade", value: String(Date.now()), url: page.url() }]);
+  await page.goto(link);
+  await page.getByRole("button", { name: "Confirmar minha conta" }).click();
+  await expect(page).toHaveURL(/\/entrar\?aviso=link-invalido/);
+  await expect(page.getByText(aviso)).toBeVisible();
+
+  await page.goto("/auth/confirmar?token_hash=ruim&type=signup");
+  await page.getByRole("button", { name: "Confirmar minha conta" }).click();
+  await expect(page.getByText(aviso)).toBeVisible();
+
+  await page.goto("/auth/confirmar");
+  await expect(page).toHaveURL(/\/entrar\?aviso=link-invalido/);
+  await expect(page.getByText(aviso)).toBeVisible();
 });
