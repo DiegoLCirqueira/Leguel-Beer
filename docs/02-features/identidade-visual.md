@@ -168,8 +168,16 @@ Só tema escuro. O verde da marca, o texto sobre ele e o texto principal são os
 ### Componentes
 
 - **Botão:** variantes primária (fundo verde da marca, ex.: "Entrar", "Criar conta" do formulário), contorno (borda verde da marca, fundo transparente, ex.: "Criar conta" da tela inicial) e discreta (fundo `superficie`, borda `borda`; sobre a arte da [[boas-vindas]], "Continuar como convidado" usa `arte-vidro` e `arte-borda`). Ícone opcional à esquerda e/ou à direita (seta). Tamanhos: pequeno (ex.: "Adicionar" no card) e grande (largura total, nos formulários). Estados: carregando e desabilitado. Área de toque mínima de 44 × 44 px.
+- **Botão de voltar das telas de acesso** (`/entrar` e `/criar-conta`): fica sobre a folhagem, então tem destaque para não perder visibilidade, com fundo `arte-vidro` quase opaco e borda de 2 px no verde da marca (decisão do Diego, 2026-10-31). Área de toque de 44 × 44 px, como os botões. Exceção: os links do rodapé têm 24 px, de propósito ([[termos-privacidade]]).
 - **Badge de estilo:** pílula com o nome da categoria em maiúsculas, cor do token da categoria.
 - **Chip de categoria:** ícone em cima, rótulo e contador entre parênteses abaixo ("IPAs (4)"); selecionável, um por vez, com `aria-pressed`. Selecionado: borda e texto no verde da marca. O comportamento na página está em [[catalogo]].
+
+### Componentes reutilizáveis
+
+- **Onde ficam:** botões, badges, chips e todo componente visual usado em mais de uma tela ficam em `apps/web/src/components/ui`, com um export único em `apps/web/src/components/ui/index.ts`. As telas importam de lá, sem copiar o código (decisão do Diego, 2026-10-31).
+- **Cores:** só os tokens de `apps/web/src/app/globals.css`. Cor nova vira token lá, nunca valor solto na tela (o lint já barra; cenário "Cor fixa num componente é barrada pelo lint").
+- **Vitrine:** `/dev/tokens`, só no desenvolvimento, mostra os tokens e os componentes de `components/ui`. Componente novo entra na vitrine.
+- **Antes de criar:** usar o que já existe em `components/ui` e nos tokens; se faltar, criar lá, nunca dentro da tela.
 
 ### Decisões do Diego (2026-10-29)
 
@@ -184,6 +192,8 @@ Só tema escuro. O verde da marca, o texto sobre ele e o texto principal são os
 ### Decisões do Diego (2026-10-31)
 
 - **Telas responsivas:** "Verificar os tamanhos de tela, precisa que encaixe em qualquer dispositivo mobile, deve ser algo responsivo, quando chegar na resolução de tablet faremos igual/semelhante a versão de desktop". Mobile de 320 a 767 px, fluido e sem rolagem horizontal; de 768 px para cima, versão própria parecida com a de desktop, depois do mobile 100%.
+- **Rodapé e botão de voltar:** "o footer está MUITO grande, deve ser pequeno, praticamente um detalhe" e "de um destaque no botão de retornar já que a folhagem pode tirar um pouco da sua visibilidade". Rodapé discreto, com links de 24 px de área de toque, e botão de voltar destacado sobre a folhagem.
+- **Componentes reutilizáveis:** "esses botões, cores e tudo que é reutilizável devem ser deixados em um local pra não precisar colocar o código completo toda vez que for usar...". Componentes em `components/ui` com export único, cores só em tokens e vitrine em `/dev/tokens`.
 
 ## Seams de teste
 

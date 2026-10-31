@@ -4,7 +4,7 @@ modulo: acesso
 card-notion: https://app.notion.com/p/3fd490a7ac7d815c9785f1be8cd09271
 prioridade: P1
 criado: 2026-10-29
-atualizado: 2026-10-30
+atualizado: 2026-10-31
 issues:
   - "#100 LB-22"
 tags:
@@ -33,7 +33,7 @@ Funcionalidade: Termos, privacidade e entregas
     Quando abro /criar-conta e rolo até o fim
     Então vejo "Aprecie com moderação" e "Venda proibida para menores de 18 anos"
     E vejo os links "Termos de Uso", "Política de Privacidade" e "Entregas"
-    E vejo os dados da empresa marcados como fictícios
+    E não vejo a razão social nem o CNPJ da empresa
 
   Cenário: Termos abertos do cadastro não apagam o formulário
     Dado que preenchi parte de "Criar sua conta"
@@ -56,7 +56,8 @@ Funcionalidade: Termos, privacidade e entregas
 
 - **Páginas:** `/termos` (Termos de Uso), `/privacidade` (Política de Privacidade) e `/entregas` (Entregas). Conteúdo estático, versionado no repositório, com a data da última atualização.
 - **Sem aviso de portfólio:** nenhuma página do site mostra faixa, nota ou texto dizendo que o site é um projeto de portfólio (decisão do Diego, 2026-10-30).
-- **Rodapé:** em todas as páginas, menos na pergunta de maioridade: os avisos (texto em "Textos", linha "Rodapé, avisos", fonte única também para a pergunta de maioridade e o checkout), links para as três páginas e os dados fictícios da empresa.
+- **Rodapé:** em todas as páginas, menos na pergunta de maioridade: os avisos (texto em "Textos", linha "Rodapé, avisos", fonte única também para a pergunta de maioridade e o checkout), e os links para as três páginas. A linha da empresa (razão social, CNPJ e cidade) sai do rodapé (decisão do Diego, 2026-10-31).
+  - **Rodapé discreto:** pequeno, praticamente um detalhe (decisão do Diego, 2026-10-31). Por isso os links do rodapé têm área de toque de 24 px (WCAG 2.5.8, nível AA), e não os 44 px dos botões. É deliberado: não aumentar para 44 px.
 - **Sem pergunta de maioridade** em `/termos` e `/privacidade`, para quem quer ler antes de entrar ([[maioridade-entrada]]). `/entregas` segue a regra normal.
 - **Boas-vindas sem rodapé:** além da pergunta de maioridade, a [[boas-vindas]] também fica sem o rodapé, porque não tem rolagem (decisão do Diego, 2026-10-30). Os links legais continuam nas outras páginas e no cadastro.
 - **Links do cadastro** abrem em nova aba.
@@ -72,7 +73,6 @@ Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adic
 | Lugar | Texto |
 | --- | --- |
 | Rodapé, avisos | "Aprecie com moderação." e "Venda proibida para menores de 18 anos." |
-| Rodapé, empresa | "Leguelé Beer Cervejaria Artesanal Ltda. (empresa fictícia) · CNPJ 00.000.000/0001-00 (fictício) · Maceió, AL" |
 
 ### Termos de Uso (`/termos`)
 
@@ -129,6 +129,12 @@ Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adic
 ### Decisões do Diego (2026-10-30)
 
 - **Sem aviso de portfólio:** "quero que retire o 'Projeto de portfóio pagamentos em modo de teste', isso não deve aparecer em lugar algum já que é desnecessário". Saem a faixa do topo, a nota do rodapé e o item "Projeto de portfólio." de Entregas. O rodapé e as páginas legais continuam, e a empresa segue marcada como fictícia.
+
+### Decisões do Diego (2026-10-31)
+
+- **Rodapé enxuto:** 'o footer está com muita informação, retire o "Leguelé Beer Cervejaria Artesanal Ltda. (empresa fictícia) · CNPJ 00.000.000/0001-00 (fictício) · Maceió, AL" e ajuste o tamanho'. O rodapé fica só com o aviso de consumo e os links, sem a linha da empresa.
+- **Empresa fora do site ("1- A"):** a razão social e o CNPJ fictícios não aparecem em nenhuma página do site. Os Termos já dizem que a empresa é fictícia, e a Política de Privacidade nomeia o responsável pelos dados e o contato. Substitui a parte "sempre marcados como fictícios" da pergunta 8 (2026-10-29), que só valia enquanto os dados apareciam no rodapé.
+- **Rodapé discreto:** "o footer está MUITO grande, deve ser pequeno, praticamente um detalhe". Links do rodapé com área de toque de 24 px, de propósito.
 
 ## Decisões tomadas sem consulta
 
