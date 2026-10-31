@@ -9,7 +9,7 @@ for (const caminho of ["/criar-conta", "/termos"]) {
     await rodape.scrollIntoViewIfNeeded();
 
     const caixa = await rodape.boundingBox();
-    expect(caixa?.height ?? 999, "altura do rodapé").toBeLessThanOrEqual(110);
+    expect(caixa?.height ?? 999, "altura do rodapé").toBeLessThanOrEqual(80);
 
     // Texto no piso de 12 px e na cor texto-suave (#a9bfa0).
     const estilos = await rodape.evaluate((el) => {
