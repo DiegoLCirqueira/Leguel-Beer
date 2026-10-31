@@ -141,7 +141,7 @@ describe("proxy: sessão e proteção das páginas", () => {
     expect(isRewrite(resultado)).toBe(true);
     expect(getRewrittenUrl(resultado)).toBe("http://localhost:3000/nao-encontrada");
     const [url, init] = fetchFalso.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe("http://api.local/me/profile");
+    expect(url).toBe("http://api.local/me/role");
     expect(init.headers).toMatchObject({ Authorization: `Bearer ${sessaoValida.lb_acesso}` });
   });
 
