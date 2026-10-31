@@ -11,7 +11,7 @@ const LINKS = [
 export function SiteFooter() {
   return (
     <footer className="relative flex flex-col items-center border-t border-borda bg-fundo px-3 py-1 pb-[max(0.25rem,env(safe-area-inset-bottom,0px))] text-center text-xs leading-4 text-texto-suave">
-      <p>
+      <p className="text-balance">
         {AVISOS_RODAPE.map((aviso, indice) => (
           <span key={aviso}>
             {indice > 0 ? " " : null}
