@@ -24,6 +24,7 @@ async function entrarComoCliente(page: Page, retorno?: string) {
   await page.getByLabel("E-mail").fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(SENHA);
   await page.getByRole("button", { name: "Entrar" }).click();
+  await page.waitForURL((url) => !url.pathname.startsWith("/entrar"));
   return email;
 }
 
