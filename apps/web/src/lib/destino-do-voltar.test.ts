@@ -39,4 +39,16 @@ describe("destinoDoVoltar", () => {
       }),
     ).toBe("/boas-vindas");
   });
+
+  it("quem chegou por uma navegação dentro do site (o referrer não muda) volta na história", () => {
+    expect(
+      destinoDoVoltar({ referrer: "", origem, tamanhoDoHistorico: 2, navegouNoSite: true }),
+    ).toBe("voltar");
+  });
+
+  it("navegação dentro do site sem página anterior na história não tenta voltar", () => {
+    expect(
+      destinoDoVoltar({ referrer: "", origem, tamanhoDoHistorico: 1, navegouNoSite: true }),
+    ).toBe("/boas-vindas");
+  });
 });
