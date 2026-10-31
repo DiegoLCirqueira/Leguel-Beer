@@ -6,6 +6,7 @@ Hospedagem da API: docs/03-decisoes/ADR-002-hospedagem-api.md. No MVP não há p
 ### Estrutura de pastas
 Monorepo pnpm + Turborepo (spec: docs/02-features/base-monorepo.md).
 - `apps/web` (`@leguele/web`): Next.js, porta 3000. E2E em `apps/web/e2e`.
+  - Componentes e cores reutilizáveis: antes de criar um componente ou uma cor, use o que já existe em `apps/web/src/components/ui` (export único em `index.ts`) e nos tokens de `apps/web/src/app/globals.css`. Se faltar, crie lá e mostre na vitrine `/dev/tokens`; nunca dentro da tela ([[identidade-visual]], "Componentes reutilizáveis").
 - `apps/api` (`@leguele/api`): NestJS, porta 3333. Código em `src/modules/<contexto>/{domain,application,infrastructure,presentation}`.
 - `apps/api/prisma` (schema, migrations, seed) e `supabase/` (config do Supabase local); ver `apps/api/README.md`.
 - `packages/shared` (`@leguele/shared`): código puro compartilhado, compilado com `tsc` (`dist/`).
