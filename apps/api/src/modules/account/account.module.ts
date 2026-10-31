@@ -5,6 +5,7 @@ import { CreateProfile } from "./application/create-profile.js";
 import { GetProfile } from "./application/get-profile.js";
 import { LEGAL_VERSIONS } from "./domain/legal-versions.js";
 import { ProfileController } from "./presentation/profile.controller.js";
+import { RoleController } from "./presentation/role.controller.js";
 import { AuthorizeRequest } from "./application/authorize-request.js";
 import type { EmailConfirmation } from "./domain/email-confirmation.js";
 import type { ProfileRepository } from "./domain/profile-repository.js";
@@ -22,7 +23,7 @@ function authUrl(): string {
 }
 
 @Module({
-  controllers: [ProfileController],
+  controllers: [ProfileController, RoleController],
   providers: [
     {
       provide: TOKEN_VERIFIER,
