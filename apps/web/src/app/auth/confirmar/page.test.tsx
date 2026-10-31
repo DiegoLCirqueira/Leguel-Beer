@@ -18,6 +18,9 @@ describe("/auth/confirmar (GET)", () => {
   it("só mostra o botão Confirmar minha conta, sem gastar o token: quem confirma é o POST", async () => {
     await abrir({ token_hash: "hash-1", type: "signup" });
 
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Confirmar minha conta" }),
+    ).toBeInTheDocument();
     const botao = screen.getByRole("button", { name: "Confirmar minha conta" });
     expect(botao).toHaveAttribute("type", "submit");
     const formulario = botao.closest("form");
