@@ -10,7 +10,7 @@ const LINKS = [
 /** Rodapé discreto, só um detalhe: texto de 12 px, links em linha e cor texto-suave. */
 export function SiteFooter() {
   return (
-    <footer className="relative flex flex-col items-center border-t border-borda bg-fundo px-4 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom,0px))] text-center text-xs leading-4 text-texto-suave">
+    <footer className="relative flex flex-col items-center border-t border-borda bg-fundo px-3 py-1 pb-[max(0.25rem,env(safe-area-inset-bottom,0px))] text-center text-xs leading-4 text-texto-suave">
       <p>
         {AVISOS_RODAPE.map((aviso, indice) => (
           <span key={aviso}>
@@ -35,10 +35,6 @@ export function SiteFooter() {
           ))}
         </ul>
       </nav>
-      <p className="max-w-sm">
-        Leguelé Beer Cervejaria Artesanal Ltda. (empresa fictícia) · CNPJ 00.000.000/0001-00
-        (fictício) · Maceió, AL
-      </p>
     </footer>
   );
 }

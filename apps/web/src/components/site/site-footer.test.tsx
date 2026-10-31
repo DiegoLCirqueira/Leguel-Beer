@@ -22,14 +22,10 @@ describe("SiteFooter", () => {
     expect(rodape.getByRole("link", { name: "Entregas" })).toHaveAttribute("href", "/entregas");
   });
 
-  it("marca os dados da empresa como fictícios e não fala em projeto de portfólio", () => {
+  it("não traz os dados da empresa nem fala em projeto de portfólio: só os avisos e os links", () => {
     render(<SiteFooter />);
 
-    expect(
-      screen.getByText(
-        "Leguelé Beer Cervejaria Artesanal Ltda. (empresa fictícia) · CNPJ 00.000.000/0001-00 (fictício) · Maceió, AL",
-      ),
-    ).toBeInTheDocument();
+    expect(screen.queryByText(/CNPJ|empresa fictícia|Maceió/)).not.toBeInTheDocument();
     expect(screen.queryByText(/portfólio/i)).not.toBeInTheDocument();
   });
 });

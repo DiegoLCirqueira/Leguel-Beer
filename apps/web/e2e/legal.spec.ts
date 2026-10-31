@@ -4,7 +4,7 @@ import { expect, test } from "./support/maior-de-idade";
 test.use({ viewport: { width: 360, height: 780 } });
 semConfirmacao.use({ viewport: { width: 360, height: 780 } });
 
-test("o rodapé das páginas legais traz avisos, links e dados fictícios", async ({ page }) => {
+test("o rodapé das páginas legais traz só os avisos e os links", async ({ page }) => {
   await page.goto("/termos");
   const rodape = page.getByRole("contentinfo");
   await rodape.scrollIntoViewIfNeeded();
@@ -14,9 +14,7 @@ test("o rodapé das páginas legais traz avisos, links e dados fictícios", asyn
   await expect(rodape.getByRole("link", { name: "Termos de Uso" })).toBeVisible();
   await expect(rodape.getByRole("link", { name: "Política de Privacidade" })).toBeVisible();
   await expect(rodape.getByRole("link", { name: "Entregas" })).toBeVisible();
-  await expect(
-    rodape.getByText(/empresa fictícia.*CNPJ 00\.000\.000\/0001-00 \(fictício\)/),
-  ).toBeVisible();
+  await expect(rodape.getByText(/CNPJ|empresa fictícia/)).toHaveCount(0);
 });
 
 test("os links do rodapé levam às outras páginas legais", async ({ page }) => {
