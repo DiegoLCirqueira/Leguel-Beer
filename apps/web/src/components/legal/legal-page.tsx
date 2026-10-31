@@ -1,3 +1,4 @@
+import { BotaoVoltarLegal } from "@/components/auth/botao-voltar-legal";
 import { SiteFooter } from "@/components/site/site-footer";
 
 export type SecaoLegal = { titulo: string; texto: string };
@@ -14,7 +15,8 @@ const formatarData = new Intl.DateTimeFormat("pt-BR", { dateStyle: "long", timeZ
 export function LegalPage({ titulo, atualizadoEm, secoes }: Props) {
   return (
     <>
-      <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-6 pb-12 pt-14 text-texto">
+      <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-6 pb-12 pt-4 text-texto">
+        <BotaoVoltarLegal />
         <header className="flex flex-col gap-2">
           <h1 className="font-titulo text-balance text-3xl">{titulo}</h1>
           <p className="text-sm text-texto-suave">

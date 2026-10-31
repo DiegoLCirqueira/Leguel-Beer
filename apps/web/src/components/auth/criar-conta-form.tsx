@@ -177,7 +177,7 @@ export function CriarContaForm({ criar }: Props) {
             <Link
               href="/termos"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener"
               className="font-semibold text-primaria underline underline-offset-2"
             >
               Termos de Uso
@@ -186,7 +186,7 @@ export function CriarContaForm({ criar }: Props) {
             <Link
               href="/privacidade"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener"
               className="font-semibold text-primaria underline underline-offset-2"
             >
               Política de Privacidade
