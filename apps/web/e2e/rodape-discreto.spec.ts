@@ -41,3 +41,26 @@ for (const caminho of ["/criar-conta", "/termos"]) {
     await expect(rodape.getByText("·", { exact: true }).first()).toBeVisible();
   });
 }
+
+// "anos." não pode ficar sozinho na segunda linha: o aviso quebra em duas linhas equilibradas.
+test("o aviso do rodapé quebra em linhas equilibradas em 360x780", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 780 });
+  await page.goto("/termos");
+  const aviso = page.getByRole("contentinfo").locator("p").first();
+  await aviso.scrollIntoViewIfNeeded();
+
+  const larguras = await aviso.evaluate((el) => {
+    const intervalo = document.createRange();
+    intervalo.selectNodeContents(el);
+    const porLinha = new Map<number, number>();
+    for (const r of Array.from(intervalo.getClientRects())) {
+      const topo = Math.round(r.top);
+      porLinha.set(topo, (porLinha.get(topo) ?? 0) + r.width);
+    }
+    return Array.from(porLinha.values());
+  });
+
+  expect(larguras.length, "linhas do aviso").toBeGreaterThanOrEqual(2);
+  const [menor, maior] = [Math.min(...larguras), Math.max(...larguras)];
+  expect(menor / maior, `larguras das linhas ${larguras}`).toBeGreaterThan(0.5);
+});
