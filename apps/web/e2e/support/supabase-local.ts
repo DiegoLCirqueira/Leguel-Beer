@@ -86,3 +86,25 @@ export async function criarContaConfirmada(email: string, senha: string) {
     body: JSON.stringify({ type: "signup", token_hash: tokenHash }),
   });
 }
+
+/**
+ * Credenciais da conta admin criada pelo seed de desenvolvimento (ADMIN_EMAIL e ADMIN_SEED_PASSWORD).
+ * Vêm do ambiente ou de apps/api/.env, que fica fora do git; a senha nunca entra em código, log ou nota.
+ */
+export function credenciaisDoAdmin(): { email: string; senha: string } | undefined {
+  const lido: Record<string, string> = {};
+  const arquivo = resolve(process.cwd(), "../api/.env");
+  if (existsSync(arquivo)) {
+    for (const linha of readFileSync(arquivo, "utf8").split("\n")) {
+      const posicao = linha.indexOf("=");
+      if (posicao < 1 || linha.trim().startsWith("#")) continue;
+      lido[linha.slice(0, posicao).trim()] = linha
+        .slice(posicao + 1)
+        .trim()
+        .replace(/^"|"$/g, "");
+    }
+  }
+  const email = process.env.ADMIN_EMAIL ?? lido.ADMIN_EMAIL;
+  const senha = process.env.ADMIN_SEED_PASSWORD ?? lido.ADMIN_SEED_PASSWORD;
+  return email && senha ? { email, senha } : undefined;
+}
