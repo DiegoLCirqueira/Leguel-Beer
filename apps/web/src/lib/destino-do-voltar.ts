@@ -7,6 +7,11 @@ interface Entrada {
   origem: string;
   /** `history.length`: 1 numa aba nova, sem página anterior para voltar. */
   tamanhoDoHistorico: number;
+  /**
+   * `true` quando a página atual foi aberta por uma navegação dentro do site (sem recarregar):
+   * nesse caso o `document.referrer` continua o da primeira página e não diz de onde a pessoa veio.
+   */
+  navegouNoSite?: boolean;
 }
 
 function caminhoDoSite(referrer: string, origem: string): string | undefined {
@@ -28,7 +33,9 @@ export function destinoDoVoltar({
   referrer,
   origem,
   tamanhoDoHistorico,
+  navegouNoSite = false,
 }: Entrada): DestinoDoVoltar {
+  if (navegouNoSite) return tamanhoDoHistorico > 1 ? "voltar" : "/boas-vindas";
   const caminho = caminhoDoSite(referrer, origem);
   if (caminho === undefined) return "/boas-vindas";
   if (tamanhoDoHistorico > 1) return "voltar";
