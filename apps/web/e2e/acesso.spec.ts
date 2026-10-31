@@ -5,14 +5,19 @@ import {
   emailUnico,
   esperarEmail,
   linkDeConfirmacao,
-  supabaseDisponivel,
+  modo,
 } from "./support/supabase-local";
 
 const API_URL = process.env.API_URL ?? "http://localhost:3333";
 const SENHA = "senha-segura-123";
 const TRINTA_DIAS = 30 * 24 * 60 * 60;
 
-test.skip(!supabaseDisponivel, "precisa do Supabase local (SUPABASE_URL e SUPABASE_ANON_KEY)");
+test.skip(modo === "pular", "precisa do Supabase local (SUPABASE_URL e SUPABASE_ANON_KEY)");
+test.beforeEach(() => {
+  if (modo === "falhar") {
+    throw new Error("CI sem Supabase local: faltam SUPABASE_URL e SUPABASE_ANON_KEY no job de E2E");
+  }
+});
 test.use({ viewport: { width: 360, height: 780 } });
 
 async function preencherCadastro(page: Page, email: string) {

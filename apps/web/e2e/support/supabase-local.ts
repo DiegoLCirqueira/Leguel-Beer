@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { modoSupabase } from "./modo-supabase";
 
 // Lê apps/web/.env.local (fora do git), como o servidor do site; o que já está no ambiente vale mais.
 const arquivo = resolve(process.cwd(), ".env.local");
@@ -20,8 +21,8 @@ export const SUPABASE_URL = process.env.SUPABASE_URL;
 export const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 const EMAILS_URL = process.env.SUPABASE_EMAILS_URL ?? "http://127.0.0.1:54324";
 
-/** Os cenários com o Supabase local só rodam onde ele existe (o CI não tem). */
-export const supabaseDisponivel = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+/** Fora do CI os cenários com o Supabase local pulam sem ele; no CI a falta dele é falha. */
+export const modo = modoSupabase(process.env);
 
 export const emailUnico = (prefixo = "ana") =>
   `${prefixo}.${Date.now()}.${Math.floor(Math.random() * 1e6)}@exemplo.com`;
