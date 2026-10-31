@@ -37,4 +37,20 @@ describe("/entrar", () => {
 
     expect(screen.getByLabelText("E-mail")).toHaveValue("ana@exemplo.com");
   });
+
+  it("avisa quando o link de confirmação é inválido ou já venceu, com o texto aprovado", async () => {
+    await abrir({ aviso: "link-invalido" });
+
+    expect(
+      screen.getByText(
+        "Este link de confirmação é inválido ou já venceu. Entre com seu e-mail e senha para receber um novo link.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("sem o parâmetro não mostra aviso nenhum", async () => {
+    await abrir();
+
+    expect(screen.queryByText(/link de confirmação é inválido/)).not.toBeInTheDocument();
+  });
 });

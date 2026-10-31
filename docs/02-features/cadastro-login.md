@@ -4,7 +4,7 @@ modulo: conta
 card-notion: https://app.notion.com/p/3fd490a7ac7d81709d51f352c2257c0b
 prioridade: P0
 criado: 2026-10-29
-atualizado: 2026-10-29
+atualizado: 2026-10-31
 issues:
   - "#40 LB-25"
 tags:
@@ -28,14 +28,21 @@ tags:
 # language: pt
 Funcionalidade: Cadastro e login com e-mail e senha
 
-  Cenário: Cadastro válido com confirmação por e-mail
+  Esquema do Cenário: Cadastro válido com confirmação por e-mail
     Dado que estou em "Criar sua conta"
     Quando preencho nome completo, e-mail, telefone, senha e a confirmação da senha válidos
     E aceito os Termos de Uso e a Política de Privacidade
     E toco em "Criar conta"
     Então vejo o aviso de que enviamos um link de confirmação para o meu e-mail
     E o e-mail de confirmação chega em português
-    E ao abrir o link entro na conta e meu perfil existe com o nome e o telefone informados
+    E ao abrir um link de confirmação <link> vejo a página com o botão "Confirmar minha conta"
+    E ao tocar em "Confirmar minha conta" <resultado>
+
+    Exemplos:
+      | link     | resultado                                                                                                                                         |
+      | válido   | entro na conta e meu perfil existe com o nome e o telefone informados                                                                            |
+      | vencido  | vou para /entrar com o aviso "Este link de confirmação é inválido ou já venceu. Entre com seu e-mail e senha para receber um novo link." |
+      | inválido | vou para /entrar com o aviso "Este link de confirmação é inválido ou já venceu. Entre com seu e-mail e senha para receber um novo link." |
 
   Cenário: E-mail já cadastrado
     Dado que já existe uma conta com o e-mail "ana@exemplo.com"
@@ -100,6 +107,8 @@ Funcionalidade: Cadastro e login com e-mail e senha
 - **Telefone:** brasileiro, com DDD, 10 ou 11 dígitos, com a máscara "(00) 00000-0000" do Figma.
 - **Senha:** de 8 a 72 caracteres, sem exigência de tipos de caractere. O olho mostra e esconde a senha.
 - **Confirmação por e-mail:** obrigatória. Sem confirmar, a conta não entra.
+  - **Página de confirmação (`/auth/confirmar`):** o link do e-mail abre uma página com o botão "Confirmar minha conta". Abrir o link não confirma nada: só o toque no botão envia um POST ao próprio site, e só então o site chama o `/verify` do Supabase Auth, entra na conta e cria o perfil. Motivo: scanners de e-mail que abrem links gastariam o link de uso único, e um link de outra conta aberto sem querer entraria na conta errada (login CSRF). Decisão técnica de segurança do Orchestrator (2026-10-31), apontada pelo Reviewer no #162.
+  - **Link inválido ou vencido:** ao tocar em "Confirmar minha conta", a pessoa vai para `/entrar` com o aviso de link inválido ou vencido (ver "Textos"). Ao entrar com e-mail e senha, a conta ainda não confirmada mostra "Reenviar link" (decisão do Diego, 2026-10-31).
 - **Perfil:** no primeiro acesso autenticado (depois de confirmar o e-mail), o site envia à API o nome, o telefone e o aceite dos termos guardados no cadastro, e a API cria o perfil do cliente. Criar o perfil é idempotente: repetir o pedido não cria outro nem muda o que existe.
   - **A API não confia nesses dados:** valida nome, telefone e aceite com o mesmo schema compartilhado do formulário ([[contratos-compartilhados]]) e responde 400 `VALIDATION_ERROR` se forem inválidos. O e-mail e o id da conta vêm do token, nunca do corpo.
   - **Aceite registrado no servidor:** o perfil grava a data e a hora do aceite (pelo relógio da API) e as versões dos Termos de Uso e da Política de Privacidade em vigor, que são as datas de "Última atualização" de [[termos-privacidade]]. A versão vem da API, não do site.
@@ -160,6 +169,8 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 | Aviso de e-mail não confirmado | "Confirme seu e-mail para entrar. Não recebeu?" e a ação "Reenviar link" |
 | Assunto do e-mail de confirmação | "Confirme sua conta na Leguelé Beer" |
 | Corpo do e-mail de confirmação * | "Olá, {nome}! Toque no botão abaixo para ativar sua conta na Leguelé Beer." e o botão "Confirmar minha conta" |
+| Botão da página de confirmação (`/auth/confirmar`) | "Confirmar minha conta" |
+| Aviso de link de confirmação inválido ou vencido (em `/entrar`) | "Este link de confirmação é inválido ou já venceu. Entre com seu e-mail e senha para receber um novo link." |
 | Depois de reenviar o link * | "Enviamos um novo link para {e-mail}." |
 | Falha de rede ou erro inesperado * | "Não foi possível concluir agora. Tente de novo em instantes." |
 | Senha visível ou escondida (leitor de tela) * | "Mostrar senha" e "Esconder senha" |
@@ -196,6 +207,14 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 ### Decisão do Orchestrator (2026-10-29)
 
 - **"30 dias sem uso":** contados no site, pela validade dos cookies renovada a cada uso (opção A). O plano Pro do Supabase (opção B) fere a restrição "tudo gratuito" do [[ADR-001-stack]] e do [[ADR-002-hospedagem-api]]; a opção A mantém os 30 dias já aprovados. O limite do cookie copiado é risco aceito.
+
+### Decisão do Orchestrator (2026-10-31)
+
+- **Página com botão em `/auth/confirmar`:** o link do e-mail abre uma página, e só o POST do botão "Confirmar minha conta" chama o `/verify`. Protege contra scanners de e-mail que gastam o link e contra login CSRF (apontado pelo Reviewer no #162).
+
+### Decisões do Diego (2026-10-31)
+
+- **Link de confirmação inválido ou vencido ("1- A"):** a pessoa vai para `/entrar` com o aviso "Este link de confirmação é inválido ou já venceu. Entre com seu e-mail e senha para receber um novo link."
 
 ### Decisões do Diego (2026-10-29)
 
