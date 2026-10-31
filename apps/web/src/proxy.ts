@@ -7,7 +7,7 @@ import {
   opcoesCookieSessao,
 } from "@/lib/auth/cookies";
 import { precisaRenovar } from "@/lib/auth/expiracao";
-import { createGoTrue, type Sessao } from "@/lib/auth/gotrue";
+import { createGoTrue } from "@/lib/auth/gotrue";
 import { decidirProtecao } from "@/lib/auth/protecao";
 import { MAIORIDADE_COOKIE } from "@/lib/maioridade";
 
@@ -48,14 +48,18 @@ async function prepararSessao(request: NextRequest): Promise<EstadoDaSessao> {
 
   const url = process.env.SUPABASE_URL;
   const anonKey = process.env.SUPABASE_ANON_KEY;
-  const nova: Sessao | null =
-    renovacao && url && anonKey ? await createGoTrue({ url, anonKey }).refresh(renovacao) : null;
-  if (!nova) return { temSessao: false, manter, encerrada: true };
+  if (!renovacao || !url || !anonKey) return { temSessao: false, manter, encerrada: true };
+
+  const renovada = await createGoTrue({ url, anonKey }).refresh(renovacao);
+  // Só a recusa do Supabase (400 ou 401) encerra a sessão. Com o serviço fora do ar a pessoa fica
+  // sem sessão nesta requisição, mas os cookies ficam: a próxima requisição tenta de novo.
+  if (renovada.tipo === "recusada") return { temSessao: false, manter, encerrada: true };
+  if (renovada.tipo === "indisponivel") return { temSessao: false, manter, encerrada: false };
 
   return {
     temSessao: true,
-    acesso: nova.accessToken,
-    renovacao: nova.refreshToken,
+    acesso: renovada.sessao.accessToken,
+    renovacao: renovada.sessao.refreshToken,
     manter,
     encerrada: false,
   };
