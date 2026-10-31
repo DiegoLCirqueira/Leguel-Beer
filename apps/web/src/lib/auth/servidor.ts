@@ -1,11 +1,11 @@
 import { cookies } from "next/headers";
 import { createApiClient } from "@/lib/api-client";
 import { COOKIE_ACESSO, COOKIE_MANTER, COOKIE_RENOVACAO, opcoesCookieSessao } from "./cookies";
+import { urlDaApi } from "./config";
 import { createGoTrue } from "./gotrue";
 import type { Sessao } from "./gotrue";
 
 const SITE_LOCAL = "http://localhost:3000";
-const API_LOCAL = "http://localhost:3333";
 
 const emProducao = () => process.env.NODE_ENV === "production";
 
@@ -28,7 +28,7 @@ export function origemDoSite(): string | undefined {
 
 /** Cliente da API com o token desta sessão (o servidor do site repassa em Authorization: Bearer). */
 export function criarClienteApi(sessao: Sessao) {
-  const baseUrl = process.env.API_URL ?? (emProducao() ? "" : API_LOCAL);
+  const baseUrl = urlDaApi();
   return createApiClient({
     baseUrl,
     getToken: async () => sessao.accessToken,
