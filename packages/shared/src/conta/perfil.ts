@@ -18,6 +18,11 @@ export const papelSchema = z.enum(["cliente", "admin"]);
 
 export type Papel = z.infer<typeof papelSchema>;
 
+/** Resposta de GET /me/role: só o papel, sem exigir perfil completo. */
+export const papelResponseSchema = z.object({ papel: papelSchema });
+
+export type PapelResponse = z.infer<typeof papelResponseSchema>;
+
 export const perfilResponseSchema = z.object({
   id: z.uuid(),
   email: z.email(),
