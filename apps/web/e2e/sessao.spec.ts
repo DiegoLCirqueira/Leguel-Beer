@@ -3,6 +3,7 @@ import { expect, test } from "./support/maior-de-idade";
 import {
   SUPABASE_ANON_KEY,
   SUPABASE_URL,
+  credenciaisDoAdmin,
   criarContaConfirmada,
   emailUnico,
   supabaseDisponivel,
@@ -144,4 +145,20 @@ test("sair leva à boas-vindas, /conta volta a pedir entrar e a sessão encerrad
     body: JSON.stringify({ refresh_token: renovacao }),
   });
   expect(tentativa.ok).toBe(false);
+});
+
+test("admin acessa /admin com a conta do seed, mesmo sem o perfil completo", async ({ page }) => {
+  const admin = credenciaisDoAdmin();
+  test.skip(!admin, "precisa da conta admin do seed (ADMIN_EMAIL e ADMIN_SEED_PASSWORD)");
+  if (!admin) return;
+
+  await page.goto("/entrar?retorno=%2Fadmin");
+  await page.getByLabel("E-mail").fill(admin.email);
+  await page.getByLabel("Senha", { exact: true }).fill(admin.senha);
+  await page.getByRole("button", { name: "Entrar" }).click();
+
+  await expect(page).toHaveURL(/\/admin$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Administração" })).toBeVisible();
+  const resposta = await page.goto("/admin");
+  expect(resposta?.status()).toBe(200);
 });
