@@ -6,13 +6,18 @@ import {
   credenciaisDoAdmin,
   criarContaConfirmada,
   emailUnico,
-  supabaseDisponivel,
+  modo,
 } from "./support/supabase-local";
 
 const SENHA = "senha-segura-123";
 const TRINTA_DIAS = 30 * 24 * 60 * 60;
 
-test.skip(!supabaseDisponivel, "precisa do Supabase local (SUPABASE_URL e SUPABASE_ANON_KEY)");
+test.skip(modo === "pular", "precisa do Supabase local (SUPABASE_URL e SUPABASE_ANON_KEY)");
+test.beforeEach(() => {
+  if (modo === "falhar") {
+    throw new Error("CI sem Supabase local: faltam SUPABASE_URL e SUPABASE_ANON_KEY no job de E2E");
+  }
+});
 test.use({ viewport: { width: 360, height: 780 } });
 
 const tokenFalso = (expiraEmSegundos: number) =>
@@ -149,8 +154,14 @@ test("sair leva à boas-vindas, /conta volta a pedir entrar e a sessão encerrad
 
 test("admin acessa /admin com a conta do seed, mesmo sem o perfil completo", async ({ page }) => {
   const admin = credenciaisDoAdmin();
-  test.skip(!admin, "precisa da conta admin do seed (ADMIN_EMAIL e ADMIN_SEED_PASSWORD)");
-  if (!admin) return;
+  if (!admin) {
+    // Sem a conta do seed o cenário pula na máquina de quem não a tem, mas falha no CI.
+    if (process.env.CI) {
+      throw new Error("CI sem a conta admin do seed: faltam ADMIN_EMAIL e ADMIN_SEED_PASSWORD");
+    }
+    test.skip(true, "precisa da conta admin do seed (ADMIN_EMAIL e ADMIN_SEED_PASSWORD)");
+    return;
+  }
 
   await page.goto("/entrar?retorno=%2Fadmin");
   await page.getByLabel("E-mail").fill(admin.email);
