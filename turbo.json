@@ -5,7 +5,9 @@
     "DIRECT_URL",
     "TEST_DATABASE_URL",
     "WEB_ORIGIN",
-    "SUPABASE_URL"
+    "SUPABASE_URL",
+    "SUPABASE_ANON_KEY",
+    "SUPABASE_EMAILS_URL"
   ],
   "tasks": {
     "build": {
