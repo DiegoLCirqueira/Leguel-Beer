@@ -36,6 +36,7 @@ jobs:
       WEB_ORIGIN: http://localhost:3000
       SITE_URL: http://localhost:3000
       API_URL: http://localhost:3333
+      ADMIN_EMAIL: admin@ci.leguele.test
       SUPABASE_URL: http://127.0.0.1:54321
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -110,6 +111,16 @@ jobs:
           status="$(pnpm exec supabase status -o env)"
           echo "SUPABASE_ANON_KEY=$(echo "$status" | grep '^ANON_KEY=' | cut -d= -f2- | tr -d '"')" >> "$GITHUB_ENV"
           echo "SUPABASE_EMAILS_URL=$(echo "$status" | grep '^MAILPIT_URL=' | cut -d= -f2- | tr -d '"')" >> "$GITHUB_ENV"
+
+      # Senha gerada neste job, mascarada antes de qualquer uso e nunca impressa. O e-mail é fictício.
+      - name: Criar o admin do E2E com o seed
+        run: |
+          senha="$(openssl rand -hex 16)"
+          echo "::add-mask::$senha"
+          echo "ADMIN_SEED_PASSWORD=$senha" >> "$GITHUB_ENV"
+          status="$(pnpm exec supabase status -o env)"
+          export SUPABASE_SERVICE_ROLE_KEY="$(echo "$status" | grep '^SERVICE_ROLE_KEY=' | cut -d= -f2- | tr -d '"')"
+          ADMIN_SEED_PASSWORD="$senha" pnpm db:seed
 
       - name: E2E
         run: pnpm test:e2e

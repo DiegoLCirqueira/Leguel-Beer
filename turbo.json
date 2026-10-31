@@ -9,7 +9,9 @@
     "API_URL",
     "SUPABASE_URL",
     "SUPABASE_ANON_KEY",
-    "SUPABASE_EMAILS_URL"
+    "SUPABASE_EMAILS_URL",
+    "ADMIN_EMAIL",
+    "ADMIN_SEED_PASSWORD"
   ],
   "tasks": {
     "build": {
