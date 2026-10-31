@@ -95,5 +95,19 @@ jobs:
       - name: Instalar o Chromium do Playwright
         run: pnpm --filter @leguele/web exec playwright install --with-deps chromium
 
+      # O Supabase CLI sobe só o Auth (gotrue, kong e mailpit) com o Postgres dele; a API do E2E
+      # continua no Postgres do service container, que o db:check acima já deixou migrado.
+      - name: Subir o Supabase local para os E2E de acesso
+        run: |
+          pnpm db:signing-key
+          pnpm db:start -x realtime,storage-api,imgproxy,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+
+      # As chaves são as de desenvolvimento do Supabase CLI, não são segredos.
+      - name: Exportar as chaves do Supabase local
+        run: |
+          status="$(pnpm exec supabase status -o env)"
+          echo "SUPABASE_ANON_KEY=$(echo "$status" | grep '^ANON_KEY=' | cut -d= -f2- | tr -d '"')" >> "$GITHUB_ENV"
+          echo "SUPABASE_EMAILS_URL=$(echo "$status" | grep '^MAILPIT_URL=' | cut -d= -f2- | tr -d '"')" >> "$GITHUB_ENV"
+
       - name: E2E
         run: pnpm test:e2e
