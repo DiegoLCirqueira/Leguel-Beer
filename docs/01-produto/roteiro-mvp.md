@@ -61,8 +61,9 @@ Agrupado por dependência. Dentro de cada grupo, a ordem da lista.
 O que a nuvem precisa repetir do Supabase local. Vem das specs e das revisões dos PRs #153 (tela de criar conta) e #154 (perfil em `/me/profile`).
 
 - [ ] **Limites de tentativa:** replicar na nuvem os "Limites de tentativa" de [[cadastro-login]].
-- [ ] **Limite por IP do cadastro:** a Server Action do cadastro repassa o IP do visitante (`X-Forwarded-For`) ao Supabase Auth. Confirmar na nuvem que o GoTrue confia nesse cabeçalho e testar com 31 cadastros seguidos do mesmo IP.
+- [ ] **Limite por IP do cadastro:** a Server Action do cadastro precisa repassar o IP do visitante (`X-Forwarded-For`) ao Supabase Auth (a implementar). Depois, confirmar na nuvem que o GoTrue confia nesse cabeçalho e testar com 31 cadastros seguidos do mesmo IP.
 - [ ] **Chave assimétrica de JWT:** replicar a de [[guards-api]].
+- [ ] **Emissor do token (`iss`):** a API compara o `iss` do JWT ao pé da letra com `SUPABASE_URL` + `/auth/v1`. Conferir na nuvem que o `iss` emitido é exatamente esse valor (mesmo protocolo e domínio, sem barra a mais).
 - [ ] **Confirmação de e-mail obrigatória:** `enable_confirmations = true` na nuvem. Sem ela, quem cadastrar o e-mail do admin vira admin.
 - [ ] **Leitura de `auth.users`:** a API lê `id` e `email_confirmed_at` para conceder admin. Se o papel do `DATABASE_URL` de produção não for o `postgres`, dar `GRANT SELECT (id, email_confirmed_at) ON auth.users` a esse papel.
 - [ ] **Endereço do site:** `SITE_URL` obrigatório em produção, e `site_url` e `additional_redirect_urls` do Supabase na nuvem iguais ao domínio do site.
