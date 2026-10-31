@@ -9,7 +9,12 @@ export type { EntrarForm, RecuperarSenhaForm } from "./conta/entrar.js";
 export { nomeCompletoSchema } from "./conta/nome.js";
 export { novaSenhaSchema } from "./conta/nova-senha.js";
 export type { NovaSenhaForm } from "./conta/nova-senha.js";
-export { criarPerfilRequestSchema, papelSchema, perfilResponseSchema } from "./conta/perfil.js";
-export type { CriarPerfilRequest, Papel, PerfilResponse } from "./conta/perfil.js";
+export {
+  criarPerfilRequestSchema,
+  papelResponseSchema,
+  papelSchema,
+  perfilResponseSchema,
+} from "./conta/perfil.js";
+export type { CriarPerfilRequest, Papel, PapelResponse, PerfilResponse } from "./conta/perfil.js";
 export { senhaSchema } from "./conta/senha.js";
 export { telefoneSchema } from "./conta/telefone.js";

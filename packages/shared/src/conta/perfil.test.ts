@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { criarPerfilRequestSchema, perfilResponseSchema } from "./perfil.js";
+import { criarPerfilRequestSchema, papelResponseSchema, perfilResponseSchema } from "./perfil.js";
 
 describe("criarPerfilRequestSchema", () => {
   const valido = { nome: "Ana Souza", telefone: "(82) 91234-5678", aceite: true };
@@ -55,5 +55,14 @@ describe("perfilResponseSchema", () => {
 
   it("recusa um papel desconhecido", () => {
     expect(perfilResponseSchema.safeParse({ ...perfil, papel: "dono" }).success).toBe(false);
+  });
+});
+
+describe("papelResponseSchema", () => {
+  it("aceita só o papel cliente ou admin", () => {
+    expect(papelResponseSchema.parse({ papel: "cliente" })).toEqual({ papel: "cliente" });
+    expect(papelResponseSchema.parse({ papel: "admin" })).toEqual({ papel: "admin" });
+    expect(papelResponseSchema.safeParse({ papel: "dono" }).success).toBe(false);
+    expect(papelResponseSchema.safeParse({}).success).toBe(false);
   });
 });

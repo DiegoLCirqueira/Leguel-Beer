@@ -61,4 +61,15 @@ describe("AppModule: rotas protegidas por padrão", () => {
       "telefone",
     );
   });
+
+  it("o Swagger documenta GET /me/role com Bearer e o papel na resposta", async () => {
+    const { body } = await request(app.getHttpServer()).get("/docs-json");
+
+    const rota = body.paths["/me/role"].get;
+    expect(rota.security).toEqual([{ bearer: [] }]);
+    expect(Object.keys(rota.responses)).toEqual(expect.arrayContaining(["200", "401"]));
+    expect(rota.responses["200"].content["application/json"].schema.properties).toHaveProperty(
+      "papel",
+    );
+  });
 });
