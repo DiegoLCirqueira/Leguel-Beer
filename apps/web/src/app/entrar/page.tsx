@@ -15,6 +15,7 @@ type Props = {
     retorno?: string;
     email?: string;
     "manter-conectado"?: string;
+    aviso?: string;
   }>;
 };
 
@@ -73,6 +74,15 @@ export default async function Entrar({ searchParams }: Props) {
             </h1>
             <p className="text-texto">Que bom te ver de novo!</p>
           </header>
+          {busca.aviso === "link-invalido" ? (
+            <p
+              role="alert"
+              className="rounded-2xl border border-aviso bg-superficie/70 px-4 py-3 text-sm text-texto"
+            >
+              Este link de confirmação é inválido ou já venceu. Entre com seu e-mail e senha para
+              receber um novo link.
+            </p>
+          ) : null}
           <EntrarForm
             entrar={entrarAction.bind(null, busca.retorno)}
             reenviar={reenviarAction}
