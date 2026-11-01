@@ -67,6 +67,11 @@ export function EntrarForm({ entrar, reenviar, emailInicial = "", manterConectad
     }
   }
 
+  /** Ao editar, o aviso vermelho some; "não confirmado" e "reenviado" continuam. */
+  function limparAvisoVermelho() {
+    setAviso((atual) => (atual?.tipo === "credenciais" || atual?.tipo === "erro" ? null : atual));
+  }
+
   async function reenviarLink(destino: string) {
     const resultado = await reenviar(destino);
     setAviso(resultado === "enviado" ? { tipo: "reenviado", email: destino } : { tipo: "erro" });
@@ -84,7 +89,10 @@ export function EntrarForm({ entrar, reenviar, emailInicial = "", manterConectad
         autoComplete="email"
         spellCheck={false}
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={(e) => {
+          setEmail(e.target.value);
+          limparAvisoVermelho();
+        }}
         erro={erros.email}
       />
       <Campo
@@ -96,7 +104,10 @@ export function EntrarForm({ entrar, reenviar, emailInicial = "", manterConectad
         placeholder="Digite sua senha"
         autoComplete="current-password"
         value={senha}
-        onChange={(e) => setSenha(e.target.value)}
+        onChange={(e) => {
+          setSenha(e.target.value);
+          limparAvisoVermelho();
+        }}
         erro={erros.senha}
         acao={<OlhoDaSenha visivel={verSenha} alternar={() => setVerSenha((v) => !v)} />}
       />
