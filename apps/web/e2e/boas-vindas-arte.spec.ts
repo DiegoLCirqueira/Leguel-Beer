@@ -278,3 +278,38 @@ for (const viewport of VIEWPORTS) {
     });
   });
 }
+
+for (const viewport of [
+  { width: 320, height: 568 },
+  { width: 375, height: 667 },
+]) {
+  test.describe(`boas-vindas viewport baixo ${viewport.width}x${viewport.height}`, () => {
+    test.use({ viewport });
+
+    test("a dica do (i) deixa Entrar, Criar conta, o checkbox e o (i) livres", async ({ page }) => {
+      await page.goto("/boas-vindas");
+      const info = page.getByRole("button", { name: "Saiba mais sobre Manter-me conectado" });
+      await info.scrollIntoViewIfNeeded();
+      await info.click();
+      const hint = await page.getByText(/Sua sessão continua ativa/).boundingBox();
+      expect(hint).not.toBeNull();
+
+      const livres = [
+        page.getByRole("link", { name: "Entrar" }),
+        page.getByRole("link", { name: "Criar conta" }),
+        page.getByRole("checkbox", { name: "Manter-me conectado" }),
+        info,
+      ];
+      for (const control of livres) {
+        const box = await control.boundingBox();
+        if (!box) throw new Error("controle não encontrado");
+        const separated =
+          hint!.y + hint!.height <= box.y ||
+          box.y + box.height <= hint!.y ||
+          hint!.x + hint!.width <= box.x ||
+          box.x + box.width <= hint!.x;
+        expect(separated).toBe(true);
+      }
+    });
+  });
+}
