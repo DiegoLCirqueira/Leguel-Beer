@@ -4,10 +4,8 @@ import { novaSenhaSchema } from "@leguele/shared";
 import { ArrowRight, Lock } from "lucide-react";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
-import { Button } from "@/components/ui/button";
+import { Button, Campo, OlhoDaSenha } from "@/components/ui";
 import { ehErroDeRedirect } from "@/lib/erro-de-redirect";
-import { Campo } from "./campo";
-import { OlhoDaSenha } from "./olho-da-senha";
 
 export type RespostaNovaSenha =
   | { tipo: "invalido"; erros: Partial<Record<"senha" | "confirmacao", string>> }

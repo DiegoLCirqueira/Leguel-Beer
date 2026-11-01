@@ -3,7 +3,7 @@
 import { ArrowRight, Check, Lock, Mail, Phone, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
-import { Button } from "@/components/ui/button";
+import { Button, Campo, OlhoDaSenha } from "@/components/ui";
 import {
   validarCadastro,
   type CampoCadastro,
@@ -11,8 +11,6 @@ import {
   type ResultadoCriarConta,
 } from "@/lib/auth/criar-conta";
 import { mascararTelefone } from "@/lib/mascara-telefone";
-import { Campo } from "./campo";
-import { OlhoDaSenha } from "./olho-da-senha";
 
 type Props = { criar: (entrada: EntradaCadastro) => Promise<ResultadoCriarConta> };
 

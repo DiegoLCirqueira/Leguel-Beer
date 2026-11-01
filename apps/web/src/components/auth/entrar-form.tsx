@@ -3,11 +3,9 @@
 import { ArrowRight, Check, Lock, Mail } from "lucide-react";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
-import { Button } from "@/components/ui/button";
+import { Button, Campo, OlhoDaSenha } from "@/components/ui";
 import { validarEntrada } from "@/lib/auth/entrar";
 import { ehErroDeRedirect } from "@/lib/erro-de-redirect";
-import { Campo } from "./campo";
-import { OlhoDaSenha } from "./olho-da-senha";
 
 export type RespostaEntrar =
   | { tipo: "invalido"; erros: Partial<Record<"email" | "senha", string>> }

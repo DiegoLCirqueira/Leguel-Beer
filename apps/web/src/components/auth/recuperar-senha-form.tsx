@@ -4,9 +4,8 @@ import { recuperarSenhaSchema } from "@leguele/shared";
 import { ArrowLeft, ArrowRight, Clock, Mail, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useState, type FormEvent, type ReactNode } from "react";
-import { Button } from "@/components/ui/button";
+import { Button, Campo } from "@/components/ui";
 import type { ResultadoPedido } from "@/lib/auth/recuperar-senha";
-import { Campo } from "./campo";
 
 type Props = { pedir: (entrada: { email: string }) => Promise<ResultadoPedido> };
 
