@@ -2,10 +2,7 @@
 
 import { ArrowRight, Link2, Lock, UserRound } from "lucide-react";
 import { useState } from "react";
-import { Campo } from "@/components/auth/campo";
-import { Button } from "@/components/ui/button";
-import { CategoryChips } from "@/components/ui/category-chips";
-import { StyleBadge } from "@/components/ui/style-badge";
+import { Button, Campo, CategoryChips, StyleBadge } from "@/components/ui";
 
 const swatches = [
   { name: "fundo", className: "bg-fundo" },

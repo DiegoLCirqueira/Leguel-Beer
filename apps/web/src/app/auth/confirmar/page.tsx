@@ -2,7 +2,7 @@ import { Check } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui";
 import { SiteFooter } from "@/components/site/site-footer";
 import { confirmarContaAction } from "./actions";
 

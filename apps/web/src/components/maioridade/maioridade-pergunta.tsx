@@ -3,7 +3,7 @@
 import { Check } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui";
 import { AVISOS_RODAPE } from "@/lib/avisos";
 
 type Props = {
