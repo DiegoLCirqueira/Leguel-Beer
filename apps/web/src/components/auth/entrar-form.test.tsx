@@ -141,4 +141,16 @@ describe("EntrarForm", () => {
     await waitFor(() => expect(screen.getByRole("button", { name: "Entrar" })).toBeEnabled());
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
+
+  it("falha comum da ação (rede) mostra o aviso de erro", async () => {
+    const { entrar } = renderizar();
+    entrar.mockRejectedValue(new Error("rede"));
+    await preencher();
+
+    await userEvent.click(screen.getByRole("button", { name: "Entrar" }));
+
+    expect(
+      await screen.findByText("Não foi possível concluir agora. Tente de novo em instantes."),
+    ).toBeInTheDocument();
+  });
 });
