@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 const HINT =
   "Sua sessão continua ativa neste aparelho por até 30 dias, mesmo depois de fechar o navegador.";
 
+const HINT_DURATION_MS = 5000;
+
 // Área de toque de pelo menos 44 px de altura mesmo quando o controle desenhado é menor.
 const TOUCH_AREA =
   "before:absolute before:inset-x-0 before:-inset-y-[max(0px,calc((44px_-_100%)/2))] before:content-['']";
@@ -39,9 +41,11 @@ export function WelcomeActions() {
       if (hintRef.current?.contains(target) || infoRef.current?.contains(target)) return;
       setShowHint(false);
     }
+    const autoClose = setTimeout(() => setShowHint(false), HINT_DURATION_MS);
     document.addEventListener("keydown", closeOnEscape);
     document.addEventListener("pointerdown", closeOnOutsidePress);
     return () => {
+      clearTimeout(autoClose);
       document.removeEventListener("keydown", closeOnEscape);
       document.removeEventListener("pointerdown", closeOnOutsidePress);
     };
