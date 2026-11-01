@@ -105,4 +105,16 @@ describe("NovaSenhaForm", () => {
     );
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
+
+  it("falha comum da ação (rede) mostra o aviso de erro", async () => {
+    const salvar = renderizar();
+    salvar.mockRejectedValue(new Error("rede"));
+    await preencher();
+
+    await userEvent.click(screen.getByRole("button", { name: "Salvar nova senha" }));
+
+    expect(
+      await screen.findByText("Não foi possível concluir agora. Tente de novo em instantes."),
+    ).toBeInTheDocument();
+  });
 });

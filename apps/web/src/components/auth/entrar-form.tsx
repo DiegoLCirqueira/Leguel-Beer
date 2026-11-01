@@ -1,11 +1,11 @@
 "use client";
 
 import { ArrowRight, Check, Lock, Mail } from "lucide-react";
-import { isRedirectError } from "next/dist/client/components/redirect-error";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { validarEntrada } from "@/lib/auth/entrar";
+import { ehErroDeRedirect } from "@/lib/erro-de-redirect";
 import { Campo } from "./campo";
 import { OlhoDaSenha } from "./olho-da-senha";
 
@@ -60,7 +60,7 @@ export function EntrarForm({ entrar, reenviar, emailInicial = "", manterConectad
       else setAviso(resposta);
     } catch (e) {
       // No sucesso a ação redireciona no servidor e a promise rejeita com o erro de redirect do Next.
-      if (isRedirectError(e)) return;
+      if (ehErroDeRedirect(e)) return;
       setAviso({ tipo: "erro" });
     } finally {
       setEnviando(false);
