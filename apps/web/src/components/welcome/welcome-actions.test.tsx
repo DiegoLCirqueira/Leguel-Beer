@@ -110,4 +110,14 @@ describe("WelcomeActions", () => {
       vi.useRealTimers();
     }
   });
+
+  it("a dica do (i) abre ancorada junto ao ícone, no mesmo bloco do Manter-me conectado", async () => {
+    render(<WelcomeActions />);
+    const info = screen.getByRole("button", { name: "Saiba mais sobre Manter-me conectado" });
+    await userEvent.click(info);
+
+    const dica = screen.getByText(/Sua sessão continua ativa/);
+
+    expect(info.parentElement).toContainElement(dica);
+  });
 });
