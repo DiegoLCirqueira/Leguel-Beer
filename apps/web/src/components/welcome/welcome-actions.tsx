@@ -3,7 +3,7 @@
 import { ArrowRight, Check, Info, Link as LinkIcon, UserPlus, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
-import { ART, CONTROLS, OR_ROW, cq, fl, pctH, pctW, pctX, pctY, rectStyle } from "@/lib/arte-login";
+import { CONTROLS, OR_ROW, cq, fl, pctH, pctW, pctX, pctY, rectStyle } from "@/lib/arte-login";
 import { markGuest } from "@/lib/guest";
 import { cn } from "@/lib/utils";
 
@@ -50,8 +50,6 @@ export function WelcomeActions() {
       document.removeEventListener("pointerdown", closeOnOutsidePress);
     };
   }, [showHint]);
-
-  const enterTopPct = ((CONTROLS.enter.y - ART.y0) / ART.height) * 100;
 
   return (
     <>
@@ -198,19 +196,15 @@ export function WelcomeActions() {
         >
           <Info aria-hidden="true" className="size-full" />
         </button>
-      </div>
-      <div
-        ref={hintRef}
-        id={hintId}
-        aria-live="polite"
-        style={{
-          left: pctX(CONTROLS.enter.x),
-          width: pctW(CONTROLS.enter.w),
-          bottom: `calc(${(100 - enterTopPct).toFixed(3)}% + 0.5rem)`,
-        }}
-        className="absolute z-30 rounded-campo border border-arte-borda bg-arte-vidro px-3 py-2 text-center text-xs leading-snug text-texto empty:hidden"
-      >
-        {showHint ? HINT : null}
+        <div
+          ref={hintRef}
+          id={hintId}
+          aria-live="polite"
+          style={{ width: cq(667) }}
+          className="absolute bottom-full left-1/2 z-30 mb-2 -translate-x-1/2 rounded-campo border border-arte-borda bg-arte-vidro px-3 py-2 text-center text-xs leading-snug text-texto empty:hidden"
+        >
+          {showHint ? HINT : null}
+        </div>
       </div>
     </>
   );

@@ -195,6 +195,7 @@ for (const viewport of VIEWPORTS) {
 
     test("a área de toque de cada controle tem pelo menos 44 px de altura", async ({ page }) => {
       await page.goto("/boas-vindas");
+      // A dica abre colada ao (i) e some em 5 s; a "Continuar como convidado" pode ficar sob ela nesse tempo.
       const controls = [
         page.getByRole("link", { name: "Entrar" }),
         page.getByRole("link", { name: "Criar conta" }),
@@ -241,7 +242,7 @@ for (const viewport of VIEWPORTS) {
       }
     });
 
-    test("a dica do (i) não cobre nenhum controle e o segundo toque no (i) a fecha", async ({
+    test("a dica do (i) fica junto ao ícone, não cobre os controles principais e o segundo toque no (i) a fecha", async ({
       page,
     }) => {
       await page.goto("/boas-vindas");
@@ -254,7 +255,6 @@ for (const viewport of VIEWPORTS) {
       const controls = [
         page.getByRole("link", { name: "Entrar" }),
         page.getByRole("link", { name: "Criar conta" }),
-        page.getByRole("link", { name: "Continuar como convidado" }),
         page.getByRole("checkbox", { name: "Manter-me conectado" }),
         info,
       ];
