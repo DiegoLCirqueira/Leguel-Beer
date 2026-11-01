@@ -200,8 +200,8 @@ export function WelcomeActions() {
           ref={hintRef}
           id={hintId}
           aria-live="polite"
-          style={{ width: cq(667) }}
-          className="absolute bottom-full left-1/2 z-30 mb-2 -translate-x-1/2 rounded-campo border border-arte-borda bg-arte-vidro px-3 py-2 text-center text-xs leading-snug text-texto empty:hidden"
+          style={{ width: "calc(100cqw - 16px)" }}
+          className="absolute bottom-full left-1/2 z-30 mb-1 -translate-x-1/2 rounded-campo border border-arte-borda bg-arte-vidro px-3 py-2 text-center text-xs leading-snug text-texto empty:hidden"
         >
           {showHint ? HINT : null}
         </div>
