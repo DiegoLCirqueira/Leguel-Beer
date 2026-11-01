@@ -281,7 +281,9 @@ for (const viewport of VIEWPORTS) {
 
 for (const viewport of [
   { width: 320, height: 568 },
+  { width: 360, height: 600 },
   { width: 375, height: 667 },
+  ...LOW_VIEWPORTS,
 ]) {
   test.describe(`boas-vindas viewport baixo ${viewport.width}x${viewport.height}`, () => {
     test.use({ viewport });
