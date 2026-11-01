@@ -54,8 +54,8 @@ export default async function Entrar({ searchParams }: Props) {
           <Image
             src="/acesso/logo-nome.webp"
             alt="Leguelé Beer"
-            width={772}
-            height={750}
+            width={507}
+            height={492}
             sizes="144px"
             quality={90}
             priority
