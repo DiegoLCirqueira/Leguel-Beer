@@ -9,10 +9,9 @@ Sobrescrito pelo Orchestrator ao fim de cada ordem. A próxima conversa começa 
 
 ## Última ordem: fase 1 do roteiro (acesso) e ajustes de tela (30/10 a 01/11)
 
-Encerrada, com uma pendência (#176). Resumo em [[2026-10-30]] e [[2026-10-31]].
+Encerrada. Resumo em [[2026-10-30]] e [[2026-10-31]].
 
-- Entregues: identidade com as cores do Figma, LB-119, LB-120, LB-19, LB-22, LB-24, LB-25, LB-27 e LB-28 (API e site). PRs #139 a #175.
-- Pendente: #176 (minors da recuperação de senha), aprovado no código e à espera do texto "Não foi possível salvar a nova senha. Peça um novo link." pelo Diego.
+- Entregues: identidade com as cores do Figma, LB-119, LB-120, LB-19, LB-22, LB-24, LB-25, LB-27 e LB-28 (API e site). PRs #139 a #176. Texto da nova senha não salva aprovado pelo Diego ("A").
 
 ## Estado
 
@@ -25,10 +24,9 @@ Encerrada, com uma pendência (#176). Resumo em [[2026-10-30]] e [[2026-10-31]].
 
 ## Próximo
 
-1. Merge do #176 depois da resposta do Diego.
-2. Refatoração de `apps/web/src/components/ui` com export único em `index.ts` e vitrine em `/dev/tokens` (pedido do Diego; regra já no CLAUDE.md e em [[identidade-visual]]).
-3. PR do Devops: `@leguele/shared` em watch no `pnpm dev`.
-4. Fase 2 do [[roteiro-mvp]]: bloco A (base técnica) e depois B (catálogo). O Diego inspeciona cada página entregue (nota "Páginas do projeto").
+1. Refatoração de `apps/web/src/components/ui` com export único em `index.ts` e vitrine em `/dev/tokens` (pedido do Diego; regra já no CLAUDE.md e em [[identidade-visual]]).
+2. PR do Devops: `@leguele/shared` em watch no `pnpm dev`.
+3. Fase 2 do [[roteiro-mvp]]: bloco A (base técnica) e depois B (catálogo). O Diego inspeciona cada página entregue (nota "Páginas do projeto").
 
 ## Follow-ups
 
