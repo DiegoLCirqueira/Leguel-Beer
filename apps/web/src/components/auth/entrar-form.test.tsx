@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { EntrarForm, type RespostaEntrar } from "./entrar-form";
@@ -127,5 +127,18 @@ describe("EntrarForm", () => {
       await screen.findByText("Não foi possível concluir agora. Tente de novo em instantes."),
     ).toBeInTheDocument();
     expect(screen.getByLabelText("E-mail")).toHaveValue("ana@exemplo.com");
+  });
+
+  it("login bem-sucedido (a ação rejeita com o erro de redirect do Next) não mostra aviso nenhum", async () => {
+    const { entrar } = renderizar();
+    entrar.mockRejectedValue(
+      Object.assign(new Error("NEXT_REDIRECT"), { digest: "NEXT_REDIRECT;push;/;307;" }),
+    );
+    await preencher();
+
+    await userEvent.click(screen.getByRole("button", { name: "Entrar" }));
+
+    await waitFor(() => expect(screen.getByRole("button", { name: "Entrar" })).toBeEnabled());
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 });
