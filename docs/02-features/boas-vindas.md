@@ -92,7 +92,7 @@ Funcionalidade: Tela de boas-vindas
 - **Imagens:** logo, garrafa com copo, barril e folhagem de `Imagens/`, otimizadas para celular. A imagem principal tem texto alternativo.
 - **Componentes:** "Entrar" é o botão primário com ícone e seta; "Criar conta", o botão de contorno; "Continuar como convidado", o botão discreto ([[identidade-visual]]).
 
-- **Ícone (i) de "Manter-me conectado":** ao ser tocado, mostra a dica da tabela abaixo.
+- **Ícone (i) de "Manter-me conectado":** ao ser tocado, mostra a dica da tabela abaixo, em texto de 12 px, junto ao ícone e acima dele. A dica fecha sozinha em 5 s, ao tocar fora dela e com Esc. Enquanto aberta, pode cobrir só "Continuar como convidado"; nunca cobre "Criar conta", "Entrar", a caixa de "Manter-me conectado" nem o próprio (i) (decisão do Diego, 2026-11-01, que substitui a regra de 2026-10-30 de não cobrir nenhum controle).
 
 ## Textos
 
@@ -130,6 +130,10 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 - **Estilo do slogan (histórico, substituído pela decisão final abaixo):** "melhorar a fonte que ficou escrito 'Sabor Qualidad e Tradição' (ficou péssimo) pode deixar igual na imagem do figma se ficar mais fácil". Duas possibilidades, com a escolha final depois que o Diego vir o resultado: (1) "Sabor Qualidade e Tradição" recriado no estilo de pincel da arte original; (2) se não ficar fiel, voltar à arte original do Figma, com "Cervejas artesanais e muito mais!".
 - **Slogan, decisão final:** 'deixe só "Cervejas artesanais"'. O slogan é "Cervejas artesanais", da arte original do Figma sem a linha "e muito mais!". As duas possibilidades acima ("Sabor Qualidade e Tradição" recriado e a arte original completa) ficam só como histórico.
 - **Sem rolagem:** "Retirar rolagem da página principal". A boas-vindas não rola e fica sem o rodapé.
+
+### Decisões do Diego (2026-11-01)
+
+- **Dica do (i) de "Manter-me conectado" ("1- B"):** abre junto ao ícone, acima dele, em 12 px; fecha sozinha em 5 s, ao tocar fora e com Esc; pode cobrir só "Continuar como convidado" enquanto aberta, nunca "Criar conta", "Entrar", a caixa de "Manter-me conectado" ou o (i). Substitui a regra de 2026-10-30 (#133) de a dica não cobrir nenhum controle.
 
 ## Decisões tomadas sem consulta
 
