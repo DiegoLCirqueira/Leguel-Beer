@@ -59,8 +59,8 @@ export function MaioridadePergunta({ retorno, confirmar }: Props) {
           src="/maioridade/logo.webp"
           quality={90}
           alt="Leguelé Beer"
-          width={768}
-          height={768}
+          width={500}
+          height={500}
           sizes="128px"
           priority
           className="size-32"
