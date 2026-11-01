@@ -43,6 +43,15 @@ describe("pares de tokens", () => {
   });
 });
 
+describe("borda dos campos de digitar", () => {
+  it.each(["fundo", "superficie"])(
+    "borda-campo sobre %s atinge contraste de componente (3:1, WCAG 1.4.11)",
+    (fundo) => {
+      expect(contrastRatio(token("borda-campo"), token(fundo))).toBeGreaterThanOrEqual(3);
+    },
+  );
+});
+
 describe("cores e fonte do Figma no site inteiro", () => {
   it.each([
     ["primaria", "#95dc50"],
