@@ -127,6 +127,7 @@ Funcionalidade: Cadastro e login com e-mail e senha
 - **Risco aceito:** o refresh token não vence no Supabase. Um cookie copiado antes dos 30 dias continua valendo até a sessão ser renovada ou encerrada (por "Sair" ou pela troca de senha).
 - **Depois de entrar:** volta à página de onde a pessoa veio (só endereços do próprio site), ou à home.
 - **Erro de credencial:** sempre "E-mail ou senha inválidos", exista ou não a conta.
+- **Aviso some ao editar:** o aviso vermelho de `/entrar` ("E-mail ou senha inválidos" ou "Não foi possível concluir agora. Tente de novo em instantes.") some assim que a pessoa edita o e-mail ou a senha, sem esperar um novo envio (decisão do Diego, 2026-11-01).
 - **Sair:** o botão "Sair" fica no fim da tela de perfil e, até ela existir, no menu da conta. Encerra a sessão deste aparelho no Supabase Auth (a renovação deixa de funcionar), apaga os cookies e leva à [[boas-vindas]]. O token de acesso já emitido continua aceito pela API até vencer, no máximo 1 hora (risco aceito, igual ao de [[recuperacao-senha]]).
 
 ### Sessão e cookies
@@ -211,6 +212,10 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 ### Decisão do Orchestrator (2026-10-31)
 
 - **Página com botão em `/auth/confirmar`:** o link do e-mail abre uma página, e só o POST do botão "Confirmar minha conta" chama o `/verify`. Protege contra scanners de e-mail que gastam o link e contra login CSRF (apontado pelo Reviewer no #162).
+
+### Decisões do Diego (2026-11-01)
+
+- **Aviso vermelho de `/entrar` ("2- A"):** o aviso de credenciais inválidas ou de erro some assim que a pessoa edita o e-mail ou a senha, sem esperar novo envio. Sem cenário Gherkin novo: a spec já passa do limite de 6 cenários; a regra fica em "Entrar".
 
 ### Decisões do Diego (2026-10-31)
 
