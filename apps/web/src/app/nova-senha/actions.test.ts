@@ -92,4 +92,13 @@ describe("novaSenhaAction", () => {
 
     expect(await novaSenhaAction("hash-1", "recovery", dados)).toEqual({ tipo: "erro" });
   });
+
+  it("senha recusada depois de verificar o link devolve senha-nao-salva e não entra", async () => {
+    fetchFalso.mockImplementation(async (url: string) =>
+      url.includes("/auth/v1/verify") ? resposta(200, sessaoGoTrue) : resposta(422, {}),
+    );
+
+    expect(await novaSenhaAction("hash-1", "recovery", dados)).toEqual({ tipo: "senha-nao-salva" });
+    expect(gravados.size).toBe(0);
+  });
 });

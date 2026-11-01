@@ -110,10 +110,42 @@ describe("definirNovaSenha", () => {
     expect(deps.auth.updatePassword).not.toHaveBeenCalled();
   });
 
-  it("senha recusada pelo Supabase vira erro, sem encerrar as outras sessões", async () => {
+  it("senha recusada pelo Supabase depois do verify (o link já foi gasto) devolve senha-nao-salva, sem encerrar as outras sessões", async () => {
     const deps = dependencias({ updatePassword: vi.fn().mockResolvedValue(false) });
 
-    expect(await definirNovaSenha(entrada, deps)).toEqual({ tipo: "erro" });
+    expect(await definirNovaSenha(entrada, deps)).toEqual({ tipo: "senha-nao-salva" });
     expect(deps.auth.signOutOthers).not.toHaveBeenCalled();
+  });
+
+  it("se encerrar as outras sessões falha, tenta de novo uma vez e segue com a senha trocada", async () => {
+    const deps = dependencias({
+      signOutOthers: vi.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true),
+    });
+    const registrar = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    expect(await definirNovaSenha(entrada, deps)).toEqual({ tipo: "ok", sessao });
+    expect(deps.auth.signOutOthers).toHaveBeenCalledTimes(2);
+    expect(registrar).not.toHaveBeenCalled();
+    registrar.mockRestore();
+  });
+
+  it("falhando as duas tentativas registra a falha, sem dados pessoais, e a pessoa entra mesmo assim", async () => {
+    const deps = dependencias({ signOutOthers: vi.fn().mockResolvedValue(false) });
+    const registrar = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    expect(await definirNovaSenha(entrada, deps)).toEqual({ tipo: "ok", sessao });
+    expect(deps.auth.signOutOthers).toHaveBeenCalledTimes(2);
+    expect(registrar).toHaveBeenCalledTimes(1);
+    const registrado = JSON.stringify(registrar.mock.calls);
+    for (const dado of [
+      "ana@exemplo.com",
+      "acesso-novo",
+      "renovacao-nova",
+      "nova-senha-123",
+      "u1",
+    ]) {
+      expect(registrado).not.toContain(dado);
+    }
+    registrar.mockRestore();
   });
 });

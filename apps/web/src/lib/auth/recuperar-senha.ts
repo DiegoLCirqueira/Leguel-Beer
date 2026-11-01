@@ -37,6 +37,8 @@ export type ResultadoNovaSenha =
   | { tipo: "ok"; sessao: Sessao }
   | { tipo: "invalido"; erros: Partial<Record<"senha" | "confirmacao", string>> }
   | { tipo: "link-invalido" }
+  /** O link já foi gasto no verify, mas o Supabase não salvou a senha: é preciso pedir outro. */
+  | { tipo: "senha-nao-salva" }
   | { tipo: "erro" };
 
 interface DependenciasNovaSenha {
@@ -77,8 +79,17 @@ export async function definirNovaSenha(
   if (!sessao) return { tipo: "link-invalido" };
 
   if (!(await auth.updatePassword(sessao.accessToken, validacao.data.senha))) {
-    return { tipo: "erro" };
+    return { tipo: "senha-nao-salva" };
   }
-  await auth.signOutOthers(sessao.accessToken);
+  // A spec diz que as outras sessões são encerradas: tenta de novo uma vez e, se falhar, registra
+  // a falha (sem dados pessoais). A senha já mudou, então a pessoa entra mesmo assim.
+  const encerrou =
+    (await auth.signOutOthers(sessao.accessToken)) ||
+    (await auth.signOutOthers(sessao.accessToken));
+  if (!encerrou) {
+    console.error(
+      "[nova-senha] não foi possível encerrar as outras sessões depois de trocar a senha",
+    );
+  }
   return { tipo: "ok", sessao };
 }

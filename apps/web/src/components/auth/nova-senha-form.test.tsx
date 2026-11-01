@@ -75,4 +75,19 @@ describe("NovaSenhaForm", () => {
     ).toBeInTheDocument();
     expect(screen.getByLabelText("Nova senha")).toHaveValue("nova-senha-123");
   });
+
+  it("senha que não foi salva depois de gastar o link pede um novo link", async () => {
+    renderizar({ tipo: "senha-nao-salva" });
+    await preencher();
+
+    await userEvent.click(screen.getByRole("button", { name: "Salvar nova senha" }));
+
+    expect(
+      await screen.findByText("Não foi possível salvar a nova senha. Peça um novo link."),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Pedir novo link" })).toHaveAttribute(
+      "href",
+      "/recuperar-senha",
+    );
+  });
 });

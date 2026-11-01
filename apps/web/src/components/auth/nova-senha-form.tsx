@@ -11,6 +11,7 @@ import { OlhoDaSenha } from "./olho-da-senha";
 export type RespostaNovaSenha =
   | { tipo: "invalido"; erros: Partial<Record<"senha" | "confirmacao", string>> }
   | { tipo: "link-invalido" }
+  | { tipo: "senha-nao-salva" }
   | { tipo: "erro" };
 
 type Props = {
@@ -38,7 +39,9 @@ export function NovaSenhaForm({ salvar }: Props) {
   const [verSenha, setVerSenha] = useState(false);
   const [verConfirmacao, setVerConfirmacao] = useState(false);
   const [erros, setErros] = useState<Partial<Record<"senha" | "confirmacao", string>>>({});
-  const [resposta, setResposta] = useState<"link-invalido" | "erro" | null>(null);
+  const [resposta, setResposta] = useState<"link-invalido" | "senha-nao-salva" | "erro" | null>(
+    null,
+  );
   const [enviando, setEnviando] = useState(false);
 
   async function enviar(evento: FormEvent) {
@@ -104,6 +107,19 @@ export function NovaSenhaForm({ salvar }: Props) {
         }
       />
 
+      {resposta === "senha-nao-salva" ? (
+        <div role="alert" className="flex flex-col items-center gap-1 text-center">
+          <p className="text-sm text-erro">
+            Não foi possível salvar a nova senha. Peça um novo link.
+          </p>
+          <Link
+            href="/recuperar-senha"
+            className="inline-flex min-h-11 items-center text-sm font-semibold text-primaria underline underline-offset-2"
+          >
+            Pedir novo link
+          </Link>
+        </div>
+      ) : null}
       {resposta === "erro" ? (
         <p role="alert" className="text-center text-sm text-erro">
           Não foi possível concluir agora. Tente de novo em instantes.
