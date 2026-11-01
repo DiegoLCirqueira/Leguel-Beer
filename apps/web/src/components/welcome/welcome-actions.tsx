@@ -3,12 +3,14 @@
 import { ArrowRight, Check, Info, Link as LinkIcon, UserPlus, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
-import { ART, CONTROLS, OR_ROW, cq, fl, pctH, pctW, pctX, pctY, rectStyle } from "@/lib/arte-login";
+import { CONTROLS, OR_ROW, cq, fl, pctH, pctW, pctX, pctY, rectStyle } from "@/lib/arte-login";
 import { markGuest } from "@/lib/guest";
 import { cn } from "@/lib/utils";
 
 const HINT =
   "Sua sessão continua ativa neste aparelho por até 30 dias, mesmo depois de fechar o navegador.";
+
+const HINT_DURATION_MS = 5000;
 
 // Área de toque de pelo menos 44 px de altura mesmo quando o controle desenhado é menor.
 const TOUCH_AREA =
@@ -39,15 +41,15 @@ export function WelcomeActions() {
       if (hintRef.current?.contains(target) || infoRef.current?.contains(target)) return;
       setShowHint(false);
     }
+    const autoClose = setTimeout(() => setShowHint(false), HINT_DURATION_MS);
     document.addEventListener("keydown", closeOnEscape);
     document.addEventListener("pointerdown", closeOnOutsidePress);
     return () => {
+      clearTimeout(autoClose);
       document.removeEventListener("keydown", closeOnEscape);
       document.removeEventListener("pointerdown", closeOnOutsidePress);
     };
   }, [showHint]);
-
-  const enterTopPct = ((CONTROLS.enter.y - ART.y0) / ART.height) * 100;
 
   return (
     <>
@@ -194,19 +196,15 @@ export function WelcomeActions() {
         >
           <Info aria-hidden="true" className="size-full" />
         </button>
-      </div>
-      <div
-        ref={hintRef}
-        id={hintId}
-        aria-live="polite"
-        style={{
-          left: pctX(CONTROLS.enter.x),
-          width: pctW(CONTROLS.enter.w),
-          bottom: `calc(${(100 - enterTopPct).toFixed(3)}% + 0.5rem)`,
-        }}
-        className="absolute z-30 rounded-campo border border-arte-borda bg-arte-vidro px-3 py-2 text-center text-xs leading-snug text-texto empty:hidden"
-      >
-        {showHint ? HINT : null}
+        <div
+          ref={hintRef}
+          id={hintId}
+          aria-live="polite"
+          style={{ width: "min(100vw - 16px, max(100cqw - 16px, 21rem))" }}
+          className="absolute bottom-full left-1/2 z-30 mb-1 -translate-x-1/2 rounded-campo border border-arte-borda bg-arte-vidro px-3 py-1.5 text-center text-xs leading-snug text-texto empty:hidden"
+        >
+          {showHint ? HINT : null}
+        </div>
       </div>
     </>
   );

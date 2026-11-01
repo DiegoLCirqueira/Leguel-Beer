@@ -153,4 +153,31 @@ describe("EntrarForm", () => {
       await screen.findByText("Não foi possível concluir agora. Tente de novo em instantes."),
     ).toBeInTheDocument();
   });
+
+  it.each([
+    ["E-mail", { tipo: "credenciais" } as const],
+    ["Senha", { tipo: "credenciais" } as const],
+    ["E-mail", { tipo: "erro" } as const],
+    ["Senha", { tipo: "erro" } as const],
+  ])("o aviso vermelho (%s, %o) some ao editar o campo", async (campo, resposta) => {
+    renderizar(resposta);
+    await preencher();
+    await userEvent.click(screen.getByRole("button", { name: "Entrar" }));
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
+
+    await userEvent.type(screen.getByLabelText(campo), "x");
+
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("o aviso de e-mail não confirmado, com Reenviar link, continua ao editar", async () => {
+    renderizar({ tipo: "nao-confirmado", email: "ana@exemplo.com" });
+    await preencher();
+    await userEvent.click(screen.getByRole("button", { name: "Entrar" }));
+    expect(await screen.findByRole("button", { name: "Reenviar link" })).toBeInTheDocument();
+
+    await userEvent.type(screen.getByLabelText("E-mail"), "x");
+
+    expect(screen.getByRole("button", { name: "Reenviar link" })).toBeInTheDocument();
+  });
 });

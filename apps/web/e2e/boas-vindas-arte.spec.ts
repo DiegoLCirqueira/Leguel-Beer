@@ -195,6 +195,7 @@ for (const viewport of VIEWPORTS) {
 
     test("a área de toque de cada controle tem pelo menos 44 px de altura", async ({ page }) => {
       await page.goto("/boas-vindas");
+      // A dica abre colada ao (i) e some em 5 s; a "Continuar como convidado" pode ficar sob ela nesse tempo.
       const controls = [
         page.getByRole("link", { name: "Entrar" }),
         page.getByRole("link", { name: "Criar conta" }),
@@ -241,7 +242,7 @@ for (const viewport of VIEWPORTS) {
       }
     });
 
-    test("a dica do (i) não cobre nenhum controle e o segundo toque no (i) a fecha", async ({
+    test("a dica do (i) fica junto ao ícone, não cobre os controles principais e o segundo toque no (i) a fecha", async ({
       page,
     }) => {
       await page.goto("/boas-vindas");
@@ -254,7 +255,6 @@ for (const viewport of VIEWPORTS) {
       const controls = [
         page.getByRole("link", { name: "Entrar" }),
         page.getByRole("link", { name: "Criar conta" }),
-        page.getByRole("link", { name: "Continuar como convidado" }),
         page.getByRole("checkbox", { name: "Manter-me conectado" }),
         info,
       ];
@@ -275,6 +275,43 @@ for (const viewport of VIEWPORTS) {
       await expect(hintText).toBeVisible();
       await info.click();
       await expect(hintText).toBeHidden();
+    });
+  });
+}
+
+for (const viewport of [
+  { width: 320, height: 568 },
+  { width: 360, height: 600 },
+  { width: 375, height: 667 },
+  ...LOW_VIEWPORTS,
+]) {
+  test.describe(`boas-vindas viewport baixo ${viewport.width}x${viewport.height}`, () => {
+    test.use({ viewport });
+
+    test("a dica do (i) deixa Entrar, Criar conta, o checkbox e o (i) livres", async ({ page }) => {
+      await page.goto("/boas-vindas");
+      const info = page.getByRole("button", { name: "Saiba mais sobre Manter-me conectado" });
+      await info.scrollIntoViewIfNeeded();
+      await info.click();
+      const hint = await page.getByText(/Sua sessão continua ativa/).boundingBox();
+      expect(hint).not.toBeNull();
+
+      const livres = [
+        page.getByRole("link", { name: "Entrar" }),
+        page.getByRole("link", { name: "Criar conta" }),
+        page.getByRole("checkbox", { name: "Manter-me conectado" }),
+        info,
+      ];
+      for (const control of livres) {
+        const box = await control.boundingBox();
+        if (!box) throw new Error("controle não encontrado");
+        const separated =
+          hint!.y + hint!.height <= box.y ||
+          box.y + box.height <= hint!.y ||
+          hint!.x + hint!.width <= box.x ||
+          box.x + box.width <= hint!.x;
+        expect(separated).toBe(true);
+      }
     });
   });
 }

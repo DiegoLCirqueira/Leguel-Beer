@@ -1,6 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { WelcomeActions } from "./welcome-actions";
 
 describe("WelcomeActions", () => {
@@ -86,5 +86,38 @@ describe("WelcomeActions", () => {
     await userEvent.click(document.body);
 
     expect(screen.queryByText(/Sua sessão continua ativa/)).not.toBeInTheDocument();
+  });
+
+  it("a dica do (i) fecha sozinha depois de 5 segundos", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      render(<WelcomeActions />);
+      await userEvent.click(
+        screen.getByRole("button", { name: "Saiba mais sobre Manter-me conectado" }),
+      );
+      expect(screen.getByText(/Sua sessão continua ativa/)).toBeInTheDocument();
+
+      act(() => {
+        vi.advanceTimersByTime(4900);
+      });
+      expect(screen.getByText(/Sua sessão continua ativa/)).toBeInTheDocument();
+
+      act(() => {
+        vi.advanceTimersByTime(200);
+      });
+      expect(screen.queryByText(/Sua sessão continua ativa/)).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("a dica do (i) abre ancorada junto ao ícone, no mesmo bloco do Manter-me conectado", async () => {
+    render(<WelcomeActions />);
+    const info = screen.getByRole("button", { name: "Saiba mais sobre Manter-me conectado" });
+    await userEvent.click(info);
+
+    const dica = screen.getByText(/Sua sessão continua ativa/);
+
+    expect(info.parentElement).toContainElement(dica);
   });
 });

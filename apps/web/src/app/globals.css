@@ -8,6 +8,8 @@
   --color-superficie: #10261a;
   --color-superficie-elevada: #163021;
   --color-borda: #24452f;
+  /* Borda dos campos de digitar: 3:1 contra fundo e superfície (WCAG 1.4.11) */
+  --color-borda-campo: #5a8450;
   --color-texto: #f7fbf5;
   --color-texto-suave: #a9bfa0;
   --color-primaria: #95dc50;

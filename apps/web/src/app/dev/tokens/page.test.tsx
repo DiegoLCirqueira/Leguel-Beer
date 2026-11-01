@@ -23,6 +23,12 @@ describe("/dev/tokens", () => {
     );
   });
 
+  it("mostra o Campo de digitar com contorno, para conferir a borda e o foco", () => {
+    render(<DevTokens />);
+
+    expect(screen.getByLabelText("Senha de exemplo")).toBeInTheDocument();
+  });
+
   it("em produção não existe", () => {
     vi.stubEnv("NODE_ENV", "production");
 
