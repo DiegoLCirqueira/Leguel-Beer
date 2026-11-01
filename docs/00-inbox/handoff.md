@@ -1,35 +1,41 @@
 ---
 tags: [handoff]
-atualizado: 2026-10-30
+atualizado: 2026-11-01
 ---
 
 # Handoff
 
 Sobrescrito pelo Orchestrator ao fim de cada ordem. A próxima conversa começa lendo este arquivo, a daily note mais recente em `docs/05-diario/` e [[licoes-aprendidas]].
 
-## Última ordem: design da tela de login e usuário admin (30/10)
+## Última ordem: fase 1 do roteiro (acesso) e ajustes de tela (30/10 a 01/11)
 
-Encerrada. Resumo em [[2026-10-30]].
+Encerrada, com uma pendência (#176). Resumo em [[2026-10-30]] e [[2026-10-31]].
 
-- Mergeados: #134 (perfil com papéis e admin de desenvolvimento, LB-28 primeira fatia), #135 (skills Web Design Guidelines e Playwright CLI), #136 (spec sem o slogan lateral) e #133 ([[boas-vindas]], LB-24; issue #39 fechada).
+- Entregues: identidade com as cores do Figma, LB-119, LB-120, LB-19, LB-22, LB-24, LB-25, LB-27 e LB-28 (API e site). PRs #139 a #175.
+- Pendente: #176 (minors da recuperação de senha), aprovado no código e à espera do texto "Não foi possível salvar a nova senha. Peça um novo link." pelo Diego.
 
 ## Estado
 
-- Site em `localhost:3000` (working copy principal, `main`, `next dev`). API em `localhost:3333` (worktree `../leguele-api` em `origin/main`, rodando `node dist/main.js`, sem watch: mudou código, refaz o build e reinicia).
-- Supabase local no Docker (`supabase_*_leguele-beer`). Conta admin de desenvolvimento no banco local; credenciais só na nota "Acesso local (admin)" do canvas. O `.env` com a senha do seed se perdeu junto do worktree antigo; o `.env` do `../leguele-api` não tem `ADMIN_*`.
-- Portais "Leguelé Desktop", "Leguelé iPhone" e "Leguelé Android" apontando para `/boas-vindas`; nota "Status da banda" atualizada pelo Orchestrator.
-- Design base fora do repositório: `C:\Users\Arthur\Desktop\leguele\Imagens\figma\{telas,cervejas,logos}` e assets na raiz de `Imagens\` (barril, folhagens, copos etc.).
-- O stash `obsidian` é do Diego: não aplicar nem descartar. O Obsidian altera `docs/.obsidian` sozinho: nunca adicionar esses arquivos.
+- Site em `localhost:3000` (working copy principal, `main`, `next dev`). Preview da branch em uso em `localhost:3001`, no worktree do Front.
+- API em `localhost:3333` (worktree `../leguele-api`, `node dist/main.js`, sem watch). Para atualizar: `pnpm --filter @leguele/shared build`, build da API, conferir e só então reiniciar.
+- Supabase local no Docker (`supabase_*_leguele-beer`), JWT ES256 (`signing_keys.json` fora do git), confirmação de e-mail ligada e e-mails no Mailpit. O `SUPABASE_URL` precisa ser `http://127.0.0.1:54321`.
+- Conta admin de desenvolvimento no banco local; credenciais só na nota "Acesso local (admin)" do canvas.
+- Portais "Leguelé iPhone" e "Leguelé Android" (o Desktop foi removido até o mobile ficar 100%), sempre na página em alteração. Notas "Status da banda" e "Páginas do projeto" mantidas pelo Orchestrator.
+- O stash `obsidian` é do Diego: não aplicar nem descartar. Nunca adicionar `docs/.obsidian`.
 
-## Próximo no roteiro (fase 1)
+## Próximo
 
-LB-25 ([[cadastro-login]]: telas `/entrar` e `/criar-conta`, que o botão "Entrar" já chama) para o admin conseguir entrar pelo site. Depois LB-28 completo ([[guards-api]]), LB-119 e LB-120, LB-19, LB-22 e LB-27, conforme [[roteiro-mvp]].
+1. Merge do #176 depois da resposta do Diego.
+2. Refatoração de `apps/web/src/components/ui` com export único em `index.ts` e vitrine em `/dev/tokens` (pedido do Diego; regra já no CLAUDE.md e em [[identidade-visual]]).
+3. PR do Devops: `@leguele/shared` em watch no `pnpm dev`.
+4. Fase 2 do [[roteiro-mvp]]: bloco A (base técnica) e depois B (catálogo). O Diego inspeciona cada página entregue (nota "Páginas do projeto").
 
 ## Follow-ups
 
-- Web: `meta theme-color` e favicon com o LB-16; testes extras de contraste, regex do lint de cor fixa e `role="group"` nos chips.
-- API: pendências no `apps/api/README.md`; `DATABASE_URL` obrigatória no seed (nit da revisão do #134).
-- CLAUDE.md: exemplo do `NO_UPDATE_NOTIFIER` também para PowerShell.
+- LB-8 (nuvem): checklist do [[roteiro-mvp]] (IP real no cadastro, na renovação e no `/recover`; `GRANT SELECT` em `auth.users`; `iss`; `SITE_URL`; `enable_confirmations`).
+- Web: `meta theme-color` e favicon com o LB-16; logo com fundo transparente exportado pelo Diego.
+- API: `DATABASE_URL` obrigatória no seed; código fixo no log de falha do `signOutOthers` quando houver observabilidade.
+- Limpeza dos worktrees e arquivos temporários em `C:\Users\Arthur\Desktop\leguele\` fica com o Diego.
 
 ## Skills sugeridas
 
