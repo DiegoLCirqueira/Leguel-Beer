@@ -1,7 +1,8 @@
 "use client";
 
-import { ArrowRight, Link2, UserRound } from "lucide-react";
+import { ArrowRight, Link2, Lock, UserRound } from "lucide-react";
 import { useState } from "react";
+import { Campo } from "@/components/auth/campo";
 import { Button } from "@/components/ui/button";
 import { CategoryChips } from "@/components/ui/category-chips";
 import { StyleBadge } from "@/components/ui/style-badge";
@@ -11,6 +12,7 @@ const swatches = [
   { name: "superficie", className: "bg-superficie" },
   { name: "superficie-elevada", className: "bg-superficie-elevada" },
   { name: "borda", className: "bg-borda" },
+  { name: "borda-campo", className: "bg-borda-campo" },
   { name: "texto", className: "bg-texto" },
   { name: "texto-suave", className: "bg-texto-suave" },
   { name: "primaria", className: "bg-primaria" },
@@ -66,6 +68,20 @@ export function ComponentShowcase() {
             Desabilitado
           </Button>
         </div>
+      </Section>
+      <Section title="Campo de digitar (clique para ver o foco)">
+        <Campo
+          id="campo-exemplo"
+          rotulo="Senha de exemplo"
+          icone={Lock}
+          placeholder="Digite sua senha"
+        />
+        <Campo
+          id="campo-exemplo-erro"
+          rotulo="Campo com erro"
+          icone={Lock}
+          erro="Mensagem de erro de exemplo"
+        />
       </Section>
       <Section title="Badges de estilo">
         <div className="flex flex-wrap gap-2">
