@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Check, Lock, Mail } from "lucide-react";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
@@ -57,7 +58,9 @@ export function EntrarForm({ entrar, reenviar, emailInicial = "", manterConectad
       if (!resposta) return;
       if (resposta.tipo === "invalido") setErros(resposta.erros);
       else setAviso(resposta);
-    } catch {
+    } catch (e) {
+      // No sucesso a ação redireciona no servidor e a promise rejeita com o erro de redirect do Next.
+      if (isRedirectError(e)) return;
       setAviso({ tipo: "erro" });
     } finally {
       setEnviando(false);

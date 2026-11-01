@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { NovaSenhaForm, type RespostaNovaSenha } from "./nova-senha-form";
@@ -89,5 +89,20 @@ describe("NovaSenhaForm", () => {
       "href",
       "/recuperar-senha",
     );
+  });
+
+  it("senha salva (a ação rejeita com o erro de redirect do Next) não mostra aviso nenhum", async () => {
+    const salvar = renderizar();
+    salvar.mockRejectedValue(
+      Object.assign(new Error("NEXT_REDIRECT"), { digest: "NEXT_REDIRECT;push;/;307;" }),
+    );
+    await preencher();
+
+    await userEvent.click(screen.getByRole("button", { name: "Salvar nova senha" }));
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Salvar nova senha" })).toBeEnabled(),
+    );
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 });

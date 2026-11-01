@@ -1,5 +1,6 @@
 "use client";
 
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { novaSenhaSchema } from "@leguele/shared";
 import { ArrowRight, Lock } from "lucide-react";
 import Link from "next/link";
@@ -67,7 +68,9 @@ export function NovaSenhaForm({ salvar }: Props) {
       if (!retorno) return;
       if (retorno.tipo === "invalido") setErros(retorno.erros);
       else setResposta(retorno.tipo);
-    } catch {
+    } catch (e) {
+      // No sucesso a ação redireciona no servidor e a promise rejeita com o erro de redirect do Next.
+      if (isRedirectError(e)) return;
       setResposta("erro");
     } finally {
       setEnviando(false);
