@@ -120,7 +120,7 @@ Só tema escuro. O verde da marca, o texto sobre ele e o texto principal são os
 | `superficie` | `#10261A` | Cards, campos de formulário, caixas de aviso |
 | `superficie-elevada` | `#163021` | Chips não selecionados, badge neutro |
 | `borda` | `#24452F` | Contorno de cards e chips |
-| `borda-campo` | `#5A8450` | Contorno dos campos de digitar; contraste mínimo de 3:1 sobre `fundo` e `superficie` (decisão do Diego, 2026-11-01) |
+| `borda-campo` | `#5A8450` | Contorno dos campos de digitar; contraste mínimo de 3:1 sobre `fundo` e `superficie`. Contorno visível pedido pelo Diego (2026-11-01); a cor foi escolhida pelo Front e pode ser vetada |
 | `texto` | `#F7FBF5` | Títulos, rótulos e texto principal |
 | `texto-suave` | `#A9BFA0` | Placeholders, legendas, preço riscado |
 | `primaria` | `#95DC50` | Verde da marca: botão primário, links, ícones dos campos, chip selecionado |
@@ -170,7 +170,7 @@ Só tema escuro. O verde da marca, o texto sobre ele e o texto principal são os
 
 - **Botão:** variantes primária (fundo verde da marca, ex.: "Entrar", "Criar conta" do formulário), contorno (borda verde da marca, fundo transparente, ex.: "Criar conta" da tela inicial) e discreta (fundo `superficie`, borda `borda`; sobre a arte da [[boas-vindas]], "Continuar como convidado" usa `arte-vidro` e `arte-borda`). Ícone opcional à esquerda e/ou à direita (seta). Tamanhos: pequeno (ex.: "Adicionar" no card) e grande (largura total, nos formulários). Estados: carregando e desabilitado. Área de toque mínima de 44 × 44 px.
 - **Botão de voltar das telas de acesso** (`/entrar` e `/criar-conta`): fica sobre a folhagem, então tem destaque para não perder visibilidade, com fundo `arte-vidro` quase opaco e borda de 2 px no verde da marca (decisão do Diego, 2026-10-31). Área de toque de 44 × 44 px, como os botões. Exceção: os links do rodapé têm 24 px, de propósito ([[termos-privacidade]]).
-- **Campo de digitar:** contorno `borda-campo`. No foco, borda `primaria` mais um anel de foco; inválido, borda `erro` (decisão do Diego, 2026-11-01).
+- **Campo de digitar:** contorno `borda-campo`. No foco, borda `primaria` mais um anel de foco; inválido, borda `erro`. Contorno visível e foco pedidos pelo Diego (2026-11-01); a cor de `borda-campo` foi escolhida pelo Front e pode ser vetada.
 - **Badge de estilo:** pílula com o nome da categoria em maiúsculas, cor do token da categoria.
 - **Chip de categoria:** ícone em cima, rótulo e contador entre parênteses abaixo ("IPAs (4)"); selecionável, um por vez, com `aria-pressed`. Selecionado: borda e texto no verde da marca. O comportamento na página está em [[catalogo]].
 
@@ -199,7 +199,7 @@ Só tema escuro. O verde da marca, o texto sobre ele e o texto principal são os
 
 ### Decisões do Diego (2026-11-01)
 
-- **Borda dos campos de digitar:** token `borda-campo` (`#5A8450`), com contraste mínimo de 3:1 sobre `fundo` e `superficie`; no foco, borda `primaria` mais anel. Os campos deixam de usar `borda`, que fica para cards e chips.
+- **Borda dos campos de digitar:** os campos de digitar têm contorno visível, com contraste mínimo de 3:1 sobre `fundo` e `superficie`; no foco, borda `primaria` mais anel. Os campos deixam de usar `borda`, que fica para cards e chips. O valor do token `borda-campo` (`#5A8450`) não foi aprovado pelo Diego: foi escolhido pelo Front e pode ser vetado.
 
 ## Seams de teste
 
