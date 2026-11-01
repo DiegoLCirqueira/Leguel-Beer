@@ -18,6 +18,7 @@ export function Campo({ id, rotulo, icone: Icone, erro, acao, className, ...inpu
   return (
     <div className="flex flex-col gap-1">
       <div
+        data-testid="campo-contorno"
         className={cn(
           "flex items-center gap-3 rounded-2xl border bg-superficie/70 px-4 py-2.5 focus-within:border-primaria focus-within:ring-2 focus-within:ring-primaria/40",
           erro ? "border-erro" : "border-borda-campo",
