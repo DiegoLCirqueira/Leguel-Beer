@@ -4,7 +4,7 @@ modulo: conta
 card-notion: https://app.notion.com/p/3fd490a7ac7d814fbeded6d8c0143a57
 prioridade: P0
 criado: 2026-10-29
-atualizado: 2026-10-31
+atualizado: 2026-11-02
 issues:
   - "#42 LB-27"
 tags:
@@ -81,6 +81,7 @@ Funcionalidade: Recuperação de senha
 - **Validade do link:** 1 hora, como diz a tela do Figma. O link vale uma única vez; um pedido novo invalida o anterior.
 - **Quando o link é gasto:** abrir `/nova-senha` pelo link não gasta nada, para que scanners de e-mail que abrem links não o invalidem (como na confirmação do cadastro, #167). Só o POST de salvar a nova senha usa o link. Por isso o link vencido, já usado ou substituído só é detectado ao salvar: aí aparece "Este link expirou ou já foi usado." com "Pedir novo link" (decisão técnica do Orchestrator, 2026-10-31).
 - **Nova senha:** mesmas regras do cadastro (8 a 72 caracteres), com confirmação ([[cadastro-login]]).
+- **Altura da tela de nova senha:** em 390x844, o conteúdo de `/nova-senha` (título, campos e botão "Salvar nova senha") usa melhor a altura, com mais espaço entre os blocos, sem um vão em branco grande (decisão do Diego, 2026-11-02: "tentar usar melhor o espaço em branco"). Critério verificável: o botão "Salvar nova senha" fica a no máximo 96 px da borda de baixo da área visível, sem bloco sobreposto nem fora da tela. Sem texto novo.
 - **Depois de trocar:** a pessoa entra na conta e vai para a home; as outras sessões abertas da conta são encerradas.
 - **Token já emitido (risco aceito):** encerrar as outras sessões impede que elas sejam renovadas, mas o token de acesso que elas já têm continua aceito pela API até vencer, no máximo 1 hora (validade padrão do Supabase Auth). O mesmo vale para "Sair" ([[cadastro-login]]). Revogar na hora exigiria a API consultar o Supabase a cada requisição.
 - **Pedidos repetidos:** um novo pedido para o mesmo e-mail só é aceito 60 segundos depois do anterior; antes disso, o aviso genérico aparece igual e nenhum e-mail novo sai.
@@ -123,6 +124,11 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 
 - [[cadastro-login]]: regras de senha e tela de entrar.
 - [[identidade-visual]]
+
+### Decisões do Diego (2026-11-02)
+
+- **Nova senha:** "tentar usar melhor o espaço em branco". Regra "Altura da tela de nova senha" em "Regras de negócio", sem cenário novo (o limite de 6 vale).
+- **Aprovada sem mudança:** Recuperar senha.
 
 ### Decisão do Orchestrator (2026-10-31)
 
