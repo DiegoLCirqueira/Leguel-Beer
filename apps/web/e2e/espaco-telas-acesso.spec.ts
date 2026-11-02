@@ -6,10 +6,7 @@ test("em criar conta, 'Já tem uma conta?' e 'Entrar' ficam na mesma linha", asy
   await page.goto("/criar-conta");
 
   const pergunta = await page.getByText("Já tem uma conta?").boundingBox();
-  const entrar = await page
-    .getByRole("link", { name: "Entrar", exact: true })
-    .last()
-    .boundingBox();
+  const entrar = await page.getByRole("link", { name: "Entrar", exact: true }).last().boundingBox();
 
   expect(pergunta).not.toBeNull();
   expect(entrar).not.toBeNull();
