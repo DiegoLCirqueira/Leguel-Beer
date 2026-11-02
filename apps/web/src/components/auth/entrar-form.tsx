@@ -76,93 +76,95 @@ export function EntrarForm({ entrar, reenviar, emailInicial = "", manterConectad
   }
 
   return (
-    <form onSubmit={enviar} noValidate className="flex flex-col gap-4">
-      <Campo
-        id="email"
-        name="email"
-        rotulo="E-mail"
-        icone={Mail}
-        type="email"
-        placeholder="Digite seu e-mail"
-        autoComplete="email"
-        spellCheck={false}
-        value={email}
-        onChange={(e) => {
-          setEmail(e.target.value);
-          limparAvisoVermelho();
-        }}
-        erro={erros.email}
-      />
-      <Campo
-        id="senha"
-        name="senha"
-        rotulo="Senha"
-        icone={Lock}
-        type={verSenha ? "text" : "password"}
-        placeholder="Digite sua senha"
-        autoComplete="current-password"
-        value={senha}
-        onChange={(e) => {
-          setSenha(e.target.value);
-          limparAvisoVermelho();
-        }}
-        erro={erros.senha}
-        acao={<OlhoDaSenha visivel={verSenha} alternar={() => setVerSenha((v) => !v)} />}
-      />
+    <form onSubmit={enviar} noValidate className="flex flex-1 flex-col justify-between gap-6">
+      <div className="flex flex-col gap-4">
+        <Campo
+          id="email"
+          name="email"
+          rotulo="E-mail"
+          icone={Mail}
+          type="email"
+          placeholder="Digite seu e-mail"
+          autoComplete="email"
+          spellCheck={false}
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            limparAvisoVermelho();
+          }}
+          erro={erros.email}
+        />
+        <Campo
+          id="senha"
+          name="senha"
+          rotulo="Senha"
+          icone={Lock}
+          type={verSenha ? "text" : "password"}
+          placeholder="Digite sua senha"
+          autoComplete="current-password"
+          value={senha}
+          onChange={(e) => {
+            setSenha(e.target.value);
+            limparAvisoVermelho();
+          }}
+          erro={erros.senha}
+          acao={<OlhoDaSenha visivel={verSenha} alternar={() => setVerSenha((v) => !v)} />}
+        />
 
-      <div className="flex items-center justify-between gap-3 text-sm text-texto">
-        <label className="flex cursor-pointer items-center gap-3">
-          <span className="relative block size-6 shrink-0">
-            <input
-              type="checkbox"
-              name="manterConectado"
-              checked={manterConectado}
-              onChange={(e) => setManterConectado(e.target.checked)}
-              className="peer absolute inset-0 size-full cursor-pointer appearance-none rounded-md border-2 border-primaria checked:bg-primaria focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaria"
-            />
-            <Check
-              aria-hidden="true"
-              strokeWidth={3}
-              className="pointer-events-none absolute inset-[15%] hidden size-[70%] text-texto-na-primaria peer-checked:block"
-            />
-          </span>
-          Manter-me conectado
-        </label>
-        <Link
-          href="/recuperar-senha"
-          className="inline-flex min-h-11 items-center font-semibold text-primaria underline underline-offset-2"
-        >
-          Esqueci minha senha
-        </Link>
-      </div>
-
-      {aviso?.tipo === "credenciais" ? (
-        <p role="alert" className="text-center text-sm text-erro">
-          E-mail ou senha inválidos
-        </p>
-      ) : null}
-      {aviso?.tipo === "nao-confirmado" ? (
-        <p role="alert" className="text-center text-sm text-aviso">
-          Confirme seu e-mail para entrar. Não recebeu?{" "}
-          <button
-            type="button"
-            onClick={() => reenviarLink(aviso.email)}
+        <div className="flex items-center justify-between gap-3 text-sm text-texto">
+          <label className="flex cursor-pointer items-center gap-3">
+            <span className="relative block size-6 shrink-0">
+              <input
+                type="checkbox"
+                name="manterConectado"
+                checked={manterConectado}
+                onChange={(e) => setManterConectado(e.target.checked)}
+                className="peer absolute inset-0 size-full cursor-pointer appearance-none rounded-md border-2 border-primaria checked:bg-primaria focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaria"
+              />
+              <Check
+                aria-hidden="true"
+                strokeWidth={3}
+                className="pointer-events-none absolute inset-[15%] hidden size-[70%] text-texto-na-primaria peer-checked:block"
+              />
+            </span>
+            Manter-me conectado
+          </label>
+          <Link
+            href="/recuperar-senha"
             className="inline-flex min-h-11 items-center font-semibold text-primaria underline underline-offset-2"
           >
-            Reenviar link
-          </button>
-        </p>
-      ) : null}
-      {aviso?.tipo === "reenviado" ? (
-        <p role="status" className="text-center text-sm text-sucesso">
-          {`Enviamos um novo link para ${aviso.email}.`}
-        </p>
-      ) : null}
-      {aviso?.tipo === "erro" ? (
-        <p role="alert" className="text-center text-sm text-erro">
-          Não foi possível concluir agora. Tente de novo em instantes.
-        </p>
-      ) : null}
+            Esqueci minha senha
+          </Link>
+        </div>
+
+        {aviso?.tipo === "credenciais" ? (
+          <p role="alert" className="text-center text-sm text-erro">
+            E-mail ou senha inválidos
+          </p>
+        ) : null}
+        {aviso?.tipo === "nao-confirmado" ? (
+          <p role="alert" className="text-center text-sm text-aviso">
+            Confirme seu e-mail para entrar. Não recebeu?{" "}
+            <button
+              type="button"
+              onClick={() => reenviarLink(aviso.email)}
+              className="inline-flex min-h-11 items-center font-semibold text-primaria underline underline-offset-2"
+            >
+              Reenviar link
+            </button>
+          </p>
+        ) : null}
+        {aviso?.tipo === "reenviado" ? (
+          <p role="status" className="text-center text-sm text-sucesso">
+            {`Enviamos um novo link para ${aviso.email}.`}
+          </p>
+        ) : null}
+        {aviso?.tipo === "erro" ? (
+          <p role="alert" className="text-center text-sm text-erro">
+            Não foi possível concluir agora. Tente de novo em instantes.
+          </p>
+        ) : null}
+      </div>
 
       <Button
         type="submit"

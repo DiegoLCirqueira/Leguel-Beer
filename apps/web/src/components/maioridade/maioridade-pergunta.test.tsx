@@ -46,6 +46,15 @@ describe("MaioridadePergunta", () => {
     expect(confirmar).not.toHaveBeenCalled();
   });
 
+  it("no acesso negado, os avisos de consumo e de venda não aparecem", async () => {
+    renderizar();
+
+    await userEvent.click(screen.getByRole("button", { name: "Não" }));
+
+    expect(screen.queryByText("Aprecie com moderação.")).not.toBeInTheDocument();
+    expect(screen.queryByText("Venda proibida para menores de 18 anos.")).not.toBeInTheDocument();
+  });
+
   it("responder não leva o foco para o título do acesso negado", async () => {
     renderizar();
 
