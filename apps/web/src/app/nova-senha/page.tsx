@@ -20,6 +20,7 @@ export default async function NovaSenha({ searchParams }: Props) {
 
   return (
     <TelaDeAcesso
+      centralizado
       titulo={
         <>
           Nova <span className="text-primaria">senha</span>

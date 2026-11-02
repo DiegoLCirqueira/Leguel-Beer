@@ -4,7 +4,6 @@ import { Check } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui";
-import { AVISOS_RODAPE } from "@/lib/avisos";
 
 type Props = {
   retorno: string;
@@ -104,13 +103,6 @@ export function MaioridadePergunta({ retorno, confirmar }: Props) {
               </Button>
             </form>
           </>
-        )}
-        {negado ? null : (
-          <div className="flex flex-col gap-1 text-sm text-texto-suave">
-            {AVISOS_RODAPE.map((aviso) => (
-              <p key={aviso}>{aviso}</p>
-            ))}
-          </div>
         )}
       </div>
     </main>

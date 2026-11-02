@@ -78,8 +78,8 @@ export function NovaSenhaForm({ salvar }: Props) {
   if (resposta === "link-invalido") return <LinkInvalido />;
 
   return (
-    <form onSubmit={enviar} noValidate className="flex flex-1 flex-col gap-6">
-      <div className="my-auto flex flex-col gap-4">
+    <form onSubmit={enviar} noValidate className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
         <Campo
           id="senha"
           name="senha"

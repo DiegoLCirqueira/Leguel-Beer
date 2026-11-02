@@ -1,3 +1,4 @@
+import type { Locator } from "@playwright/test";
 import { expect, test } from "./support/maior-de-idade";
 
 test.use({ viewport: { width: 390, height: 844 } });
@@ -16,28 +17,73 @@ test("em criar conta, 'Já tem uma conta?' e 'Entrar' ficam na mesma linha", asy
   expect(entrar?.x ?? 0).toBeGreaterThan((pergunta?.x ?? 0) + (pergunta?.width ?? 0) - 1);
 });
 
-test("em entrar, a borda de baixo de 'Criar conta' fica a no máximo 48 px do fim da tela", async ({
+test("em criar conta, 'Já tem uma conta? Entrar' fica visível sem rolar a página", async ({
+  page,
+}) => {
+  await page.goto("/criar-conta");
+
+  const entrar = await page.getByRole("link", { name: "Entrar", exact: true }).last().boundingBox();
+
+  expect(entrar).not.toBeNull();
+  expect((entrar?.y ?? 0) + (entrar?.height ?? 0)).toBeLessThanOrEqual(844);
+});
+
+type Caixa = { top: number; bottom: number };
+
+/** Caixas dos blocos da tela, de cima para baixo; falha se algum não estiver na tela. */
+async function caixasDosBlocos(blocos: Locator[]): Promise<Caixa[]> {
+  const caixas: Caixa[] = [];
+  for (const bloco of blocos) {
+    const caixa = await bloco.boundingBox();
+    if (!caixa) throw new Error("bloco sem caixa");
+    caixas.push({ top: caixa.y, bottom: caixa.y + caixa.height });
+  }
+  return caixas;
+}
+
+/** Vão de 24 a 48 px entre blocos vizinhos e o grupo centralizado na altura de 844 px. */
+function esperarGrupoAgrupadoECentralizado(caixas: Caixa[]) {
+  for (let i = 1; i < caixas.length; i++) {
+    const vao = (caixas[i]?.top ?? 0) - (caixas[i - 1]?.bottom ?? 0);
+    expect(vao, `vão entre o bloco ${i} e o anterior`).toBeGreaterThanOrEqual(24);
+    expect(vao, `vão entre o bloco ${i} e o anterior`).toBeLessThanOrEqual(48);
+  }
+  const acima = caixas[0]?.top ?? 0;
+  const abaixo = 844 - (caixas[caixas.length - 1]?.bottom ?? 0);
+  expect(acima).toBeGreaterThanOrEqual(0);
+  expect(abaixo).toBeGreaterThanOrEqual(0);
+  expect(Math.abs(acima - abaixo), "espaço livre repartido em cima e embaixo").toBeLessThanOrEqual(
+    12,
+  );
+}
+
+test("em entrar, os blocos ficam a 24-48 px um do outro e o grupo centralizado na altura", async ({
   page,
 }) => {
   await page.goto("/entrar");
 
-  const criar = await page.getByRole("link", { name: "Criar conta" }).boundingBox();
+  const caixas = await caixasDosBlocos([
+    page.getByRole("img", { name: "Leguelé Beer" }),
+    page.locator("main header"),
+    page.locator("main form > div").first(),
+    page.getByRole("button", { name: "Entrar" }),
+    page.locator("main form > div").last(),
+  ]);
 
-  expect(criar).not.toBeNull();
-  const folga = 844 - ((criar?.y ?? 0) + (criar?.height ?? 0));
-  expect(folga).toBeGreaterThanOrEqual(0);
-  expect(folga).toBeLessThanOrEqual(48);
+  esperarGrupoAgrupadoECentralizado(caixas);
 });
 
-test("em nova senha, o botão 'Salvar nova senha' fica a no máximo 96 px do fim da tela", async ({
+test("em nova senha, os blocos ficam a 24-48 px um do outro e o grupo centralizado na altura", async ({
   page,
 }) => {
   await page.goto("/nova-senha?token_hash=abc&type=recovery");
 
-  const botao = await page.getByRole("button", { name: "Salvar nova senha" }).boundingBox();
+  const caixas = await caixasDosBlocos([
+    page.getByRole("img", { name: "Leguelé Beer" }),
+    page.locator("main header"),
+    page.locator("main form > div").first(),
+    page.getByRole("button", { name: "Salvar nova senha" }),
+  ]);
 
-  expect(botao).not.toBeNull();
-  const folga = 844 - ((botao?.y ?? 0) + (botao?.height ?? 0));
-  expect(folga).toBeGreaterThanOrEqual(0);
-  expect(folga).toBeLessThanOrEqual(96);
+  esperarGrupoAgrupadoECentralizado(caixas);
 });

@@ -8,11 +8,19 @@ type Props = {
   titulo: ReactNode;
   subtitulo?: string;
   voltarHref?: string;
+  /** Centraliza o conteúdo na altura da tela, repartindo o espaço livre em cima e embaixo. */
+  centralizado?: boolean;
   children: ReactNode;
 };
 
 /** Moldura das telas de acesso (fundo do estúdio, folhagem, voltar, logo e título) e o rodapé. */
-export function TelaDeAcesso({ titulo, subtitulo, voltarHref = "/entrar", children }: Props) {
+export function TelaDeAcesso({
+  titulo,
+  subtitulo,
+  voltarHref = "/entrar",
+  centralizado = false,
+  children,
+}: Props) {
   return (
     <>
       <main className="relative isolate flex min-h-dvh flex-col items-center overflow-hidden bg-fundo px-6 pb-12 pt-14">
@@ -41,7 +49,7 @@ export function TelaDeAcesso({ titulo, subtitulo, voltarHref = "/entrar", childr
         />
         <BotaoVoltar href={voltarHref} />
 
-        <div className="flex w-full max-w-sm flex-1 flex-col gap-6">
+        <div className={`flex w-full max-w-sm flex-col gap-6 ${centralizado ? "my-auto" : ""}`}>
           <Image
             src="/acesso/logo-nome.webp"
             alt="Leguelé Beer"
