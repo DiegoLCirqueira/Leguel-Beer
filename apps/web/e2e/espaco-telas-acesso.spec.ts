@@ -31,3 +31,16 @@ test("em entrar, a borda de baixo de 'Criar conta' fica a no máximo 48 px do fi
   expect(folga).toBeGreaterThanOrEqual(0);
   expect(folga).toBeLessThanOrEqual(48);
 });
+
+test("em nova senha, o botão 'Salvar nova senha' fica a no máximo 96 px do fim da tela", async ({
+  page,
+}) => {
+  await page.goto("/nova-senha?token_hash=abc&type=recovery");
+
+  const botao = await page.getByRole("button", { name: "Salvar nova senha" }).boundingBox();
+
+  expect(botao).not.toBeNull();
+  const folga = 844 - ((botao?.y ?? 0) + (botao?.height ?? 0));
+  expect(folga).toBeGreaterThanOrEqual(0);
+  expect(folga).toBeLessThanOrEqual(96);
+});
