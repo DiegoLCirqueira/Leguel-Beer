@@ -16,6 +16,17 @@ test("em criar conta, 'Já tem uma conta?' e 'Entrar' ficam na mesma linha", asy
   expect(entrar?.x ?? 0).toBeGreaterThan((pergunta?.x ?? 0) + (pergunta?.width ?? 0) - 1);
 });
 
+test("em criar conta, 'Já tem uma conta? Entrar' fica visível sem rolar a página", async ({
+  page,
+}) => {
+  await page.goto("/criar-conta");
+
+  const entrar = await page.getByRole("link", { name: "Entrar", exact: true }).last().boundingBox();
+
+  expect(entrar).not.toBeNull();
+  expect((entrar?.y ?? 0) + (entrar?.height ?? 0)).toBeLessThanOrEqual(844);
+});
+
 test("em entrar, a borda de baixo de 'Criar conta' fica a no máximo 48 px do fim da tela", async ({
   page,
 }) => {
