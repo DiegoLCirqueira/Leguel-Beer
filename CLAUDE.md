@@ -36,7 +36,7 @@ Na API, em `apps/api/.env` (fora do git; chaves em `apps/api/.env.example`, sem 
 - `WEB_ORIGIN`: origem do web liberada no CORS (padrão `http://localhost:3000`).
 - `TEST_DATABASE_URL` (opcional): banco de testes de integração; padrão `leguele_test` no mesmo Postgres local. O nome deve terminar em `_test`.
 - `ADMIN_EMAIL`: e-mail da conta que recebe o papel admin (seed de desenvolvimento e, depois, criação do perfil).
-- `ADMIN_SEED_PASSWORD`: senha da conta admin criada pelo seed no Supabase Auth local. Só no `.env` local; nunca em commit, PR, log ou nota.
+- `ADMIN_SEED_PASSWORD`: senha da conta admin criada pelo seed no Supabase Auth local. Só no `.env` local; nunca em commit, PR, log ou nota. A única exceção é a nota local "Acesso local (admin)" do canvas do Maestri, fora do git, pedida pelo Diego (2026-10-30) e confirmada em 2026-11-02; fora dela, nunca em commit, PR, log ou outra nota.
 - `SUPABASE_URL`: URL do Supabase Auth (no local, `http://127.0.0.1:54321`).
 - `SUPABASE_SERVICE_ROLE_KEY`: chave de serviço, usada só pelo seed (no local: `pnpm exec supabase status -o env`). Nunca no site nem em variável pública.
 Detalhes e banco local: `apps/api/README.md`.
