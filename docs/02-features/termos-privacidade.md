@@ -4,7 +4,7 @@ modulo: acesso
 card-notion: https://app.notion.com/p/3fd490a7ac7d815c9785f1be8cd09271
 prioridade: P1
 criado: 2026-10-29
-atualizado: 2026-10-31
+atualizado: 2026-11-02
 issues:
   - "#100 LB-22"
 tags:
@@ -59,6 +59,7 @@ Funcionalidade: Termos, privacidade e entregas
 - **Rodapé:** em todas as páginas, menos na pergunta de maioridade: os avisos (texto em "Textos", linha "Rodapé, avisos", fonte única também para a pergunta de maioridade e o checkout), e os links para as três páginas. A linha da empresa (razão social, CNPJ e cidade) sai do rodapé (decisão do Diego, 2026-10-31).
   - **Rodapé discreto:** pequeno, praticamente um detalhe (decisão do Diego, 2026-10-31). Por isso os links do rodapé têm área de toque de 24 px (WCAG 2.5.8, nível AA), e não os 44 px dos botões. É deliberado: não aumentar para 44 px.
 - **Sem pergunta de maioridade** em `/termos` e `/privacidade`, para quem quer ler antes de entrar ([[maioridade-entrada]]). `/entregas` segue a regra normal.
+- **Acesso negado sem avisos:** a tela "Acesso não permitido" ([[maioridade-entrada]]) também não mostra os avisos do rodapé, porque ficam desnecessários para quem respondeu que é menor de 18 anos (decisão do Diego, 2026-11-02). A regra "avisos na pergunta de maioridade" vale só para a pergunta. Os Termos e a Privacidade, aprovados sem mudança na inspeção, não mudam.
 - **Boas-vindas sem rodapé:** além da pergunta de maioridade, a [[boas-vindas]] também fica sem o rodapé, porque não tem rolagem (decisão do Diego, 2026-10-30). Os links legais continuam nas outras páginas e no cadastro.
 - **Links do cadastro** abrem em nova aba.
 - **Checkout:** o resumo do pedido mostra o primeiro aviso do rodapé e o link dos Termos de Uso. Vale quando o checkout existir; o teste entra com o LB-55 (#31, [[checkout]]).

@@ -4,7 +4,7 @@ modulo: acesso
 card-notion: https://app.notion.com/p/3fd490a7ac7d81caab51c2698587fd52
 prioridade: P0
 criado: 2026-10-29
-atualizado: 2026-10-30
+atualizado: 2026-11-02
 issues:
   - "#97 LB-19"
 tags:
@@ -39,6 +39,7 @@ Funcionalidade: Confirmação de maioridade na entrada
     Dado que abro o site pela primeira vez neste navegador
     Quando respondo que não tenho 18 anos
     Então vejo "Acesso não permitido" e o botão "Voltar para a página inicial"
+    E não vejo os avisos "Aprecie com moderação" nem "Venda proibida para menores de 18 anos"
     E ao tocar em "Voltar para a página inicial" vejo a pergunta "Você tem 18 anos ou mais?" de novo
     E ao abrir /catalogo continuo vendo a pergunta de maioridade, sem o catálogo
 
@@ -69,7 +70,7 @@ Funcionalidade: Confirmação de maioridade na entrada
 
 - **Quando aparece:** em qualquer página do site, para quem ainda não confirmou a maioridade neste navegador. Arquivos estáticos (imagens, fontes, ícones) e a API não passam pela pergunta.
 - **Validade:** a confirmação vale 30 dias no navegador. Depois disso, a pergunta volta.
-- **Resposta "não":** mostra "Acesso não permitido", com o botão "Voltar para a página inicial", que volta para a pergunta de maioridade (decisão do Diego, 2026-10-30). A resposta não é lembrada; ao abrir o site de novo, a pergunta volta. Nenhuma página do site é exibida a quem respondeu "não".
+- **Resposta "não":** mostra "Acesso não permitido", com o botão "Voltar para a página inicial", que volta para a pergunta de maioridade (decisão do Diego, 2026-10-30). A resposta não é lembrada; ao abrir o site de novo, a pergunta volta. Nenhuma página do site é exibida a quem respondeu "não". A tela não mostra os avisos do rodapé ("Aprecie com moderação" e "Venda proibida para menores de 18 anos"): ficam desnecessários nessa situação (decisão do Diego, 2026-11-02). Os avisos continuam na pergunta de maioridade.
 - **Retorno:** depois de confirmar, a pessoa vai para a página que tentou abrir, com os mesmos parâmetros. Sem página pedida, ou quando ela é a home, vai para a [[boas-vindas]]. Só endereços do próprio site são aceitos como retorno; qualquer outro é ignorado.
 - **Robôs de busca:** uma lista de user-agents conhecidos (ex.: Googlebot, Bingbot) passa sem a pergunta, para não atrapalhar a indexação.
 - **Risco aceito:** o user-agent é informado pelo próprio navegador, então qualquer pessoa pode se passar por robô e pular a pergunta. É aceito porque a pergunta é uma confirmação declarada, sem validação; a compra continua exigindo conta e a confirmação no checkout (LB-20).
@@ -84,7 +85,7 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 | --- | --- |
 | Botão "sim" (primário) | "Sim, tenho 18 anos ou mais" |
 | Botão "não" (contorno) | "Não" |
-| Aviso abaixo dos botões | Os avisos do rodapé, com o texto definido em [[termos-privacidade]] ("Textos", linha "Rodapé, avisos") |
+| Aviso abaixo dos botões (só na pergunta, não em "Acesso não permitido") | Os avisos do rodapé, com o texto definido em [[termos-privacidade]] ("Textos", linha "Rodapé, avisos") |
 | Texto de apoio em "Acesso não permitido" | "Este site é só para maiores de 18 anos." |
 | Botão em "Acesso não permitido" (primário) | "Voltar para a página inicial" |
 | Texto de apoio da pergunta * | "Para entrar, confirme sua idade." |
@@ -109,6 +110,11 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 - [[mvp-corte]]: escopo reduzido do E12.
 - [[boas-vindas]]: a tela seguinte.
 - [[identidade-visual]]: componentes da tela.
+
+### Decisões do Diego (2026-11-02)
+
+- **Acesso negado sem os avisos de consumo:** "retire o Aprecie com moderação e venda proibida para menores de 18 anos, fica desnecessário nessa situação". A tela "Acesso não permitido" fica só com o texto de apoio e o botão; a pergunta de maioridade mantém os avisos. Entra como mais uma linha no cenário do menor de idade, que continua dentro do limite de 6.
+- **Aprovada sem mudança na inspeção:** a pergunta de maioridade.
 
 ### Decisões do Diego (2026-10-30)
 
