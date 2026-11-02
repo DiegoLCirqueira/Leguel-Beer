@@ -76,7 +76,7 @@ export function EntrarForm({ entrar, reenviar, emailInicial = "", manterConectad
   }
 
   return (
-    <form onSubmit={enviar} noValidate className="flex flex-1 flex-col justify-between gap-6">
+    <form onSubmit={enviar} noValidate className="flex flex-col gap-6">
       <div className="flex flex-col gap-4">
         <Campo
           id="email"
