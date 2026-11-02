@@ -73,15 +73,17 @@ test("em entrar, os blocos ficam a 24-48 px um do outro e o grupo centralizado n
   esperarGrupoAgrupadoECentralizado(caixas);
 });
 
-test("em nova senha, o botão 'Salvar nova senha' fica a no máximo 96 px do fim da tela", async ({
+test("em nova senha, os blocos ficam a 24-48 px um do outro e o grupo centralizado na altura", async ({
   page,
 }) => {
   await page.goto("/nova-senha?token_hash=abc&type=recovery");
 
-  const botao = await page.getByRole("button", { name: "Salvar nova senha" }).boundingBox();
+  const caixas = await caixasDosBlocos([
+    page.getByRole("img", { name: "Leguelé Beer" }),
+    page.locator("main header"),
+    page.locator("main form > div").first(),
+    page.getByRole("button", { name: "Salvar nova senha" }),
+  ]);
 
-  expect(botao).not.toBeNull();
-  const folga = 844 - ((botao?.y ?? 0) + (botao?.height ?? 0));
-  expect(folga).toBeGreaterThanOrEqual(0);
-  expect(folga).toBeLessThanOrEqual(96);
+  esperarGrupoAgrupadoECentralizado(caixas);
 });
