@@ -105,11 +105,13 @@ export function MaioridadePergunta({ retorno, confirmar }: Props) {
             </form>
           </>
         )}
-        <div className="flex flex-col gap-1 text-sm text-texto-suave">
-          {AVISOS_RODAPE.map((aviso) => (
-            <p key={aviso}>{aviso}</p>
-          ))}
-        </div>
+        {negado ? null : (
+          <div className="flex flex-col gap-1 text-sm text-texto-suave">
+            {AVISOS_RODAPE.map((aviso) => (
+              <p key={aviso}>{aviso}</p>
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );
