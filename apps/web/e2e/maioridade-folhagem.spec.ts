@@ -7,7 +7,7 @@ for (const viewport of [
   { width: 360, height: 780 },
   { width: 390, height: 844 },
 ]) {
-  test(`a folhagem da base não passa por cima dos avisos em ${viewport.width}x${viewport.height}`, async ({
+  test(`a folhagem da base não passa por cima dos botões em ${viewport.width}x${viewport.height}`, async ({
     page,
   }) => {
     await page.setViewportSize(viewport);
@@ -15,15 +15,15 @@ for (const viewport of [
     const folhagem = await page.locator('img[src*="folhagem-base"]').boundingBox();
     if (!folhagem) throw new Error("folhagem sem caixa");
 
-    for (const aviso of ["Aprecie com moderação.", "Venda proibida para menores de 18 anos."]) {
-      const caixa = await page.getByText(aviso).boundingBox();
-      if (!caixa) throw new Error(`${aviso} sem caixa`);
+    for (const nome of ["Sim, tenho 18 anos ou mais", "Não"]) {
+      const caixa = await page.getByRole("button", { name: nome }).boundingBox();
+      if (!caixa) throw new Error(`${nome} sem caixa`);
       const seCruzam =
         caixa.x < folhagem.x + folhagem.width &&
         caixa.x + caixa.width > folhagem.x &&
         caixa.y < folhagem.y + folhagem.height &&
         caixa.y + caixa.height > folhagem.y;
-      expect(seCruzam, `${aviso} cruza a folhagem`).toBe(false);
+      expect(seCruzam, `${nome} cruza a folhagem`).toBe(false);
     }
   });
 }

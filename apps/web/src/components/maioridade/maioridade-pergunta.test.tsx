@@ -7,7 +7,7 @@ const renderizar = (retorno = "/catalogo?categoria=ipa") =>
   render(<MaioridadePergunta retorno={retorno} confirmar={vi.fn()} />);
 
 describe("MaioridadePergunta", () => {
-  it("mostra a pergunta, o apoio, os dois botões e os avisos do rodapé", () => {
+  it("mostra a pergunta, o apoio e os dois botões, sem os avisos do rodapé", () => {
     renderizar();
 
     expect(
@@ -16,8 +16,8 @@ describe("MaioridadePergunta", () => {
     expect(screen.getByText("Para entrar, confirme sua idade.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Sim, tenho 18 anos ou mais" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Não" })).toBeInTheDocument();
-    expect(screen.getByText("Aprecie com moderação.")).toBeInTheDocument();
-    expect(screen.getByText("Venda proibida para menores de 18 anos.")).toBeInTheDocument();
+    expect(screen.queryByText("Aprecie com moderação.")).not.toBeInTheDocument();
+    expect(screen.queryByText("Venda proibida para menores de 18 anos.")).not.toBeInTheDocument();
   });
 
   it("o botão de confirmar envia o formulário levando o retorno", async () => {
