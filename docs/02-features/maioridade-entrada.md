@@ -30,7 +30,7 @@ Funcionalidade: Confirmação de maioridade na entrada
 
   Cenário: Maior de idade confirma e a resposta é lembrada
     Dado que abro o site pela primeira vez neste navegador
-    E vejo a pergunta "Você tem 18 anos ou mais?"
+    E vejo a pergunta "Você tem 18 anos ou mais?", sem os avisos "Aprecie com moderação" nem "Venda proibida para menores de 18 anos"
     Quando confirmo que tenho 18 anos ou mais
     Então vejo a tela de boas-vindas
     E ao voltar ao site 29 dias depois a pergunta não aparece
@@ -70,7 +70,7 @@ Funcionalidade: Confirmação de maioridade na entrada
 
 - **Quando aparece:** em qualquer página do site, para quem ainda não confirmou a maioridade neste navegador. Arquivos estáticos (imagens, fontes, ícones) e a API não passam pela pergunta.
 - **Validade:** a confirmação vale 30 dias no navegador. Depois disso, a pergunta volta.
-- **Resposta "não":** mostra "Acesso não permitido", com o botão "Voltar para a página inicial", que volta para a pergunta de maioridade (decisão do Diego, 2026-10-30). A resposta não é lembrada; ao abrir o site de novo, a pergunta volta. Nenhuma página do site é exibida a quem respondeu "não". A tela não mostra os avisos do rodapé ("Aprecie com moderação" e "Venda proibida para menores de 18 anos"): ficam desnecessários nessa situação (decisão do Diego, 2026-11-02). Os avisos continuam na pergunta de maioridade.
+- **Resposta "não":** mostra "Acesso não permitido", com o botão "Voltar para a página inicial", que volta para a pergunta de maioridade (decisão do Diego, 2026-10-30). A resposta não é lembrada; ao abrir o site de novo, a pergunta volta. Nenhuma página do site é exibida a quem respondeu "não". A tela não mostra os avisos do rodapé ("Aprecie com moderação" e "Venda proibida para menores de 18 anos"): ficam desnecessários nessa situação (decisão do Diego, 2026-11-02). A pergunta de maioridade também não mostra esses avisos (decisão do Diego, 2026-11-02, 2ª rodada): nenhuma tela desta spec mostra "Aprecie com moderação" nem "Venda proibida para menores de 18 anos".
 - **Retorno:** depois de confirmar, a pessoa vai para a página que tentou abrir, com os mesmos parâmetros. Sem página pedida, ou quando ela é a home, vai para a [[boas-vindas]]. Só endereços do próprio site são aceitos como retorno; qualquer outro é ignorado.
 - **Robôs de busca:** uma lista de user-agents conhecidos (ex.: Googlebot, Bingbot) passa sem a pergunta, para não atrapalhar a indexação.
 - **Risco aceito:** o user-agent é informado pelo próprio navegador, então qualquer pessoa pode se passar por robô e pular a pergunta. É aceito porque a pergunta é uma confirmação declarada, sem validação; a compra continua exigindo conta e a confirmação no checkout (LB-20).
@@ -85,7 +85,7 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 | --- | --- |
 | Botão "sim" (primário) | "Sim, tenho 18 anos ou mais" |
 | Botão "não" (contorno) | "Não" |
-| Aviso abaixo dos botões (só na pergunta, não em "Acesso não permitido") | Os avisos do rodapé, com o texto definido em [[termos-privacidade]] ("Textos", linha "Rodapé, avisos") |
+| Aviso abaixo dos botões | Nenhum. Sem os avisos do rodapé, nem na pergunta nem em "Acesso não permitido" (decisão do Diego, 2026-11-02, 2ª rodada) |
 | Texto de apoio em "Acesso não permitido" | "Este site é só para maiores de 18 anos." |
 | Botão em "Acesso não permitido" (primário) | "Voltar para a página inicial" |
 | Texto de apoio da pergunta * | "Para entrar, confirme sua idade." |
@@ -113,8 +113,8 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 
 ### Decisões do Diego (2026-11-02)
 
-- **Acesso negado sem os avisos de consumo:** "retire o Aprecie com moderação e venda proibida para menores de 18 anos, fica desnecessário nessa situação". A tela "Acesso não permitido" fica só com o texto de apoio e o botão; a pergunta de maioridade mantém os avisos. Entra como mais uma linha no cenário do menor de idade, que continua dentro do limite de 6.
-- **Aprovada sem mudança na inspeção:** a pergunta de maioridade.
+- **Pergunta também sem os avisos (2ª rodada):** "tire esse texto 'Aprecie com moderação. Venda proibida para menores de 18 anos' (da parte que é a pergunta), a parte de 'acesso não permitido' está boa". Muda a decisão anterior, que mantinha os avisos na pergunta. Sem cenário novo: a frase entra no cenário do caminho feliz, e a spec continua com 6 cenários.
+- **Acesso negado sem os avisos de consumo:** "retire o Aprecie com moderação e venda proibida para menores de 18 anos, fica desnecessário nessa situação". A tela "Acesso não permitido" fica só com o texto de apoio e o botão (a pergunta também ficou sem os avisos, na 2ª rodada). Entra como mais uma linha no cenário do menor de idade, que continua dentro do limite de 6.
 
 ### Decisões do Diego (2026-10-30)
 
