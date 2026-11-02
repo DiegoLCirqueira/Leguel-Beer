@@ -85,7 +85,7 @@ test("e-mail já cadastrado leva à tela de entrar com o e-mail preenchido", asy
   await preencherCadastro(page, email);
 
   await expect(page.getByText(/Este e-mail já tem conta\./)).toBeVisible();
-  await page.getByRole("main").getByRole("link", { name: "Entrar" }).first().click();
+  await page.getByRole("alert").getByRole("link", { name: "Entrar" }).click();
   await expect(page).toHaveURL(new RegExp(`/entrar\\?email=`));
   await expect(page.getByLabel("E-mail")).toHaveValue(email);
 });
