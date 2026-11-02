@@ -41,7 +41,7 @@ export function TelaDeAcesso({ titulo, subtitulo, voltarHref = "/entrar", childr
         />
         <BotaoVoltar href={voltarHref} />
 
-        <div className="flex w-full max-w-sm flex-col gap-6">
+        <div className="flex w-full max-w-sm flex-1 flex-col gap-6">
           <Image
             src="/acesso/logo-nome.webp"
             alt="Leguelé Beer"

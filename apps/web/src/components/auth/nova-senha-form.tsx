@@ -78,54 +78,56 @@ export function NovaSenhaForm({ salvar }: Props) {
   if (resposta === "link-invalido") return <LinkInvalido />;
 
   return (
-    <form onSubmit={enviar} noValidate className="flex flex-col gap-4">
-      <Campo
-        id="senha"
-        name="senha"
-        rotulo="Nova senha"
-        icone={Lock}
-        type={verSenha ? "text" : "password"}
-        placeholder="Digite a nova senha"
-        autoComplete="new-password"
-        value={senha}
-        onChange={(e) => setSenha(e.target.value)}
-        erro={erros.senha}
-        acao={<OlhoDaSenha visivel={verSenha} alternar={() => setVerSenha((v) => !v)} />}
-      />
-      <Campo
-        id="confirmacao"
-        name="confirmacao"
-        rotulo="Confirmar senha"
-        icone={Lock}
-        type={verConfirmacao ? "text" : "password"}
-        placeholder="Confirme a nova senha"
-        autoComplete="new-password"
-        value={confirmacao}
-        onChange={(e) => setConfirmacao(e.target.value)}
-        erro={erros.confirmacao}
-        acao={
-          <OlhoDaSenha visivel={verConfirmacao} alternar={() => setVerConfirmacao((v) => !v)} />
-        }
-      />
+    <form onSubmit={enviar} noValidate className="flex flex-1 flex-col justify-between gap-6">
+      <div className="flex flex-col gap-4">
+        <Campo
+          id="senha"
+          name="senha"
+          rotulo="Nova senha"
+          icone={Lock}
+          type={verSenha ? "text" : "password"}
+          placeholder="Digite a nova senha"
+          autoComplete="new-password"
+          value={senha}
+          onChange={(e) => setSenha(e.target.value)}
+          erro={erros.senha}
+          acao={<OlhoDaSenha visivel={verSenha} alternar={() => setVerSenha((v) => !v)} />}
+        />
+        <Campo
+          id="confirmacao"
+          name="confirmacao"
+          rotulo="Confirmar senha"
+          icone={Lock}
+          type={verConfirmacao ? "text" : "password"}
+          placeholder="Confirme a nova senha"
+          autoComplete="new-password"
+          value={confirmacao}
+          onChange={(e) => setConfirmacao(e.target.value)}
+          erro={erros.confirmacao}
+          acao={
+            <OlhoDaSenha visivel={verConfirmacao} alternar={() => setVerConfirmacao((v) => !v)} />
+          }
+        />
 
-      {resposta === "senha-nao-salva" ? (
-        <div role="alert" className="flex flex-col items-center gap-1 text-center">
-          <p className="text-sm text-erro">
-            Não foi possível salvar a nova senha. Peça um novo link.
+        {resposta === "senha-nao-salva" ? (
+          <div role="alert" className="flex flex-col items-center gap-1 text-center">
+            <p className="text-sm text-erro">
+              Não foi possível salvar a nova senha. Peça um novo link.
+            </p>
+            <Link
+              href="/recuperar-senha"
+              className="inline-flex min-h-11 items-center text-sm font-semibold text-primaria underline underline-offset-2"
+            >
+              Pedir novo link
+            </Link>
+          </div>
+        ) : null}
+        {resposta === "erro" ? (
+          <p role="alert" className="text-center text-sm text-erro">
+            Não foi possível concluir agora. Tente de novo em instantes.
           </p>
-          <Link
-            href="/recuperar-senha"
-            className="inline-flex min-h-11 items-center text-sm font-semibold text-primaria underline underline-offset-2"
-          >
-            Pedir novo link
-          </Link>
-        </div>
-      ) : null}
-      {resposta === "erro" ? (
-        <p role="alert" className="text-center text-sm text-erro">
-          Não foi possível concluir agora. Tente de novo em instantes.
-        </p>
-      ) : null}
+        ) : null}
+      </div>
 
       <Button
         type="submit"
