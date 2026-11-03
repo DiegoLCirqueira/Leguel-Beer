@@ -92,15 +92,40 @@ test("em nova senha, os blocos ficam a 24-48 px um do outro e o grupo centraliza
   esperarGrupoAgrupadoECentralizado(caixas, area as Caixa);
 });
 
-test("em criar conta, o aceite dos Termos tem contorno borda-campo e linha de 44 px de toque", async ({
+/** Contraste WCAG entre duas cores [r, g, b] de 0 a 255. */
+function contraste(a: number[], b: number[]): number {
+  const luz = (cor: number[]) => {
+    const [r = 0, g = 0, bl = 0] = cor.map((c) => {
+      const v = c / 255;
+      return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * bl;
+  };
+  const [claro, escuro] = [luz(a), luz(b)].sort((x, y) => y - x);
+  return ((claro ?? 0) + 0.05) / ((escuro ?? 0) + 0.05);
+}
+
+const hexParaRgb = (hex: string) =>
+  [1, 3, 5].map((i) => Number.parseInt(hex.trim().slice(i, i + 2), 16));
+
+test("em criar conta, o aceite dos Termos tem contorno de contraste alto e linha de 44 px de toque", async ({
   page,
 }) => {
   await page.goto("/criar-conta");
 
   const caixa = page.getByRole("checkbox", { name: /Eu aceito os Termos de Uso/ });
   const contorno = await caixa.evaluate((el) => getComputedStyle(el).borderTopColor);
+  const { fundo, superficie } = await page.evaluate(() => {
+    const raiz = getComputedStyle(document.documentElement);
+    return {
+      fundo: raiz.getPropertyValue("--color-fundo"),
+      superficie: raiz.getPropertyValue("--color-superficie"),
+    };
+  });
+  const rgb = (contorno.match(/\d+/g) ?? []).slice(0, 3).map(Number);
   const linha = await page.locator("label", { has: caixa }).boundingBox();
 
-  expect(contorno).toBe("rgb(90, 132, 80)");
+  expect(contraste(rgb, hexParaRgb(fundo))).toBeGreaterThanOrEqual(9);
+  expect(contraste(rgb, hexParaRgb(superficie))).toBeGreaterThanOrEqual(9);
   expect(linha?.height ?? 0).toBeGreaterThanOrEqual(44);
 });
