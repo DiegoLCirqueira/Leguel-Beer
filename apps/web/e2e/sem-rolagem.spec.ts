@@ -30,3 +30,12 @@ test("em entrar, o conteúdo e o rodapé cabem na tela de 844 px sem rolagem ver
 
   expect(await alturaDoDocumento(page)).toBeLessThanOrEqual(844);
 });
+
+test("em entrar com o aviso de link inválido (confirmar sem token), cabe sem rolagem vertical", async ({
+  page,
+}) => {
+  await page.goto("/auth/confirmar");
+
+  await expect(page).toHaveURL(/\/entrar\?aviso=link-invalido$/);
+  expect(await alturaDoDocumento(page)).toBeLessThanOrEqual(844);
+});
