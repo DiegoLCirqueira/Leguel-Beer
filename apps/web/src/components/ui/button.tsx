@@ -27,6 +27,8 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
     loading?: boolean;
     iconLeft?: ReactNode;
     iconRight?: ReactNode;
+    /** Prende o ícone direito (ou o indicador de carregamento) à borda direita, centrado na vertical. */
+    pinIconRight?: boolean;
   };
 
 export function Button({
@@ -35,6 +37,7 @@ export function Button({
   loading = false,
   iconLeft,
   iconRight,
+  pinIconRight = false,
   className,
   disabled,
   children,
@@ -46,10 +49,12 @@ export function Button({
     <Loader2 aria-hidden="true" className="size-5 animate-spin motion-reduce:animate-none" />
   );
 
+  const right = loading && spinnerOnRight ? spinner : iconRight;
+
   return (
     <button
       type={type}
-      className={cn(buttonVariants({ variant, size }), className)}
+      className={cn(buttonVariants({ variant, size }), pinIconRight && "relative", className)}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       {...props}
@@ -61,7 +66,11 @@ export function Button({
       ) : null}
       {loading && !spinnerOnRight ? spinner : iconLeft}
       {children}
-      {loading && spinnerOnRight ? spinner : iconRight}
+      {pinIconRight && right ? (
+        <span className="absolute right-[5.4%] top-1/2 flex -translate-y-1/2">{right}</span>
+      ) : (
+        right
+      )}
     </button>
   );
 }

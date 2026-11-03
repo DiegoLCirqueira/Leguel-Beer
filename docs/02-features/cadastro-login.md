@@ -124,7 +124,10 @@ Funcionalidade: Cadastro e login com e-mail e senha
 ### Entrar (`/entrar`)
 
 - Campos E-mail e Senha, "Manter-me conectado", "Esqueci minha senha" (leva à [[recuperacao-senha]]), botão "Entrar" e o link "Criar conta". Mesmo visual de "Criar sua conta" ([[identidade-visual]]).
-- **Distribuição na altura:** em 390x844, o conteúdo de `/entrar` (título, subtítulo, campos, ações e o rodapé "Ainda não tem conta? Criar conta") fica agrupado, sem vão grande entre os blocos nem embaixo. O Diego pediu mais espaço na 1ª rodada ("da pra espalhar mais...") e, na 2ª, achou que o limite de 48 px embaixo ficou "espaçado demais" (2026-11-02). Critério (decisão do Orchestrator de 2026-11-02, técnica e reversível, sujeita à inspeção do Diego): vão de 24 a 48 px entre dois blocos vizinhos; o grupo de conteúdo fica centralizado na altura disponível, e o espaço livre se reparte em cima e embaixo, sem esticar os blocos; nenhum bloco se sobrepõe nem sai da tela; sem limite de vão embaixo. Sem texto novo.
+- **Distribuição na altura:** em 390x844, o conteúdo de `/entrar` (título, campos, ações e o rodapé "Ainda não tem conta? Criar conta") fica agrupado, sem vão grande entre os blocos nem embaixo. O Diego pediu mais espaço na 1ª rodada ("da pra espalhar mais...") e, na 2ª, achou que o limite de 48 px embaixo ficou "espaçado demais" (2026-11-02). Critério (decisão do Orchestrator de 2026-11-02, técnica e reversível, sujeita à inspeção do Diego): vão de 24 a 48 px entre dois blocos vizinhos; o grupo de conteúdo fica centralizado na altura disponível, e o espaço livre se reparte em cima e embaixo, sem esticar os blocos; nenhum bloco se sobrepõe nem sai da tela; sem limite de vão embaixo. Sem texto novo.
+- **Botão "Entrar" com seta:** o botão "Entrar" tem a mesma seta do botão da [[boas-vindas]]: mesmo ícone e mesmo traço, presa à borda direita do botão (decisão do Diego, 2026-11-03). Sem texto novo.
+- **Divisor "ou":** entre o botão "Entrar" e o convite para criar conta há um divisor: linha, o texto "ou" e outra linha (decisão do Diego, 2026-11-03).
+- **Convite em uma linha:** "Ainda não tem conta? Criar conta" fica numa linha só, em 390x844 (decisão do Diego, 2026-11-03). Sem cenário Gherkin novo: a spec já passa do limite de 6; a verificação é E2E.
 - **"Manter-me conectado":** começa com o valor vindo da [[boas-vindas]], ou marcado quando a pessoa chega por outro caminho. Marcado: a sessão continua depois de fechar o navegador, por até 30 dias sem uso. Desmarcado: a sessão acaba ao fechar o navegador.
 - **"30 dias sem uso" no site:** com a opção marcada, os cookies de sessão têm validade de 30 dias, renovada a cada requisição ao site; depois de 30 dias sem abrir o site, o navegador descarta os cookies e a pessoa entra de novo. Com a opção desmarcada, os cookies não têm validade e somem ao fechar o navegador. O tempo de inatividade nativo do Supabase Auth exige o plano Pro, que fere a restrição "tudo gratuito" ([[ADR-001-stack]]); por isso os 30 dias ficam no site (decisão do Orchestrator, 2026-10-29).
 - **Risco aceito:** o refresh token não vence no Supabase. Um cookie copiado antes dos 30 dias continua valendo até a sessão ser renovada ou encerrada (por "Sair" ou pela troca de senha).
@@ -165,10 +168,11 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 | Lugar | Texto proposto |
 | --- | --- |
 | Título da tela de entrar | "Entrar na sua conta" (mesmo estilo de "Criar sua conta") |
-| Subtítulo da tela de entrar | "Que bom te ver de novo!" |
+| Subtítulo da tela de entrar | Nenhum. O Diego pediu para retirar "Que bom te ver de novo!" (2026-11-03) |
 | Placeholders de entrar | "Digite seu e-mail" e "Digite sua senha" (os do Figma) |
 | Link | "Esqueci minha senha" |
 | Rodapé de entrar | "Ainda não tem conta?" e "Criar conta" |
+| Divisor de entrar | "ou" (entre linhas), acima do rodapé (decisão do Diego, 2026-11-03) |
 | Aviso depois do cadastro | "Enviamos um link de confirmação para {e-mail}. Abra o e-mail para ativar sua conta." |
 | Aviso de e-mail não confirmado | "Confirme seu e-mail para entrar. Não recebeu?" e a ação "Reenviar link" |
 | Assunto do e-mail de confirmação | "Confirme sua conta na Leguelé Beer" |

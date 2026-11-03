@@ -3,7 +3,7 @@
 import { ArrowRight, Check, Lock, Mail } from "lucide-react";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
-import { Button, Campo, OlhoDaSenha } from "@/components/ui";
+import { Button, Campo, DivisorOu, OlhoDaSenha } from "@/components/ui";
 import { validarEntrada } from "@/lib/auth/entrar";
 import { ehErroDeRedirect } from "@/lib/erro-de-redirect";
 
@@ -169,12 +169,15 @@ export function EntrarForm({ entrar, reenviar, emailInicial = "", manterConectad
       <Button
         type="submit"
         loading={enviando}
-        iconRight={<ArrowRight aria-hidden="true" className="size-5" />}
+        pinIconRight
+        iconRight={<ArrowRight aria-hidden="true" strokeWidth={1.8} className="size-6" />}
       >
         Entrar
       </Button>
 
-      <div className="flex flex-col items-center gap-1 pt-2 text-sm text-texto">
+      <DivisorOu />
+
+      <div className="flex flex-wrap items-center justify-center gap-x-2 text-sm text-texto">
         <p>Ainda não tem conta?</p>
         <Link
           href="/criar-conta"
