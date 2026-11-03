@@ -65,7 +65,6 @@ export default async function Entrar({ searchParams }: Props) {
             <h1 className="font-titulo text-balance text-4xl leading-tight text-texto">
               Entrar na sua <span className="text-primaria">conta</span>
             </h1>
-            <p className="text-texto">Que bom te ver de novo!</p>
           </header>
           {busca.aviso === "link-invalido" ? (
             <p
