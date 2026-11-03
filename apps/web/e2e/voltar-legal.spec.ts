@@ -23,13 +23,13 @@ for (const caminho of ["/termos", "/privacidade", "/entregas"]) {
 }
 
 test("termos aberto pelo rodapé de outra página voltam para ela, na história", async ({ page }) => {
-  await page.goto("/entrar");
+  await page.goto("/privacidade");
   await page.getByRole("contentinfo").getByRole("link", { name: "Termos de Uso" }).click();
   await expect(page).toHaveURL(/\/termos$/);
 
   await page.getByRole("link", { name: "Voltar" }).click();
 
-  await expect(page).toHaveURL(/\/entrar$/);
+  await expect(page).toHaveURL(/\/privacidade$/);
 });
 
 test("termos abertos em nova aba pelo cadastro levam de volta ao /criar-conta, sem apagar o formulário", async ({
