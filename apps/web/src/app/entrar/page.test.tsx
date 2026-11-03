@@ -6,7 +6,7 @@ const abrir = async (busca: Record<string, string> = {}) =>
   render(await Entrar({ searchParams: Promise.resolve(busca) }));
 
 describe("/entrar", () => {
-  it("mostra o título, o logo, o voltar, o formulário e o rodapé, sem subtítulo", async () => {
+  it("mostra o título, o logo, o voltar, o formulário, sem subtítulo e sem rodapé", async () => {
     await abrir();
 
     expect(
@@ -16,7 +16,7 @@ describe("/entrar", () => {
     expect(screen.getByRole("img", { name: "Leguelé Beer" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Voltar" })).toHaveAttribute("href", "/boas-vindas");
     expect(screen.getByLabelText("E-mail")).toHaveValue("");
-    expect(screen.getByRole("contentinfo")).toBeInTheDocument();
+    expect(screen.queryByRole("contentinfo")).not.toBeInTheDocument();
     expect(screen.getAllByRole("img")).toHaveLength(1);
   });
 
