@@ -55,3 +55,11 @@ test("em recuperar senha, o conteúdo e o rodapé cabem na tela de 844 px sem ro
 
   expect(await alturaDoDocumento(page)).toBeLessThanOrEqual(844);
 });
+
+test("em confirmar conta, o conteúdo e o rodapé cabem na tela de 844 px sem rolagem vertical", async ({
+  page,
+}) => {
+  await page.goto("/auth/confirmar?token_hash=abc&type=signup");
+
+  expect(await alturaDoDocumento(page)).toBeLessThanOrEqual(844);
+});
