@@ -47,3 +47,11 @@ test("em nova senha, o conteúdo e o rodapé cabem na tela de 844 px sem rolagem
 
   expect(await alturaDoDocumento(page)).toBeLessThanOrEqual(844);
 });
+
+test("em recuperar senha, o conteúdo e o rodapé cabem na tela de 844 px sem rolagem vertical", async ({
+  page,
+}) => {
+  await page.goto("/recuperar-senha");
+
+  expect(await alturaDoDocumento(page)).toBeLessThanOrEqual(844);
+});
