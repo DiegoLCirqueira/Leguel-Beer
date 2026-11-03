@@ -1,3 +1,4 @@
+import type { Page } from "@playwright/test";
 import { expect, test } from "./support/maior-de-idade";
 
 // O modo móvel esconde a barra de rolagem e mascara o problema: estes testes rodam sem ele.
@@ -16,4 +17,16 @@ test("a barra de rolagem não ocupa espaço (estilo) e a página longa ainda rol
 
   await page.keyboard.press("End");
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+});
+
+async function alturaDoDocumento(page: Page): Promise<number> {
+  return page.evaluate(() => document.documentElement.scrollHeight);
+}
+
+test("em entrar, o conteúdo e o rodapé cabem na tela de 844 px sem rolagem vertical", async ({
+  page,
+}) => {
+  await page.goto("/entrar");
+
+  expect(await alturaDoDocumento(page)).toBeLessThanOrEqual(844);
 });
