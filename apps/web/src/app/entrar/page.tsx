@@ -23,7 +23,7 @@ export default async function Entrar({ searchParams }: Props) {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <main className="relative isolate flex flex-1 flex-col items-center overflow-hidden bg-fundo px-6 pb-4 pt-6">
+      <main className="relative isolate flex flex-1 flex-col items-center overflow-hidden bg-fundo px-6 pb-4 pt-5">
         <Image
           src="/maioridade/fundo.webp"
           alt=""
@@ -70,7 +70,7 @@ export default async function Entrar({ searchParams }: Props) {
           {busca.aviso === "link-invalido" ? (
             <p
               role="alert"
-              className="rounded-2xl border border-aviso bg-superficie/70 px-4 py-3 text-sm text-texto"
+              className="rounded-2xl border border-aviso bg-superficie/70 px-4 py-2 text-sm text-texto"
             >
               Este link de confirmação é inválido ou já venceu. Entre com seu e-mail e senha para
               receber um novo link.
