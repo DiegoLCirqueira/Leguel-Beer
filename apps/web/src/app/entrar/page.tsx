@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { BotaoVoltar } from "@/components/auth/botao-voltar";
 import { EntrarForm } from "@/components/auth/entrar-form";
-import { SiteFooter } from "@/components/site/site-footer";
 import { reenviarAction, entrarAction } from "./actions";
 
 export const metadata: Metadata = {
@@ -83,7 +82,6 @@ export default async function Entrar({ searchParams }: Props) {
           />
         </div>
       </main>
-      <SiteFooter />
     </div>
   );
 }
