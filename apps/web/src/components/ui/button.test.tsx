@@ -56,4 +56,15 @@ describe("Button", () => {
 
     expect(screen.getByRole("button")).not.toHaveAttribute("aria-busy");
   });
+
+  it("com o ícone direito preso, o carregamento troca o ícone pelo indicador", () => {
+    render(
+      <Button loading pinIconRight iconRight={<svg data-testid="seta" />}>
+        Entrar
+      </Button>,
+    );
+
+    expect(screen.queryByTestId("seta")).not.toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("Carregando");
+  });
 });
