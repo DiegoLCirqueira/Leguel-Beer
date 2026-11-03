@@ -32,3 +32,17 @@ test("em entrar, a seta do botão fica como na boas-vindas: na borda direita, ce
   expect(Math.abs(emEntrar.desvioVertical)).toBeLessThanOrEqual(1);
   expect(Math.abs(emEntrar.folgaDireita - naBoasVindas.folgaDireita)).toBeLessThanOrEqual(3);
 });
+
+test("em entrar, o divisor 'ou' fica entre o botão Entrar e o convite para criar conta", async ({
+  page,
+}) => {
+  await page.goto("/entrar");
+
+  const botao = await page.getByRole("button", { name: "Entrar" }).boundingBox();
+  const ou = await page.getByText("ou", { exact: true }).boundingBox();
+  const pergunta = await page.getByText("Ainda não tem conta?").boundingBox();
+
+  expect(ou).not.toBeNull();
+  expect(ou?.y ?? 0).toBeGreaterThanOrEqual((botao?.y ?? 0) + (botao?.height ?? 0));
+  expect((ou?.y ?? 0) + (ou?.height ?? 0)).toBeLessThanOrEqual(pergunta?.y ?? 0);
+});
