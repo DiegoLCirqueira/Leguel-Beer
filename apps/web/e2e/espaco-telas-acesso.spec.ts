@@ -41,15 +41,15 @@ async function caixasDosBlocos(blocos: Locator[]): Promise<Caixa[]> {
   return caixas;
 }
 
-/** Vão de 24 a 48 px entre blocos vizinhos e o grupo centralizado na altura de 844 px. */
-function esperarGrupoAgrupadoECentralizado(caixas: Caixa[]) {
+/** Vão de 24 a 48 px entre blocos vizinhos e o grupo centralizado na área do conteúdo principal. */
+function esperarGrupoAgrupadoECentralizado(caixas: Caixa[], area: Caixa) {
   for (let i = 1; i < caixas.length; i++) {
     const vao = (caixas[i]?.top ?? 0) - (caixas[i - 1]?.bottom ?? 0);
     expect(vao, `vão entre o bloco ${i} e o anterior`).toBeGreaterThanOrEqual(24);
     expect(vao, `vão entre o bloco ${i} e o anterior`).toBeLessThanOrEqual(48);
   }
-  const acima = caixas[0]?.top ?? 0;
-  const abaixo = 844 - (caixas[caixas.length - 1]?.bottom ?? 0);
+  const acima = (caixas[0]?.top ?? 0) - area.top;
+  const abaixo = area.bottom - (caixas[caixas.length - 1]?.bottom ?? 0);
   expect(acima).toBeGreaterThanOrEqual(0);
   expect(abaixo).toBeGreaterThanOrEqual(0);
   expect(Math.abs(acima - abaixo), "espaço livre repartido em cima e embaixo").toBeLessThanOrEqual(
@@ -70,7 +70,8 @@ test("em entrar, os blocos ficam a 24-48 px um do outro e o grupo centralizado n
     page.locator("main form > div").last(),
   ]);
 
-  esperarGrupoAgrupadoECentralizado(caixas);
+  const [area] = await caixasDosBlocos([page.getByRole("main")]);
+  esperarGrupoAgrupadoECentralizado(caixas, area as Caixa);
 });
 
 test("em nova senha, os blocos ficam a 24-48 px um do outro e o grupo centralizado na altura", async ({
@@ -85,5 +86,6 @@ test("em nova senha, os blocos ficam a 24-48 px um do outro e o grupo centraliza
     page.getByRole("button", { name: "Salvar nova senha" }),
   ]);
 
-  esperarGrupoAgrupadoECentralizado(caixas);
+  const [area] = await caixasDosBlocos([page.getByRole("main")]);
+  esperarGrupoAgrupadoECentralizado(caixas, area as Caixa);
 });
