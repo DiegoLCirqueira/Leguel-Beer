@@ -29,8 +29,8 @@ tags:
 Funcionalidade: Termos, privacidade e entregas
 
   Cenário: Rodapé com avisos e links
-    Dado que confirmei a maioridade
-    Quando abro /catalogo e rolo até o fim
+    Dado que confirmei a maioridade e continuei como convidado
+    Quando abro a loja (/) e rolo até o fim
     Então vejo "Aprecie com moderação" e "Venda proibida para menores de 18 anos"
     E vejo os links "Termos de Uso", "Política de Privacidade" e "Entregas"
     E não vejo a razão social nem o CNPJ da empresa
