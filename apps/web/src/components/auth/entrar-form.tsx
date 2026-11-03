@@ -169,7 +169,8 @@ export function EntrarForm({ entrar, reenviar, emailInicial = "", manterConectad
       <Button
         type="submit"
         loading={enviando}
-        iconRight={<ArrowRight aria-hidden="true" className="size-5" />}
+        pinIconRight
+        iconRight={<ArrowRight aria-hidden="true" strokeWidth={1.8} className="size-6" />}
       >
         Entrar
       </Button>
