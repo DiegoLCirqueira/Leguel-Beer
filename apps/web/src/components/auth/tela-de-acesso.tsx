@@ -1,6 +1,5 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
-import { SiteFooter } from "@/components/site/site-footer";
 import { BotaoVoltar } from "./botao-voltar";
 
 type Props = {
@@ -67,7 +66,6 @@ export function TelaDeAcesso({
           {children}
         </div>
       </main>
-      <SiteFooter />
     </div>
   );
 }
