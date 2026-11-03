@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 export default function RecuperarSenha() {
   return (
     <TelaDeAcesso
+      centralizado
       titulo={
         <>
           Recuperar <span className="text-primaria">senha</span>
