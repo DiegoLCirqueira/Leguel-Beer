@@ -105,7 +105,7 @@ Funcionalidade: Tokens e componentes base da marca
     Dado o botão nas variantes primária, contorno e discreta, o badge e o chip
     Quando a verificação automática de acessibilidade roda sobre eles
     Então não há violações
-    E a área de toque de cada botão e chip mede pelo menos 44 × 44 px
+    E a área de toque de cada botão e chip mede pelo menos 44 × 44 px, exceto a boas-vindas (2- B, 2026-11-03)
 ```
 
 ## Regras de negócio
@@ -207,7 +207,7 @@ Só tema escuro. O verde da marca, o texto sobre ele e o texto principal são os
 
 ### Decisões do Diego (2026-11-02, 3ª rodada)
 
-- **Sem scroll nas páginas:** "retire o scroll das páginas (todas)". Regras "Telas de acesso sem rolagem vertical" e "Barra de rolagem invisível" em "Telas e layout". Sem cenário Gherkin novo: a spec já passa do limite de 6; a verificação é E2E em 390x844 e 360x600, com `isMobile: false` para a barra de rolagem. Ajustes do Orchestrator depois da revisão: rodapé mantido onde já existe, compactação em `/recuperar-senha` e `/auth/confirmar`, e logo de `/criar-conta` pendente do Diego.
+- **Sem scroll nas páginas:** "retire o scroll das páginas (todas)". Regras "Telas de acesso sem rolagem vertical" e "Barra de rolagem invisível" em "Telas e layout". Sem cenário Gherkin novo: a spec já passa do limite de 6; a verificação é E2E em 390x844 e 360x600, com `isMobile: false` para a barra de rolagem. Ajustes do Orchestrator depois da revisão: rodapé mantido onde já existe, compactação em `/recuperar-senha` e `/auth/confirmar`, logo de `/criar-conta` mantido, rolagem aceita pelo Diego em 2026-11-03 (1- c).
 
 ### Decisões do Diego (2026-11-01)
 
