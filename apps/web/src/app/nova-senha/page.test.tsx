@@ -12,7 +12,7 @@ describe("/nova-senha", () => {
     expect(screen.getByRole("heading", { level: 1, name: "Nova senha" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Salvar nova senha" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Voltar" })).toHaveAttribute("href", "/entrar");
-    expect(screen.getByRole("contentinfo")).toBeInTheDocument();
+    expect(screen.queryByRole("contentinfo")).not.toBeInTheDocument();
   });
 
   it.each([{}, { token_hash: "h" }, { token_hash: "h", type: "signup" }])(

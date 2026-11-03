@@ -23,9 +23,7 @@ async function alturaDoDocumento(page: Page): Promise<number> {
   return page.evaluate(() => document.documentElement.scrollHeight);
 }
 
-test("em entrar, o conteúdo e o rodapé cabem na tela de 844 px sem rolagem vertical", async ({
-  page,
-}) => {
+test("em entrar, o conteúdo cabe na tela de 844 px sem rolagem vertical", async ({ page }) => {
   await page.goto("/entrar");
 
   expect(await alturaDoDocumento(page)).toBeLessThanOrEqual(844);
@@ -40,15 +38,13 @@ test("em entrar com o aviso de link inválido (confirmar sem token), cabe sem ro
   expect(await alturaDoDocumento(page)).toBeLessThanOrEqual(844);
 });
 
-test("em nova senha, o conteúdo e o rodapé cabem na tela de 844 px sem rolagem vertical", async ({
-  page,
-}) => {
+test("em nova senha, o conteúdo cabe na tela de 844 px sem rolagem vertical", async ({ page }) => {
   await page.goto("/nova-senha?token_hash=abc&type=recovery");
 
   expect(await alturaDoDocumento(page)).toBeLessThanOrEqual(844);
 });
 
-test("em recuperar senha, o conteúdo e o rodapé cabem na tela de 844 px sem rolagem vertical", async ({
+test("em recuperar senha, o conteúdo cabe na tela de 844 px sem rolagem vertical", async ({
   page,
 }) => {
   await page.goto("/recuperar-senha");
@@ -56,7 +52,7 @@ test("em recuperar senha, o conteúdo e o rodapé cabem na tela de 844 px sem ro
   expect(await alturaDoDocumento(page)).toBeLessThanOrEqual(844);
 });
 
-test("em confirmar conta, o conteúdo e o rodapé cabem na tela de 844 px sem rolagem vertical", async ({
+test("em confirmar conta, o conteúdo cabe na tela de 844 px sem rolagem vertical", async ({
   page,
 }) => {
   await page.goto("/auth/confirmar?token_hash=abc&type=signup");

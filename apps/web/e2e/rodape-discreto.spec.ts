@@ -1,7 +1,7 @@
 import { expect, test } from "./support/maior-de-idade";
 
 // O rodapé é um detalhe: texto de 12 px, pouco espaço, links em linha e na cor texto-suave.
-for (const caminho of ["/criar-conta", "/termos"]) {
+for (const caminho of ["/privacidade", "/termos"]) {
   test(`o rodapé de ${caminho} é pequeno e discreto em 360x780`, async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 780 });
     await page.goto(caminho);

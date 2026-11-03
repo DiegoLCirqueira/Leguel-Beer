@@ -32,6 +32,12 @@ describe("/auth/confirmar (GET)", () => {
     ).toBeInTheDocument();
   });
 
+  it("não mostra o rodapé do site", async () => {
+    await abrir({ token_hash: "hash-1", type: "signup" });
+
+    expect(screen.queryByRole("contentinfo")).not.toBeInTheDocument();
+  });
+
   it.each([{}, { token_hash: "h" }, { token_hash: "h", type: "recovery" }])(
     "sem token ou com tipo desconhecido (%j) leva à tela de entrar com o aviso",
     async (busca) => {

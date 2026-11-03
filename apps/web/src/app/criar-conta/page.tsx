@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { BotaoVoltar } from "@/components/auth/botao-voltar";
-import { SiteFooter } from "@/components/site/site-footer";
 import { CriarContaForm } from "@/components/auth/criar-conta-form";
 import { criarContaAction } from "./actions";
 
@@ -73,7 +72,6 @@ export default function CriarConta() {
           <CriarContaForm criar={criarContaAction} />
         </div>
       </main>
-      <SiteFooter />
     </>
   );
 }
