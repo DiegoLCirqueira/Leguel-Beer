@@ -130,3 +130,18 @@ test("em criar conta, o aceite dos Termos tem contorno de contraste alto e linha
   expect(contraste(rgb, hexParaRgb(superficie))).toBeGreaterThanOrEqual(9);
   expect(linha?.height ?? 0).toBeGreaterThanOrEqual(44);
 });
+
+test("em recuperar senha, os blocos ficam a 24-48 px um do outro e o grupo centralizado na altura", async ({
+  page,
+}) => {
+  await page.goto("/recuperar-senha");
+
+  const caixas = await caixasDosBlocos([
+    page.getByRole("img", { name: "Leguelé Beer" }),
+    page.locator("main header"),
+    page.locator("main form"),
+  ]);
+  const [area] = await caixasDosBlocos([page.getByRole("main")]);
+
+  esperarGrupoAgrupadoECentralizado(caixas, area as Caixa);
+});
