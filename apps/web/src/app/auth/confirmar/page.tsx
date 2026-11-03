@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui";
-import { SiteFooter } from "@/components/site/site-footer";
 import { confirmarContaAction } from "./actions";
 
 export const metadata: Metadata = {
@@ -55,7 +54,6 @@ export default async function Confirmar({ searchParams }: Props) {
           </form>
         </div>
       </main>
-      <SiteFooter />
     </div>
   );
 }
