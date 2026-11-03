@@ -23,7 +23,7 @@ export default async function Entrar({ searchParams }: Props) {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <main className="relative isolate flex flex-1 flex-col items-center overflow-hidden bg-fundo px-6 pb-12 pt-14">
+      <main className="relative isolate flex flex-1 flex-col items-center overflow-hidden bg-fundo px-6 pb-4 pt-6">
         <Image
           src="/maioridade/fundo.webp"
           alt=""
