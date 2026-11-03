@@ -29,7 +29,7 @@ export function LegalPage({ titulo, atualizadoEm, secoes }: Props) {
         {secoes.map(({ titulo: tituloSecao, texto }, indice) => (
           <section key={tituloSecao} className="flex flex-col gap-2">
             <h2 className="text-lg font-semibold">{`${indice + 1}. ${tituloSecao}`}</h2>
-            <p className="leading-relaxed text-texto-suave">{texto}</p>
+            <p className="break-words leading-relaxed text-texto-suave">{texto}</p>
           </section>
         ))}
       </main>
