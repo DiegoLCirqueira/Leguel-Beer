@@ -39,3 +39,11 @@ test("em entrar com o aviso de link inválido (confirmar sem token), cabe sem ro
   await expect(page).toHaveURL(/\/entrar\?aviso=link-invalido$/);
   expect(await alturaDoDocumento(page)).toBeLessThanOrEqual(844);
 });
+
+test("em nova senha, o conteúdo e o rodapé cabem na tela de 844 px sem rolagem vertical", async ({
+  page,
+}) => {
+  await page.goto("/nova-senha?token_hash=abc&type=recovery");
+
+  expect(await alturaDoDocumento(page)).toBeLessThanOrEqual(844);
+});
