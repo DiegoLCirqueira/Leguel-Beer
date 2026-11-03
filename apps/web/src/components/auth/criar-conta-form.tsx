@@ -85,16 +85,6 @@ export function CriarContaForm({ criar }: Props) {
 
   return (
     <form onSubmit={enviar} noValidate className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-center gap-x-2 text-sm text-texto">
-        <p>Já tem uma conta?</p>
-        <Link
-          href="/entrar"
-          className="inline-flex min-h-11 min-w-11 items-center justify-center font-semibold text-primaria underline underline-offset-2"
-        >
-          Entrar
-        </Link>
-      </div>
-
       <Campo
         id="nome"
         name="nome"
@@ -233,6 +223,16 @@ export function CriarContaForm({ criar }: Props) {
       >
         Criar conta
       </Button>
+
+      <div className="flex flex-wrap items-center justify-center gap-x-2 text-sm text-texto">
+        <p>Já tem uma conta?</p>
+        <Link
+          href="/entrar"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center font-semibold text-primaria underline underline-offset-2"
+        >
+          Entrar
+        </Link>
+      </div>
     </form>
   );
 }
