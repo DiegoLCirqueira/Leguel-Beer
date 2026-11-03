@@ -111,6 +111,11 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 - [[boas-vindas]]: a tela seguinte.
 - [[identidade-visual]]: componentes da tela.
 
+### Decisões do Diego (2026-11-02, 3ª rodada)
+
+- **Aprovadas sem mudança:** a pergunta de maioridade e "Acesso não permitido".
+- **Sem rolagem:** a pergunta e o acesso negado cabem em 390x844 sem rolagem vertical e sem barra de rolagem visível; regra geral em [[identidade-visual]] ("Telas e layout"). Sem cenário novo (limite de 6).
+
 ### Decisões do Diego (2026-11-02)
 
 - **Pergunta também sem os avisos (2ª rodada):** "tire esse texto 'Aprecie com moderação. Venda proibida para menores de 18 anos' (da parte que é a pergunta), a parte de 'acesso não permitido' está boa". Muda a decisão anterior, que mantinha os avisos na pergunta. Sem cenário novo: a frase entra no cenário do caminho feliz, e a spec continua com 6 cenários.
