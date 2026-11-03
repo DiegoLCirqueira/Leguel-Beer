@@ -69,6 +69,7 @@ test("em entrar, os blocos ficam a 24-48 px um do outro e o grupo centralizado n
     page.locator("main header"),
     page.locator("main form > div").first(),
     page.getByRole("button", { name: "Entrar" }),
+    page.getByText("ou", { exact: true }),
     page.locator("main form > div").last(),
   ]);
 

@@ -46,3 +46,18 @@ test("em entrar, o divisor 'ou' fica entre o botão Entrar e o convite para cria
   expect(ou?.y ?? 0).toBeGreaterThanOrEqual((botao?.y ?? 0) + (botao?.height ?? 0));
   expect((ou?.y ?? 0) + (ou?.height ?? 0)).toBeLessThanOrEqual(pergunta?.y ?? 0);
 });
+
+test("em entrar, 'Ainda não tem conta?' e 'Criar conta' ficam na mesma linha, com 44 px de toque", async ({
+  page,
+}) => {
+  await page.goto("/entrar");
+
+  const pergunta = await page.getByText("Ainda não tem conta?").boundingBox();
+  const criar = await page.getByRole("link", { name: "Criar conta" }).boundingBox();
+
+  const centroPergunta = (pergunta?.y ?? 0) + (pergunta?.height ?? 0) / 2;
+  const centroCriar = (criar?.y ?? 0) + (criar?.height ?? 0) / 2;
+  expect(Math.abs(centroPergunta - centroCriar)).toBeLessThanOrEqual(4);
+  expect(criar?.x ?? 0).toBeGreaterThan((pergunta?.x ?? 0) + (pergunta?.width ?? 0) - 1);
+  expect(criar?.height ?? 0).toBeGreaterThanOrEqual(44);
+});
