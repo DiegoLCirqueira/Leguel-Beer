@@ -129,6 +129,7 @@ Aprovados pelo Diego em 2026-10-29 (pergunta 4), que autorizou acrescentar os te
 
 - **Nova senha:** "tentar usar melhor o espaço em branco". Regra "Altura da tela de nova senha" em "Regras de negócio", sem cenário novo (o limite de 6 vale).
 - **Aprovada sem mudança:** Recuperar senha.
+- **3ª rodada ("nova senha boa", "recuperar senha boa"):** as duas telas mantêm texto, logo e cor e passam a seguir a regra geral de [[identidade-visual]]: cabem em 390x844 sem rolagem vertical (o que pode exigir compactar padding e vãos de `/recuperar-senha`) e sem barra de rolagem visível, com rolagem possível em telas menores (360x600, zoom de 200%). O critério de vão da 2ª rodada continua valendo.
 - **2ª rodada:** "ficou espaçado demais". O limite de 96 px sai; entra o critério do Orchestrator (24 a 48 px entre blocos, grupo centralizado, sem limite embaixo), sujeito à inspeção do Diego.
 
 ### Decisão do Orchestrator (2026-10-31)

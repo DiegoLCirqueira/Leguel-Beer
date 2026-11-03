@@ -4,7 +4,7 @@ modulo: design
 card-notion: https://app.notion.com/p/3fd490a7ac7d818bbd1ef6ebfb609310
 prioridade: P0
 criado: 2026-10-29
-atualizado: 2026-10-31
+atualizado: 2026-11-02
 issues:
   - "#63 LB-11"
   - "#64 LB-12"
@@ -157,6 +157,8 @@ Só tema escuro. O verde da marca, o texto sobre ele e o texto principal são os
 ### Telas e layout
 
 - **Mobile (320 a 767 px):** o site é desenhado para celular e se encaixa em qualquer aparelho dessa faixa, com layout fluido (decisão do Diego, 2026-10-31). Nenhuma página tem rolagem horizontal (cenário "Nenhuma página tem rolagem horizontal"). A [[boas-vindas]] e a pergunta de [[maioridade-entrada]] ficam sem rolagem vertical em retrato a partir de ~640 px de altura; na horizontal ou com zoom alto podem rolar, para os controles continuarem alcançáveis (WCAG 1.4.10, como aprovado no #138). Os tokens desta spec valem em qualquer largura.
+- **Telas de acesso sem rolagem vertical:** o Diego pediu "retire o scroll das páginas (todas)" (2026-11-02, 3ª rodada). Interpretação (decisão do Orchestrator de 2026-11-02, reversível, sujeita a veto do Diego): em 390x844, as telas de acesso (pergunta de [[maioridade-entrada]], acesso negado, [[boas-vindas]], `/criar-conta`, `/entrar`, `/recuperar-senha`, `/nova-senha` e `/auth/confirmar`) cabem sem rolagem vertical. Onde a tela já tem rodapé ([[termos-privacidade]]), o critério é: o conteúdo principal mais o rodapé cabem em 100dvh (o conteúdo principal deixa de ter `min-h-dvh` sozinho); onde não tem, a altura do documento é menor ou igual à altura visível. `/recuperar-senha` e `/auth/confirmar` sem token também seguem a regra: ganham compactação de espaçamento (padding e vãos), sem mexer em texto, logo ou cor. `/criar-conta` cabe sem rolagem em 390x844 **condicionado à decisão do Diego sobre o tamanho do logo (pendente)**: o critério não fixa o logo. Em telas menores (ex.: 360x600) e com zoom de 200% a rolagem continua possível, para nenhum controle ficar inalcançável (WCAG 1.4.10).
+- **Barra de rolagem invisível:** em todas as páginas do site a barra de rolagem não aparece (mesma decisão). A rolagem por toque, roda do mouse e teclado continua funcionando; as páginas legais longas ([[termos-privacidade]]) seguem roláveis, só sem a barra. Critério verificável: em 390x844, o espaço da barra de rolagem é 0 (largura do documento igual à da janela) e o conteúdo de uma página longa ainda rola. A rolagem por teclado e o foco continuam funcionando nas páginas longas. O E2E dessas medidas roda com `isMobile: false`, porque o modo móvel esconde a barra e mascara o problema (lição do #191).
 - **Tablet e desktop (768 px ou mais):** ganham uma versão própria, igual ou parecida com a de desktop, feita só depois de o mobile estar 100% pronto e quando o design de web existir no Figma (decisões do Diego, 2026-10-30 e 2026-10-31). Até lá, em 768 px ou mais o site só não pode quebrar: sem rolagem horizontal, sem conteúdo cortado ou sobreposto e com os controles utilizáveis.
 
 ### Espaçamento, raios e sombras
@@ -196,6 +198,10 @@ Só tema escuro. O verde da marca, o texto sobre ele e o texto principal são os
 - **Telas responsivas:** "Verificar os tamanhos de tela, precisa que encaixe em qualquer dispositivo mobile, deve ser algo responsivo, quando chegar na resolução de tablet faremos igual/semelhante a versão de desktop". Mobile de 320 a 767 px, fluido e sem rolagem horizontal; de 768 px para cima, versão própria parecida com a de desktop, depois do mobile 100%.
 - **Rodapé e botão de voltar:** "o footer está MUITO grande, deve ser pequeno, praticamente um detalhe" e "de um destaque no botão de retornar já que a folhagem pode tirar um pouco da sua visibilidade". Rodapé discreto, com links de 24 px de área de toque, e botão de voltar destacado sobre a folhagem.
 - **Componentes reutilizáveis:** "esses botões, cores e tudo que é reutilizável devem ser deixados em um local pra não precisar colocar o código completo toda vez que for usar...". Componentes em `components/ui` com export único, cores só em tokens e vitrine em `/dev/tokens`.
+
+### Decisões do Diego (2026-11-02, 3ª rodada)
+
+- **Sem scroll nas páginas:** "retire o scroll das páginas (todas)". Regras "Telas de acesso sem rolagem vertical" e "Barra de rolagem invisível" em "Telas e layout". Sem cenário Gherkin novo: a spec já passa do limite de 6; a verificação é E2E em 390x844 e 360x600, com `isMobile: false` para a barra de rolagem. Ajustes do Orchestrator depois da revisão: rodapé mantido onde já existe, compactação em `/recuperar-senha` e `/auth/confirmar`, e logo de `/criar-conta` pendente do Diego.
 
 ### Decisões do Diego (2026-11-01)
 

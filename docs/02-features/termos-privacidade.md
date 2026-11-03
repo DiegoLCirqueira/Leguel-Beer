@@ -60,6 +60,7 @@ Funcionalidade: Termos, privacidade e entregas
   - **Rodapé discreto:** pequeno, praticamente um detalhe (decisão do Diego, 2026-10-31). Por isso os links do rodapé têm área de toque de 24 px (WCAG 2.5.8, nível AA), e não os 44 px dos botões. É deliberado: não aumentar para 44 px.
 - **Sem pergunta de maioridade** em `/termos` e `/privacidade`, para quem quer ler antes de entrar ([[maioridade-entrada]]). `/entregas` segue a regra normal.
 - **Sem avisos nas telas de maioridade:** nem a pergunta de maioridade nem "Acesso não permitido" ([[maioridade-entrada]]) mostram os avisos do rodapé (decisões do Diego, 2026-11-02: "Acesso não permitido" na 1ª rodada, a pergunta na 2ª). Os avisos ficam só no rodapé das demais páginas e no resumo do checkout. Os Termos e a Privacidade, aprovados sem mudança na inspeção, não mudam.
+- **Rodapé e rolagem:** nas telas de acesso que já têm rodapé, o critério de "sem rolagem vertical em 390x844" de [[identidade-visual]] é que o conteúdo principal mais o rodapé caibam em 100dvh. O rodapé não sai (2026-11-02, decisão do Orchestrator de 2026-11-02, reversível).
 - **Boas-vindas sem rodapé:** além da pergunta de maioridade, a [[boas-vindas]] também fica sem o rodapé, porque não tem rolagem (decisão do Diego, 2026-10-30). Os links legais continuam nas outras páginas e no cadastro.
 - **Links do cadastro** abrem em nova aba.
 - **Checkout:** o resumo do pedido mostra o primeiro aviso do rodapé e o link dos Termos de Uso. Vale quando o checkout existir; o teste entra com o LB-55 (#31, [[checkout]]).
