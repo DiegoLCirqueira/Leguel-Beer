@@ -22,8 +22,8 @@ export default async function Confirmar({ searchParams }: Props) {
   if (!tokenHash || type !== "signup") redirect("/entrar?aviso=link-invalido");
 
   return (
-    <>
-      <main className="relative isolate flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-fundo px-6 py-12">
+    <div className="flex min-h-dvh flex-col">
+      <main className="relative isolate flex flex-1 flex-col items-center justify-center overflow-hidden bg-fundo px-6 py-12">
         <Image
           src="/maioridade/fundo.webp"
           alt=""
@@ -56,6 +56,6 @@ export default async function Confirmar({ searchParams }: Props) {
         </div>
       </main>
       <SiteFooter />
-    </>
+    </div>
   );
 }
