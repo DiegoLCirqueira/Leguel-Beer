@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import RecuperarSenha from "./page";
 
 describe("/recuperar-senha", () => {
-  it("mostra o título, o texto do Figma, o logo, o voltar, o formulário e o rodapé", () => {
+  it("mostra o título, o texto do Figma, o logo, o voltar e o formulário, sem rodapé", () => {
     render(<RecuperarSenha />);
 
     expect(screen.getByRole("heading", { level: 1, name: "Recuperar senha" })).toBeInTheDocument();
@@ -13,7 +13,7 @@ describe("/recuperar-senha", () => {
     expect(screen.getByRole("img", { name: "Leguelé Beer" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Voltar" })).toHaveAttribute("href", "/entrar");
     expect(screen.getByRole("button", { name: "Enviar link" })).toBeInTheDocument();
-    expect(screen.getByRole("contentinfo")).toBeInTheDocument();
+    expect(screen.queryByRole("contentinfo")).not.toBeInTheDocument();
   });
 
   it("só o logo é imagem com descrição", () => {
