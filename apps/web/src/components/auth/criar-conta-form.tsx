@@ -162,7 +162,7 @@ export function CriarContaForm({ criar }: Props) {
               onChange={(e) => alterar("aceite", e.target.checked)}
               aria-describedby={erros.aceite ? "aceite-erro" : undefined}
               aria-invalid={erros.aceite ? true : undefined}
-              className="peer absolute inset-0 size-full cursor-pointer appearance-none rounded-md border-2 border-borda-campo bg-superficie checked:border-primaria checked:bg-primaria focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaria"
+              className="peer absolute inset-0 size-full cursor-pointer appearance-none rounded-md border-2 border-primaria bg-superficie checked:border-primaria checked:bg-primaria focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaria"
             />
             <Check
               aria-hidden="true"
