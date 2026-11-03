@@ -89,7 +89,7 @@ export function CriarContaForm({ criar }: Props) {
         <p>Já tem uma conta?</p>
         <Link
           href="/entrar"
-          className="inline-flex min-h-11 items-center font-semibold text-primaria underline underline-offset-2"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center font-semibold text-primaria underline underline-offset-2"
         >
           Entrar
         </Link>
