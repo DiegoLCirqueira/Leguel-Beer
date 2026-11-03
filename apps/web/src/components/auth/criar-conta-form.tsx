@@ -85,16 +85,6 @@ export function CriarContaForm({ criar }: Props) {
 
   return (
     <form onSubmit={enviar} noValidate className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-center gap-x-2 text-sm text-texto">
-        <p>Já tem uma conta?</p>
-        <Link
-          href="/entrar"
-          className="inline-flex min-h-11 min-w-11 items-center justify-center font-semibold text-primaria underline underline-offset-2"
-        >
-          Entrar
-        </Link>
-      </div>
-
       <Campo
         id="nome"
         name="nome"
@@ -162,7 +152,7 @@ export function CriarContaForm({ criar }: Props) {
       />
 
       <div className="flex flex-col gap-1">
-        <label className="relative flex cursor-pointer items-center gap-3 text-sm text-texto">
+        <label className="relative flex min-h-11 cursor-pointer items-center gap-3 text-sm text-texto">
           <span className="relative block size-6 shrink-0">
             <input
               id="aceite"
@@ -172,7 +162,7 @@ export function CriarContaForm({ criar }: Props) {
               onChange={(e) => alterar("aceite", e.target.checked)}
               aria-describedby={erros.aceite ? "aceite-erro" : undefined}
               aria-invalid={erros.aceite ? true : undefined}
-              className="peer absolute inset-0 size-full cursor-pointer appearance-none rounded-md border-2 border-primaria checked:bg-primaria focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaria"
+              className="peer absolute inset-0 size-full cursor-pointer appearance-none rounded-md border-2 border-primaria bg-superficie checked:border-primaria checked:bg-primaria focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaria"
             />
             <Check
               aria-hidden="true"
@@ -233,6 +223,16 @@ export function CriarContaForm({ criar }: Props) {
       >
         Criar conta
       </Button>
+
+      <div className="flex flex-wrap items-center justify-center gap-x-2 text-sm text-texto">
+        <p>Já tem uma conta?</p>
+        <Link
+          href="/entrar"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center font-semibold text-primaria underline underline-offset-2"
+        >
+          Entrar
+        </Link>
+      </div>
     </form>
   );
 }

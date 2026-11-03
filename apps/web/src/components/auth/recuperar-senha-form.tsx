@@ -21,7 +21,7 @@ function Aviso({
   children: string;
 }) {
   return (
-    <li className="flex gap-3 py-3 first:pt-0 last:pb-0">
+    <li className="flex gap-3 py-2 first:pt-0 last:pb-0">
       <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-primaria text-primaria">
         {icone}
       </span>
@@ -62,7 +62,7 @@ export function RecuperarSenhaForm({ pedir }: Props) {
   }
 
   return (
-    <form onSubmit={enviar} noValidate className="flex flex-col gap-4">
+    <form onSubmit={enviar} noValidate className="flex flex-col gap-2">
       <Campo
         id="email"
         name="email"
@@ -77,7 +77,7 @@ export function RecuperarSenhaForm({ pedir }: Props) {
         erro={erro}
       />
 
-      <ul className="divide-y divide-borda rounded-2xl border border-borda bg-superficie/70 px-4 py-4">
+      <ul className="divide-y divide-borda rounded-2xl border border-borda bg-superficie/70 px-4 py-3">
         <Aviso
           icone={<Mail aria-hidden="true" className="size-5" />}
           titulo="Verifique sua caixa de entrada"
