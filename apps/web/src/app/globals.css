@@ -61,6 +61,13 @@
 }
 
 @layer base {
+  /* Barra de rolagem invisível no site todo; a rolagem continua por toque, roda e teclado. */
+  html {
+    scrollbar-width: none;
+  }
+  html::-webkit-scrollbar {
+    display: none;
+  }
   body {
     @apply bg-fundo font-texto text-texto;
     -webkit-tap-highlight-color: transparent;
