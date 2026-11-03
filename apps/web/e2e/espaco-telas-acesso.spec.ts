@@ -17,15 +17,17 @@ test("em criar conta, 'Já tem uma conta?' e 'Entrar' ficam na mesma linha", asy
   expect(entrar?.x ?? 0).toBeGreaterThan((pergunta?.x ?? 0) + (pergunta?.width ?? 0) - 1);
 });
 
-test("em criar conta, 'Já tem uma conta? Entrar' fica visível sem rolar a página", async ({
+test("em criar conta, 'Já tem uma conta? Entrar' vem no fim, abaixo do botão Criar conta", async ({
   page,
 }) => {
   await page.goto("/criar-conta");
 
+  const botao = await page.getByRole("button", { name: "Criar conta" }).boundingBox();
   const entrar = await page.getByRole("link", { name: "Entrar", exact: true }).last().boundingBox();
 
+  expect(botao).not.toBeNull();
   expect(entrar).not.toBeNull();
-  expect((entrar?.y ?? 0) + (entrar?.height ?? 0)).toBeLessThanOrEqual(844);
+  expect(entrar?.y ?? 0).toBeGreaterThanOrEqual((botao?.y ?? 0) + (botao?.height ?? 0));
 });
 
 type Caixa = { top: number; bottom: number };
