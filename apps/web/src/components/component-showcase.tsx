@@ -2,7 +2,7 @@
 
 import { ArrowRight, Link2, Lock, UserRound } from "lucide-react";
 import { useState } from "react";
-import { Button, Campo, CategoryChips, StyleBadge } from "@/components/ui";
+import { Button, Campo, CategoryChips, DivisorOu, StyleBadge } from "@/components/ui";
 
 const swatches = [
   { name: "fundo", className: "bg-fundo" },
@@ -79,6 +79,9 @@ export function ComponentShowcase() {
           icone={Lock}
           erro="Mensagem de erro de exemplo"
         />
+      </Section>
+      <Section title="Divisor ou">
+        <DivisorOu />
       </Section>
       <Section title="Badges de estilo">
         <div className="flex flex-wrap gap-2">

@@ -3,7 +3,7 @@
 import { ArrowRight, Check, Lock, Mail } from "lucide-react";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
-import { Button, Campo, OlhoDaSenha } from "@/components/ui";
+import { Button, Campo, DivisorOu, OlhoDaSenha } from "@/components/ui";
 import { validarEntrada } from "@/lib/auth/entrar";
 import { ehErroDeRedirect } from "@/lib/erro-de-redirect";
 
@@ -174,6 +174,8 @@ export function EntrarForm({ entrar, reenviar, emailInicial = "", manterConectad
       >
         Entrar
       </Button>
+
+      <DivisorOu />
 
       <div className="flex flex-col items-center gap-1 pt-2 text-sm text-texto">
         <p>Ainda não tem conta?</p>
