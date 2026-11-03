@@ -177,7 +177,7 @@ export function EntrarForm({ entrar, reenviar, emailInicial = "", manterConectad
 
       <DivisorOu />
 
-      <div className="flex flex-col items-center gap-1 pt-2 text-sm text-texto">
+      <div className="flex flex-wrap items-center justify-center gap-x-2 text-sm text-texto">
         <p>Ainda não tem conta?</p>
         <Link
           href="/criar-conta"
