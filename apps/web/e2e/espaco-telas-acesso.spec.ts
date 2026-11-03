@@ -91,3 +91,16 @@ test("em nova senha, os blocos ficam a 24-48 px um do outro e o grupo centraliza
   const [area] = await caixasDosBlocos([page.getByRole("main")]);
   esperarGrupoAgrupadoECentralizado(caixas, area as Caixa);
 });
+
+test("em criar conta, o aceite dos Termos tem contorno borda-campo e linha de 44 px de toque", async ({
+  page,
+}) => {
+  await page.goto("/criar-conta");
+
+  const caixa = page.getByRole("checkbox", { name: /Eu aceito os Termos de Uso/ });
+  const contorno = await caixa.evaluate((el) => getComputedStyle(el).borderTopColor);
+  const linha = await page.locator("label", { has: caixa }).boundingBox();
+
+  expect(contorno).toBe("rgb(90, 132, 80)");
+  expect(linha?.height ?? 0).toBeGreaterThanOrEqual(44);
+});
