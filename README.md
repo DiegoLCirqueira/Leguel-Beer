@@ -25,7 +25,7 @@ Uma loja online de cervejas artesanais para o celular. O cliente monta a compra 
 **Planejado para o MVP** (ver `docs/01-produto/mvp-corte.md`):
 
 - Catálogo com filtros e página de produto.
-- Geladeira (carrinho), guardada no aparelho e na conta.
+- Geladeira (carrinho).
 - Checkout com Pix e cartão, entrega por distância e e-mail de confirmação do pedido.
 - Lista de pedidos do cliente e painel admin para cadastrar cervejas e ver pedidos.
 
@@ -36,21 +36,21 @@ Uma loja online de cervejas artesanais para o celular. O cliente monta a compra 
 Monorepo com pnpm e Turborepo:
 
 | Pacote | Tecnologias |
-|---|---|
+| --- | --- |
 | `apps/web` (site) | Next.js (App Router), React, TypeScript, Tailwind CSS, Lucide |
 | `apps/api` (API) | NestJS, Prisma, PostgreSQL, Zod, Swagger, Helmet, rate limit |
 | `packages/shared` | Código puro compartilhado entre site e API (Zod) |
 | `packages/config` | ESLint, `tsconfig` base e Prettier |
 
 **Dados e login:** Supabase só para PostgreSQL, autenticação e arquivos. A API valida o JWT e é a única a acessar o banco.
-**Testes:** Vitest e Testing Library (site), Vitest e Supertest (API), Playwright com viewport de celular (E2E) e axe-core (acessibilidade).
+**Testes:** Vitest e Testing Library (site, com axe-core para acessibilidade), Vitest e Supertest (API) e Playwright com viewport de celular (E2E).
 **CI:** GitHub Actions a cada PR: lint, formatação, regra de camadas, tipos, migrations em sincronia, testes, build e E2E.
 **Hospedagem prevista:** site e API na Vercel (a API como função serverless). Ver o ADR-002.
 
 ## Onde olhar no código
 
 | Assunto | Caminho |
-|---|---|
+| --- | --- |
 | Módulos da API em camadas (`domain`, `application`, `infrastructure`, `presentation`) | `apps/api/src/modules/` |
 | Contas, perfil e papéis | `apps/api/src/modules/account/` |
 | Modelo de dados, migrations e seed | `apps/api/prisma/` |
@@ -90,6 +90,7 @@ Banco local, variáveis de ambiente (`apps/api/.env`, a partir do `.env.example`
 ## Documentação
 
 A pasta `docs/` é um vault do Obsidian: visão do produto, corte do MVP, specs, ADRs e diário. Para começar, veja `docs/01-produto/visao.md` e os ADRs em `docs/03-decisoes/`.
+
 ## Licença
 
 [MIT](LICENSE)
