@@ -6,13 +6,13 @@ const abrir = async (busca: Record<string, string> = {}) =>
   render(await Entrar({ searchParams: Promise.resolve(busca) }));
 
 describe("/entrar", () => {
-  it("mostra o título, o subtítulo, o logo, o voltar, o formulário e o rodapé", async () => {
+  it("mostra o título, o logo, o voltar, o formulário e o rodapé, sem subtítulo", async () => {
     await abrir();
 
     expect(
       screen.getByRole("heading", { level: 1, name: "Entrar na sua conta" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Que bom te ver de novo!")).toBeInTheDocument();
+    expect(screen.queryByText("Que bom te ver de novo!")).not.toBeInTheDocument();
     expect(screen.getByRole("img", { name: "Leguelé Beer" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Voltar" })).toHaveAttribute("href", "/boas-vindas");
     expect(screen.getByLabelText("E-mail")).toHaveValue("");
