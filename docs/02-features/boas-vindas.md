@@ -4,7 +4,7 @@ modulo: acesso
 card-notion: https://app.notion.com/p/3fd490a7ac7d8172b935df8e794f5411
 prioridade: P0
 criado: 2026-10-29
-atualizado: 2026-11-02
+atualizado: 2026-11-03
 issues:
   - "#39 LB-24"
 tags:
@@ -88,6 +88,7 @@ Funcionalidade: Tela de boas-vindas
 - **Textos do Figma** (decisão do Diego já tomada): "Entrar", "Criar conta", "ou", "Continuar como convidado", "Manter-me conectado".
 - **Slogan:** "Cervejas artesanais", da arte original do Figma, sem a linha "e muito mais!" (decisão final do Diego, 2026-10-30). Fica na posição e no estilo de pincel da arte original. "Sabor Qualidade e Tradição" não aparece na tela; as tentativas anteriores ficam só como histórico, em "Decisões do Diego".
 - **Sem rolagem:** em retrato a partir de ~640 px de altura, a boas-vindas cabe inteira na tela do celular e não rola (decisão do Diego, 2026-10-30). Na horizontal ou com zoom alto ela pode rolar, para os controles continuarem alcançáveis (WCAG 1.4.10, como aprovado no #138). Por isso não mostra o rodapé de [[termos-privacidade]], como a pergunta de maioridade. Os links legais continuam nas outras páginas e no cadastro ([[cadastro-login]]). A regra geral de telas de acesso sem rolagem vertical em 390x844 e a barra de rolagem invisível estão em [[identidade-visual]] (3ª rodada da inspeção, 2026-11-02). A boas-vindas foi aprovada sem mudança.
+- **Área de toque como está (exceção registrada):** os botões "Entrar" (42 px), "Criar conta" (40 px) e "Continuar como convidado" (29 px) e o (i) (16 px) mantêm a medida atual, abaixo dos 44 × 44 px de [[identidade-visual]] (decisão do Diego, 2026-11-03, "2- B", depois de ele escolher entre aumentar só a área de toque com margem invisível e deixar como está).
 - **Sem o texto lateral "Sabor Qualidade Tradição":** o texto lateral do Figma sai da tela (decisão do Diego, 2026-10-30, #136). Com o slogan final "Cervejas artesanais", essas palavras não aparecem em lugar nenhum da tela.
 - **Imagens:** logo, garrafa com copo, barril e folhagem de `Imagens/`, otimizadas para celular. A imagem principal tem texto alternativo.
 - **Componentes:** "Entrar" é o botão primário com ícone e seta; "Criar conta", o botão de contorno; "Continuar como convidado", o botão discreto ([[identidade-visual]]).
