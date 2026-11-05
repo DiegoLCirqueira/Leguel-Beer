@@ -36,6 +36,7 @@ Resumo em [[2026-11-04]].
 - Estados após envio (sucesso/erro) de recuperar senha podem somar altura e rolar.
 - Stash `wip-distribuir-nova-senha` no worktree `leguele-espaco` (não usado; pode ser descartado na limpeza).
 - LB-8 (nuvem): checklist do [[roteiro-mvp]]. Web: `meta theme-color` e favicon com o LB-16.
+- API, segurança (achado do Reviewer no #200): o `ThrottlerModule` em `apps/api/src/app.module.ts` (desde o #129) guarda a contagem em memória (100 por 60 s). Numa API serverless isso conta por instância, e o limite fica fraco. Não há decisão registrada: o Back avalia junto do LB-8 e, se mantiver, registra o ADR.
 - API: `DATABASE_URL` obrigatória no seed; código fixo no log de falha do `signOutOthers`.
 - `src/lib/erro-de-redirect.ts` usa caminho interno do Next: conferir a cada upgrade.
 - Limpeza dos worktrees e pastas em `C:\Users\Arthur\Desktop\leguele\` e `C:\lb-*` fica com o Diego (agora inclui `C:/lb-adrp` e `C:/lb-adrr` depois do merge).
