@@ -8,7 +8,7 @@ tags:
 # ADR-010: Validação com Zod, sem class-validator
 
 > [!info] Status
-> **Aceito.** Registro retroativo (2026-11-04): a decisão foi tomada em 2026-10-29 e ficou só nas notas do diário e nos PRs.
+> **Aceito.** Registro retroativo (2026-11-04): a decisão foi tomada em 2026-10-29 e mergeada no PR #129 às 23h49 (Brasília) do mesmo dia, que já é 2026-10-30 em UTC; ficou só nas notas do diário e nos PRs.
 
 ## Contexto
 
@@ -24,4 +24,4 @@ Um schema só vale nos dois lados e dá o tipo por inferência, sem decorators r
 
 ## Consequências
 
-O papel do Back ainda manda usar "ValidationPipe global com whitelist, transform e forbidNonWhitelisted"; isso não vale mais. Campo extra é descartado pelo `z.object` (que ignora chaves desconhecidas) e recusado só nos schemas `z.strictObject`, como o de criar perfil em `packages/shared/src/conta/perfil.ts`; não há `whitelist`.
+O papel do Back mandava usar "ValidationPipe global com whitelist, transform e forbidNonWhitelisted"; isso foi corrigido em 2026-11-04 no #199. Campo extra é descartado pelo `z.object` (que ignora chaves desconhecidas) e recusado só nos schemas `z.strictObject`, como o de criar perfil em `packages/shared/src/conta/perfil.ts`; não há `whitelist`.

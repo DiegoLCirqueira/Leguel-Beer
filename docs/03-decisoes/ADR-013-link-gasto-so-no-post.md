@@ -20,4 +20,4 @@ Abrir o link (GET) só mostra uma página com um botão. O token é gasto no POS
 
 ## Por quê
 
-O GET fica sem efeito colateral, então scanners não invalidam o link. A contrapartida é um passo a mais para a pessoa e o aviso de link vencido aparecer só depois do toque.
+O GET fica sem efeito colateral, então scanners não invalidam o link. Voltar a gastar o link no GET reabre o risco (scanners de e-mail consumindo o token e login CSRF), e é isso que justifica o ADR. A contrapartida é um passo a mais para a pessoa e o aviso de link vencido aparecer só depois do toque.
