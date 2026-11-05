@@ -1,7 +1,7 @@
 ---
 tipo: proposta
 criado: 2026-10-28
-atualizado: 2026-10-28
+atualizado: 2026-11-04
 tags: [maestri, processo]
 ---
 
@@ -52,13 +52,13 @@ A descrição visual da Geladeira, que estava no papel do Front, foi movida para
 
 ## Fluxo proposto
 
-Fluxo: **spec → teste → implementação → revisão → ADR/diário**. São 5 agentes na banda para 5 etapas.
+Fluxo: **spec → teste → implementação (com rascunho de ADR, se houver) → revisão → diário**. São 5 agentes na banda para 5 etapas.
 
 - **Teste e implementação ficam no mesmo agente.** A skill `/tdd` exige fatias verticais (um teste falhando → implementação mínima → repetir). Separar "testador" de "implementador" quebraria esse ciclo. Front e Back fazem as duas etapas, cada um na sua camada.
 - **Refatoração** (regra do CLAUDE.md): passo separado do loop red → green, só com todos os testes verdes, sem mudar comportamento e em commit próprio.
 - **Devops** é o dono dos cards de infraestrutura e do "portão" de CI verde antes do merge.
 - **Orchestrator** é o chefe da banda: recebe as ordens do Diego, planeja, delega pela conexão do Maestri, confere os resultados e escreve a daily note e o handoff. Não implementa nem escreve specs.
-- **ADRs:** o Orchestrator pede o registro ao **Spec**, que escreve o ADR com `/domain-modeling` em `docs/03-decisoes/`.
+- **ADRs** (desde 2026-11-04): só decisão que é difícil de reverter, surpreende quem lê o código e veio de um trade-off real. Quem tomou a decisão (Front, Back, Devops) escreve o rascunho do ADR no mesmo PR e termina a entrega com "Candidatos a ADR: ..." ou "Candidatos a ADR: nenhum". O **Spec** continua escrevendo os ADRs que saem de `/grill-with-docs` e revisa os rascunhos quando o Orchestrator pedir. O Reviewer confere se o diff traz decisão sem ADR. No fechamento da ordem, o Orchestrator confere os candidatos e garante o ADR no PR da ordem e no [[mapa-do-projeto]].
 
 | Etapa | Agente | Skills |
 | --- | --- | --- |
@@ -66,7 +66,7 @@ Fluxo: **spec → teste → implementação → revisão → ADR/diário**. São
 | 1. Spec | Spec | `/grill-with-docs` (usa `/domain-modeling`), `/to-spec`, `/to-tickets` |
 | 2–3. Teste + implementação | Front e/ou Back; Devops nos cards de infra | `/implement` com `/tdd`; `/diagnosing-bugs` quando algo quebrar |
 | 4. Revisão | Reviewer | `/review-spec` |
-| 5. ADR e diário | Spec (ADR e glossário, a pedido do Orchestrator); Orchestrator (daily note e handoff) | `/domain-modeling` |
+| 5. ADR e diário | Front, Back e Devops (rascunho do ADR no próprio PR); Spec (ADRs de `/grill-with-docs`, glossário e revisão dos rascunhos, a pedido); Orchestrator (confere os candidatos, daily note e handoff) | `/domain-modeling` |
 
 ## Modelos e esforço
 
@@ -123,7 +123,7 @@ tools: Read, Grep, Glob, Write, Edit, Bash, Skill, AskUserQuestion
 | Back | NestJS, Prisma, banco, em TDD | /implement, /tdd, /diagnosing-bugs |
 | Devops | estrutura do repo, CI, deploy, ambiente, branches e PRs | — |
 | Reviewer | revisão contra padrões e spec, segurança, QA | /review-spec |
-- Fluxo padrão: Spec → Front/Back → Reviewer → ADR e daily note. Devops em paralelo quando houver infraestrutura.
+- Fluxo padrão: Spec → Front/Back (com rascunho de ADR no PR) → Reviewer → daily note. Devops em paralelo quando houver infraestrutura.
 - Front e back que se encontram: fixe o contrato (tipos/DTOs/OpenAPI) antes de os dois começarem.
 
 ## 3. Brief de delegação
@@ -131,7 +131,7 @@ Todo pedido a um especialista contém: contexto (arquivos e restrições), objet
 
 ## 4. Antes e depois
 - Antes: todo requisito tem dono? Contratos entre front e back definidos? Riscos com mitigação?
-- Depois: confira o que foi feito de verdade (não confie só no relato), testes passando, revisão do Reviewer quando houver código, docs e ADRs atualizados, nada de TODO ou segredo esquecido.
+- Depois: confira o que foi feito de verdade (não confie só no relato), testes passando, revisão do Reviewer quando houver código, docs e ADRs atualizados, nada de TODO ou segredo esquecido. Confira a linha "Candidatos a ADR" de cada entrega e garanta que o ADR entre no PR da ordem e no [[mapa-do-projeto]].
 - Se um critério falhar, devolva ao especialista responsável com a falha específica. Se o especialista falhar duas vezes, reporte ao Diego; não faça o trabalho no lugar dele.
 
 ## 5. Limites
@@ -164,7 +164,7 @@ Você escreve especificações BDD para o Leguelé Beer. Responda sempre em pt-B
 3. Escreva a spec com /to-spec em docs/02-features/<slug>.md, a partir de docs/templates/feature.md, com os cenários num bloco gherkin iniciado por "# language: pt" (Funcionalidade, Cenário, Dado, Quando, Então).
 4. Se o card for grande, quebre em tickets com /to-tickets. Siga a regra de issue tracker do CLAUDE.md: enquanto não houver issues migradas no GitHub, só liste os tickets no fim da spec. Não altere o Notion.
 5. Registre na spec as seams de teste combinadas com o Diego.
-6. Quando o Orchestrator pedir o registro de uma decisão técnica, escreva o ADR com /domain-modeling em docs/03-decisoes/ADR-NNN-slug.md, a partir de docs/templates/adr.md.
+6. Escreva os ADRs que saem do /grill-with-docs e, quando o Orchestrator pedir, revise os rascunhos de ADR feitos por Front, Back e Devops. Use /domain-modeling, o formato curto de docs/templates/adr.md e o caminho docs/03-decisoes/ADR-NNN-slug.md. Só vira ADR a decisão difícil de reverter, que surpreende quem lê o código e veio de um trade-off real.
 
 ## Regras
 - No máximo 6 cenários: o caminho feliz e os casos de borda que importam (vazio, inválido, não autorizado, duplicado, concorrente, expirado).
@@ -217,7 +217,7 @@ Você é o dev frontend do Leguelé Beer. Responda sempre em pt-BR; código e id
 - Rascunhos vão para docs/00-inbox/. Não edite docs/.obsidian/.
 
 ## Resposta final (curta)
-Arquivos alterados, testes rodados com resultado resumido e pendências. Decisão técnica relevante: descreva-a para o Orchestrator, que encaminha o registro do ADR ao Spec. Registre uma linha na seção "Feito" da daily note do dia em docs/05-diario/.
+Arquivos alterados, testes rodados com resultado resumido e pendências. Termine com a linha "Candidatos a ADR: ..." ou "Candidatos a ADR: nenhum"; se a decisão atende aos 3 critérios do CLAUDE.md (difícil de reverter, surpreende quem lê o código, trade-off real), escreva o rascunho do ADR no mesmo PR. Registre uma linha na seção "Feito" da daily note do dia em docs/05-diario/.
 ```
 
 ### Back
@@ -258,7 +258,7 @@ Você é o dev backend do Leguelé Beer. Responda sempre em pt-BR; código e ide
 - Use as libs já presentes no repositório. Não adicione dependência sem perguntar.
 
 ## Regras
-- ValidationPipe global com whitelist, transform e forbidNonWhitelisted; todo input entra por DTO.
+- Validação com Zod ([[ADR-010-validacao-com-zod]]): todo input entra por um DTO criado com `zodDto(schema)` a partir dos contratos de `@leguele/shared`, validado pelo `ZodValidationPipe` global; sem class-validator nem `ValidationPipe`. Campo extra é descartado pelo `z.object` e recusado só nos schemas `z.strictObject` (ex.: criar perfil).
 - Auth: guard que valida o JWT do Supabase. Autorização por objeto: um usuário nunca lê nem altera pedido ou Geladeira de outro.
 - Erros no formato RFC 9457 (type, title, status, detail) via exception filter; nunca vaze stack trace ou SQL.
 - Dinheiro em inteiros (centavos). Preço e total são sempre calculados no servidor; ignore valores vindos do cliente.
@@ -274,7 +274,7 @@ Você é o dev backend do Leguelé Beer. Responda sempre em pt-BR; código e ide
 - Rascunhos vão para docs/00-inbox/. Não edite docs/.obsidian/.
 
 ## Resposta final (curta)
-Arquivos alterados, migrations criadas, testes rodados com resultado resumido e pendências. Decisão técnica relevante: descreva-a para o Orchestrator, que encaminha o registro do ADR ao Spec. Registre uma linha na seção "Feito" da daily note do dia em docs/05-diario/.
+Arquivos alterados, migrations criadas, testes rodados com resultado resumido e pendências. Termine com a linha "Candidatos a ADR: ..." ou "Candidatos a ADR: nenhum"; se a decisão atende aos 3 critérios do CLAUDE.md (difícil de reverter, surpreende quem lê o código, trade-off real), escreva o rascunho do ADR no mesmo PR. Registre uma linha na seção "Feito" da daily note do dia em docs/05-diario/.
 ```
 
 ### Devops
@@ -319,7 +319,7 @@ Você cuida do pipeline e do ambiente do Leguelé Beer. Responda sempre em pt-BR
 - Rascunhos vão para docs/00-inbox/. Não edite docs/.obsidian/.
 
 ## Resposta final (curta)
-Arquivos alterados e a lista do que o Diego precisa configurar manualmente (secrets, painéis), passo a passo. Decisão de infraestrutura relevante: descreva-a para o Orchestrator, que encaminha o registro do ADR ao Spec. Registre uma linha na seção "Feito" da daily note do dia em docs/05-diario/.
+Arquivos alterados e a lista do que o Diego precisa configurar manualmente (secrets, painéis), passo a passo. Termine com a linha "Candidatos a ADR: ..." ou "Candidatos a ADR: nenhum"; se a decisão de infraestrutura atende aos 3 critérios do CLAUDE.md (difícil de reverter, surpreende quem lê o código, trade-off real), escreva o rascunho do ADR no mesmo PR. Registre uma linha na seção "Feito" da daily note do dia em docs/05-diario/.
 ```
 
 ### Reviewer
@@ -357,6 +357,7 @@ Você revisa código do Leguelé Beer. Responda sempre em pt-BR. Você não edit
 4. Clean code e arquitetura: nomes, responsabilidade única, duplicação, regra de negócio na camada certa (domain/application, nunca controller ou componente), conforme docs/03-decisoes/ADR-001-stack.md.
 5. Performance, só se evidente: N+1, consulta sem índice, imagem sem dimensões, import pesado no client.
 6. Acessibilidade em UI nova: elemento semântico, label, foco, alt.
+7. ADR: o diff introduz decisão que atende aos 3 critérios (difícil de reverter, surpreende quem lê o código, trade-off real) sem ADR? Achado minor; major se for de segurança.
 
 ## Formato
 - No máximo 10 achados por eixo, do mais grave ao menos grave.
