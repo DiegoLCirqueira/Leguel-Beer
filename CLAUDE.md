@@ -74,7 +74,9 @@ Padrão de https://github.com/iuricode/padroes-de-commits (vale para os commits 
 - Fluxo obrigatório (red-green-refactor): cenário Gherkin → teste falhando (red) → implementação mínima até passar (green) → refatoração.
   - Red e green andam em fatias verticais, uma de cada vez, como na skill `/tdd`: um teste falhando, o mínimo para passar, e só então o próximo teste. Não escreva todos os testes antes.
   - A refatoração não faz parte do loop red → green: é um passo separado, feito só com todos os testes verdes, sem mudar comportamento (se um teste precisar mudar, não é refatoração) e em commit próprio (`:recycle: refactor: ...`), separado dos commits da funcionalidade.
-- Toda decisão técnica relevante vira um ADR em docs/03-decisoes/ usando docs/templates/adr.md.
+- ADR (docs/03-decisoes/, com docs/templates/adr.md, formato curto): uma decisão técnica vira ADR quando as três condições valem: (a) é difícil de reverter, (b) surpreende quem lê o código sem contexto, (c) veio de um trade-off real entre alternativas. Decisão de produto fica nas specs. Decisão pequena e reversível fica na daily note.
+  - ADR aceito não é editado. Mudar a decisão gera um ADR novo, e o antigo vira `substituído` com link para o novo.
+  - Quem tomou a decisão escreve o rascunho do ADR no mesmo PR; toda entrega termina com "Candidatos a ADR: ..." ou "Candidatos a ADR: nenhum".
 - Use [[wikilinks]] entre notas; não crie notas fora das pastas existentes (na dúvida, docs/00-inbox/).
 - Ao terminar uma tarefa, registre um resumo na daily note do dia em docs/05-diario/.
 - Toda spec ou ADR novo é linkado em [[mapa-do-projeto]], e a daily note linka as notas criadas ou alteradas no dia.
@@ -123,7 +125,7 @@ Os agentes têm autonomia para decidir e executar a maior parte do trabalho sem 
 - Planejamento: ordem das tarefas, divisão em branches e PRs, qual especialista recebe o quê.
 - Correções de bugs, refatorações, testes, ajustes de CI, melhorias de performance e acessibilidade que não mudam o comportamento combinado.
 - Nomes de branches, commits, PRs e arquivos (ex.: nomear imagens com base no conteúdo).
-- Pequenas ambiguidades: escolha a opção mais simples e mais fácil de reverter e registre a decisão numa nota no diário. Decisão técnica relevante continua virando ADR, como manda a seção Documentação.
+- Pequenas ambiguidades: escolha a opção mais simples e mais fácil de reverter e registre a decisão numa nota no diário. Decisão que atende aos três critérios de ADR (seção Documentação) vira ADR.
 
 **Decisões que são do Diego** (pare só esse item e pergunte):
 1. Produto e negócio: preços, catálogo, regras de venda, kits, Clube, escopo do MVP, o que entra ou sai de uma feature.
