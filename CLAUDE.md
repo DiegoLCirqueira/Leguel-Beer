@@ -76,7 +76,8 @@ Padrão de https://github.com/iuricode/padroes-de-commits (vale para os commits 
   - A refatoração não faz parte do loop red → green: é um passo separado, feito só com todos os testes verdes, sem mudar comportamento (se um teste precisar mudar, não é refatoração) e em commit próprio (`:recycle: refactor: ...`), separado dos commits da funcionalidade.
 - ADR (docs/03-decisoes/, com docs/templates/adr.md, formato curto): uma decisão técnica vira ADR quando as três condições valem: (a) é difícil de reverter, (b) surpreende quem lê o código sem contexto, (c) veio de um trade-off real entre alternativas. Decisão de produto fica nas specs. Decisão pequena e reversível fica na daily note.
   - ADR aceito não é editado. Mudar a decisão gera um ADR novo, e o antigo vira `substituído` com link para o novo.
-  - Quem tomou a decisão escreve o rascunho do ADR no mesmo PR; toda entrega termina com "Candidatos a ADR: ..." ou "Candidatos a ADR: nenhum".
+  - Os ADRs antigos (001 a 007) ficam no formato em que foram escritos; não precisam ser reescritos.
+  - Quem tomou a decisão escreve o rascunho do ADR no mesmo PR; toda entrega de Front, Back e Devops termina com "Candidatos a ADR: ..." ou "Candidatos a ADR: nenhum".
 - Use [[wikilinks]] entre notas; não crie notas fora das pastas existentes (na dúvida, docs/00-inbox/).
 - Ao terminar uma tarefa, registre um resumo na daily note do dia em docs/05-diario/.
 - Toda spec ou ADR novo é linkado em [[mapa-do-projeto]], e a daily note linka as notas criadas ou alteradas no dia.

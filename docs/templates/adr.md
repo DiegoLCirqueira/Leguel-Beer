@@ -20,9 +20,9 @@ tags:
 ## Alternativas consideradas
 
 > [!tip] Opcional
-> Só inclua esta seção (e apague este aviso) se as alternativas descartadas acrescentam algo que o "Por quê" não diz.
+> Se não precisar, apague a seção inteira (título e aviso). Use só se as alternativas descartadas acrescentam algo que o "Por quê" não diz.
 
 ## Consequências
 
 > [!tip] Opcional
-> Só inclua esta seção (e apague este aviso) se há um custo ou uma obrigação que quem mexer no código precisa saber.
+> Se não precisar, apague a seção inteira (título e aviso). Use só se há um custo ou uma obrigação que quem mexer no código precisa saber.

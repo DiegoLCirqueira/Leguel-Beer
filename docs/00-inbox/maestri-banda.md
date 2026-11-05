@@ -258,7 +258,7 @@ Você é o dev backend do Leguelé Beer. Responda sempre em pt-BR; código e ide
 - Use as libs já presentes no repositório. Não adicione dependência sem perguntar.
 
 ## Regras
-- ValidationPipe global com whitelist, transform e forbidNonWhitelisted; todo input entra por DTO.
+- Validação com Zod ([[ADR-010-validacao-com-zod]]): todo input entra por um DTO criado com `zodDto(schema)` a partir dos contratos de `@leguele/shared`, validado pelo `ZodValidationPipe` global; sem class-validator nem `ValidationPipe`. Campo extra é descartado pelo `z.object` e recusado só nos schemas `z.strictObject` (ex.: criar perfil).
 - Auth: guard que valida o JWT do Supabase. Autorização por objeto: um usuário nunca lê nem altera pedido ou Geladeira de outro.
 - Erros no formato RFC 9457 (type, title, status, detail) via exception filter; nunca vaze stack trace ou SQL.
 - Dinheiro em inteiros (centavos). Preço e total são sempre calculados no servidor; ignore valores vindos do cliente.
