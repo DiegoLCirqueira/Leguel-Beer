@@ -45,6 +45,13 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[ADR-005-monorepo-camadas]]: monorepo com arquitetura em camadas (com a seção Complemento).
 - [[ADR-006-merge-por-agentes]]: merge de PRs pelo Orchestrator e pelo Devops.
 - [[ADR-007-banco-de-teste]]: banco separado no Postgres local e service container no CI para os testes de integração.
+- [[ADR-008-token-jwks-assimetrico]]: token da API validado só com chave assimétrica (JWKS), HS256 recusado.
+- [[ADR-009-guard-global-fechado]]: rotas fechadas por padrão, papel lido do banco e 404 na posse.
+- [[ADR-010-validacao-com-zod]]: validação com Zod em vez de class-validator.
+- [[ADR-011-maioridade-proxy-cookie]]: maioridade pelo proxy, cookie de 30 dias e robôs de busca liberados.
+- [[ADR-012-sessao-em-cookies-httponly]]: sessão em cookies HttpOnly, API chamada pelo servidor do site.
+- [[ADR-013-link-gasto-so-no-post]]: link do e-mail só é gasto no POST.
+- [[ADR-014-admin-so-com-email-confirmado]]: admin só com e-mail confirmado, lido pela API no banco.
 
 ## Arquitetura
 

@@ -1,48 +1,45 @@
 ---
 tags: [handoff]
-atualizado: 2026-11-03
+atualizado: 2026-11-04
 ---
 
 # Handoff
 
 Sobrescrito pelo Orchestrator ao fim de cada ordem. A próxima conversa começa lendo este arquivo, a daily note mais recente em `docs/05-diario/` e [[licoes-aprendidas]].
 
-## Última ordem: ajustes de `/entrar` e do rodapé (03/11)
+## Última ordem: processo de ADR (04/11)
 
-Encerrada. Resumo em [[2026-11-03]].
+Resumo em [[2026-11-04]].
 
-- PR #195: em `/entrar`, seta do "Entrar" igual à da boas-vindas (`pinIconRight` no Button), divisor "ou" (`DivisorOu` em `components/ui`), "Ainda não tem conta? Criar conta" na mesma linha e sem o subtítulo "Que bom te ver de novo!".
-- PR #196: rodapé do site fora de `/entrar`, `/criar-conta`, `/recuperar-senha`, `/nova-senha` e `/auth/confirmar`; segue em `/`, `/conta` e nas páginas legais. Decisão do Diego "1- A" (não retirar de todas as páginas por causa dos avisos legais e dos links de Termos/Privacidade).
-- Ordem anterior (inspeção das telas de acesso, #186 a #194): ver [[2026-11-02]].
+- PR #199: critério de ADR (três condições juntas), ADR aceito imutável, template curto e linha "Candidatos a ADR" nas entregas de Front, Back e Devops; item 7 no checklist do Reviewer.
+- PR dos ADRs retroativos: ADR-008 a ADR-014, daily note, este handoff e a lição do `maestri role edit`.
+- Papéis em `.maestri/roles/` atualizados direto nos arquivos. Os terminais que já estavam abertos só leem o papel novo ao reiniciar.
 
 ## Estado
 
-- Site em `localhost:3000` (working copy principal, `main` c8cda54, `next dev`). Preview em :3001 ainda no ar, servindo o worktree `leguele-rodape` (destacado no mesmo commit da `main`).
-- API em `localhost:3333` (worktree `../leguele-api`, `node dist/main.js`, sem watch). Para atualizar: `pnpm --filter @leguele/shared build`, build da API, conferir e só então reiniciar.
-- Supabase local no Docker, e-mails no Mailpit (`127.0.0.1:54324`). Conta admin: credenciais só na nota "Acesso local (admin)" do canvas.
-- Portais "Leguelé iPhone 390" e "Leguelé Android". O Diego remove os portais "Inspeção: ..." depois de ver.
-- Para abrir `/nova-senha` na inspeção: pedir link em `/recuperar-senha` com a conta admin e abrir no portal o link `token_hash=...&type=recovery` do Mailpit.
+- Site em `localhost:3000` (working copy principal, `main`), preview em :3001 (worktree `leguele-rodape`), API em :3333 (worktree `../leguele-api`), Supabase local e Mailpit. Nada disso foi tocado nesta ordem.
+- Worktrees desta ordem: `C:/lb-adrp` (`docs/processo-adr`) e `C:/lb-adrr` (`docs/adrs-retroativos`).
+- O cadastro de papéis do Maestri (`maestri role show`) está defasado (textos de 27/10); os arquivos de `.maestri/roles/` são a fonte real. Não usar `maestri role edit` (lição de 04/11).
+- O papel do Orchestrator ainda diz "Merge é sempre do Diego" na seção 5 (defasado em relação ao [[ADR-006-merge-por-agentes]]). Vale o CLAUDE.md; a edição do próprio papel fica com o Diego.
 - O stash `obsidian` é do Diego: não aplicar nem descartar. Nunca adicionar `docs/.obsidian`.
-- Merge com worktree na branch: `git switch --detach` no worktree antes do `gh pr merge --squash --delete-branch` (lição de 02/11).
 
 ## Próximo
 
-1. Diego inspeciona `/entrar` (seta, divisor, sem subtítulo) e as telas de acesso sem rodapé; `/criar-conta` final (link no fim, aceite verde, rolagem sem barra).
-2. Front: `fix/dica-zoom-200` (worktree `leguele-zoom`, só o red 5f189f7) e o Voltar que cobre o logo no zoom de 200%.
-3. PR do Devops: `@leguele/shared` em watch no `pnpm dev`.
-4. Fase 2 do [[roteiro-mvp]]: bloco A (base técnica) e depois B (catálogo).
+1. Respostas do Diego às perguntas da ordem (status do ADR-004, proposta de ADR para o Complemento do ADR-005, cadastro de papéis do Maestri).
+2. Pendências do handoff de 03/11: inspeção de `/entrar` e das telas de acesso sem rodapé; Front `fix/dica-zoom-200` (worktree `leguele-zoom`, só o red 5f189f7); PR do Devops com `@leguele/shared` em watch no `pnpm dev`; fase 2 do [[roteiro-mvp]] (bloco A e depois B).
 
 ## Follow-ups
 
 - Sem E2E para 360x600 e zoom de 200% nas telas de acesso (conferido à mão pelo Front e pelo Reviewer).
-- Minors do Reviewer no #195/#196: boas-vindas deveria usar o `pinIconRight` (hoje posiciona a seta com `absolute` próprio) e a vitrine `/dev/tokens` não mostra o `pinIconRight`; falta E2E de ausência do rodapé nas 5 telas de acesso; o cenário "Rodapé com avisos e links" da loja ganha teste com o catálogo.
+- Minors do Reviewer no #195/#196: boas-vindas deveria usar o `pinIconRight`; a vitrine `/dev/tokens` não mostra o `pinIconRight`; falta E2E de ausência do rodapé nas 5 telas de acesso; o cenário "Rodapé com avisos e links" da loja ganha teste com o catálogo.
 - Selo "issues" do Next em dev aparece em maioridade e recuperar senha: investigar.
-- Estados após envio (sucesso/erro) de recuperar senha podem somar altura e rolar; o critério cobre o estado inicial.
+- Estados após envio (sucesso/erro) de recuperar senha podem somar altura e rolar.
 - Stash `wip-distribuir-nova-senha` no worktree `leguele-espaco` (não usado; pode ser descartado na limpeza).
 - LB-8 (nuvem): checklist do [[roteiro-mvp]]. Web: `meta theme-color` e favicon com o LB-16.
+- API, segurança (achado do Reviewer no #200): o `ThrottlerModule` em `apps/api/src/app.module.ts` (desde o #129) guarda a contagem em memória (100 por 60 s). Numa API serverless isso conta por instância, e o limite fica fraco. Não há decisão registrada: o Back avalia junto do LB-8 e, se mantiver, registra o ADR.
 - API: `DATABASE_URL` obrigatória no seed; código fixo no log de falha do `signOutOthers`.
 - `src/lib/erro-de-redirect.ts` usa caminho interno do Next: conferir a cada upgrade.
-- Limpeza dos worktrees e pastas em `C:\Users\Arthur\Desktop\leguele\` e `C:\lb-*` fica com o Diego (inclui `leguele-espaco2`, meio apagado, e `leguele-login0b`).
+- Limpeza dos worktrees e pastas em `C:\Users\Arthur\Desktop\leguele\` e `C:\lb-*` fica com o Diego (agora inclui `C:/lb-adrp` e `C:/lb-adrr` depois do merge).
 
 ## Skills sugeridas
 
