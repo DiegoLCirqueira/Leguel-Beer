@@ -16,7 +16,7 @@ O [[ADR-005-monorepo-camadas]] fixou a estrutura (`apps/web`, `apps/api`, `packa
 
 ## Decisão
 
-- **pnpm workspaces + Turborepo.** `pnpm-workspace.yaml` lista `apps/*` e `packages/*`; `turbo.json` define as tarefas. A versão do pnpm fica em `packageManager` (`pnpm@12.16.1`, `package.json`) e a do Node em `.nvmrc` (22.23.4) e em `engines`.
+- **pnpm workspaces + Turborepo já vêm do [[ADR-005-monorepo-camadas]]** (`pnpm-workspace.yaml` lista `apps/*` e `packages/*`; `turbo.json` define as tarefas). O que este ADR fixa são as versões: a do pnpm em `packageManager` (`pnpm@12.16.1`, `package.json`) e a do Node em `.nvmrc` (22.23.4) e em `engines`; e o `dependsOn: ["^build"]` das tarefas do `turbo.json` (ver o item seguinte).
 - **`@leguele/shared` é compilado com `tsc`** (`packages/shared/package.json`, script `build`, saída em `dist/`; `main`, `types` e `exports` apontam para `dist/`). Por isso `build`, `lint`, `typecheck` e `test` do `turbo.json` têm `dependsOn: ["^build"]`: o Next e o NestJS consomem JavaScript pronto, sem `transpilePackages`.
 - **Vitest em todos os pacotes**, em vez de Jest (`apps/api`, `apps/web`, `packages/shared`). Na API entram Supertest para HTTP; no web, Testing Library para componentes e Playwright (`@playwright/test`) para E2E.
 - **dependency-cruiser faz cumprir as camadas e a pureza do `shared`** (`.dependency-cruiser.cjs`, `pnpm arch`, etapa do CI): `domain` e `application` não importam framework, `domain` não importa as outras camadas, e `packages/shared/src` não importa Node nem framework.
@@ -24,7 +24,7 @@ O [[ADR-005-monorepo-camadas]] fixou a estrutura (`apps/web`, `apps/api`, `packa
 
 ## Por quê
 
-- **Compilar o `shared`** troca um passo de build (e o cuidado de recompilar o `dist/`, que já derrubou o site local duas vezes; ver [[licoes-aprendidas]]) por não depender de `transpilePackages` nem de o bundle da API compilar TypeScript de outro pacote.
+- **Compilar o `shared`** troca um passo de build (e o cuidado de recompilar o `dist/`, que já causou erro no ambiente local duas vezes; ver [[licoes-aprendidas]]) por não depender de `transpilePackages` nem de o bundle da API compilar TypeScript de outro pacote.
 - **Vitest único** evita dois runners e dois formatos de configuração para o mesmo TypeScript.
 - **dependency-cruiser** transforma a regra de camadas do ADR-005 em falha de CI; só o código revisado não a sustentaria.
 
