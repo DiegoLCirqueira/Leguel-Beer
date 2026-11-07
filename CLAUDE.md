@@ -67,13 +67,14 @@ Padrão de https://github.com/iuricode/padroes-de-commits (vale para os commits 
 | `:lock:` | `security` | Correção de segurança e hardening |
 
 - Exemplos: `:sparkles: feat: adiciona página de login`, `:bug: fix: corrige loop infinito no carrinho`, `:recycle: refactor: extrai cálculo de frete`.
-- A regra de Atribuição vale em todo commit: sem `Co-Authored-By` do Claude.
+- A regra de Atribuição vale em todo commit: sem `Co-Authored-By` de agente de IA (Claude, Codex ou outro).
 
 ## Documentação (docs/ é um vault do Obsidian)
 - Antes de implementar uma funcionalidade, leia a spec correspondente em docs/02-features/.
 - Fluxo obrigatório (red-green-refactor): cenário Gherkin → teste falhando (red) → implementação mínima até passar (green) → refatoração.
   - Red e green andam em fatias verticais, uma de cada vez, como na skill `/tdd`: um teste falhando, o mínimo para passar, e só então o próximo teste. Não escreva todos os testes antes.
   - A refatoração não faz parte do loop red → green: é um passo separado, feito só com todos os testes verdes, sem mudar comportamento (se um teste precisar mudar, não é refatoração) e em commit próprio (`:recycle: refactor: ...`), separado dos commits da funcionalidade.
+- Refino de testes: depois que a ordem é dada como finalizada (PRs da ordem mergeados), o agente Codex (papel "Testes") refina a suíte num PR próprio, revisado pelo Reviewer e mergeado pela regra de [[ADR-006-merge-por-agentes]]. Todo teste novo ou alterado é visto falhando por mutação do código que ele protege, e isso é registrado no commit. Ele não muda código de produção; bug encontrado volta ao Orchestrator.
 - ADR (docs/03-decisoes/, com docs/templates/adr.md, formato curto): uma decisão técnica vira ADR quando as três condições valem: (a) é difícil de reverter, (b) surpreende quem lê o código sem contexto, (c) veio de um trade-off real entre alternativas. Decisão de produto fica nas specs. Decisão pequena e reversível fica na daily note.
   - ADR aceito não é editado. Mudar a decisão gera um ADR novo, e o antigo vira `substituído` com link para o novo.
   - Os ADRs antigos (001 a 007) ficam no formato em que foram escritos; não precisam ser reescritos.
@@ -112,7 +113,7 @@ Estas regras têm prioridade sobre os caminhos padrão descritos nos SKILL.md em
   - Pesquisas comparando várias fontes podem usar `/deep-research`, também só com autorização.
 - Modelos: cada agente usa o modelo definido em `docs/00-inbox/maestri-banda.md`. Não troque de modelo por conta própria.
 - Merge de PRs (ver [[ADR-006-merge-por-agentes]]): o Orchestrator decide o merge e o Devops executa, sem aprovação do Diego PR a PR, quando TODAS as condições valem: (1) o Reviewer deu veredito "Aprovar" para o commit atual do PR (commit novo depois da aprovação exige nova aprovação); (2) o CI está verde, quando houver CI configurado; (3) a mensagem do squash e a descrição do PR foram conferidas sem atribuição ao Claude; (4) a base é `main` e não há conflitos. Método único: `gh pr merge <n> --squash --delete-branch`. Nenhum outro agente faz merge. Se alguma condição falhar, não há merge e o Orchestrator reporta ao Diego. O Diego pode fazer merge a qualquer momento.
-- Atribuição (regra permanente para todos os agentes, nesta e em todas as ordens futuras): o Claude nunca aparece como colaborador do projeto. Nenhum commit tem `Co-Authored-By: Claude` (ou variação), e nenhum PR, descrição, comentário ou mensagem tem "Generated with Claude Code", link de sessão ou qualquer outra atribuição ao Claude ou à Anthropic.
+- Atribuição (regra permanente para todos os agentes, nesta e em todas as ordens futuras): nenhum agente de IA (Claude, Codex ou outro) aparece como colaborador do projeto. Nenhum commit tem `Co-Authored-By` de agente (Claude, Codex ou variação), e nenhum PR, descrição, comentário ou mensagem tem "Generated with Claude Code", link de sessão ou qualquer outra atribuição ao Claude, à Anthropic, ao Codex ou à OpenAI.
   - Antes de cada push ou PR, confira a mensagem de commit e a descrição do PR.
   - A atribuição automática do Claude Code fica desativada em `.claude/settings.json` (chave `attribution`).
   - Se encontrar atribuição ao Claude em commit ou PR ainda aberto, avise o Diego antes de corrigir. Não reescreva histórico já mergeado sem autorização dele.
