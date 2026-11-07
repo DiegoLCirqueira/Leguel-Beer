@@ -52,6 +52,7 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[ADR-012-sessao-em-cookies-httponly]]: sessão em cookies HttpOnly, API chamada pelo servidor do site.
 - [[ADR-013-link-gasto-so-no-post]]: link do e-mail só é gasto no POST.
 - [[ADR-014-admin-so-com-email-confirmado]]: admin só com e-mail confirmado, lido pela API no banco.
+- [[ADR-015-ferramentas-monorepo]]: pnpm + Turborepo, `@leguele/shared` compilado com `tsc`, Vitest em todos os pacotes e dependency-cruiser no CI.
 
 ## Arquitetura
 
