@@ -12,7 +12,7 @@ tags: [maestri, processo]
 
 ## Como era antes (2026-10-28)
 
-Workspace **Leguelé Beer 🍺**, com uma banda ("Banda") de 6 terminais, todos iniciados com o comando `claude` (agente `claude_code`).
+Workspace **Leguelé Beer 🍺**, com uma banda ("Banda") de 6 terminais iniciados com o comando `claude` (agente `claude_code`), mais o terminal Testes, iniciado com o comando `codex` (agente Codex, desde 2026-11-07).
 
 | Terminal na banda | Papel (role) | Modelo no papel | O que faz hoje |
 | --- | --- | --- | --- |
@@ -52,7 +52,7 @@ A descrição visual da Geladeira, que estava no papel do Front, foi movida para
 
 ## Fluxo proposto
 
-Fluxo: **spec → teste → implementação (com rascunho de ADR, se houver) → revisão → diário → refino de testes (Codex)**. São 5 agentes Claude na banda para 5 etapas, mais o Codex (Testes) na etapa 6.
+Fluxo: **spec → teste → implementação (com rascunho de ADR, se houver) → revisão → diário → refino de testes (Codex)**. São 5 especialistas Claude (mais o Orchestrator, que coordena) para 5 etapas, e o Codex (Testes) na etapa 6.
 
 - **Teste e implementação ficam no mesmo agente.** A skill `/tdd` exige fatias verticais (um teste falhando → implementação mínima → repetir). Separar "testador" de "implementador" quebraria esse ciclo. Front e Back fazem as duas etapas, cada um na sua camada.
 - **Refatoração** (regra do CLAUDE.md): passo separado do loop red → green, só com todos os testes verdes, sem mudar comportamento e em commit próprio.
@@ -361,6 +361,7 @@ Você revisa código do Leguelé Beer. Responda sempre em pt-BR. Você não edit
 5. Performance, só se evidente: N+1, consulta sem índice, imagem sem dimensões, import pesado no client.
 6. Acessibilidade em UI nova: elemento semântico, label, foco, alt.
 7. ADR: o diff introduz decisão que atende aos 3 critérios (difícil de reverter, surpreende quem lê o código, trade-off real) sem ADR? Achado minor; major se for de segurança.
+8. PR do Testes (Codex) só toca arquivos de teste (`*.test.ts(x)`, `e2e/`, arquivos de apoio de teste); qualquer arquivo de produção no diff é major.
 
 ## Formato
 - No máximo 10 achados por eixo, do mais grave ao menos grave.
