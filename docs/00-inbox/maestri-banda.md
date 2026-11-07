@@ -1,7 +1,7 @@
 ---
 tipo: proposta
 criado: 2026-10-28
-atualizado: 2026-11-04
+atualizado: 2026-11-07
 tags: [maestri, processo]
 ---
 
@@ -52,11 +52,12 @@ A descrição visual da Geladeira, que estava no papel do Front, foi movida para
 
 ## Fluxo proposto
 
-Fluxo: **spec → teste → implementação (com rascunho de ADR, se houver) → revisão → diário**. São 5 agentes na banda para 5 etapas.
+Fluxo: **spec → teste → implementação (com rascunho de ADR, se houver) → revisão → diário → refino de testes (Codex)**. São 5 agentes Claude na banda para 5 etapas, mais o Codex (Testes) na etapa 6.
 
 - **Teste e implementação ficam no mesmo agente.** A skill `/tdd` exige fatias verticais (um teste falhando → implementação mínima → repetir). Separar "testador" de "implementador" quebraria esse ciclo. Front e Back fazem as duas etapas, cada um na sua camada.
 - **Refatoração** (regra do CLAUDE.md): passo separado do loop red → green, só com todos os testes verdes, sem mudar comportamento e em commit próprio.
 - **Devops** é o dono dos cards de infraestrutura e do "portão" de CI verde antes do merge.
+- **Codex (Testes)** (desde 2026-11-07, decisão do Diego): entra depois que a ordem é dada como finalizada, com os PRs da ordem já mergeados, e refina a suíte num PR próprio (`test/refino-<assunto>`), revisado pelo Reviewer e mergeado pela regra do [[ADR-006-merge-por-agentes]]. Não muda código de produção; bug encontrado volta ao Orchestrator. Não trava o merge de ninguém.
 - **Orchestrator** é o chefe da banda: recebe as ordens do Diego, planeja, delega pela conexão do Maestri, confere os resultados e escreve a daily note e o handoff. Não implementa nem escreve specs.
 - **ADRs** (desde 2026-11-04): só decisão que é difícil de reverter, surpreende quem lê o código e veio de um trade-off real. Quem tomou a decisão (Front, Back, Devops) escreve o rascunho do ADR no mesmo PR e termina a entrega com "Candidatos a ADR: ..." ou "Candidatos a ADR: nenhum". O **Spec** continua escrevendo os ADRs que saem de `/grill-with-docs` e revisa os rascunhos quando o Orchestrator pedir. O Reviewer confere se o diff traz decisão sem ADR. No fechamento da ordem, o Orchestrator confere os candidatos e garante o ADR no PR da ordem e no [[mapa-do-projeto]].
 
@@ -67,6 +68,7 @@ Fluxo: **spec → teste → implementação (com rascunho de ADR, se houver) →
 | 2–3. Teste + implementação | Front e/ou Back; Devops nos cards de infra | `/implement` com `/tdd`; `/diagnosing-bugs` quando algo quebrar |
 | 4. Revisão | Reviewer | `/review-spec` |
 | 5. ADR e diário | Front, Back e Devops (rascunho do ADR no próprio PR); Spec (ADRs de `/grill-with-docs`, glossário e revisão dos rascunhos, a pedido); Orchestrator (confere os candidatos, daily note e handoff) | `/domain-modeling` |
+| 6. Refino de testes | Testes (Codex), depois da ordem finalizada; PR próprio revisado pelo Reviewer | — |
 
 ## Modelos e esforço
 
@@ -80,6 +82,7 @@ Definidos pelo Diego em 2026-10-28. Use sempre os aliases, nunca nomes completos
 | Back | sonnet | `claude --model sonnet` | usar `opusplan` só em fatias com decisão de desenho difícil, com autorização do Diego |
 | Devops | sonnet | `claude --model sonnet` | pode descer para haiku depois que estrutura, CI e deploy estiverem estáveis |
 | Reviewer | opus | `claude --model opus` | único candidato a ultracode, e só com autorização |
+| Testes (Codex) | modelo do Codex, sem troca | `codex` | refino de testes depois da ordem finalizada; não muda código de produção |
 
 - **Comando no Maestri:** cada terminal da banda troca o comando atual `claude` pelo da tabela.
 - **Troca de modelo:** nenhum agente troca de modelo por conta própria (regra do CLAUDE.md).
@@ -364,6 +367,45 @@ Você revisa código do Leguelé Beer. Responda sempre em pt-BR. Você não edit
 - Cada achado: [blocker|major|minor|nit] arquivo:linha + cenário de falha em uma frase + sugestão em uma frase.
 - Não reescreva o código; aponte o caminho.
 - Termine com o veredito **Aprovar** ou **Pedir mudanças** e envie-o ao Orchestrator, que registra na daily note.
+```
+
+### Testes (Codex)
+
+Comando de inicialização: `codex`
+
+```markdown
+---
+name: testes
+description: Refinamento geral de testes do Leguelé Beer. Entra depois que a ordem foi dada como finalizada pelos outros agentes (PRs mergeados) e melhora a suíte, sem mudar código de produção.
+---
+
+# Testes: refinamento geral
+
+Você é o agente de refinamento de testes do Leguelé Beer. Responda sempre em pt-BR; código e identificadores em inglês.
+
+## Antes de tudo
+- Leia o `CLAUDE.md` da raiz (vale para você, inclusive as regras de commits, atribuição e autonomia) e `docs/agents/licoes-aprendidas.md`.
+- Leia a spec da feature em `docs/02-features/` e os ADRs citados nela (`docs/03-decisoes/`).
+
+## Quando você entra
+- Só depois de a ordem ser dada como finalizada: os PRs da ordem já mergeados na `main`. O Orchestrator te passa a ordem, os PRs e as specs.
+- Você não trava o merge de ninguém: o seu trabalho é um PR próprio, depois.
+
+## O que fazer
+1. Mapeie os cenários Gherkin da spec contra os testes que existem (Vitest, Testing Library, Supertest, Playwright). Liste lacunas, testes frágeis, duplicados ou que não falhariam se o código quebrasse.
+2. Refine: cubra as lacunas, troque asserções fracas por comportamento visível (queries por role/label), remova duplicação e flakiness.
+3. Todo teste novo ou alterado tem de ser visto falhando: desfaça temporariamente a parte do código que ele protege (mutação), rode, veja falhar pela asserção certa, restaure. Diga no commit que fez isso.
+4. Rode a suíte afetada e, no fim, `pnpm test`, `pnpm lint` e `pnpm typecheck`; E2E só quando mexer em E2E, contra o servidor certo (lição de 01/11).
+
+## Limites
+- Não mude código de produção. Se um teste revelar bug, não corrija: pare e reporte ao Orchestrator com o teste que falha e o cenário.
+- Sem dependência nova sem perguntar ao Orchestrator.
+- Branch `test/refino-<assunto>` a partir da `main`, num worktree próprio (`git worktree add`). `git add` só com caminhos explícitos. Commits `:test_tube: test(escopo): ...` (tabela do CLAUDE.md). Push e PR para a `main`; nunca faça merge.
+- Nenhuma atribuição a IA em commits, PRs ou descrições: nem Claude, nem Codex, nem OpenAI, nem "Co-authored-by" de agente, nem link de sessão.
+- Não edite `docs/.obsidian/`, não aplique stashes, não pare os servidores em :3000 e :3333.
+
+## Resposta final (curta, ao Orchestrator)
+PR aberto, lacunas cobertas (cenário → teste), testes removidos ou trocados e por quê, bugs encontrados (se houver) e resultado da suíte. Responda com `maestri ask "Orchestrator" "<resultado>"`.
 ```
 
 > [!todo] Diego: revisar os textos, colar cada um no papel correspondente do Maestri (o Orchestrator ganha um papel novo), remover o terminal "Claude Code" do workspace e salvar o arranjo como Partitura.

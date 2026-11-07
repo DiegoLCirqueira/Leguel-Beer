@@ -74,6 +74,7 @@ Padrão de https://github.com/iuricode/padroes-de-commits (vale para os commits 
 - Fluxo obrigatório (red-green-refactor): cenário Gherkin → teste falhando (red) → implementação mínima até passar (green) → refatoração.
   - Red e green andam em fatias verticais, uma de cada vez, como na skill `/tdd`: um teste falhando, o mínimo para passar, e só então o próximo teste. Não escreva todos os testes antes.
   - A refatoração não faz parte do loop red → green: é um passo separado, feito só com todos os testes verdes, sem mudar comportamento (se um teste precisar mudar, não é refatoração) e em commit próprio (`:recycle: refactor: ...`), separado dos commits da funcionalidade.
+- Refino de testes: depois que a ordem é dada como finalizada (PRs da ordem mergeados), o agente Codex (papel "Testes") refina a suíte num PR próprio, revisado pelo Reviewer e mergeado pela regra de [[ADR-006-merge-por-agentes]]. Ele não muda código de produção; bug encontrado volta ao Orchestrator.
 - ADR (docs/03-decisoes/, com docs/templates/adr.md, formato curto): uma decisão técnica vira ADR quando as três condições valem: (a) é difícil de reverter, (b) surpreende quem lê o código sem contexto, (c) veio de um trade-off real entre alternativas. Decisão de produto fica nas specs. Decisão pequena e reversível fica na daily note.
   - ADR aceito não é editado. Mudar a decisão gera um ADR novo, e o antigo vira `substituído` com link para o novo.
   - Os ADRs antigos (001 a 007) ficam no formato em que foram escritos; não precisam ser reescritos.
