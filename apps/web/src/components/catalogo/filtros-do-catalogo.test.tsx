@@ -45,7 +45,7 @@ describe("FiltrosDoCatalogo", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("Limpar filtros tira teor, IBU, preço e disponíveis, mantém a categoria e fecha", async () => {
+  it("Limpar tira teor, IBU, preço e disponíveis, mantém a categoria e fecha", async () => {
     render(
       <FiltrosDoCatalogo
         query={{
@@ -59,7 +59,7 @@ describe("FiltrosDoCatalogo", () => {
     );
     await userEvent.click(screen.getByRole("button", { name: "Filtrar (3)" }));
 
-    await userEvent.click(screen.getByRole("button", { name: "Limpar filtros" }));
+    await userEvent.click(screen.getByRole("button", { name: "Limpar" }));
 
     expect(push).toHaveBeenCalledWith("/catalogo?categoria=ipa");
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();

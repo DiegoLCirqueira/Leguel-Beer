@@ -92,4 +92,26 @@ describe("CatalogoConteudo", () => {
 
     expect(push).toHaveBeenCalledWith("/catalogo");
   });
+
+  it("a contagem é um título de nível 2 antes da grade", () => {
+    render(<CatalogoConteudo query={padrao} dados={dados([cerveja("1", "Maré Alta IPA")])} />);
+
+    expect(screen.getByRole("heading", { level: 2, name: "1 cerveja" })).toBeInTheDocument();
+  });
+
+  it("com resultados e algum filtro ativo (até a categoria) mostra Limpar filtros ao lado da contagem", async () => {
+    const { rerender } = render(
+      <CatalogoConteudo
+        query={{ ...padrao, categoria: "ipa" }}
+        dados={dados([cerveja("1", "Maré Alta IPA")])}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "Limpar filtros" }));
+    expect(push).toHaveBeenCalledWith("/catalogo");
+
+    rerender(<CatalogoConteudo query={padrao} dados={dados([cerveja("1", "Maré Alta IPA")])} />);
+
+    expect(screen.queryByRole("button", { name: "Limpar filtros" })).not.toBeInTheDocument();
+  });
 });
