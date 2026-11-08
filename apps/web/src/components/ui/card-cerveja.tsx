@@ -1,7 +1,7 @@
 "use client";
 
 import { formatPriceBRL, type CervejaCard } from "@leguele/shared";
-import { Plus, Refrigerator } from "lucide-react";
+import { PackageX, Plus, Refrigerator } from "lucide-react";
 import Image from "next/image";
 import { useId } from "react";
 import { cn } from "@/lib/utils";
@@ -25,7 +25,9 @@ const teor = (valor: number) =>
 /** Card de cerveja da grade do catálogo e da home: imagem, nome, estilo, preço e ação. */
 export function CardCerveja({ cerveja, aoAdicionar, className }: CardCervejaProps) {
   const idMotivo = useId();
-  const { nome, estilo, categoria, teorAlcoolico, volumeMl, precoCentavos, imagemUrl } = cerveja;
+  const { nome, estilo, categoria, teorAlcoolico, volumeMl, precoCentavos, imagemUrl, esgotada } =
+    cerveja;
+  const podeAdicionar = Boolean(aoAdicionar) && !esgotada;
   return (
     <article
       className={cn(
@@ -37,6 +39,12 @@ export function CardCerveja({ cerveja, aoAdicionar, className }: CardCervejaProp
         <div className="absolute left-0 top-0">
           <StyleBadge slug={categoria.slug} name={categoria.nome} />
         </div>
+        {esgotada ? (
+          <span className="absolute right-0 top-1/3 inline-flex items-center gap-1 rounded-full border-2 border-erro bg-fundo px-3 py-1 text-sm font-semibold text-erro">
+            <PackageX aria-hidden="true" className="size-4" />
+            Esgotado
+          </span>
+        ) : null}
         <Image
           src={imagemUrl ?? IMAGEM_PADRAO}
           alt={imagemUrl ? `${nome}, ${estilo}` : ""}
@@ -50,9 +58,9 @@ export function CardCerveja({ cerveja, aoAdicionar, className }: CardCervejaProp
       <p className="text-sm text-texto-suave">{`${estilo} • ${teor(teorAlcoolico)}% • ${volumeMl}ml`}</p>
       <p className="text-xl font-bold text-primaria">{formatPriceBRL(precoCentavos)}</p>
       <Button
-        disabled={!aoAdicionar}
+        disabled={!podeAdicionar}
         onClick={aoAdicionar}
-        aria-describedby={aoAdicionar ? undefined : idMotivo}
+        aria-describedby={podeAdicionar ? undefined : idMotivo}
         iconLeft={
           <>
             <Plus aria-hidden="true" className="size-4" />
@@ -62,9 +70,9 @@ export function CardCerveja({ cerveja, aoAdicionar, className }: CardCervejaProp
       >
         Adicionar
       </Button>
-      {aoAdicionar ? null : (
+      {podeAdicionar ? null : (
         <span id={idMotivo} className="sr-only">
-          A Geladeira ainda não está disponível.
+          {esgotada ? "Cerveja esgotada." : "A Geladeira ainda não está disponível."}
         </span>
       )}
     </article>
