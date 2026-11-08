@@ -13,6 +13,7 @@ Resumo em [[2026-11-08]]. O Diego pediu para terminar o que estava aberto e para
 
 - Item 1 de [[sequencia-telas]] concluído: contrato, modelos/seed, GET /catalogo e /catalogo/destaques, layout da loja, bottom sheet/toast/skeleton, card com stepper, tela /catalogo e destaques na home (#210 a #226).
 - Item 2 (página de produto) começou: spec [[produto]] (#220, #225), contrato (#223). A fatia 2 da API (campos descrição e preço anterior, migration, seed, GET /catalogo/:slug) está pronta em `feat/produto-api`, sem PR: falta trazer a main e abrir o PR.
+- Auditoria final do Codex (154d1fe..5a104a9): **Ordem com achados**: 3 minors de Front no catálogo (abaixo, em Follow-ups) e um teste frágil de ordenação por preço, corrigido pelo próprio Codex no #228. Lint, typecheck, build, 710 testes, 69 de integração e 471 E2E verdes (3 pulados sem a senha do seed); /catalogo e / conferidos no Windows e no Linux.
 - Processo: auditoria final do Codex a cada ordem; ciclo contínuo ([[ADR-016-ciclo-continuo-da-banda]]); PR de código não edita a daily.
 
 ## Estado
@@ -29,11 +30,14 @@ Resumo em [[2026-11-08]]. O Diego pediu para terminar o que estava aberto e para
 ## Próximo
 
 1. Aguardar novas ordens do Diego (pedido de 08/11).
-2. Quando retomar: auditoria do Codex sobre 3482c9a..(main depois do PR de fechamento), se ainda não tiver rodado; abrir o PR da fatia 2 do item 2 (`feat/produto-api`); depois a tela de produto (fatias 3 e 4, Front).
+2. Quando retomar: Front corrige os 3 achados do catálogo (Follow-ups, primeiro item); abrir o PR da fatia 2 do item 2 (`feat/produto-api`); depois a tela de produto (fatias 3 e 4, Front).
 3. Inspeção pendente do Diego: `/entrar`, `/criar-conta`, `/conta`, `/entregas`, e agora `/catalogo` e a home com destaques.
 4. LB-8 (nuvem) espera o Diego (contas). O spike LB-54 abre o checkout (item 5).
 
 ## Follow-ups
+
+- Achados da auditoria final no catálogo (dono: Front), contra [[catalogo]]: (1) estado vazio sem a contagem "0 cervejas" (`catalogo-conteudo.tsx:35`; spec linha ~142); (2) o bottom sheet de filtros não oferece categoria (`filtros-do-catalogo.tsx:87`; spec linhas ~92 e ~131); (3) `?categoria=nao-existe` mostra as 16 cervejas mas nenhum chip fica marcado e "Limpar filtros" continua (`catalogo-conteudo.tsx:20,34`; spec linha ~195 manda ignorar o parâmetro e abrir sem aquele filtro).
+- Item antigo "API: `DATABASE_URL` obrigatória no seed" já foi atendido (#214 e #222).
 
 - Do #212: registrar a mutação dos testes de loja-layout que nasceram verdes; a exceção da barra fixa no `responsivo.spec.ts` vale para qualquer rolagem (rever quando /catalogo e /geladeira usarem o layout); rótulo da barra até 12 px; fragmentos `<>` sobrando; a barra e a variável `--altura-barra-loja` têm o 57 px em dois lugares.
 - Do #214: `categories.order` único quando o admin escrever categorias (LB-73).
@@ -57,9 +61,9 @@ Resumo em [[2026-11-08]]. O Diego pediu para terminar o que estava aberto e para
 - Stash `wip-distribuir-nova-senha` no worktree `leguele-espaco` (não usado; pode ser descartado na limpeza).
 - LB-8 (nuvem): checklist do [[roteiro-mvp]]. Web: `meta theme-color` e favicon com o LB-16.
 - API, segurança (achado do Reviewer no #200): o `ThrottlerModule` em `apps/api/src/app.module.ts` guarda a contagem em memória (100 por 60 s); numa API serverless conta por instância. O Back avalia junto do LB-8 e, se mantiver, registra o ADR.
-- API: `DATABASE_URL` obrigatória no seed; código fixo no log de falha do `signOutOthers`.
+- API: código fixo no log de falha do `signOutOthers`.
 - `src/lib/erro-de-redirect.ts` usa caminho interno do Next: conferir a cada upgrade.
-- Limpeza dos worktrees e pastas em `C:\Users\Arthur\Desktop\leguele\` e `C:\lb-*` fica com o Diego (inclui `C:/lb-adrp`, `C:/lb-adrr`, `C:/lb-adr15`, `C:/lb-codex`, `C:/lb-testes-acesso`, `leguele-zoom`, `C:/lb-doc0811` e os worktrees desta rodada: `leguele-zoom2`, `leguele-loja-layout`, `leguele-sheet`, `leguele-card`, `leguele-catalogo`, `leguele-home`, `leguele-catalogo-*`, `leguele-produto-contrato`, `leguele-seed-admin`, `C:/lb-doc0811b`, `C:/lb-auditoria`, `C:/lb-ciclo`, `C:/lb-spec-*`, `C:/lb-seq-09`, `C:/lb-docs-daily`, `C:/lb-sharedwatch`, `C:/lb-produto-desc`, `C:/lb-fecho-0811` e a pasta vazia `C:/lb-auditoria-0811`; NÃO limpar o `feat/produto-api` (trabalho sem PR) nem o `leguele-g2` (branch refactor/components-ui-g2 com 5 arquivos não commitados e 1 commit fora da main)).
+- Limpeza dos worktrees e pastas em `C:\Users\Arthur\Desktop\leguele\` e `C:\lb-*` fica com o Diego (inclui `C:/lb-adrp`, `C:/lb-adrr`, `C:/lb-adr15`, `C:/lb-codex`, `C:/lb-testes-acesso`, `leguele-zoom`, `C:/lb-doc0811` e os worktrees desta rodada: `leguele-zoom2`, `leguele-loja-layout`, `leguele-sheet`, `leguele-card`, `leguele-catalogo`, `leguele-home`, `leguele-catalogo-*`, `leguele-produto-contrato`, `leguele-seed-admin`, `C:/lb-doc0811b`, `C:/lb-auditoria`, `C:/lb-ciclo`, `C:/lb-spec-*`, `C:/lb-seq-09`, `C:/lb-docs-daily`, `C:/lb-sharedwatch`, `C:/lb-produto-desc`, `C:/lb-fecho-0811` `C:/lb-handoff-final` e a pasta vazia `C:/lb-auditoria-0811`; NÃO limpar o `feat/produto-api` (trabalho sem PR) nem o `leguele-g2` (branch refactor/components-ui-g2 com 5 arquivos não commitados e 1 commit fora da main)).
 
 ## Skills sugeridas
 
