@@ -110,3 +110,19 @@ test("em 195x422 (zoom de 200%) o catálogo não tem rolagem horizontal", async 
 
   expect(excesso).toBeLessThanOrEqual(0);
 });
+
+test("combinar categoria, faixa e ordem mostra a lista certa e Limpar filtros ao lado da contagem desfaz tudo", async ({
+  page,
+}) => {
+  await page.goto("/catalogo?categoria=ipa&teor=6-ou-mais&ordem=menor-preco");
+
+  await expect(page.getByRole("heading", { level: 2, name: "3 cervejas" })).toBeVisible();
+  const nomes = await cards(page).getByRole("heading", { level: 3 }).allTextContents();
+  expect(nomes).toEqual(["Leguelé IPA", "Teste IPA 1", "Maré Alta"]);
+
+  await page.getByRole("button", { name: "Limpar filtros" }).click();
+
+  await expect(page).toHaveURL(/\/catalogo$/);
+  await expect(page.getByRole("heading", { level: 2, name: "16 cervejas" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Limpar filtros" })).toHaveCount(0);
+});
