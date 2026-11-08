@@ -25,4 +25,17 @@ describe("catalogoQuerySchema", () => {
       ordem: "menor-preco",
     });
   });
+
+  it("ignora valor inválido em vez de rejeitar, e mantém os valores válidos", () => {
+    const resultado = catalogoQuerySchema.safeParse({
+      categoria: "IPA com espaço",
+      teor: "faixa-que-nao-existe",
+      ibu: ["20-a-40", "40-ou-mais"],
+      preco: "25-a-30",
+      disponiveis: "talvez",
+      ordem: "mais-vendidos",
+    });
+
+    expect(resultado.data).toEqual({ preco: "25-a-30", disponiveis: false, ordem: "relevancia" });
+  });
 });
