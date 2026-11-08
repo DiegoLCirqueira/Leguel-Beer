@@ -3,7 +3,7 @@
 import type { CatalogoQuery, CatalogoResponse } from "@leguele/shared";
 import { useRouter } from "next/navigation";
 import { Button, CardCerveja, CategoryChips } from "@/components/ui";
-import { paraQueryString } from "@/lib/catalogo/url";
+import { contarFiltros, paraQueryString } from "@/lib/catalogo/url";
 
 const TODAS = "todas";
 
@@ -17,6 +17,7 @@ export function CatalogoConteudo({
 }) {
   const router = useRouter();
   const { itens, categorias } = dados;
+  const filtrado = Boolean(query.categoria) || contarFiltros(query) > 0;
   const totalGeral = categorias.reduce((soma, categoria) => soma + categoria.quantidade, 0);
   const chips = [
     { id: TODAS, label: "Todas", count: totalGeral },
@@ -40,9 +41,16 @@ export function CatalogoConteudo({
         </div>
       ) : (
         <>
-          <p className="text-sm text-texto-suave">
-            {itens.length === 1 ? "1 cerveja" : `${itens.length} cervejas`}
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-sm font-normal text-texto-suave">
+              {itens.length === 1 ? "1 cerveja" : `${itens.length} cervejas`}
+            </h2>
+            {filtrado ? (
+              <Button size="sm" variant="ghost" onClick={() => router.push("/catalogo")}>
+                Limpar filtros
+              </Button>
+            ) : null}
+          </div>
           <div className="grid grid-cols-1 gap-3 min-[360px]:grid-cols-2">
             {itens.map((cerveja) => (
               <CardCerveja key={cerveja.id} cerveja={cerveja} />

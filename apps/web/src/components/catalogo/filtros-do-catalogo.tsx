@@ -77,7 +77,7 @@ export function FiltrosDoCatalogo({ query }: { query: CatalogoQuery }) {
                 })
               }
             >
-              Limpar filtros
+              Limpar
             </Button>
             <Button onClick={() => ir(rascunho)}>Aplicar</Button>
           </div>
