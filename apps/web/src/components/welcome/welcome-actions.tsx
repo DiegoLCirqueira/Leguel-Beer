@@ -19,6 +19,10 @@ const TOUCH_AREA =
 const CONTROL_BASE =
   "absolute flex items-center justify-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaria";
 
+// Recuo do texto da ação: o do Figma, mas nunca tanto que o rótulo (ícone, vão e texto, ~104 px)
+// deixe de caber na caixa quando o palco fica estreito (zoom alto).
+const padStart = (px: number) => `min(${cq(px)}, calc(${cq(CONTROLS.enter.w)} - 104px))`;
+
 const OR_ROW_WIDTH = OR_ROW.right.x + OR_ROW.right.w - OR_ROW.left.x;
 const pctOfOrRow = (part: number) => `${((part / OR_ROW_WIDTH) * 100).toFixed(3)}%`;
 
@@ -59,7 +63,7 @@ export function WelcomeActions() {
           ...rectStyle(CONTROLS.enter),
           fontSize: fl(14, 26.1),
           gap: cq(21.7),
-          paddingLeft: cq(256.3),
+          paddingLeft: padStart(256.3),
         }}
         className={cn(
           CONTROL_BASE,
@@ -86,7 +90,7 @@ export function WelcomeActions() {
           ...rectStyle(CONTROLS.signUp),
           fontSize: fl(14, 24.1),
           gap: cq(23.1),
-          paddingLeft: cq(233.4),
+          paddingLeft: padStart(233.4),
           borderWidth: cq(2.5),
         }}
         className={cn(
