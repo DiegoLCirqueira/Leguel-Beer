@@ -248,15 +248,25 @@ Ordem dos cards do grupo B do [[roteiro-mvp]], em fatias verticais:
 | 1 | LB-4 (#13) | Back | Modelos de categoria e cerveja (ativa, destaque, estoque, data de cadastro), migration, seed de 16 cervejas em 4 categorias e o contrato em `@leguele/shared` |
 | 2 | LB-36 (#25), API | Back | `GET /catalogo`: filtros, faixas, ordenação por relevância, menor e maior preço e mais novas, esgotadas no fim; contagem por categoria (LB-33, #22) e `esgotada` (LB-38, #27, sem reservas ainda); é o módulo de referência `ListBeers` e o `Money` previstos em [[api-base]] |
 | 3 | LB-34 (#23), API | Back | `GET /catalogo/destaques`, com ordem e corte em 6 |
-| 4 | LB-13 (#65) | Front | Card de produto (nome, estilo, teor, volume, preço, `StyleBadge`, Adicionar) com a variante esgotada; o stepper de quantidade fica para quando o Adicionar funcionar ([[adicionar-do-card]], item 3 da [[sequencia-telas]]) |
-| 5 | LB-14 (#66) | Front | Bottom sheet, toast e skeleton (o sheet dos filtros depende dele) |
-| 6 | LB-15 (#67) | Front | Cabeçalho e barra inferior da loja (ver abaixo) |
-| 7 | LB-33 (#22) e LB-36 (#25), telas | Front | Faixa de categorias, `/catalogo` com filtros na URL, contagem e estado vazio |
+| 4 | LB-15 (#67) | Front | Layout compartilhado da loja: cabeçalho (logo e contador da Geladeira, recebido por prop) e barra inferior de 4 abas (ver abaixo) |
+| 5 | LB-14 (#66) | Front | Bottom sheet, toast com "Desfazer" e skeleton (o sheet dos filtros depende dele) |
+| 6 | LB-13 (#65) | Front | Card de produto (nome, estilo, teor, volume, preço, `StyleBadge`, Adicionar) com a variante esgotada, e o stepper de quantidade, que o produto e a Geladeira reusam |
+| 7 | LB-33 (#22) e LB-36 (#25), telas | Front | Faixa de categorias, `/catalogo` com filtros e ordem na URL, contagem e estado vazio |
 | 8 | LB-34 (#23), tela | Front | Home com a seção "Cervejas em destaque" ([[destaques-home]]) |
 
-As fatias 1 a 3 (Back) e 4 a 6 (Front) andam em paralelo depois do contrato; 7 e 8 dependem da API.
+As fatias 1 a 3 (Back) e 4 a 6 (Front) andam em paralelo depois do contrato; o LB-4 (fatia 1) fica pronto antes de o card (fatia 6) usar dado real. As fatias 7 e 8 dependem da API.
 
 > [!info] LB-15 sem spec própria (recomendação aplicada, vetável, 08/11)
 > O LB-15 não tem spec. Escopo mínimo: cabeçalho com o logo e o contador da Geladeira, e barra inferior com Início, Catálogo, Geladeira e Perfil, nos alvos de 44 px. Sem lupa (busca é MVP+) e sem "Mix & Match". O contador mostra 0 até a Geladeira persistida (LB-47, item 3 da ordem) existir.
+
+### Ajustes do Front (revisão de 08/11, recomendações aplicadas, vetáveis)
+
+- **Ordem do Front:** LB-15, LB-14, LB-13, LB-33 (chips), LB-36 (filtros e ordem) e LB-34 (destaques), como na tabela.
+- **Adicionar desabilitado:** o botão do card fica desabilitado até o LB-47 e o LB-35 (item 3 da [[sequencia-telas]]); o esgotado já nasce desabilitado.
+- **Fora:** busca (LB-37) e a ordenação "Mais vendidos".
+- **Selo "Esgotado":** feito com os tokens existentes, sem cor nova.
+- **Rodapé da loja** ([[termos-privacidade]]): fica no fim da rolagem, acima da barra inferior fixa.
+- **Bottom sheet:** em tela baixa ou com zoom de 200% rola por dentro e fecha com Esc.
+- **Componentes novos** em `apps/web/src/components/ui`, cada um na vitrine `/dev/tokens` ([[identidade-visual]], "Componentes reutilizáveis"): cabeçalho da loja, barra inferior, card de cerveja, stepper, bottom sheet, toast com "Desfazer", skeleton, select, faixa, switch, estado vazio, título de página e selo "Esgotado".
 
 > [!todo] Preencher: imagens das garrafas dos cards. Sem `imagemUrl`, o card usa a imagem padrão da categoria; as imagens recortadas vêm do LB-124 (item 3 da [[sequencia-telas]]).
