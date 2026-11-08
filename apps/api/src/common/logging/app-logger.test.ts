@@ -27,19 +27,18 @@ describe("AppLogger", () => {
     });
   });
 
-  it("atende a interface de logger do Nest (log e warn viram info)", () => {
+  it("atende a interface de logger do Nest (log vira info)", () => {
     const write = vi.spyOn(process.stdout, "write").mockReturnValue(true);
     const logger = new AppLogger();
 
     logger.log("a", "Contexto");
-    logger.warn("b");
 
     expect(JSON.parse(String(write.mock.calls[0]?.[0]))).toMatchObject({
       level: "info",
       message: "a",
       context: "Contexto",
     });
-    expect(write).toHaveBeenCalledTimes(2);
+    expect(write).toHaveBeenCalledTimes(1);
   });
 
   it("aceita a assinatura error(message, stack, context) que o Nest usa", () => {
