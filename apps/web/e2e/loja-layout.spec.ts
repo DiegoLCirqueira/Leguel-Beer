@@ -24,7 +24,7 @@ test("a home tem cabeçalho com a Geladeira, barra inferior fixa e o rodapé aci
   expect(caixaBarra).not.toBeNull();
   expect((caixaBarra?.y ?? 0) + (caixaBarra?.height ?? 0)).toBeCloseTo(844, 0);
   expect((caixaRodape?.y ?? 0) + (caixaRodape?.height ?? 0)).toBeLessThanOrEqual(
-    (caixaBarra?.y ?? 0) + 1,
+    (caixaBarra?.y ?? 0) + 0.01,
   );
   for (const aba of await barra.getByRole("link").all()) {
     const caixa = await aba.boundingBox();
