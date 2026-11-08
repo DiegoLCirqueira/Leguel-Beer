@@ -46,7 +46,7 @@ describe("sortBeers", () => {
     ]);
   });
 
-  it("menor preÃ§o: do mais barato ao mais caro, e o empate cai na relevÃ¢ncia", () => {
+  it("menor preço: do mais barato ao mais caro, e o empate cai na relevância", () => {
     const barata = makeBeer({ name: "Lager Barata", category: CATEGORIES.lager, priceCents: 2000 });
     const caraA = makeBeer({ name: "IPA A", category: CATEGORIES.ipa, priceCents: 3200 });
     const caraB = makeBeer({ name: "Frutas B", category: CATEGORIES.frutas, priceCents: 3200 });
@@ -58,7 +58,7 @@ describe("sortBeers", () => {
     ]);
   });
 
-  it("relevÃ¢ncia nÃ£o olha o preÃ§o: um destaque caro vem antes de uma cerveja barata", () => {
+  it("relevância não olha o preço: um destaque caro vem antes de uma cerveja barata", () => {
     const destaqueCaro = makeBeer({ name: "Destaque Caro", featured: true, priceCents: 4000 });
     const baratinha = makeBeer({ name: "Baratinha", priceCents: 1500 });
 
@@ -68,7 +68,7 @@ describe("sortBeers", () => {
     ]);
   });
 
-  it("maior preÃ§o: do mais caro ao mais barato, e o empate cai na relevÃ¢ncia", () => {
+  it("maior preço: do mais caro ao mais barato, e o empate cai na relevância", () => {
     const cara = makeBeer({ name: "Lager Cara", category: CATEGORIES.lager, priceCents: 4000 });
     const barataA = makeBeer({ name: "IPA A", category: CATEGORIES.ipa, priceCents: 2000 });
     const barataB = makeBeer({ name: "Frutas B", category: CATEGORIES.frutas, priceCents: 2000 });
@@ -83,19 +83,19 @@ describe("sortBeers", () => {
   it("esgotadas sempre no fim, mesmo a mais barata ou em destaque; a ordem vale dentro de cada grupo", () => {
     const esgotadaBarata = makeBeer({ name: "Esgotada Barata", stock: 0, priceCents: 1000 });
     const esgotadaDestaque = makeBeer({ name: "Esgotada Destaque", stock: 0, featured: true });
-    const disponivelCara = makeBeer({ name: "DisponÃ­vel Cara", priceCents: 4000 });
-    const disponivelBarata = makeBeer({ name: "DisponÃ­vel Barata", priceCents: 2000 });
+    const disponivelCara = makeBeer({ name: "Disponível Cara", priceCents: 4000 });
+    const disponivelBarata = makeBeer({ name: "Disponível Barata", priceCents: 2000 });
     const todas = [esgotadaBarata, disponivelCara, esgotadaDestaque, disponivelBarata];
 
     expect(names(sortBeers(todas, "menor-preco"))).toEqual([
-      "DisponÃ­vel Barata",
-      "DisponÃ­vel Cara",
+      "Disponível Barata",
+      "Disponível Cara",
       "Esgotada Barata",
       "Esgotada Destaque",
     ]);
     expect(names(sortBeers(todas, "relevancia"))).toEqual([
-      "DisponÃ­vel Barata",
-      "DisponÃ­vel Cara",
+      "Disponível Barata",
+      "Disponível Cara",
       "Esgotada Destaque",
       "Esgotada Barata",
     ]);
