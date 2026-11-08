@@ -21,3 +21,13 @@ export interface Beer {
   imageUrl: string | null;
   createdAt: Date;
 }
+
+export function availableQuantity(beer: Beer): number {
+  void beer;
+  return -1;
+}
+
+export function isSoldOut(beer: Beer): boolean {
+  void beer;
+  return false;
+}
