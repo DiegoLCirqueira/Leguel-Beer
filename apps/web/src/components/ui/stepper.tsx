@@ -14,10 +14,12 @@ export type StepperProps = {
 };
 
 const BOTAO =
-  "flex size-11 items-center justify-center rounded-full text-primaria transition-colors hover:bg-primaria/10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primaria disabled:opacity-40 disabled:hover:bg-transparent";
+  "flex size-11 items-center justify-center rounded-full text-primaria transition-colors hover:bg-primaria/10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primaria aria-disabled:opacity-40 aria-disabled:hover:bg-transparent";
 
 /** Seletor de quantidade (− 1 +): reusado pelo produto e pela Geladeira; alvos de 44 px. */
 export function Stepper({ valor, aoAlterar, min = 1, max, rotulo, className }: StepperProps) {
+  const noMinimo = valor <= min;
+  const noMaximo = max !== undefined && valor >= max;
   return (
     <div
       role="group"
@@ -30,18 +32,24 @@ export function Stepper({ valor, aoAlterar, min = 1, max, rotulo, className }: S
       <button
         type="button"
         aria-label="Diminuir quantidade"
-        disabled={valor <= min}
-        onClick={() => aoAlterar(valor - 1)}
+        aria-disabled={noMinimo || undefined}
+        onClick={() => {
+          if (!noMinimo) aoAlterar(valor - 1);
+        }}
         className={BOTAO}
       >
         <Minus aria-hidden="true" className="size-5" />
       </button>
-      <span className="min-w-8 text-center text-lg font-semibold tabular-nums">{valor}</span>
+      <output aria-live="polite" className="min-w-8 text-center text-lg font-semibold tabular-nums">
+        {valor}
+      </output>
       <button
         type="button"
         aria-label="Aumentar quantidade"
-        disabled={max !== undefined && valor >= max}
-        onClick={() => aoAlterar(valor + 1)}
+        aria-disabled={noMaximo || undefined}
+        onClick={() => {
+          if (!noMaximo) aoAlterar(valor + 1);
+        }}
         className={BOTAO}
       >
         <Plus aria-hidden="true" className="size-5" />

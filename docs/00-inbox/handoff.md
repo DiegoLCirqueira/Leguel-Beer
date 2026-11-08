@@ -7,7 +7,7 @@ atualizado: 2026-11-08
 
 Sobrescrito pelo Orchestrator ao fim de cada ordem. A próxima conversa começa lendo este arquivo, a daily note mais recente em `docs/05-diario/` e [[licoes-aprendidas]].
 
-## Última ordem: auditoria, telas do design, ciclo contínuo e início do item 1 (08/11)
+## Última ordem: item 1 em andamento (catálogo e início) e regra da daily (08/11)
 
 Resumo em [[2026-11-08]].
 
@@ -16,6 +16,8 @@ Resumo em [[2026-11-08]].
 - Levantamento das telas sem design no cartão "Telas sem design" do canvas (fichário "Fichário"). O Diego adicionou as telas 16 a 30 em `Imagens/figma/telas` (a revisar com o Front); a Geladeira segue `Imagens/estudio-garrafas.html`.
 - Auditoria final de cada ordem pelo Codex (decisão do Diego), registrada no `CLAUDE.md` e em [[maestri-banda]]. A primeira (297bb03..e393f50) deu "Ordem com achados": dois major de zoom na boas-vindas, corrigidos no #208 (d4263b5), que também falhou uma vez no CI do Linux (fonte mais larga) e passou a não depender da largura da fonte.
 - Ordem de implementação 1 a 9 em [[sequencia-telas]] (revisada com o Front); item 1 (catálogo e início) com a spec pronta (#209): Back no contrato em `@leguele/shared`, Front no LB-15 (cabeçalho e barra de baixo da loja).
+- Item 1: mergeados contrato (#210), layout da loja (#212) e modelos/seed (#214); terceira auditoria aprovada. Em revisão: #215 (bottom sheet, toast, skeleton; CI falhou no E2E contra o build) e #216 (GET /catalogo).
+- PR de código não edita mais a daily (regra de 08/11): o Orchestrator passa o resumo da descrição do PR para a daily.
 - Ciclo contínuo: [[ADR-016-ciclo-continuo-da-banda]]. A banda não espera ordem entre tarefas; decisões do Diego ficam no cartão "🗳️ Decisões pendentes do Diego".
 
 ## Estado
@@ -31,12 +33,16 @@ Resumo em [[2026-11-08]].
 
 ## Próximo
 
-1. Auditoria final do Codex sobre e393f50..(main depois deste PR): #207, #208, #209 e este.
-2. Item 1 de [[sequencia-telas]]: contrato (Back) → LB-4, LB-36 e LB-34 na API (Back) em paralelo com LB-15, LB-14 e LB-13 (Front) → telas do catálogo e do início. Depois, item 2 (página de produto).
+1. Fechar #215 (Front: E2E do sheet no CI) e #216 (Back: mojibake nos testes, `take` de segurança, casos pela rota).
+2. Item 1 de [[sequencia-telas]]: Back nos destaques (LB-34 na API); Front no card com stepper (LB-13), depois chips/filtros (LB-33/36) e destaques da home (LB-34). Auditoria do Codex quando o item 1 fechar. Depois, item 2 (página de produto).
 3. Inspeção pendente do Diego: `/entrar`, `/criar-conta`, `/conta`, `/entregas`.
 4. PR do Devops com `@leguele/shared` em watch no `pnpm dev`. LB-8 (nuvem) espera o Diego (contas). O spike LB-54 abre o checkout (item 5).
 
 ## Follow-ups
+
+- Do #212: registrar a mutação dos testes de loja-layout que nasceram verdes; a exceção da barra fixa no `responsivo.spec.ts` vale para qualquer rolagem (rever quando /catalogo e /geladeira usarem o layout); rótulo da barra até 12 px; fragmentos `<>` sobrando; a barra e a variável `--altura-barra-loja` têm o 57 px em dois lugares.
+- Do #214: guarda de banco local também no `seed-admin` (falhar fechado sem `DATABASE_URL`); `categories.order` único quando o admin escrever categorias (LB-73).
+- Do #215: tornar o resto da página inerte e usar portal quando o sheet entrar na loja.
 
 - Próximo refino do Codex (minors do Reviewer no #203 e no #204):
   - `/nova-senha` e `/auth/confirmar` fora de `acesso-refluxo.spec.ts` (rodapé e alcance em 360x600 e 195x422);
