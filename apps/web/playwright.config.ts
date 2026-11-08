@@ -17,6 +17,8 @@ export default defineConfig({
   webServer: [
     {
       command: webCommand,
+      // O build não serve /dev/tokens; os E2E dos componentes (sheet, card) usam a vitrine, então o CI a liga.
+      env: { VITRINE_E2E: "1" },
       url: "http://localhost:3000",
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,

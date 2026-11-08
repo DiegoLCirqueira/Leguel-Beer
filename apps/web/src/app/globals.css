@@ -10,6 +10,8 @@
   --color-fundo: #07120b;
   --color-superficie: #10261a;
   --color-superficie-elevada: #163021;
+  /* Véu atrás de sheets e diálogos: o fundo da marca com 72% de opacidade */
+  --color-veu: rgb(7 18 11 / 0.72);
   --color-borda: #24452f;
   /* Borda dos campos de digitar: 3:1 contra fundo e superfície (WCAG 1.4.11) */
   --color-borda-campo: #5a8450;

@@ -18,4 +18,14 @@ describe("layout da loja", () => {
     expect(screen.getByRole("contentinfo")).toBeInTheDocument();
     expect(screen.getByRole("navigation", { name: "Menu da loja" })).toBeInTheDocument();
   });
+
+  it("publica a altura da barra inferior numa variável CSS para o que flutua acima dela", () => {
+    const { container } = render(
+      <LojaLayout>
+        <main>x</main>
+      </LojaLayout>,
+    );
+
+    expect(container.firstElementChild).toHaveStyle("--altura-barra-loja: 57px");
+  });
 });
