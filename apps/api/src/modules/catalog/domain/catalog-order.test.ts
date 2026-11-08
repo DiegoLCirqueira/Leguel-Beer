@@ -36,4 +36,13 @@ describe("sortBeers", () => {
       "Frutas Caju",
     ]);
   });
+
+  it("mais novas: pela data de cadastro, da mais recente para a mais antiga", () => {
+    expect(names(sortBeers(embaralhadas, "mais-novas"))).toEqual([
+      "Frutas Caju",
+      "IPA Zabumba",
+      "IPA Aratu",
+      "Lager Praia",
+    ]);
+  });
 });
