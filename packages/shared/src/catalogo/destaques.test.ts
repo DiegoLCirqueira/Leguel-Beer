@@ -22,4 +22,11 @@ describe("destaquesResponseSchema", () => {
   it("aceita a lista de cards em destaque", () => {
     expect(destaquesResponseSchema.parse({ itens: [card, card] })).toEqual({ itens: [card, card] });
   });
+
+  it("recusa mais de 6 destaques", () => {
+    const seteDestaques = { itens: Array.from({ length: 7 }, () => card) };
+
+    expect(destaquesResponseSchema.safeParse(seteDestaques).success).toBe(false);
+    expect(destaquesResponseSchema.safeParse({ itens: Array(6).fill(card) }).success).toBe(true);
+  });
 });
