@@ -100,7 +100,7 @@ export function ComponentShowcase() {
         <Button variant="ghost" iconLeft={<Link2 className="size-5" />}>
           Continuar como convidado
         </Button>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <Button size="sm">Adicionar</Button>
           <Button loading>Carregando</Button>
           <Button disabled variant="ghost">
@@ -132,7 +132,7 @@ export function ComponentShowcase() {
         </div>
       </Section>
       <Section title="Card de cerveja (disponível e esgotado) e stepper">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 min-[360px]:grid-cols-2">
           <CardCerveja cerveja={cervejaExemplo} />
           <CardCerveja cerveja={cervejaEsgotada} />
         </div>
