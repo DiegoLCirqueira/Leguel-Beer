@@ -1,4 +1,4 @@
-import { catalogoResponseSchema } from "@leguele/shared";
+import { catalogoResponseSchema, destaquesResponseSchema } from "@leguele/shared";
 import type { INestApplication } from "@nestjs/common";
 import { APP_FILTER, APP_PIPE } from "@nestjs/core";
 import { Test } from "@nestjs/testing";
@@ -71,6 +71,7 @@ describe("GET /catalogo (banco real)", () => {
     });
 
   const get = (query = "") => request(app.getHttpServer()).get(`/catalogo${query}`);
+  const getDestaques = () => request(app.getHttpServer()).get("/catalogo/destaques");
 
   it("é público: sem token devolve as cervejas ativas no contrato, com a categoria e o contador", async () => {
     await addBeer("ipa", "ipa-aratu", {
@@ -203,5 +204,28 @@ describe("GET /catalogo (banco real)", () => {
       "disponivel",
       "esgotada",
     ]);
+  });
+
+  it("GET /catalogo/destaques é público e devolve só os destaques ativos, no máximo 6, na ordem da spec", async () => {
+    for (let index = 1; index <= 7; index += 1) {
+      await addBeer("lager", `lager-destaque-${index}`, { featured: true });
+    }
+    await addBeer("ipa", "ipa-destaque", { featured: true });
+    await addBeer("ipa", "ipa-inativa", { featured: true, active: false });
+    await addBeer("ipa", "ipa-comum");
+
+    const response = await getDestaques();
+
+    expect(response.status).toBe(200);
+    const body = destaquesResponseSchema.parse(response.body);
+    expect(body.itens.map((item) => item.slug)).toEqual([
+      "ipa-destaque",
+      "lager-destaque-1",
+      "lager-destaque-2",
+      "lager-destaque-3",
+      "lager-destaque-4",
+      "lager-destaque-5",
+    ]);
+    expect(body.itens[0]).toMatchObject({ destaque: true, categoria: { slug: "ipa" } });
   });
 });
