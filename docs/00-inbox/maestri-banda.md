@@ -68,7 +68,7 @@ Fluxo: **spec → teste → implementação (com rascunho de ADR, se houver) →
 | 1. Spec | Spec | `/grill-with-docs` (usa `/domain-modeling`), `/to-spec`, `/to-tickets` |
 | 2–3. Teste + implementação | Front e/ou Back; Devops nos cards de infra | `/implement` com `/tdd`; `/diagnosing-bugs` quando algo quebrar |
 | 4. Revisão | Reviewer | `/review-spec` |
-| 5. ADR e diário | Front, Back e Devops (rascunho do ADR no próprio PR); Spec (ADRs de `/grill-with-docs`, glossário e revisão dos rascunhos, a pedido); Orchestrator (confere os candidatos, daily note e handoff) | `/domain-modeling` |
+| 5. ADR e diário | Front, Back e Devops (rascunho do ADR e resumo, decisões e lições na descrição do PR, sem editar a daily); Spec (ADRs de `/grill-with-docs`, glossário e revisão dos rascunhos, a pedido); Orchestrator (confere os candidatos, daily note e handoff) | `/domain-modeling` |
 | 6. Auditoria final e refino de testes | Testes (Codex), no fim da ordem, com tudo mergeado; veredito ao Orchestrator e PR de refino próprio revisado pelo Reviewer | — |
 
 ## Modelos e esforço
@@ -221,7 +221,7 @@ Você é o dev frontend do Leguelé Beer. Responda sempre em pt-BR; código e id
 - Rascunhos vão para docs/00-inbox/. Não edite docs/.obsidian/.
 
 ## Resposta final (curta)
-Arquivos alterados, testes rodados com resultado resumido e pendências. Termine com a linha "Candidatos a ADR: ..." ou "Candidatos a ADR: nenhum"; se a decisão atende aos 3 critérios do CLAUDE.md (difícil de reverter, surpreende quem lê o código, trade-off real), escreva o rascunho do ADR no mesmo PR. Registre uma linha na seção "Feito" da daily note do dia em docs/05-diario/.
+Arquivos alterados, testes rodados com resultado resumido e pendências. Termine com a linha "Candidatos a ADR: ..." ou "Candidatos a ADR: nenhum"; se a decisão atende aos 3 critérios do CLAUDE.md (difícil de reverter, surpreende quem lê o código, trade-off real), escreva o rascunho do ADR no mesmo PR. Não edite a daily note: o resumo, as decisões vetáveis e as lições vão na descrição do PR, e o Orchestrator as passa para a daily e para `licoes-aprendidas`.
 ```
 
 ### Back
@@ -278,7 +278,7 @@ Você é o dev backend do Leguelé Beer. Responda sempre em pt-BR; código e ide
 - Rascunhos vão para docs/00-inbox/. Não edite docs/.obsidian/.
 
 ## Resposta final (curta)
-Arquivos alterados, migrations criadas, testes rodados com resultado resumido e pendências. Termine com a linha "Candidatos a ADR: ..." ou "Candidatos a ADR: nenhum"; se a decisão atende aos 3 critérios do CLAUDE.md (difícil de reverter, surpreende quem lê o código, trade-off real), escreva o rascunho do ADR no mesmo PR. Registre uma linha na seção "Feito" da daily note do dia em docs/05-diario/.
+Arquivos alterados, migrations criadas, testes rodados com resultado resumido e pendências. Termine com a linha "Candidatos a ADR: ..." ou "Candidatos a ADR: nenhum"; se a decisão atende aos 3 critérios do CLAUDE.md (difícil de reverter, surpreende quem lê o código, trade-off real), escreva o rascunho do ADR no mesmo PR. Não edite a daily note: o resumo, as decisões vetáveis e as lições vão na descrição do PR, e o Orchestrator as passa para a daily e para `licoes-aprendidas`.
 ```
 
 ### Devops
@@ -323,7 +323,7 @@ Você cuida do pipeline e do ambiente do Leguelé Beer. Responda sempre em pt-BR
 - Rascunhos vão para docs/00-inbox/. Não edite docs/.obsidian/.
 
 ## Resposta final (curta)
-Arquivos alterados e a lista do que o Diego precisa configurar manualmente (secrets, painéis), passo a passo. Termine com a linha "Candidatos a ADR: ..." ou "Candidatos a ADR: nenhum"; se a decisão de infraestrutura atende aos 3 critérios do CLAUDE.md (difícil de reverter, surpreende quem lê o código, trade-off real), escreva o rascunho do ADR no mesmo PR. Registre uma linha na seção "Feito" da daily note do dia em docs/05-diario/.
+Arquivos alterados e a lista do que o Diego precisa configurar manualmente (secrets, painéis), passo a passo. Termine com a linha "Candidatos a ADR: ..." ou "Candidatos a ADR: nenhum"; se a decisão de infraestrutura atende aos 3 critérios do CLAUDE.md (difícil de reverter, surpreende quem lê o código, trade-off real), escreva o rascunho do ADR no mesmo PR. Não edite a daily note: o resumo, as decisões vetáveis e as lições vão na descrição do PR, e o Orchestrator as passa para a daily e para `licoes-aprendidas`.
 ```
 
 ### Reviewer
@@ -363,6 +363,7 @@ Você revisa código do Leguelé Beer. Responda sempre em pt-BR. Você não edit
 6. Acessibilidade em UI nova: elemento semântico, label, foco, alt.
 7. ADR: o diff introduz decisão que atende aos 3 critérios (difícil de reverter, surpreende quem lê o código, trade-off real) sem ADR? Achado minor; major se for de segurança.
 8. PR do Testes (Codex) só toca arquivos de teste (`*.test.ts(x)`, `e2e/`, arquivos de apoio de teste); qualquer arquivo de produção no diff é major.
+9. Daily: PR de código (Front, Back, Devops) não edita `docs/05-diario/`; se editar, é achado minor (tirar do diff). A descrição do PR traz o resumo, as decisões vetáveis e as lições.
 
 ## Formato
 - No máximo 10 achados por eixo, do mais grave ao menos grave.

@@ -1,4 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("next/navigation", () => ({
@@ -41,9 +42,35 @@ describe("/dev/tokens", () => {
     );
   });
 
+  it("abre o bottom sheet e o toast de exemplo e mostra um skeleton, para conferir cada um", async () => {
+    render(<DevTokens />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Abrir bottom sheet" }));
+    expect(screen.getByRole("dialog", { name: "Filtros e ordenação" })).toBeInTheDocument();
+    await userEvent.keyboard("{Escape}");
+    await userEvent.click(screen.getByRole("button", { name: "Mostrar toast" }));
+
+    expect(
+      screen.getByText("Munich Lager foi para a geladeira").closest('[role="status"]'),
+    ).not.toBeNull();
+    expect(screen.getByRole("button", { name: "Desfazer" })).toBeInTheDocument();
+    expect(screen.getByTestId("exemplo-skeleton")).toBeInTheDocument();
+  });
+
   it("em produção não existe", () => {
     vi.stubEnv("NODE_ENV", "production");
 
     expect(() => DevTokens()).toThrow("NEXT_NOT_FOUND");
+  });
+
+  it("em produção só existe quando o E2E do CI liga VITRINE_E2E=1 (sem a variável continua 404)", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("VITRINE_E2E", "1");
+
+    render(<DevTokens />);
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Tokens e componentes" }),
+    ).toBeInTheDocument();
   });
 });
