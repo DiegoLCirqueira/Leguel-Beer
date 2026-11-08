@@ -13,7 +13,14 @@ const byCheapest = (a: Beer, b: Beer) => a.priceCents - b.priceCents;
 
 const byNewest = (a: Beer, b: Beer) => b.createdAt.getTime() - a.createdAt.getTime();
 
+const PRIMARY: Record<CatalogOrder, (a: Beer, b: Beer) => number> = {
+  relevancia: () => 0,
+  "menor-preco": byCheapest,
+  "maior-preco": (a, b) => byCheapest(b, a),
+  "mais-novas": byNewest,
+};
+
 export function sortBeers(beers: readonly Beer[], order: CatalogOrder): Beer[] {
-  const primary = order === "relevancia" ? () => 0 : order === "mais-novas" ? byNewest : byCheapest;
+  const primary = PRIMARY[order];
   return [...beers].sort((a, b) => primary(a, b) || byRelevance(a, b));
 }
