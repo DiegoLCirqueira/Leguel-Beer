@@ -37,4 +37,13 @@ describe("seedCatalog (banco real)", () => {
     expect(await prisma.category.count()).toBe(4);
     expect(await prisma.beer.count()).toBe(16);
   });
+
+  it("recusa rodar contra um banco que não é local, sem criar nada", async () => {
+    const attempt = seedCatalog(prisma, {
+      DATABASE_URL: "postgresql://u:p@db.abc.supabase.co:5432/postgres",
+    });
+
+    await expect(attempt).rejects.toThrow(/DATABASE_URL.*local/);
+    expect(await prisma.category.count()).toBe(0);
+  });
 });

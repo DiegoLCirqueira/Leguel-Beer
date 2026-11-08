@@ -6,7 +6,11 @@ import { SEED_CATEGORIES } from "./seed-catalog-data.js";
  * reaplica os dados do seed (o seed é a fonte dos dados de desenvolvimento). Só toca categorias e
  * cervejas; contas e perfis não são lidos nem alterados.
  */
-export async function seedCatalog(prisma: PrismaService): Promise<void> {
+export async function seedCatalog(
+  prisma: PrismaService,
+  env: { DATABASE_URL?: string | undefined } = process.env,
+): Promise<void> {
+  void env;
   await prisma.$transaction(async (tx) => {
     for (const { beers, ...category } of SEED_CATEGORIES) {
       const { id: categoryId } = await tx.category.upsert({
