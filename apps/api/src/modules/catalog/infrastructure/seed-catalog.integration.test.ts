@@ -58,4 +58,11 @@ describe("seedCatalog (banco real)", () => {
 
     expect(await prisma.profile.findMany()).toEqual([admin]);
   });
+
+  it("recusa rodar sem DATABASE_URL: sem saber o banco, não cria nada", async () => {
+    const attempt = seedCatalog(prisma, {});
+
+    await expect(attempt).rejects.toThrow(/DATABASE_URL/);
+    expect(await prisma.category.count()).toBe(0);
+  });
 });
