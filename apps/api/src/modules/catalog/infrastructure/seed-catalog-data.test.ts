@@ -65,4 +65,20 @@ describe("dados do seed do catálogo", () => {
     );
     expect(deTeste.every((beer) => !beer.description)).toBe(true);
   });
+
+  it("tem 3 cervejas com desconto e uma com preço anterior igual ao atual (sem desconto)", () => {
+    const comDesconto = beers.filter(
+      (beer) => calcularDesconto(beer.previousPriceCents, beer.priceCents) !== null,
+    );
+    const anteriorIgual = beers.filter(
+      (beer) => beer.previousPriceCents != null && beer.previousPriceCents === beer.priceCents,
+    );
+
+    expect(comDesconto.map((beer) => beer.slug).sort()).toEqual([
+      "cupuacu-ale",
+      "leguele-carnaval",
+      "mare-alta",
+    ]);
+    expect(anteriorIgual.map((beer) => beer.slug)).toEqual(["teste-malt-1"]);
+  });
 });
