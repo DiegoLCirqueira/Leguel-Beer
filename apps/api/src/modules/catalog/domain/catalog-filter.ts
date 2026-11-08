@@ -21,6 +21,7 @@ export function filterBeers(beers: readonly Beer[], filters: CatalogFilters): Be
   return beers.filter(
     (beer) =>
       (!filters.categorySlug || beer.category.slug === filters.categorySlug) &&
-      within(beer.abv, filters.abv),
+      within(beer.abv, filters.abv) &&
+      within(beer.ibu, filters.ibu),
   );
 }
