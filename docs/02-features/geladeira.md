@@ -40,13 +40,13 @@ Do card LB-49 e do LB-124:
 
 ## Referência visual (decisão de 08/11)
 
-- O design correto da Geladeira (o carrinho) é o arquivo `estudio-garrafas.html`, em `Imagens/` (fora do repo). Ele vale acima da descrição textual acima quando divergirem.
-- No celular, o resumo da Geladeira é um bottom sheet: tela `Imagens/figma/telas/24-resumo-da-geladeira.png` (fora do repo).
-- Moldura: o estúdio usa a **imagem** da geladeira (710 × 1573) como fundo, com o parapeito de cada prateleira redesenhado por cima e a faixa de nome e quantidade (`×N`) sobre ele. Isso resolve a dúvida entre imagem e CSS: vale a imagem.
+- O design correto da Geladeira (o carrinho) é o arquivo `estudio-garrafas.html`, em `Imagens/` (fora do repo; arquivo de 29/10/2026). Ele vale acima da descrição textual acima quando divergirem, inclusive sobre o "fundo de geladeira" em PNG da Descrição visual.
+- No celular, o resumo da Geladeira é um bottom sheet: tela `Imagens/figma/telas/24-resumo-da-geladeira.png` (fora do repo; tela de 08/11/2026).
+- Moldura: o estúdio usa a **imagem** da geladeira (710 × 1573) como fundo, com o parapeito de cada prateleira redesenhado por cima e a faixa de nome e quantidade (`×N`) sobre ele. Isso resolve a dúvida entre imagem e CSS: vale a imagem. Diverge do LB-49 (issue #56: "moldura em CSS, sem imagem pesada"); vale a decisão do Diego de 08/11 de que o estudo é o design certo, e a issue #56 será reconciliada depois do merge.
 - Medidas do estúdio, como referência: 4 prateleiras (IPA, Frutas, Malt, Lager), 4 posições por prateleira e até 3 fileiras desenhadas.
 - Cupom de desconto (MVP+) e favoritar (Pós-MVP) ficam fora da tela 24 por ora (decisão de 08/11, recomendação aplicada pelo Orchestrator, vetável).
 
-> [!todo] Preencher: confirmar se as 4 categorias do estúdio são as do catálogo, pendente em [[visao]]. As medidas acima valem até lá.
+As 4 categorias do estúdio (IPA, Frutas, Malt, Lager) são as do catálogo, conforme [[visao]].
 
 ## Cenários
 
