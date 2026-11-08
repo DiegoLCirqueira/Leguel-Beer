@@ -4,6 +4,7 @@ import type { CervejaCard } from "@leguele/shared";
 import { ArrowRight, Link2, Lock, UserRound } from "lucide-react";
 import { useState } from "react";
 import {
+  BottomSheet,
   Button,
   CardCerveja,
   Campo,
@@ -12,13 +13,16 @@ import {
   LojaHeader,
   LojaTabBar,
   Stepper,
+  Skeleton,
   StyleBadge,
+  Toast,
 } from "@/components/ui";
 
 const swatches = [
   { name: "fundo", className: "bg-fundo" },
   { name: "superficie", className: "bg-superficie" },
   { name: "superficie-elevada", className: "bg-superficie-elevada" },
+  { name: "veu", className: "bg-veu" },
   { name: "borda", className: "bg-borda" },
   { name: "borda-campo", className: "bg-borda-campo" },
   { name: "texto", className: "bg-texto" },
@@ -86,6 +90,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export function ComponentShowcase() {
   const [category, setCategory] = useState("todas");
   const [quantidade, setQuantidade] = useState(1);
+  const [sheetAberto, setSheetAberto] = useState(false);
+  const [toastAberto, setToastAberto] = useState(false);
 
   return (
     <div className="flex w-full max-w-sm flex-col gap-8">
@@ -142,6 +148,46 @@ export function ComponentShowcase() {
           max={12}
           rotulo="Quantidade de exemplo"
         />
+      </Section>
+      <Section title="Bottom sheet, toast e skeleton">
+        <div className="flex flex-wrap gap-3">
+          <Button size="sm" variant="outline" onClick={() => setSheetAberto(true)}>
+            Abrir bottom sheet
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setToastAberto(true)}>
+            Mostrar toast
+          </Button>
+        </div>
+        <div data-testid="exemplo-skeleton" className="flex flex-col gap-2">
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+        <BottomSheet
+          aberto={sheetAberto}
+          aoFechar={() => setSheetAberto(false)}
+          titulo="Filtros e ordenação"
+          rodape={<Button onClick={() => setSheetAberto(false)}>Aplicar</Button>}
+        >
+          <div className="flex flex-col gap-3 pb-3">
+            {Array.from({ length: 8 }, (_, i) => (
+              <Campo
+                key={i}
+                id={`sheet-campo-${i}`}
+                rotulo={`Campo ${i + 1}`}
+                icone={Lock}
+                placeholder="Exemplo de conteúdo que rola"
+              />
+            ))}
+          </div>
+        </BottomSheet>
+        {toastAberto ? (
+          <Toast
+            mensagem="Munich Lager foi para a geladeira"
+            acao={{ rotulo: "Desfazer", aoAcionar: () => undefined }}
+            aoFechar={() => setToastAberto(false)}
+          />
+        ) : null}
       </Section>
       <Section title="Badges de estilo">
         <div className="flex flex-wrap gap-2">
