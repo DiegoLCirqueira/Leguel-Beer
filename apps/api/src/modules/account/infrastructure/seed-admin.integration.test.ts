@@ -64,4 +64,15 @@ describe("seedAdmin (banco real)", () => {
     await expect(attempt).rejects.toThrow(/DATABASE_URL.*local/);
     expect(auth.users).toHaveLength(0);
   });
+
+  it("recusa rodar sem DATABASE_URL: sem saber o banco, não cria nada", async () => {
+    const auth = new InMemoryAuthAdmin();
+    const attempt = seedAdmin(
+      { ...env, DATABASE_URL: undefined },
+      { auth, profiles: new PrismaProfileRepository(prisma) },
+    );
+
+    await expect(attempt).rejects.toThrow(/DATABASE_URL/);
+    expect(auth.users).toHaveLength(0);
+  });
 });
