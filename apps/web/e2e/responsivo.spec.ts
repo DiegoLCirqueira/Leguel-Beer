@@ -138,6 +138,10 @@ async function medir(page: Page) {
         if (a.contains(b) || b.contains(a)) continue;
         const ra = a.getBoundingClientRect();
         const rb = b.getBoundingClientRect();
+        // Barra fixa da loja: cobre parte do conteúdo em qualquer posição de rolagem, e ao rolar até o
+        // fim o rodapé e os controles ficam acima dela (conferido em loja-layout.spec.ts).
+        const fixo = (e: Element) => e.closest("nav[aria-label='Menu da loja']") !== null;
+        if (fixo(a) !== fixo(b)) continue;
         const largura = Math.min(ra.right, rb.right) - Math.max(ra.left, rb.left);
         const altura = Math.min(ra.bottom, rb.bottom) - Math.max(ra.top, rb.top);
         if (largura > 3 && altura > 3) sobrepostos.push(`${nome(a)} x ${nome(b)}`);

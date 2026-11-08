@@ -2,7 +2,15 @@
 
 import { ArrowRight, Link2, Lock, UserRound } from "lucide-react";
 import { useState } from "react";
-import { Button, Campo, CategoryChips, DivisorOu, StyleBadge } from "@/components/ui";
+import {
+  Button,
+  Campo,
+  CategoryChips,
+  DivisorOu,
+  LojaHeader,
+  LojaTabBar,
+  StyleBadge,
+} from "@/components/ui";
 
 const swatches = [
   { name: "fundo", className: "bg-fundo" },
@@ -82,6 +90,12 @@ export function ComponentShowcase() {
       </Section>
       <Section title="Divisor ou">
         <DivisorOu />
+      </Section>
+      <Section title="Cabeçalho e barra inferior da loja">
+        <LojaHeader count={2} className="px-0" />
+        <div className="relative h-16 overflow-hidden rounded-2xl border border-borda">
+          <LojaTabBar className="absolute" />
+        </div>
       </Section>
       <Section title="Badges de estilo">
         <div className="flex flex-wrap gap-2">
