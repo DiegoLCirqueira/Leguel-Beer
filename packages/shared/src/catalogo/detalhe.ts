@@ -7,7 +7,7 @@ export const cervejaDetalheSchema = cervejaCardSchema
   .safeExtend({
     descricao: z.string().min(1).nullable(),
     precoAnteriorCentavos: z.int().nonnegative().nullable(),
-    descontoPercentual: z.int().nullable(),
+    descontoPercentual: z.int().min(1).max(100).nullable(),
   })
   .refine(
     (cerveja) =>
