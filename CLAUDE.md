@@ -80,7 +80,7 @@ Padrão de https://github.com/iuricode/padroes-de-commits (vale para os commits 
   - Os ADRs antigos (001 a 007) ficam no formato em que foram escritos; não precisam ser reescritos.
   - Quem tomou a decisão escreve o rascunho do ADR no mesmo PR; toda entrega de Front, Back e Devops termina com "Candidatos a ADR: ..." ou "Candidatos a ADR: nenhum".
 - Use [[wikilinks]] entre notas; não crie notas fora das pastas existentes (na dúvida, docs/00-inbox/).
-- Ao terminar uma tarefa, registre um resumo na daily note do dia em docs/05-diario/.
+- Daily note (docs/05-diario/, regra de 08/11 contra conflito de merge): PR de código (Front, Back, Devops) não edita a daily; o resumo, as decisões vetáveis e as lições vão na descrição do PR, e o Orchestrator passa para a daily (e as lições para [[licoes-aprendidas]]) no PR de docs dele. Spec e Orchestrator seguem escrevendo na daily nos PRs de docs.
 - Toda spec ou ADR novo é linkado em [[mapa-do-projeto]], e a daily note linka as notas criadas ou alteradas no dia.
 - Lições aprendidas: todo agente lê [[licoes-aprendidas]] (`docs/agents/licoes-aprendidas.md`) no início de cada ordem. Ao errar ou ser corrigido, registra a lição lá (data, quem, o que aconteceu, causa, regra) antes de encerrar a tarefa.
 - Handoff: ao fim de cada ordem, o Orchestrator grava o handoff em `docs/00-inbox/handoff.md` (sobrescrito a cada ordem), não no diretório temporário do sistema. A próxima conversa começa lendo o handoff, a daily note mais recente e [[licoes-aprendidas]]. O handoff entra no git junto com a daily note, no PR da ordem.
