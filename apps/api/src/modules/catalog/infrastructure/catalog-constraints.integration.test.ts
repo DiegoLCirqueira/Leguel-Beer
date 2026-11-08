@@ -62,4 +62,16 @@ describe("regras do schema do catálogo (banco real)", () => {
       prisma.beer.create({ data: beer(categoryId, { slug: "b", stock: -1 }) }),
     ).rejects.toThrow();
   });
+
+  it("recusa teor negativo, IBU negativo e volume zero direto no banco", async () => {
+    await expect(
+      prisma.beer.create({ data: beer(categoryId, { slug: "c", abv: -0.1 }) }),
+    ).rejects.toThrow();
+    await expect(
+      prisma.beer.create({ data: beer(categoryId, { slug: "d", ibu: -1 }) }),
+    ).rejects.toThrow();
+    await expect(
+      prisma.beer.create({ data: beer(categoryId, { slug: "e", volumeMl: 0 }) }),
+    ).rejects.toThrow();
+  });
 });
