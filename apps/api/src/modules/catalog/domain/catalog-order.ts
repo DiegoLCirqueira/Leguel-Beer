@@ -9,7 +9,9 @@ function byRelevance(a: Beer, b: Beer): number {
   return a.category.order - b.category.order || byName(a, b);
 }
 
+const byNewest = (a: Beer, b: Beer) => b.createdAt.getTime() - a.createdAt.getTime();
+
 export function sortBeers(beers: readonly Beer[], order: CatalogOrder): Beer[] {
-  void order;
-  return [...beers].sort(byRelevance);
+  const compare = order === "mais-novas" ? byNewest : byRelevance;
+  return [...beers].sort(compare);
 }
