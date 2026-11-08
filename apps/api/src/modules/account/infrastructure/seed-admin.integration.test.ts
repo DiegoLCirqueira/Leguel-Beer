@@ -13,6 +13,7 @@ describe("seedAdmin (banco real)", () => {
     ADMIN_SEED_PASSWORD: "senha-de-teste-123456",
     SUPABASE_URL: "http://127.0.0.1:54321",
     SUPABASE_SERVICE_ROLE_KEY: "chave-de-teste",
+    DATABASE_URL: "postgresql://postgres:postgres@127.0.0.1:54322/leguele_test",
   };
 
   afterAll(async () => {
@@ -61,6 +62,17 @@ describe("seedAdmin (banco real)", () => {
     );
 
     await expect(attempt).rejects.toThrow(/DATABASE_URL.*local/);
+    expect(auth.users).toHaveLength(0);
+  });
+
+  it("recusa rodar sem DATABASE_URL: sem saber o banco, não cria nada", async () => {
+    const auth = new InMemoryAuthAdmin();
+    const attempt = seedAdmin(
+      { ...env, DATABASE_URL: undefined },
+      { auth, profiles: new PrismaProfileRepository(prisma) },
+    );
+
+    await expect(attempt).rejects.toThrow(/DATABASE_URL/);
     expect(auth.users).toHaveLength(0);
   });
 });

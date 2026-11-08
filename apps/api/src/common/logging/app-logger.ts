@@ -23,10 +23,10 @@ export class AppLogger implements LoggerService {
   }
 
   warn(message: unknown, context?: string): void {
-    this.info(String(message), context ? { context } : {});
+    this.write("warn", String(message), context ? { context } : {});
   }
 
-  private write(level: "info" | "error", message: string, context: LogContext): void {
+  private write(level: "info" | "warn" | "error", message: string, context: LogContext): void {
     const line = JSON.stringify({ level, time: new Date().toISOString(), message, ...context });
     (level === "error" ? process.stderr : process.stdout).write(`${line}\n`);
   }

@@ -43,7 +43,12 @@ export async function seedAdmin(
   if (!isLocal(env.SUPABASE_URL as string)) {
     throw new Error("O seed do admin só roda contra o Supabase local: SUPABASE_URL não é local");
   }
-  if (env.DATABASE_URL && !isLocal(env.DATABASE_URL)) {
+  if (!env.DATABASE_URL) {
+    throw new Error(
+      "O seed do admin exige DATABASE_URL: sem ela não dá para saber que o banco é local",
+    );
+  }
+  if (!isLocal(env.DATABASE_URL)) {
     throw new Error("O seed do admin só roda contra o banco local: DATABASE_URL não é local");
   }
   const email = env.ADMIN_EMAIL as string;
