@@ -66,4 +66,19 @@ describe("ListBeers", () => {
 
     expect(names(result.items).sort()).toEqual(["4,5", "5,9"]);
   });
+
+  it("traduz as faixas de IBU e de preÃ§o da query", async () => {
+    const repository = new InMemoryBeerRepository([
+      makeBeer({ name: "A", ibu: 20, priceCents: 2500 }),
+      makeBeer({ name: "B", ibu: 40, priceCents: 2500 }),
+      makeBeer({ name: "C", ibu: 20, priceCents: 3000 }),
+      makeBeer({ name: "D", ibu: 19, priceCents: 2499 }),
+    ]);
+
+    const porIbu = await new ListBeers(repository).execute(query({ ibu: "20-a-40" }));
+    const porPreco = await new ListBeers(repository).execute(query({ preco: "25-a-30" }));
+
+    expect(names(porIbu.items).sort()).toEqual(["A", "C"]);
+    expect(names(porPreco.items).sort()).toEqual(["A", "B"]);
+  });
 });
