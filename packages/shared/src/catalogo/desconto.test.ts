@@ -20,4 +20,8 @@ describe("calcularDesconto", () => {
     expect(calcularDesconto(null, 3200)).toBeNull();
     expect(calcularDesconto(undefined, 3200)).toBeNull();
   });
+
+  it("desconto que arredonda para 0% não é desconto: R$ 32,01 para R$ 32,00 não mostra selo", () => {
+    expect(calcularDesconto(3201, 3200)).toBeNull();
+  });
 });
