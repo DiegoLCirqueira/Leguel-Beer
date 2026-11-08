@@ -50,10 +50,13 @@ export function BottomSheet({ aberto, aoFechar, titulo, children, rodape }: Bott
       const primeiro = itens[0];
       const ultimo = itens[itens.length - 1];
       if (!primeiro || !ultimo) return;
-      if (evento.shiftKey && document.activeElement === primeiro) {
+      // Foco no painel, no título ou fora dos itens: o Tab entra pelo primeiro ou pelo último item.
+      const atual = document.activeElement as HTMLElement | null;
+      const emUmItem = atual !== null && itens.includes(atual);
+      if (evento.shiftKey && (!emUmItem || atual === primeiro)) {
         evento.preventDefault();
         ultimo.focus();
-      } else if (!evento.shiftKey && document.activeElement === ultimo) {
+      } else if (!evento.shiftKey && (!emUmItem || atual === ultimo)) {
         evento.preventDefault();
         primeiro.focus();
       }
