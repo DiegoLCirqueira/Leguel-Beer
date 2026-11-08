@@ -30,9 +30,16 @@ const TOUCH_AREA =
 const CONTROL_BASE =
   "absolute flex items-center justify-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaria";
 
-// Recuo do texto da ação: o do Figma, mas nunca tanto que o rótulo (ícone, vão e texto, ~104 px)
-// deixe de caber na caixa quando o palco fica estreito (zoom alto).
-const padStart = (px: number) => `min(${cq(px)}, calc(${cq(CONTROLS.enter.w)} - 104px))`;
+// Recuo do texto da ação (o do Figma) como espaçador que encolhe até zero: o rótulo (ícone, vão e
+// texto) nunca quebra nem sai da caixa, qualquer que seja a largura da fonte no sistema.
+function ActionIndent({ px, gap }: { px: number; gap: number }) {
+  return (
+    <span
+      aria-hidden="true"
+      style={{ flex: `0 1 ${cq(px)}`, minWidth: 0, marginRight: `calc(-1 * ${cq(gap)})` }}
+    />
+  );
+}
 
 const OR_ROW_WIDTH = OR_ROW.right.x + OR_ROW.right.w - OR_ROW.left.x;
 const pctOfOrRow = (part: number) => `${((part / OR_ROW_WIDTH) * 100).toFixed(3)}%`;
@@ -79,18 +86,19 @@ export function WelcomeActions() {
           ...rectStyle(CONTROLS.enter),
           fontSize: fl(14, 26.1),
           gap: cq(21.7),
-          paddingLeft: padStart(256.3),
         }}
         className={cn(
           CONTROL_BASE,
           TOUCH_AREA,
-          "justify-start bg-primaria font-bold text-texto-na-primaria hover:brightness-105",
+          "justify-start whitespace-nowrap bg-primaria font-bold text-texto-na-primaria hover:brightness-105",
         )}
       >
+        <ActionIndent px={256.3} gap={21.7} />
         <UserRound
           aria-hidden="true"
           strokeWidth={1.6}
           style={{ width: fl(20, 52), height: fl(20, 52) }}
+          className="shrink-0"
         />
         Entrar
         <ArrowRight
@@ -106,20 +114,20 @@ export function WelcomeActions() {
           ...rectStyle(CONTROLS.signUp),
           fontSize: fl(14, 24.1),
           gap: cq(23.1),
-          paddingLeft: padStart(233.4),
           borderWidth: cq(2.5),
         }}
         className={cn(
           CONTROL_BASE,
           TOUCH_AREA,
-          "justify-start border-primaria font-bold text-texto hover:bg-primaria/10",
+          "justify-start whitespace-nowrap border-primaria font-bold text-texto hover:bg-primaria/10",
         )}
       >
+        <ActionIndent px={233.4} gap={23.1} />
         <UserPlus
           aria-hidden="true"
           strokeWidth={1.6}
           style={{ width: fl(20, 49), height: fl(20, 49) }}
-          className="text-primaria"
+          className="shrink-0 text-primaria"
         />
         Criar conta
       </Link>
