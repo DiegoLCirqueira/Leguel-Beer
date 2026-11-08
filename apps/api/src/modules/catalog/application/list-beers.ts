@@ -49,7 +49,7 @@ export class ListBeers {
       priceCents: rangeOf(faixasDeFiltro.preco, query.preco),
       onlyAvailable: query.disponiveis,
     });
-    const items = sortBeers(filtered, "relevancia");
+    const items = sortBeers(filtered, query.ordem);
     return { items, total: items.length, categories };
   }
 }
