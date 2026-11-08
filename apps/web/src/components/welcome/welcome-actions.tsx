@@ -45,6 +45,10 @@ export function WelcomeActions() {
       if (hintRef.current?.contains(target) || infoRef.current?.contains(target)) return;
       setShowHint(false);
     }
+    // Em telas baixas a dica abre abaixo da linha, fora da tela: rola até ela para a pessoa ver.
+    if (window.matchMedia("(max-height: 599px)").matches) {
+      hintRef.current?.scrollIntoView({ block: "nearest" });
+    }
     const autoClose = setTimeout(() => setShowHint(false), HINT_DURATION_MS);
     document.addEventListener("keydown", closeOnEscape);
     document.addEventListener("pointerdown", closeOnOutsidePress);
