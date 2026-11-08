@@ -22,3 +22,20 @@ describe("faixasDeFiltro.teor", () => {
     expect(idsDasFaixasDe(faixasDeFiltro.teor, 9)).toEqual(["6-ou-mais"]);
   });
 });
+
+describe("faixasDeFiltro.ibu", () => {
+  it("tem as 3 faixas da spec, com id e rótulo", () => {
+    expect(faixasDeFiltro.ibu.map(({ id, rotulo }) => [id, rotulo])).toEqual([
+      ["abaixo-de-20", "Abaixo de 20"],
+      ["20-a-40", "20 a menos de 40"],
+      ["40-ou-mais", "40 ou mais"],
+    ]);
+  });
+
+  it("inclui o limite inferior e exclui o superior: 20 e 40 caem na faixa que começa neles", () => {
+    expect(idsDasFaixasDe(faixasDeFiltro.ibu, 19)).toEqual(["abaixo-de-20"]);
+    expect(idsDasFaixasDe(faixasDeFiltro.ibu, 20)).toEqual(["20-a-40"]);
+    expect(idsDasFaixasDe(faixasDeFiltro.ibu, 39)).toEqual(["20-a-40"]);
+    expect(idsDasFaixasDe(faixasDeFiltro.ibu, 40)).toEqual(["40-ou-mais"]);
+  });
+});
