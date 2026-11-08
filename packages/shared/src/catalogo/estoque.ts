@@ -2,5 +2,5 @@
 export const LIMIAR_ESTOQUE_BAIXO = 5;
 
 export function estoqueBaixo(quantidadeDisponivel: number): boolean {
-  return quantidadeDisponivel <= LIMIAR_ESTOQUE_BAIXO;
+  return quantidadeDisponivel >= 1 && quantidadeDisponivel <= LIMIAR_ESTOQUE_BAIXO;
 }
