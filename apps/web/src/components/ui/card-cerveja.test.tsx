@@ -67,4 +67,25 @@ describe("CardCerveja", () => {
     expect(botao).toBeEnabled();
     expect(aoAdicionar).toHaveBeenCalledOnce();
   });
+
+  it("esgotada mostra o selo Esgotado e o Adicionar desabilitado, mesmo com ação de adicionar", () => {
+    const aoAdicionar = vi.fn();
+    render(
+      <CardCerveja
+        cerveja={cerveja({ esgotada: true, quantidadeDisponivel: 0 })}
+        aoAdicionar={aoAdicionar}
+      />,
+    );
+
+    expect(screen.getByText("Esgotado")).toBeInTheDocument();
+    const botao = screen.getByRole("button", { name: "Adicionar" });
+    expect(botao).toBeDisabled();
+    expect(botao).toHaveAccessibleDescription("Cerveja esgotada.");
+  });
+
+  it("disponível não mostra o selo Esgotado", () => {
+    render(<CardCerveja cerveja={cerveja()} aoAdicionar={vi.fn()} />);
+
+    expect(screen.queryByText("Esgotado")).not.toBeInTheDocument();
+  });
 });
