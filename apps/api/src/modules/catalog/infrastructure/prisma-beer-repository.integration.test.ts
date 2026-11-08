@@ -50,4 +50,25 @@ describe("PrismaBeerRepository (banco real)", () => {
       },
     ]);
   });
+
+  it("tem um teto de segurança de 200 cervejas por leitura (o catálogo do MVP tem 16)", async () => {
+    const ipa = await prisma.category.create({ data: { slug: "ipa", name: "IPAs", order: 1 } });
+    await prisma.beer.createMany({
+      data: Array.from({ length: 201 }, (_, index) => ({
+        slug: `cerveja-${String(index).padStart(3, "0")}`,
+        name: `Cerveja ${index}`,
+        style: "American IPA",
+        categoryId: ipa.id,
+        abv: 5,
+        ibu: 30,
+        volumeMl: 500,
+        priceCents: 2800,
+        stock: 1,
+      })),
+    });
+
+    const beers = await repository.findActive();
+
+    expect(beers).toHaveLength(200);
+  });
 });
