@@ -7,6 +7,7 @@ import { AllExceptionsFilter } from "./common/http/all-exceptions.filter.js";
 import { requestIdMiddleware } from "./common/http/request-id.middleware.js";
 import { ZodValidationPipe } from "./common/validation/zod-validation.pipe.js";
 import { AccountModule } from "./modules/account/account.module.js";
+import { CatalogModule } from "./modules/catalog/catalog.module.js";
 import { HealthModule } from "./modules/health/health.module.js";
 
 @Module({
@@ -14,6 +15,7 @@ import { HealthModule } from "./modules/health/health.module.js";
     CommonModule,
     PrismaModule,
     AccountModule,
+    CatalogModule,
     HealthModule,
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
   ],
