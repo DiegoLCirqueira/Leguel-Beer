@@ -22,4 +22,15 @@ describe("cervejaCardSchema", () => {
   it("aceita o card completo, com a categoria aninhada e a imagem nula", () => {
     expect(cervejaCardSchema.parse(cervejaValida)).toEqual(cervejaValida);
   });
+
+  it("recusa preço fracionado, quantidade negativa e IBU ou volume fracionados", () => {
+    const recusa = (campos: object) =>
+      cervejaCardSchema.safeParse({ ...cervejaValida, ...campos }).success;
+
+    expect(recusa({ precoCentavos: 32.5 })).toBe(false);
+    expect(recusa({ precoCentavos: -1 })).toBe(false);
+    expect(recusa({ quantidadeDisponivel: -1 })).toBe(false);
+    expect(recusa({ ibu: 55.5 })).toBe(false);
+    expect(recusa({ volumeMl: 500.5 })).toBe(false);
+  });
 });
