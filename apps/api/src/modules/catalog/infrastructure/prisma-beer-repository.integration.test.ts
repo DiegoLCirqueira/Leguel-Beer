@@ -5,7 +5,7 @@ import { PrismaBeerRepository } from "./prisma-beer-repository.js";
 
 describe("PrismaBeerRepository (banco real)", () => {
   const prisma = new PrismaService();
-  const repository = new PrismaBeerRepository(prisma);
+  const repository = new PrismaBeerRepository(prisma, { warn: () => undefined });
 
   beforeEach(() => resetDatabase(prisma));
   afterAll(() => prisma.onModuleDestroy());
