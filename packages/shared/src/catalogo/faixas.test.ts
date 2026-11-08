@@ -39,3 +39,20 @@ describe("faixasDeFiltro.ibu", () => {
     expect(idsDasFaixasDe(faixasDeFiltro.ibu, 40)).toEqual(["40-ou-mais"]);
   });
 });
+
+describe("faixasDeFiltro.preco", () => {
+  it("tem as 3 faixas da spec, com id e rótulo", () => {
+    expect(faixasDeFiltro.preco.map(({ id, rotulo }) => [id, rotulo])).toEqual([
+      ["abaixo-de-25", "Abaixo de R$ 25"],
+      ["25-a-30", "R$ 25 a menos de R$ 30"],
+      ["30-ou-mais", "R$ 30 ou mais"],
+    ]);
+  });
+
+  it("compara em centavos: R$ 25 e R$ 30 caem na faixa que começa neles", () => {
+    expect(idsDasFaixasDe(faixasDeFiltro.preco, 2499)).toEqual(["abaixo-de-25"]);
+    expect(idsDasFaixasDe(faixasDeFiltro.preco, 2500)).toEqual(["25-a-30"]);
+    expect(idsDasFaixasDe(faixasDeFiltro.preco, 2999)).toEqual(["25-a-30"]);
+    expect(idsDasFaixasDe(faixasDeFiltro.preco, 3000)).toEqual(["30-ou-mais"]);
+  });
+});
