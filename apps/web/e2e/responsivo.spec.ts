@@ -65,6 +65,7 @@ const PAGINAS: Pagina[] = [
     precisaMaioridade: true,
   },
   { nome: "criar conta", caminho: "/criar-conta", precisaMaioridade: true },
+  { nome: "catálogo", caminho: "/catalogo", precisaMaioridade: true },
   { nome: "recuperar senha", caminho: "/recuperar-senha", precisaMaioridade: true },
   {
     nome: "nova senha",
@@ -187,7 +188,11 @@ function cobrir(formatos: Formato[], rotulo: string, { vertical }: { vertical: b
   }
 }
 
+// 390x844 com zoom de 200%: a área CSS vira 195x422 (WCAG 1.4.10, reflow).
+const ZOOM_200: Formato[] = [{ w: 195, h: 422 }];
+
 cobrir(EM_PE, "celular em pé", { vertical: true });
+cobrir(ZOOM_200, "zoom de 200%", { vertical: false });
 cobrir(DEITADO, "celular deitado", { vertical: false });
 cobrir(TABLET_E_DESKTOP, "tablet e desktop: não pode quebrar", { vertical: false });
 
