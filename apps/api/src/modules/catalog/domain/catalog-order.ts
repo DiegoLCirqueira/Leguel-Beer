@@ -1,4 +1,4 @@
-import type { Beer } from "./beer.js";
+import { isSoldOut, type Beer } from "./beer.js";
 
 export type CatalogOrder = "relevancia" | "menor-preco" | "maior-preco" | "mais-novas";
 
@@ -8,6 +8,9 @@ function byRelevance(a: Beer, b: Beer): number {
   if (a.featured !== b.featured) return a.featured ? -1 : 1;
   return a.category.order - b.category.order || byName(a, b);
 }
+
+/** Dois grupos: com quantidade disponível primeiro, esgotadas depois. */
+const bySoldOutLast = (a: Beer, b: Beer) => Number(isSoldOut(a)) - Number(isSoldOut(b));
 
 const byCheapest = (a: Beer, b: Beer) => a.priceCents - b.priceCents;
 
@@ -22,5 +25,5 @@ const PRIMARY: Record<CatalogOrder, (a: Beer, b: Beer) => number> = {
 
 export function sortBeers(beers: readonly Beer[], order: CatalogOrder): Beer[] {
   const primary = PRIMARY[order];
-  return [...beers].sort((a, b) => primary(a, b) || byRelevance(a, b));
+  return [...beers].sort((a, b) => bySoldOutLast(a, b) || primary(a, b) || byRelevance(a, b));
 }
