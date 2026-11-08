@@ -64,4 +64,13 @@ describe("cervejaDetalheSchema", () => {
     expect(comDesconto({ precoAnteriorCentavos: 3200, descontoPercentual: 13 })).toBe(false);
     expect(comDesconto({ precoAnteriorCentavos: null, descontoPercentual: 13 })).toBe(false);
   });
+
+  it("mantém a regra do card: esgotada só com quantidade disponível 0", () => {
+    const recusa = (campos: object) =>
+      cervejaDetalheSchema.safeParse({ ...detalheValido, ...campos }).success;
+
+    expect(recusa({ quantidadeDisponivel: 0, esgotada: true })).toBe(true);
+    expect(recusa({ quantidadeDisponivel: 0, esgotada: false })).toBe(false);
+    expect(recusa({ quantidadeDisponivel: 3, esgotada: true })).toBe(false);
+  });
 });
