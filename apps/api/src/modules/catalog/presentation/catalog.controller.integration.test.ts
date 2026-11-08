@@ -176,4 +176,32 @@ describe("GET /catalogo (banco real)", () => {
       "disponivel-cara",
     ]);
   });
+
+  it("parâmetro repetido na URL é inválido e ignorado: ?categoria=ipa&categoria=frutas não filtra", async () => {
+    await addBeer("ipa", "ipa-a");
+    await addBeer("frutas", "frutas-b");
+    await addBeer("lager", "lager-c");
+
+    const response = await get("?categoria=ipa&categoria=frutas");
+
+    expect(response.status).toBe(200);
+    expect(response.body.itens.map((item: { slug: string }) => item.slug)).toEqual([
+      "ipa-a",
+      "frutas-b",
+      "lager-c",
+    ]);
+  });
+
+  it("disponiveis=TRUE (fora de true ou false em minúsculas) é inválido e não esconde as esgotadas", async () => {
+    await addBeer("ipa", "disponivel");
+    await addBeer("ipa", "esgotada", { stock: 0 });
+
+    const response = await get("?disponiveis=TRUE");
+
+    expect(response.status).toBe(200);
+    expect(response.body.itens.map((item: { slug: string }) => item.slug)).toEqual([
+      "disponivel",
+      "esgotada",
+    ]);
+  });
 });
