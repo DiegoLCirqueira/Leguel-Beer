@@ -6,7 +6,7 @@ vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 import LojaLayout from "./layout";
 
 describe("layout da loja", () => {
-  it("põe o cabeçalho, o conteúdo, o rodapé e a barra inferior na mesma tela", () => {
+  it("põe o cabeçalho, o conteúdo e a barra inferior na mesma tela, sem rodapé", () => {
     render(
       <LojaLayout>
         <main>Conteúdo da página</main>
@@ -15,7 +15,7 @@ describe("layout da loja", () => {
 
     expect(screen.getByRole("link", { name: "Geladeira, 0 itens" })).toBeInTheDocument();
     expect(screen.getByRole("main")).toHaveTextContent("Conteúdo da página");
-    expect(screen.getByRole("contentinfo")).toBeInTheDocument();
+    expect(screen.queryByRole("contentinfo")).not.toBeInTheDocument();
     expect(screen.getByRole("navigation", { name: "Menu da loja" })).toBeInTheDocument();
   });
 
