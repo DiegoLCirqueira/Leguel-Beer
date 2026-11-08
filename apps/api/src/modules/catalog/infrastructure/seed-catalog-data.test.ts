@@ -31,4 +31,20 @@ describe("dados do seed do catálogo", () => {
     expect(beers.filter((beer) => beer.featured).length).toBeGreaterThan(6);
     expect(beers.filter((beer) => beer.stock === 0)).toHaveLength(1);
   });
+
+  it("usa as 9 cervejas do design nas categorias do estilo e completa com 7 de teste", () => {
+    const doDesign = SEED_CATEGORIES.map((category) => [
+      category.slug,
+      category.beers.filter((beer) => !beer.name.startsWith("Teste ")).map((beer) => beer.name),
+    ]);
+
+    expect(doDesign).toEqual([
+      ["ipa", ["Maré Alta", "Leguelé IPA", "Leguelé Carnaval"]],
+      ["frutas", ["Cupuaçu Ale", "Cajupá"]],
+      ["malt", ["Avermelhou"]],
+      ["lager", ["Cream Ale", "Kölsch", "Leguelé Comendador"]],
+    ]);
+    expect(beers.filter((beer) => beer.name.startsWith("Teste "))).toHaveLength(7);
+    expect(beers.filter((beer) => beer.featured)).toHaveLength(8);
+  });
 });
