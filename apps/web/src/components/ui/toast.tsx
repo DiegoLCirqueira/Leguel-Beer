@@ -62,7 +62,7 @@ export function Toast({ mensagem, acao, aoFechar, duracaoMs = 5000, className }:
       onFocus={() => setComFoco(true)}
       onBlur={() => setComFoco(false)}
       className={cn(
-        "fixed inset-x-4 bottom-[calc(57px+env(safe-area-inset-bottom,0px)+0.75rem)] z-40 mx-auto flex max-w-md items-center gap-3 rounded-2xl border-2 border-primaria bg-fundo px-4 py-3 text-texto shadow-lg",
+        "fixed inset-x-4 bottom-[calc(var(--altura-barra-loja,0px)+env(safe-area-inset-bottom,0px)+0.75rem)] z-40 mx-auto flex max-w-md items-center gap-3 rounded-2xl border-2 border-primaria bg-fundo px-4 py-3 text-texto shadow-lg",
         className,
       )}
     >
