@@ -42,4 +42,16 @@ describe("filterBeers", () => {
 
     expect(names(resultado)).toEqual(["20"]);
   });
+
+  it("filtra por faixa de preÃ§o em centavos: o limite inferior entra e o superior nÃ£o", () => {
+    const barata = makeBeer({ name: "24,99", priceCents: 2499 });
+    const noLimiteInferior = makeBeer({ name: "25", priceCents: 2500 });
+    const noLimiteSuperior = makeBeer({ name: "30", priceCents: 3000 });
+
+    const resultado = filterBeers([barata, noLimiteInferior, noLimiteSuperior], {
+      priceCents: { min: 2500, max: 3000 },
+    });
+
+    expect(names(resultado)).toEqual(["25"]);
+  });
 });
