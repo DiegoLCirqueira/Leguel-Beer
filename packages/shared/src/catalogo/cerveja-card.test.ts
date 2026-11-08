@@ -49,4 +49,22 @@ describe("cervejaCardSchema", () => {
     );
     expect(cervejaCardSchema.safeParse({ ...cervejaValida, teorAlcoolico: 0 }).success).toBe(true);
   });
+
+  it("aceita imagemUrl como texto", () => {
+    const imagemUrl = "/imagens/ipa-aratu.png";
+
+    expect(cervejaCardSchema.parse({ ...cervejaValida, imagemUrl }).imagemUrl).toBe(imagemUrl);
+  });
+
+  it("recusa cadastradaEm que não é data ISO", () => {
+    expect(
+      cervejaCardSchema.safeParse({ ...cervejaValida, cadastradaEm: "02/10/2026" }).success,
+    ).toBe(false);
+  });
+
+  it("recusa ordem da categoria fracionada", () => {
+    const categoria = { ...cervejaValida.categoria, ordem: 1.5 };
+
+    expect(cervejaCardSchema.safeParse({ ...cervejaValida, categoria }).success).toBe(false);
+  });
 });

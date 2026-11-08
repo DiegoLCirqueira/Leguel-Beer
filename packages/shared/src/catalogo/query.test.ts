@@ -44,4 +44,10 @@ describe("catalogoQuerySchema", () => {
     expect(catalogoQuerySchema.parse({ disponiveis: "TRUE" }).disponiveis).toBe(false);
     expect(catalogoQuerySchema.parse({ disponiveis: "1" }).disponiveis).toBe(false);
   });
+
+  it("aceita categoria com hífen no slug", () => {
+    expect(catalogoQuerySchema.parse({ categoria: "malt-especial" }).categoria).toBe(
+      "malt-especial",
+    );
+  });
 });
