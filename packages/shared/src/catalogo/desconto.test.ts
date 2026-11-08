@@ -10,4 +10,9 @@ describe("calcularDesconto", () => {
     expect(calcularDesconto(1000, 835)).toBe(17);
     expect(calcularDesconto(1000, 836)).toBe(16);
   });
+
+  it("preço anterior igual ou menor que o atual não é desconto", () => {
+    expect(calcularDesconto(3200, 3200)).toBeNull();
+    expect(calcularDesconto(2900, 3200)).toBeNull();
+  });
 });
