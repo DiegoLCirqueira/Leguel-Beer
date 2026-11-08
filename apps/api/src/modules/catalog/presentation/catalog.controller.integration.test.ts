@@ -1,4 +1,8 @@
-import { catalogoResponseSchema, destaquesResponseSchema } from "@leguele/shared";
+import {
+  catalogoResponseSchema,
+  cervejaDetalheSchema,
+  destaquesResponseSchema,
+} from "@leguele/shared";
 import type { INestApplication } from "@nestjs/common";
 import { APP_FILTER, APP_PIPE } from "@nestjs/core";
 import { Test } from "@nestjs/testing";
@@ -72,6 +76,7 @@ describe("GET /catalogo (banco real)", () => {
 
   const get = (query = "") => request(app.getHttpServer()).get(`/catalogo${query}`);
   const getDestaques = () => request(app.getHttpServer()).get("/catalogo/destaques");
+  const getDetalhe = (slug: string) => request(app.getHttpServer()).get(`/catalogo/${slug}`);
 
   it("é público: sem token devolve as cervejas ativas no contrato, com a categoria e o contador", async () => {
     await addBeer("ipa", "ipa-aratu", {
@@ -249,5 +254,35 @@ describe("GET /catalogo (banco real)", () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ itens: [] });
+  });
+
+  it("GET /catalogo/:slug é público e devolve o detalhe da Maré Alta com 13% de desconto", async () => {
+    await addBeer("ipa", "mare-alta", {
+      name: "Maré Alta",
+      abv: 6.5,
+      ibu: 65,
+      priceCents: 3200,
+      previousPriceCents: 3690,
+      description: "Uma IPA cítrica e resinosa.",
+      stock: 12,
+    });
+
+    const response = await getDetalhe("mare-alta");
+
+    expect(response.status).toBe(200);
+    expect(cervejaDetalheSchema.parse(response.body)).toMatchObject({
+      slug: "mare-alta",
+      nome: "Maré Alta",
+      categoria: { slug: "ipa", nome: "IPAs", ordem: 1 },
+      teorAlcoolico: 6.5,
+      ibu: 65,
+      volumeMl: 500,
+      precoCentavos: 3200,
+      descricao: "Uma IPA cítrica e resinosa.",
+      precoAnteriorCentavos: 3690,
+      descontoPercentual: 13,
+      quantidadeDisponivel: 12,
+      esgotada: false,
+    });
   });
 });
