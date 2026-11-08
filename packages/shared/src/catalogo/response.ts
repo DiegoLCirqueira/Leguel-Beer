@@ -5,7 +5,7 @@ export const categoriaComContadorSchema = z.object({
   slug: z.string(),
   nome: z.string(),
   ordem: z.int(),
-  quantidade: z.int().nonnegative(),
+  quantidade: z.int().positive(),
 });
 
 export const catalogoResponseSchema = z.object({
