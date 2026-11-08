@@ -29,4 +29,12 @@ describe("seedCatalog (banco real)", () => {
     ]);
     expect(await prisma.beer.count()).toBe(16);
   });
+
+  it("pode rodar de novo sem duplicar nem falhar", async () => {
+    await seedCatalog(prisma);
+    await expect(seedCatalog(prisma)).resolves.toBeUndefined();
+
+    expect(await prisma.category.count()).toBe(4);
+    expect(await prisma.beer.count()).toBe(16);
+  });
 });
