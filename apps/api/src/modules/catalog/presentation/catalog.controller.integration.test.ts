@@ -115,4 +115,65 @@ describe("GET /catalogo (banco real)", () => {
       { slug: "lager", nome: "Lager", ordem: 4, quantidade: 1 },
     ]);
   });
+
+  it("combina categoria, faixa de IBU e menor preÃ§o pela URL e conta o resultado", async () => {
+    await addBeer("ipa", "a-ipa-cara", { ibu: 35, priceCents: 3300 });
+    await addBeer("ipa", "ipa-barata", { ibu: 25, priceCents: 2700 });
+    await addBeer("ipa", "ipa-amarga", { ibu: 60, priceCents: 2000 });
+    await addBeer("lager", "lager-na-faixa", { ibu: 30, priceCents: 1900 });
+
+    const response = await get("?categoria=ipa&ibu=20-a-40&ordem=menor-preco");
+
+    const body = catalogoResponseSchema.parse(response.body);
+    expect(body.itens.map((item) => item.slug)).toEqual(["ipa-barata", "a-ipa-cara"]);
+    expect(body.total).toBe(2);
+    expect(body.categorias.map((c) => [c.slug, c.quantidade])).toEqual([
+      ["ipa", 3],
+      ["lager", 1],
+    ]);
+  });
+
+  it("nunca mostra cerveja inativa, nem filtrando pela categoria dela, e nÃ£o a conta", async () => {
+    await addBeer("ipa", "ipa-ativa");
+    await addBeer("ipa", "ipa-inativa", { active: false });
+    await addBeer("frutas", "frutas-inativa", { active: false });
+
+    const todas = catalogoResponseSchema.parse((await get()).body);
+    const frutas = catalogoResponseSchema.parse((await get("?categoria=frutas")).body);
+
+    expect(todas.itens.map((item) => item.slug)).toEqual(["ipa-ativa"]);
+    expect(todas.categorias).toEqual([{ slug: "ipa", nome: "IPAs", ordem: 1, quantidade: 1 }]);
+    expect(frutas.itens.map((item) => item.slug)).toEqual(["ipa-ativa"]);
+  });
+
+  it("ignora parÃ¢metro invÃ¡lido em vez de rejeitar: abre o catÃ¡logo sem aquele filtro", async () => {
+    await addBeer("ipa", "ipa-a");
+    await addBeer("lager", "lager-b");
+
+    const response = await get(
+      "?categoria=stout&teor=faixa-que-nao-existe&ordem=mais-vendidos&disponiveis=talvez",
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.itens.map((item: { slug: string }) => item.slug)).toEqual([
+      "ipa-a",
+      "lager-b",
+    ]);
+  });
+
+  it("esgotadas vÃ£o para o fim e 'sÃ³ disponÃ­veis' as esconde", async () => {
+    await addBeer("ipa", "esgotada-barata", { priceCents: 1000, stock: 0 });
+    await addBeer("ipa", "disponivel-cara", { priceCents: 4000 });
+
+    const todas = await get("?ordem=menor-preco");
+    const soDisponiveis = await get("?disponiveis=true");
+
+    expect(todas.body.itens.map((item: { slug: string }) => item.slug)).toEqual([
+      "disponivel-cara",
+      "esgotada-barata",
+    ]);
+    expect(soDisponiveis.body.itens.map((item: { slug: string }) => item.slug)).toEqual([
+      "disponivel-cara",
+    ]);
+  });
 });
