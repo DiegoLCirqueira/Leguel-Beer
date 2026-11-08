@@ -1,3 +1,4 @@
+import userEvent from "@testing-library/user-event";
 import { render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -39,6 +40,18 @@ describe("/dev/tokens", () => {
       "aria-current",
       "page",
     );
+  });
+
+  it("mostra o card de cerveja (disponível e esgotado) e o stepper, para conferir", async () => {
+    render(<DevTokens />);
+
+    expect(screen.getAllByRole("heading", { level: 3, name: "Maré Alta IPA" })).toHaveLength(1);
+    expect(screen.getByText("Esgotado")).toBeInTheDocument();
+    const grupo = screen.getByRole("group", { name: "Quantidade de exemplo" });
+    expect(grupo).toHaveTextContent("1");
+    await userEvent.click(screen.getByRole("button", { name: "Aumentar quantidade" }));
+
+    expect(grupo).toHaveTextContent("2");
   });
 
   it("em produção não existe", () => {
