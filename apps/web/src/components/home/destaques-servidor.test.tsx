@@ -38,6 +38,29 @@ describe("DestaquesServidor", () => {
     ).toBeInTheDocument();
   });
 
+  it("se a API falha registra um aviso no log do servidor, sem dado de cliente", async () => {
+    buscar.mockResolvedValue({ ok: false });
+    const aviso = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+
+    render(await DestaquesServidor());
+
+    expect(aviso).toHaveBeenCalledOnce();
+    expect(aviso).toHaveBeenCalledWith(
+      "[destaques] não foi possível buscar os destaques da home; a seção foi omitida",
+    );
+    aviso.mockRestore();
+  });
+
+  it("se a API responde não registra aviso", async () => {
+    buscar.mockResolvedValue({ ok: true, itens: [cerveja] });
+    const aviso = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+
+    render(await DestaquesServidor());
+
+    expect(aviso).not.toHaveBeenCalled();
+    aviso.mockRestore();
+  });
+
   it("se a API falha não mostra nada e não quebra a home", async () => {
     buscar.mockResolvedValue({ ok: false });
 
