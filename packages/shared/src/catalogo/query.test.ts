@@ -38,4 +38,10 @@ describe("catalogoQuerySchema", () => {
 
     expect(resultado.data).toEqual({ preco: "25-a-30", disponiveis: false, ordem: "relevancia" });
   });
+
+  it("trata disponiveis diferente de true ou false, como TRUE, como inválido", () => {
+    expect(catalogoQuerySchema.parse({ disponiveis: "true" }).disponiveis).toBe(true);
+    expect(catalogoQuerySchema.parse({ disponiveis: "TRUE" }).disponiveis).toBe(false);
+    expect(catalogoQuerySchema.parse({ disponiveis: "1" }).disponiveis).toBe(false);
+  });
 });
