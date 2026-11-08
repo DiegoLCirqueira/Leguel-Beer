@@ -104,4 +104,21 @@ describe("BottomSheet", () => {
 
     expect(document.body.style.overflow).toBe("");
   });
+
+  it("com o foco no próprio painel (clique no título), Shift+Tab e Tab não saem do diálogo", async () => {
+    abrir();
+    const dialogo = screen.getByRole("dialog");
+    const campo = screen.getByLabelText("Categoria");
+    const aplicar = screen.getByRole("button", { name: "Aplicar" });
+
+    await userEvent.click(screen.getByRole("heading", { name: "Filtros e ordenação" }));
+    await userEvent.tab({ shift: true });
+    expect(dialogo.contains(document.activeElement)).toBe(true);
+    expect(aplicar).toHaveFocus();
+
+    await userEvent.click(screen.getByRole("heading", { name: "Filtros e ordenação" }));
+    await userEvent.tab();
+
+    expect(campo).toHaveFocus();
+  });
 });
