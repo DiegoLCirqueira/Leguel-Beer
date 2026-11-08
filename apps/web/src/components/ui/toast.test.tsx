@@ -99,4 +99,21 @@ describe("Toast", () => {
 
     expect(aoFechar).toHaveBeenCalledOnce();
   });
+
+  it("com outra mensagem o contador recomeça e o toast pode fechar de novo", () => {
+    const aoFechar = vi.fn();
+    const { rerender } = render(<Toast mensagem="Primeira" aoFechar={aoFechar} />);
+
+    act(() => vi.advanceTimersByTime(4000));
+    rerender(<Toast mensagem="Segunda" aoFechar={aoFechar} />);
+    act(() => vi.advanceTimersByTime(4000));
+    expect(aoFechar).not.toHaveBeenCalled();
+    act(() => vi.advanceTimersByTime(1000));
+    expect(aoFechar).toHaveBeenCalledTimes(1);
+
+    rerender(<Toast mensagem="Terceira" aoFechar={aoFechar} />);
+    act(() => vi.advanceTimersByTime(5000));
+
+    expect(aoFechar).toHaveBeenCalledTimes(2);
+  });
 });
