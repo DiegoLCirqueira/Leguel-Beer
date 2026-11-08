@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { AppLogger } from "../../common/logging/app-logger.js";
 import { PrismaService } from "../../common/prisma/prisma.service.js";
 import { ListBeers } from "./application/list-beers.js";
 import { ListFeaturedBeers } from "./application/list-featured-beers.js";
@@ -12,8 +13,9 @@ import { CatalogController } from "./presentation/catalog.controller.js";
   providers: [
     {
       provide: BEER_REPOSITORY,
-      useFactory: (prisma: PrismaService) => new PrismaBeerRepository(prisma),
-      inject: [PrismaService],
+      useFactory: (prisma: PrismaService, logger: AppLogger) =>
+        new PrismaBeerRepository(prisma, logger),
+      inject: [PrismaService, AppLogger],
     },
     {
       provide: ListFeaturedBeers,
