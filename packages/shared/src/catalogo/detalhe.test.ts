@@ -46,4 +46,22 @@ describe("cervejaDetalheSchema", () => {
     expect(recusa({ precoAnteriorCentavos: -1 })).toBe(false);
     expect(recusa({ descontoPercentual: 13.5 })).toBe(false);
   });
+
+  it("exige descontoPercentual igual a calcularDesconto: 13 com 36,90 e 32,00", () => {
+    const comDesconto = (campos: object) =>
+      cervejaDetalheSchema.safeParse({ ...detalheValido, ...campos });
+
+    expect(comDesconto({}).success).toBe(true);
+    expect(comDesconto({ descontoPercentual: 11 }).success).toBe(false);
+    expect(comDesconto({ descontoPercentual: null }).success).toBe(false);
+  });
+
+  it("sem desconto: anterior igual ao atual ou ausente exige descontoPercentual nulo", () => {
+    const comDesconto = (campos: object) =>
+      cervejaDetalheSchema.safeParse({ ...detalheValido, ...campos }).success;
+
+    expect(comDesconto({ precoAnteriorCentavos: 3200, descontoPercentual: null })).toBe(true);
+    expect(comDesconto({ precoAnteriorCentavos: 3200, descontoPercentual: 13 })).toBe(false);
+    expect(comDesconto({ precoAnteriorCentavos: null, descontoPercentual: 13 })).toBe(false);
+  });
 });
