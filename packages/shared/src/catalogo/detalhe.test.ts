@@ -1,0 +1,28 @@
+import { describe, expect, it } from "vitest";
+import { cervejaDetalheSchema } from "./detalhe.js";
+
+const detalheValido = {
+  id: "cerveja-1",
+  slug: "mare-alta",
+  nome: "Maré Alta",
+  estilo: "American IPA",
+  categoria: { slug: "ipa", nome: "IPAs", ordem: 1 },
+  teorAlcoolico: 6.5,
+  ibu: 65,
+  volumeMl: 500,
+  precoCentavos: 3200,
+  destaque: true,
+  quantidadeDisponivel: 12,
+  esgotada: false,
+  imagemUrl: null,
+  cadastradaEm: "2026-10-02T12:00:00.000Z",
+  descricao: "Uma IPA cítrica e resinosa.",
+  precoAnteriorCentavos: 3690,
+  descontoPercentual: 13,
+};
+
+describe("cervejaDetalheSchema", () => {
+  it("aceita o card completo mais descrição, preço anterior e desconto", () => {
+    expect(cervejaDetalheSchema.parse(detalheValido)).toEqual(detalheValido);
+  });
+});
