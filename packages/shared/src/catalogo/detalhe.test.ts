@@ -73,4 +73,15 @@ describe("cervejaDetalheSchema", () => {
     expect(recusa({ quantidadeDisponivel: 0, esgotada: false })).toBe(false);
     expect(recusa({ quantidadeDisponivel: 3, esgotada: true })).toBe(false);
   });
+
+  it("descontoPercentual fora de 1 a 100 é recusado pela própria faixa do campo", () => {
+    const codigos = (descontoPercentual: number) =>
+      cervejaDetalheSchema
+        .safeParse({ ...detalheValido, descontoPercentual })
+        .error?.issues.filter((issue) => issue.path[0] === "descontoPercentual")
+        .map((issue) => issue.code);
+
+    expect(codigos(0)).toContain("too_small");
+    expect(codigos(101)).toContain("too_big");
+  });
 });
