@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function Entregas() {
-  return <LegalPage titulo="Entregas" atualizadoEm={ATUALIZADO_EM} secoes={ENTREGAS} />;
+  return <LegalPage titulo="Entregas" atualizadoEm={ATUALIZADO_EM} secoes={ENTREGAS} semRodape />;
 }
