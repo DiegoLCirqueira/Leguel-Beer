@@ -1,4 +1,4 @@
-import type { CatalogoResponse, CervejaCard } from "@leguele/shared";
+import type { CatalogoResponse, CervejaCard, DestaquesResponse } from "@leguele/shared";
 import type { CatalogResult } from "../application/list-beers.js";
 import { availableQuantity, isSoldOut, type Beer } from "../domain/beer.js";
 
@@ -32,4 +32,8 @@ export function toCatalogoResponse(result: CatalogResult): CatalogoResponse {
       quantidade: category.quantity,
     })),
   };
+}
+
+export function toDestaquesResponse(beers: readonly Beer[]): DestaquesResponse {
+  return { itens: beers.map(toCervejaCard) };
 }
