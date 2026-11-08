@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { PrismaService } from "../../../common/prisma/prisma.service.js";
 import { resetDatabase } from "../../../common/testing/database.js";
@@ -45,5 +46,16 @@ describe("seedCatalog (banco real)", () => {
 
     await expect(attempt).rejects.toThrow(/DATABASE_URL.*local/);
     expect(await prisma.category.count()).toBe(0);
+  });
+
+  it("não toca em perfis: o admin do seed de contas continua igual", async () => {
+    const admin = await prisma.profile.create({
+      data: { id: randomUUID(), email: "admin@leguele.test", role: "ADMIN" },
+    });
+
+    await seedCatalog(prisma);
+    await seedCatalog(prisma);
+
+    expect(await prisma.profile.findMany()).toEqual([admin]);
   });
 });
