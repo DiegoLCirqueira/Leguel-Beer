@@ -25,4 +25,25 @@ describe("cervejaDetalheSchema", () => {
   it("aceita o card completo mais descrição, preço anterior e desconto", () => {
     expect(cervejaDetalheSchema.parse(detalheValido)).toEqual(detalheValido);
   });
+
+  it("descrição, preço anterior e desconto podem ser nulos (sem desconto)", () => {
+    const semDesconto = {
+      ...detalheValido,
+      descricao: null,
+      precoAnteriorCentavos: null,
+      descontoPercentual: null,
+    };
+
+    expect(cervejaDetalheSchema.parse(semDesconto)).toEqual(semDesconto);
+  });
+
+  it("recusa descrição vazia, preço anterior fracionado ou negativo e desconto fracionado", () => {
+    const recusa = (campos: object) =>
+      cervejaDetalheSchema.safeParse({ ...detalheValido, ...campos }).success;
+
+    expect(recusa({ descricao: "" })).toBe(false);
+    expect(recusa({ precoAnteriorCentavos: 3690.5 })).toBe(false);
+    expect(recusa({ precoAnteriorCentavos: -1 })).toBe(false);
+    expect(recusa({ descontoPercentual: 13.5 })).toBe(false);
+  });
 });
