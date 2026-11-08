@@ -17,7 +17,7 @@ Resumo em [[2026-11-08]]. O Diego pediu para terminar o que estava aberto e para
 
 ## Estado
 
-- Ambiente a partir da `main` (e69f484) com um único `pnpm dev` na raiz (shared em watch, site :3000, API :3333; log `%TEMP%/leguele-dev.log`). Supabase local e Mailpit no Docker. Preview :3001 no ar com o worktree `leguele-zoom2` (já mergeado); o Front o troca pelo worktree da tarefa atual. Para religar: Docker, `pnpm db:start` e os dois comandos.
+- Ambiente a partir da `main` (e69f484) com um único `pnpm dev` na raiz (shared em watch, site :3000, API :3333; log `%TEMP%/leguele-dev.log`). Supabase local e Mailpit no Docker. O :3001 serve o worktree da tarefa atual do Front. Para religar: Docker, `pnpm db:start` e os dois comandos.
 - O watch da API não reinicia quando muda o `.env`: reiniciar o processo.
 - `apps/api/.env` da working copy principal foi copiado do worktree `leguele-api` (sem as chaves do seed).
 - Portais "Leguelé iPhone 390" e "Leguelé Android" apontam para :3000.
@@ -36,10 +36,11 @@ Resumo em [[2026-11-08]]. O Diego pediu para terminar o que estava aberto e para
 ## Follow-ups
 
 - Do #212: registrar a mutação dos testes de loja-layout que nasceram verdes; a exceção da barra fixa no `responsivo.spec.ts` vale para qualquer rolagem (rever quando /catalogo e /geladeira usarem o layout); rótulo da barra até 12 px; fragmentos `<>` sobrando; a barra e a variável `--altura-barra-loja` têm o 57 px em dois lugares.
-- Do #214: guarda de banco local também no `seed-admin` (falhar fechado sem `DATABASE_URL`); `categories.order` único quando o admin escrever categorias (LB-73).
+- Do #214: `categories.order` único quando o admin escrever categorias (LB-73).
 - Do #215: tornar o resto da página inerte e usar portal quando o sheet entrar na loja; a vitrine /dev/tokens abre em produção com VITRINE_E2E=1: recusar também com VERCEL_ENV=production ou documentar que a variável nunca vai ao deploy.
 - Do #218: `images.remotePatterns` no next.config.ts quando `imagemUrl` vier absoluta (LB-124); alt da imagem repete o nome.
 - Do #221/#226: faixa de categorias na home (cenário do [[catalogo]] sem tela); E2E opcional do estado de erro do catálogo com API_URL inválida; motivo da falha no aviso dos destaques; esqueleto de 4 blocos para até 6 cards.
+- Do #225: exemplo "R$ 32,01 | não vejo preço anterior nem desconto" no Esquema do Cenário de desconto de [[produto]].
 - Do #222: os warns do Nest agora saem com nível warn (quem filtra logs por nível vê mais linhas).
 - Do #219: o teto de 200 cervejas na leitura do catálogo registra aviso; perto do teto, filtrar no banco e paginar.
 
@@ -58,7 +59,7 @@ Resumo em [[2026-11-08]]. O Diego pediu para terminar o que estava aberto e para
 - API, segurança (achado do Reviewer no #200): o `ThrottlerModule` em `apps/api/src/app.module.ts` guarda a contagem em memória (100 por 60 s); numa API serverless conta por instância. O Back avalia junto do LB-8 e, se mantiver, registra o ADR.
 - API: `DATABASE_URL` obrigatória no seed; código fixo no log de falha do `signOutOthers`.
 - `src/lib/erro-de-redirect.ts` usa caminho interno do Next: conferir a cada upgrade.
-- Limpeza dos worktrees e pastas em `C:\Users\Arthur\Desktop\leguele\` e `C:\lb-*` fica com o Diego (inclui `C:/lb-adrp`, `C:/lb-adrr`, `C:/lb-adr15`, `C:/lb-codex`, `C:/lb-testes-acesso`, `leguele-zoom`, `C:/lb-doc0811` e os worktrees desta rodada: `leguele-zoom2`, `leguele-loja-layout`, `leguele-sheet`, `leguele-card`, `leguele-catalogo`, `leguele-home`, `leguele-catalogo-*`, `leguele-produto-contrato`, `leguele-seed-admin`, `C:/lb-doc0811b`, `C:/lb-auditoria`, `C:/lb-ciclo`, `C:/lb-spec-*`, `C:/lb-seq-09`, `C:/lb-docs-daily`, `C:/lb-sharedwatch`, `C:/lb-produto-desc`, `C:/lb-fecho-0811` e a pasta vazia `C:/lb-auditoria-0811`; o `feat/produto-api` NÃO, tem trabalho sem PR).
+- Limpeza dos worktrees e pastas em `C:\Users\Arthur\Desktop\leguele\` e `C:\lb-*` fica com o Diego (inclui `C:/lb-adrp`, `C:/lb-adrr`, `C:/lb-adr15`, `C:/lb-codex`, `C:/lb-testes-acesso`, `leguele-zoom`, `C:/lb-doc0811` e os worktrees desta rodada: `leguele-zoom2`, `leguele-loja-layout`, `leguele-sheet`, `leguele-card`, `leguele-catalogo`, `leguele-home`, `leguele-catalogo-*`, `leguele-produto-contrato`, `leguele-seed-admin`, `C:/lb-doc0811b`, `C:/lb-auditoria`, `C:/lb-ciclo`, `C:/lb-spec-*`, `C:/lb-seq-09`, `C:/lb-docs-daily`, `C:/lb-sharedwatch`, `C:/lb-produto-desc`, `C:/lb-fecho-0811` e a pasta vazia `C:/lb-auditoria-0811`; NÃO limpar o `feat/produto-api` (trabalho sem PR) nem o `leguele-g2` (branch refactor/components-ui-g2 com 5 arquivos não commitados e 1 commit fora da main)).
 
 ## Skills sugeridas
 
