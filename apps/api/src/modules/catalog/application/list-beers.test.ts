@@ -36,4 +36,21 @@ describe("ListBeers", () => {
       { slug: "lager", name: "Lager", order: 4, quantity: 1 },
     ]);
   });
+
+  it("filtra pela categoria da query, e os contadores continuam os de todas as categorias", async () => {
+    const repository = new InMemoryBeerRepository([
+      makeBeer({ name: "IPA 1", category: CATEGORIES.ipa }),
+      makeBeer({ name: "IPA 2", category: CATEGORIES.ipa }),
+      makeBeer({ name: "Lager 1", category: CATEGORIES.lager }),
+    ]);
+
+    const result = await new ListBeers(repository).execute(query({ categoria: "ipa" }));
+
+    expect(names(result.items)).toEqual(["IPA 1", "IPA 2"]);
+    expect(result.total).toBe(2);
+    expect(result.categories.map((c) => [c.slug, c.quantity])).toEqual([
+      ["ipa", 2],
+      ["lager", 1],
+    ]);
+  });
 });
