@@ -83,10 +83,12 @@ test("sem resultado mostra a mensagem e Limpar filtros volta ao catálogo inteir
 test("menor preço e maior preço ordenam a lista, com a esgotada sempre no fim", async ({
   page,
 }) => {
-  const precos = async () =>
-    (await cards(page).getByText(/^R\$/).allTextContents()).map((t) =>
-      Number(t.replace(/[^\d,]/g, "").replace(",", ".")),
-    );
+  const precos = async () => {
+    await expect(cards(page)).toHaveCount(16);
+    const textos = await cards(page).getByText(/^R\$/).allTextContents();
+    expect(textos).toHaveLength(16);
+    return textos.map((t) => Number(t.replace(/[^\d,]/g, "").replace(",", ".")));
+  };
 
   await page.goto("/catalogo?ordem=menor-preco");
   const crescente = (await precos()).slice(0, 15);
