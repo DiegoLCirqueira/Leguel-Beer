@@ -27,7 +27,35 @@ export interface SeedCategory {
 
 /** Descrição e preço anterior de exemplo da página de produto (LB-40 e LB-41), por slug. */
 const DETAILS: Record<string, Pick<SeedBeer, "description" | "previousPriceCents">> = {
-  "mare-alta": { previousPriceCents: 3690 },
+  "mare-alta": {
+    description:
+      "Uma American IPA de aroma cítrico e final resinoso, para quem gosta de lúpulo. (texto de exemplo)",
+    previousPriceCents: 3690,
+  },
+  "leguele-ipa": {
+    description: "A IPA da casa, equilibrada entre o amargor e o malte. (texto de exemplo)",
+  },
+  "leguele-carnaval": {
+    description: "Uma Session IPA leve e refrescante, boa para a festa. (texto de exemplo)",
+  },
+  "cupuacu-ale": {
+    description: "Uma ale de fruta com o azedinho e o aroma do cupuaçu. (texto de exemplo)",
+  },
+  cajupa: {
+    description: "Uma ale de fruta com caju e um toque de acidez. (texto de exemplo)",
+  },
+  avermelhou: {
+    description: "Uma Red Ale de cor avermelhada e sabor de caramelo. (texto de exemplo)",
+  },
+  "cream-ale": {
+    description: "Uma Cream Ale suave, clara e de final macio. (texto de exemplo)",
+  },
+  kolsch: {
+    description: "Uma Kölsch limpa e delicada, de corpo leve. (texto de exemplo)",
+  },
+  "leguele-comendador": {
+    description: "Uma lager clara e fácil de beber, a cara do Comendador. (texto de exemplo)",
+  },
 };
 
 const beer = (
