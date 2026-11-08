@@ -15,4 +15,9 @@ describe("calcularDesconto", () => {
     expect(calcularDesconto(3200, 3200)).toBeNull();
     expect(calcularDesconto(2900, 3200)).toBeNull();
   });
+
+  it("sem preço anterior (nulo ou ausente) não há desconto", () => {
+    expect(calcularDesconto(null, 3200)).toBeNull();
+    expect(calcularDesconto(undefined, 3200)).toBeNull();
+  });
 });
