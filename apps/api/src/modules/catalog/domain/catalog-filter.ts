@@ -22,6 +22,7 @@ export function filterBeers(beers: readonly Beer[], filters: CatalogFilters): Be
     (beer) =>
       (!filters.categorySlug || beer.category.slug === filters.categorySlug) &&
       within(beer.abv, filters.abv) &&
-      within(beer.ibu, filters.ibu),
+      within(beer.ibu, filters.ibu) &&
+      within(beer.priceCents, filters.priceCents),
   );
 }
