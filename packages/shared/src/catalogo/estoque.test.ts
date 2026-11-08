@@ -9,4 +9,8 @@ describe("estoqueBaixo", () => {
     expect(estoqueBaixo(5)).toBe(true);
     expect(estoqueBaixo(6)).toBe(false);
   });
+
+  it("esgotada (0 unidades) não é estoque baixo: o aviso é só para 1 a 5", () => {
+    expect(estoqueBaixo(0)).toBe(false);
+  });
 });
