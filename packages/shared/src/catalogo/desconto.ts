@@ -5,5 +5,6 @@ export function calcularDesconto(
 ): number | null {
   if (anteriorCentavos == null || anteriorCentavos <= atualCentavos) return null;
   const anterior = anteriorCentavos;
-  return Math.round(((anterior - atualCentavos) / anterior) * 100);
+  const percentual = Math.round(((anterior - atualCentavos) / anterior) * 100);
+  return percentual >= 1 ? percentual : null;
 }
