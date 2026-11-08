@@ -228,4 +228,26 @@ describe("GET /catalogo (banco real)", () => {
     ]);
     expect(body.itens[0]).toMatchObject({ destaque: true, categoria: { slug: "ipa" } });
   });
+
+  it("destaque esgotado vem por último, com esgotada verdadeira", async () => {
+    await addBeer("ipa", "a-esgotada", { featured: true, stock: 0 });
+    await addBeer("lager", "z-disponivel", { featured: true });
+
+    const body = destaquesResponseSchema.parse((await getDestaques()).body);
+
+    expect(body.itens.map((item) => [item.slug, item.esgotada])).toEqual([
+      ["z-disponivel", false],
+      ["a-esgotada", true],
+    ]);
+  });
+
+  it("sem destaques devolve 200 com a lista vazia: a seção some na home", async () => {
+    await addBeer("ipa", "ipa-comum");
+    await addBeer("lager", "lager-inativa-destaque", { featured: true, active: false });
+
+    const response = await getDestaques();
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({ itens: [] });
+  });
 });
