@@ -73,7 +73,7 @@ describe("FiltrosDoCatalogo", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("Limpar tira teor, IBU, preço e disponíveis, mantém a categoria e fecha", async () => {
+  it("Limpar tira categoria, teor, IBU, preço e disponíveis e fecha", async () => {
     render(
       <FiltrosDoCatalogo
         query={{
@@ -83,13 +83,14 @@ describe("FiltrosDoCatalogo", () => {
           preco: "30-ou-mais",
           disponiveis: true,
         }}
+        categorias={categorias}
       />,
     );
     await userEvent.click(screen.getByRole("button", { name: "Filtrar (3)" }));
 
     await userEvent.click(screen.getByRole("button", { name: "Limpar" }));
 
-    expect(push).toHaveBeenCalledWith("/catalogo?categoria=ipa");
+    expect(push).toHaveBeenCalledWith("/catalogo");
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 });
