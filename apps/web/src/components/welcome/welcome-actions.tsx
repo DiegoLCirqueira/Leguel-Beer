@@ -3,7 +3,18 @@
 import { ArrowRight, Check, Info, Link as LinkIcon, UserPlus, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
-import { CONTROLS, OR_ROW, cq, fl, pctH, pctW, pctX, pctY, rectStyle } from "@/lib/arte-login";
+import {
+  CONTROLS,
+  OR_ROW,
+  TELAS_BAIXAS,
+  cq,
+  fl,
+  pctH,
+  pctW,
+  pctX,
+  pctY,
+  rectStyle,
+} from "@/lib/arte-login";
 import { markGuest } from "@/lib/guest";
 import { cn } from "@/lib/utils";
 
@@ -46,7 +57,7 @@ export function WelcomeActions() {
       setShowHint(false);
     }
     // Em telas baixas a dica abre abaixo da linha, fora da tela: rola até ela para a pessoa ver.
-    if (window.matchMedia?.("(max-height: 599px)").matches) {
+    if (window.matchMedia?.(TELAS_BAIXAS).matches) {
       hintRef.current?.scrollIntoView?.({ block: "nearest" });
     }
     const autoClose = setTimeout(() => setShowHint(false), HINT_DURATION_MS);
@@ -210,7 +221,7 @@ export function WelcomeActions() {
           id={hintId}
           aria-live="polite"
           style={{ width: "min(100vw - 16px, max(100cqw - 16px, 21rem))" }}
-          className="absolute bottom-full left-1/2 z-30 mb-1 -translate-x-1/2 [@media(max-height:599px)]:bottom-auto [@media(max-height:599px)]:top-full [@media(max-height:599px)]:mb-0 [@media(max-height:599px)]:mt-3 rounded-campo border border-arte-borda bg-arte-vidro px-3 py-1.5 text-center text-xs leading-snug text-texto empty:hidden"
+          className="absolute bottom-full left-1/2 z-30 mb-1 -translate-x-1/2 telas-baixas:bottom-auto telas-baixas:top-full telas-baixas:mb-0 telas-baixas:mt-3 rounded-campo border border-arte-borda bg-arte-vidro px-3 py-1.5 text-center text-xs leading-snug text-texto empty:hidden"
         >
           {showHint ? HINT : null}
         </div>

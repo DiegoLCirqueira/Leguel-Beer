@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function BoasVindas() {
   return (
-    <main className="relative isolate h-dvh overflow-hidden bg-fundo [@media(max-height:599px)]:overflow-y-auto [@media(max-height:599px)]:pb-[env(safe-area-inset-bottom,0px)]">
+    <main className="relative isolate h-dvh overflow-hidden bg-fundo telas-baixas:overflow-y-auto telas-baixas:pb-[env(safe-area-inset-bottom,0px)]">
       <div aria-hidden="true" className="fixed inset-0 -z-10 overflow-hidden">
         <Image
           src="/boas-vindas/arte-login.webp"
