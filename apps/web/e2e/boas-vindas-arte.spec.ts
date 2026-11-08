@@ -170,6 +170,8 @@ test.describe("zoom de 200% (viewport de 180x390 px CSS)", () => {
 
     expect(hint!.x).toBeGreaterThanOrEqual(0);
     expect(hint!.x + hint!.width).toBeLessThanOrEqual(180);
+    expect(hint!.y).toBeGreaterThanOrEqual(0);
+    expect(hint!.y + hint!.height).toBeLessThanOrEqual(390 + 1);
     const livres = [
       page.getByRole("link", { name: "Entrar" }),
       page.getByRole("link", { name: "Criar conta" }),

@@ -31,3 +31,6 @@ export const fl = (minPx: number, px: number) => `max(${minPx}px, ${cq(px)})`;
 export function rectStyle(rect: ArtRect) {
   return { left: pctX(rect.x), top: pctY(rect.y), width: pctW(rect.w), height: pctH(rect.h) };
 }
+
+/** Mesmo corte do `@custom-variant telas-baixas` de globals.css (paisagem e zoom alto). */
+export const TELAS_BAIXAS = "(max-height: 599px)";
