@@ -52,4 +52,25 @@ describe("buscarCatalogo", () => {
     fetchFalso.mockResolvedValueOnce(new Response(JSON.stringify({ itens: 1 }), { status: 200 }));
     expect(await buscarCatalogo(query)).toEqual({ ok: false });
   });
+
+  it("uma API que não responde cai no estado de erro depois de 8 segundos", async () => {
+    vi.useFakeTimers();
+    try {
+      fetchFalso.mockImplementation(
+        (_url: string, opcoes: { signal: AbortSignal }) =>
+          new Promise((_resolve, rejeitar) => {
+            opcoes.signal.addEventListener("abort", () => rejeitar(opcoes.signal.reason));
+          }),
+      );
+
+      const busca = buscarCatalogo(query);
+      await vi.advanceTimersByTimeAsync(7999);
+      expect(await Promise.race([busca, Promise.resolve("pendente")])).toBe("pendente");
+      await vi.advanceTimersByTimeAsync(1);
+
+      expect(await busca).toEqual({ ok: false });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });
