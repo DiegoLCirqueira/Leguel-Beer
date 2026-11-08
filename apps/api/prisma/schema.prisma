@@ -42,25 +42,29 @@ model Category {
 
 /// Cerveja do catálogo. O preço é sempre em centavos; `stock` é o estoque físico (as reservas entram com o LB-56).
 model Beer {
-  id         String   @id @default(uuid()) @db.Uuid
-  slug       String   @unique
-  name       String
-  style      String
-  categoryId String   @map("category_id") @db.Uuid
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  id                 String   @id @default(uuid()) @db.Uuid
+  slug               String   @unique
+  name               String
+  style              String
+  categoryId         String   @map("category_id") @db.Uuid
+  category           Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   /// Teor alcoólico em %, uma casa decimal.
-  abv        Decimal  @db.Decimal(3, 1)
-  ibu        Int
-  volumeMl   Int      @map("volume_ml")
-  priceCents Int      @map("price_cents")
-  featured   Boolean  @default(false)
-  active     Boolean  @default(true)
-  stock      Int      @default(0)
+  abv                Decimal  @db.Decimal(3, 1)
+  ibu                Int
+  volumeMl           Int      @map("volume_ml")
+  priceCents         Int      @map("price_cents")
+  featured           Boolean  @default(false)
+  active             Boolean  @default(true)
+  stock              Int      @default(0)
+  /// Texto curto da página de produto; nulo some a seção.
+  description        String?
+  /// Preço anterior em centavos, opcional: só vale como desconto se for maior que o atual.
+  previousPriceCents Int?     @map("previous_price_cents")
   /// Nulo usa a imagem padrão da categoria.
-  imageUrl   String?  @map("image_url")
+  imageUrl           String?  @map("image_url")
   /// Data de cadastro: base da ordenação "mais novas".
-  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@index([categoryId])
   @@index([active, featured])

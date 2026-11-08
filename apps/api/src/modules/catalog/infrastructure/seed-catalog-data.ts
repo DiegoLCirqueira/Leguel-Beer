@@ -13,6 +13,8 @@ export interface SeedBeer {
   priceCents: number;
   featured: boolean;
   stock: number;
+  description?: string | null;
+  previousPriceCents?: number | null;
   createdAt: Date;
 }
 
@@ -22,6 +24,42 @@ export interface SeedCategory {
   order: number;
   beers: SeedBeer[];
 }
+
+/** Descrição e preço anterior de exemplo da página de produto (LB-40 e LB-41), por slug. */
+const DETAILS: Record<string, Pick<SeedBeer, "description" | "previousPriceCents">> = {
+  "mare-alta": {
+    description:
+      "Uma American IPA de aroma cítrico e final resinoso, para quem gosta de lúpulo. (texto de exemplo)",
+    previousPriceCents: 3690,
+  },
+  "leguele-ipa": {
+    description: "A IPA da casa, equilibrada entre o amargor e o malte. (texto de exemplo)",
+  },
+  "leguele-carnaval": {
+    description: "Uma Session IPA leve e refrescante, boa para a festa. (texto de exemplo)",
+    previousPriceCents: 3190,
+  },
+  "cupuacu-ale": {
+    description: "Uma ale de fruta com o azedinho e o aroma do cupuaçu. (texto de exemplo)",
+    previousPriceCents: 2990,
+  },
+  cajupa: {
+    description: "Uma ale de fruta com caju e um toque de acidez. (texto de exemplo)",
+  },
+  avermelhou: {
+    description: "Uma Red Ale de cor avermelhada e sabor de caramelo. (texto de exemplo)",
+  },
+  "cream-ale": {
+    description: "Uma Cream Ale suave, clara e de final macio. (texto de exemplo)",
+  },
+  kolsch: {
+    description: "Uma Kölsch limpa e delicada, de corpo leve. (texto de exemplo)",
+  },
+  "teste-malt-1": { previousPriceCents: 3050 },
+  "leguele-comendador": {
+    description: "Uma lager clara e fácil de beber, a cara do Comendador. (texto de exemplo)",
+  },
+};
 
 const beer = (
   slug: string,
@@ -44,6 +82,7 @@ const beer = (
   featured,
   stock,
   createdAt: new Date(createdAt),
+  ...DETAILS[slug],
 });
 
 export const SEED_CATEGORIES: SeedCategory[] = [
@@ -57,7 +96,7 @@ export const SEED_CATEGORIES: SeedCategory[] = [
         "Maré Alta",
         "American IPA",
         6.5,
-        55,
+        65,
         3200,
         true,
         24,

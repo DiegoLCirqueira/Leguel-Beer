@@ -21,6 +21,8 @@ describe("PrismaBeerRepository (banco real)", () => {
     priceCents: 3200,
     stock: 12,
     featured: true,
+    description: "Uma IPA cítrica e resinosa.",
+    previousPriceCents: 3690,
     createdAt: new Date("2026-10-02T12:00:00Z"),
     ...overrides,
   });
@@ -45,6 +47,8 @@ describe("PrismaBeerRepository (banco real)", () => {
         priceCents: 3200,
         featured: true,
         stock: 12,
+        description: "Uma IPA cítrica e resinosa.",
+        previousPriceCents: 3690,
         imageUrl: null,
         createdAt: new Date("2026-10-02T12:00:00Z"),
       },
@@ -115,5 +119,24 @@ describe("PrismaBeerRepository (banco real)", () => {
     await new PrismaBeerRepository(prisma, logger).findActive();
 
     expect(logger.warn).not.toHaveBeenCalled();
+  });
+
+  it("findActiveBySlug devolve a cerveja ativa e nulo para inativa ou inexistente", async () => {
+    const ipa = await prisma.category.create({ data: { slug: "ipa", name: "IPAs", order: 1 } });
+    await prisma.beer.create({ data: beerData(ipa.id) });
+    await prisma.beer.create({ data: beerData(ipa.id, { slug: "ipa-velha", active: false }) });
+
+    const found = await repository.findActiveBySlug("ipa-aratu");
+
+    expect(found).toMatchObject({
+      slug: "ipa-aratu",
+      name: "IPA Aratu",
+      category: { slug: "ipa", name: "IPAs", order: 1 },
+      abv: 6.5,
+      description: "Uma IPA cítrica e resinosa.",
+      previousPriceCents: 3690,
+    });
+    expect(await repository.findActiveBySlug("ipa-velha")).toBeNull();
+    expect(await repository.findActiveBySlug("nao-existe")).toBeNull();
   });
 });
