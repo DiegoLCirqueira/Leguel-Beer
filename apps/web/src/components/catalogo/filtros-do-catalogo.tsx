@@ -85,10 +85,8 @@ export function FiltrosDoCatalogo({ query }: { query: CatalogoQuery }) {
       >
         <div className="flex flex-col gap-4 pb-3">
           {GRUPOS.map(({ id, rotulo }) => (
-            <div key={id} role="radiogroup" aria-label={rotulo} className="flex flex-col">
-              <span aria-hidden="true" className="text-sm font-semibold text-texto-suave">
-                {rotulo}
-              </span>
+            <fieldset key={id} className="flex flex-col">
+              <legend className="text-sm font-semibold text-texto-suave">{rotulo}</legend>
               <label className={OPCAO}>
                 <input
                   type="radio"
@@ -111,7 +109,7 @@ export function FiltrosDoCatalogo({ query }: { query: CatalogoQuery }) {
                   {faixa.rotulo}
                 </label>
               ))}
-            </div>
+            </fieldset>
           ))}
           <label className={OPCAO}>
             <input
