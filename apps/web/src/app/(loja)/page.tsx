@@ -1,5 +1,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import { DestaquesServidor } from "@/components/home/destaques-servidor";
+import { DestaquesSkeleton } from "@/components/home/destaques-skeleton";
 import { COOKIE_ACESSO } from "@/lib/auth/cookies";
 import { GUEST_COOKIE } from "@/lib/guest";
 import { resolveHomeRoute } from "@/lib/home-route";
@@ -17,7 +20,7 @@ export default async function Home({ searchParams }: Props = {}) {
 
   return (
     <>
-      <main className="flex flex-1 flex-col items-center justify-center gap-4 p-6">
+      <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center gap-6 px-4 py-6">
         {aviso === "senha-alterada" ? (
           <p
             role="status"
@@ -27,6 +30,9 @@ export default async function Home({ searchParams }: Props = {}) {
           </p>
         ) : null}
         <h1 className="font-titulo text-4xl text-primaria">Leguelé Beer</h1>
+        <Suspense fallback={<DestaquesSkeleton />}>
+          <DestaquesServidor />
+        </Suspense>
       </main>
     </>
   );
