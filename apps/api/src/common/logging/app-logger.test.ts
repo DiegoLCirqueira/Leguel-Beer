@@ -53,4 +53,16 @@ describe("AppLogger", () => {
       context: "ExceptionsHandler",
     });
   });
+
+  it("warn escreve no stdout com nível warn e o contexto do Nest", () => {
+    const write = vi.spyOn(process.stdout, "write").mockReturnValue(true);
+
+    new AppLogger().warn("atenção", "Contexto");
+
+    expect(JSON.parse(String(write.mock.calls[0]?.[0]))).toMatchObject({
+      level: "warn",
+      message: "atenção",
+      context: "Contexto",
+    });
+  });
 });
