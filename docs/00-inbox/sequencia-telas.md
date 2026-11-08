@@ -33,6 +33,7 @@ Detalhes em "Contrato e fatias" de [[catalogo]].
 Detalhes em [[produto]] (contrato, fatias e decisões vetáveis).
 
 - Ordem: contrato em PR próprio e primeiro (Back, só `@leguele/shared`); depois o Back (`GET /catalogo/:slug`, campos de descrição e preço anterior) e o Front (`/catalogo/[slug]`) em paralelo; o seletor de quantidade e o botão fixo (LB-42) por último, com o botão desabilitado até o LB-47 (item 3).
+- A fatia da tela já traz o layout sem barra inferior; a barra fixa do botão publica a altura numa variável CSS (o toast fica acima) e o rodapé da loja fica acima do botão. Componentes novos em `components/ui` com vitrine: cabeçalho com voltar e contador, bloco de preço com riscado e selo, barra fixa e estado "Cerveja não encontrada". `destaques` é slug reservado (LB-73).
 - Desconto calculado (32 de 36,90 = 13%), só na página de produto; aviso de estoque baixo de 1 a 5 unidades; frete grátis só como linha informativa.
 - Fora: favoritar, avaliações, abas e blocos de ingredientes e harmonização (LB-43), "quanto falta" do frete (LB-44) e "Amargor".
 

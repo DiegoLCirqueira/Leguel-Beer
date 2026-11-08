@@ -56,6 +56,7 @@ Funcionalidade: Página de produto
       | disponivel | aviso                                       |
       | 3          | vejo "Últimas 3 unidades em estoque!"       |
       | 1          | vejo "Última unidade em estoque!"           |
+      | 5          | vejo "Últimas 5 unidades em estoque!"       |
       | 6          | não vejo aviso de estoque                   |
 
   Cenário: Cerveja esgotada
@@ -69,7 +70,7 @@ Funcionalidade: Página de produto
     Quando abro essa página
     Então vejo "Cerveja não encontrada" com a ação "Ver catálogo"
 
-  Cenário: Adicionar com a quantidade escolhida
+  Cenário: Adicionar com a quantidade escolhida (testável depois do LB-47)
     Dado a Maré Alta com quantidade disponível 5 e nenhuma unidade na Geladeira
     Quando escolho a quantidade 3 e toco em "Adicionar à geladeira"
     Então a Geladeira passa a ter 3 unidades da Maré Alta
@@ -83,7 +84,7 @@ Funcionalidade: Página de produto
 - **Desconto (LB-41):** o preço anterior é opcional. Com preço anterior maior que o atual, mostra o anterior riscado e o selo "-N%", em que N é `(anterior - atual) / anterior` arredondado ao inteiro mais próximo (32 de 36,90 dá 13%). Com preço anterior igual ou menor que o atual, ou sem valor, não mostra nada (o design da tela 28 mostra -11%, que não bate com os números). O desconto só vale para a página de produto; o card e a Geladeira seguem com o preço atual.
 - **Estoque baixo:** com quantidade disponível de 1 a 5, mostra "Últimas N unidades em estoque!" ("Última unidade em estoque!" para 1). O limiar de 5 é uma constante em `@leguele/shared`.
 - **Quantidade (LB-42):** seletor de 1 até a quantidade disponível, começando em 1. O total na Geladeira de uma cerveja não passa da quantidade disponível; ao passar, mostra "Só temos N unidades" (singular: "Só temos 1 unidade") e nada muda, igual a [[adicionar-do-card]].
-- **Botão fixo:** "Adicionar à geladeira" fica fixo no rodapé da tela, sempre visível. A página não tem a barra inferior da loja, para o botão ocupar o lugar dela. O cabeçalho tem o botão de voltar e o contador da Geladeira.
+- **Botão fixo:** "Adicionar à geladeira" fica fixo no rodapé da tela, sempre visível. A página não tem a barra inferior da loja, para o botão ocupar o lugar dela. O cabeçalho tem o botão de voltar e o contador da Geladeira. A barra fixa publica a própria altura numa variável CSS, para o toast ficar acima dela, e o rodapé da loja ([[termos-privacidade]]) fica no fim da rolagem, acima do botão.
 - **Toast:** o mesmo do card: "<nome> foi para a geladeira" com "Desfazer", por 5 segundos, e o contador do header atualiza. "Desfazer" devolve a Geladeira ao estado de antes daquele toque, inclusive quando foram várias unidades.
 - **Convidado:** adiciona sem conta, como no card.
 - **Frete grátis:** uma linha informativa fixa "Frete grátis em compras acima de R$ 150,00" ([[visao]], [[checkout]]), sem seta e sem cálculo de quanto falta.
@@ -113,15 +114,26 @@ Telas do design (fora do repo, em `Imagens/figma/telas/`), só como referência 
 
 ## Contrato compartilhado (`@leguele/shared`, pasta `catalogo/`)
 
-Estado do código em 08/11 (`main` 5145211): já existem `cervejaCardSchema`, a query e as respostas do catálogo; `GET /catalogo` e os modelos `Category` e `Beer` (sem descrição nem preço anterior); no site, `Stepper`, `Toast`, `BottomSheet`, `CardCerveja` e o layout da loja. Falta o detalhe.
+Estado do código em 08/11 (`main` 9efcca9): já existem `cervejaCardSchema`, a query e as respostas do catálogo; `GET /catalogo`, `GET /catalogo/destaques` e os modelos `Category` e `Beer` (sem descrição nem preço anterior); no site, `Stepper`, `Toast`, `BottomSheet`, `CardCerveja` e o layout da loja. Falta o detalhe.
 
 Front e Back fixam, num **PR próprio e primeiro**, só em `@leguele/shared`, com testes (feito pelo Back):
 
-- **`cervejaDetalheSchema`:** tudo do `cervejaCardSchema` mais `descricao` (texto ou nulo), `precoAnteriorCentavos` (inteiro ou nulo) e `descontoPercentual` (inteiro ou nulo, calculado pela API; nulo quando não há desconto).
+- **`cervejaDetalheSchema`:** tudo do `cervejaCardSchema` mais `descricao` (texto ou nulo), `precoAnteriorCentavos` (inteiro ou nulo) e `descontoPercentual` (inteiro ou nulo, calculado pela API; nulo quando não há desconto). O schema estende o do card (no Zod 4, `.safeExtend` quando o schema do card tem `.refine`) e acrescenta um `.refine` que exige `descontoPercentual` igual a `calcularDesconto(precoAnteriorCentavos, precoCentavos)`.
 - **`calcularDesconto(anteriorCentavos, atualCentavos)`:** função pura que devolve o percentual inteiro ou nulo, como na regra acima.
 - **`LIMIAR_ESTOQUE_BAIXO`** (5) e **`estoqueBaixo(quantidadeDisponivel)`:** verdadeiro de 1 até o limiar.
 
-Endpoint público ([[ADR-009-guard-global-fechado]], `@Public()`): `GET /catalogo/:slug`, que responde `cervejaDetalhe`, ou 404 no contrato de erros da API para slug inexistente ou cerveja inativa. A regra de desconto mora na função de `@leguele/shared`, chamada pela API.
+Endpoint público ([[ADR-009-guard-global-fechado]], `@Public()`): `GET /catalogo/:slug`, declarado depois da rota fixa `GET /catalogo/destaques` (a fixa vem antes da parametrizada), que responde `cervejaDetalhe`, ou 404 no contrato de erros da API para slug inexistente ou cerveja inativa. A regra de desconto mora na função de `@leguele/shared`, chamada pela API. `destaques` é slug reservado: o cadastro de cervejas (LB-73) tem de recusá-lo.
+
+## Componentes novos
+
+Em `apps/web/src/components/ui`, cada um na vitrine `/dev/tokens` ([[identidade-visual]], "Componentes reutilizáveis"), nunca dentro da tela:
+
+- cabeçalho da página de produto, com voltar e contador da Geladeira;
+- bloco de preço, com o preço anterior riscado e o selo "-N%";
+- barra fixa com o botão (publica a altura numa variável CSS);
+- estado "Cerveja não encontrada".
+
+Os demais já existem: `StyleBadge`, `Stepper`, `Toast` e `Button`.
 
 ## Seams de teste
 
@@ -138,7 +150,7 @@ Endpoint público ([[ADR-009-guard-global-fechado]], `@Public()`): `GET /catalog
 | --- | --- | --- | --- |
 | 1 | Contrato (LB-40, #82) | Back | PR só em `@leguele/shared`, com testes: `cervejaDetalheSchema`, `calcularDesconto` e `estoqueBaixo` |
 | 2 | LB-40 e LB-41 (#82, #83), API | Back | Campos `descricao` e `precoAnterior` no modelo da cerveja, migration, seed com descrição de exemplo e um preço anterior; `GET /catalogo/:slug` |
-| 3 | LB-40 e LB-41, tela | Front | `/catalogo/[slug]`: título, ficha, preço com desconto, aviso de estoque, frete grátis e estado "não encontrada"; o card passa a abrir esta página |
+| 3 | LB-40 e LB-41, tela | Front | `/catalogo/[slug]`, já com o layout sem a barra inferior (grupo de rotas próprio ou variante do layout da loja): título, ficha, preço com desconto, aviso de estoque, frete grátis e estado "não encontrada"; o card passa a abrir esta página |
 | 4 | LB-42 (#84) | Front | Seletor de quantidade e botão fixo; o botão só funciona depois do LB-47 (item 3 da [[sequencia-telas]]) |
 
 Depois do contrato (fatia 1), as fatias 2 e 3 andam em paralelo, e o Front usa dado real só depois da fatia 2. A fatia 4 usa o `Stepper` e o `Toast` que já existem.
@@ -166,8 +178,9 @@ Recomendações aplicadas pelo Spec em 08/11, fáceis de reverter; qualquer uma 
 - **Limiar de estoque baixo:** 5 unidades (de 1 a 5), uma constante.
 - **Desconto:** arredondado ao inteiro mais próximo; só aparece quando o preço anterior é maior que o atual; só na página de produto.
 - **Descrição e preço anterior:** campos opcionais novos na cerveja; o texto do seed é de exemplo, e o conteúdo final vem do cadastro (admin).
-- **Rota:** `/catalogo/<slug>`, para a aba Catálogo continuar marcada.
+- **Rota:** `/catalogo/<slug>`.
 - **Sem barra inferior da loja** na página, para o botão fixo ocupar o lugar dela.
+- **Barra fixa, toast e rodapé:** a barra publica a altura numa variável CSS (o toast fica acima dela) e o rodapé da loja fica no fim da rolagem, acima do botão.
 - **Toast:** o mesmo do card, com o nome da cerveja e 5 segundos, mesmo com várias unidades.
 - **Linha de frete grátis:** informativa, sem "quanto falta".
 - **Sem "Amargor":** só o IBU.
