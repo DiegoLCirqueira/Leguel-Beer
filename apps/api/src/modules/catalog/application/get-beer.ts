@@ -5,7 +5,6 @@ export class GetBeer {
   constructor(private readonly beers: BeerRepository) {}
 
   async execute(slug: string): Promise<Beer> {
-    await this.beers.findActiveBySlug(slug);
-    return undefined as unknown as Beer;
+    return (await this.beers.findActiveBySlug(slug)) as Beer;
   }
 }
