@@ -40,14 +40,16 @@ export class ListBeers {
 
   async execute(query: CatalogoQuery): Promise<CatalogResult> {
     const active = await this.beers.findActive();
+    const categories = countByCategory(active);
+    const known = categories.some((category) => category.slug === query.categoria);
     const filtered = filterBeers(active, {
-      categorySlug: query.categoria,
+      categorySlug: known ? query.categoria : undefined,
       abv: rangeOf(faixasDeFiltro.teor, query.teor),
       ibu: rangeOf(faixasDeFiltro.ibu, query.ibu),
       priceCents: rangeOf(faixasDeFiltro.preco, query.preco),
       onlyAvailable: query.disponiveis,
     });
     const items = sortBeers(filtered, "relevancia");
-    return { items, total: items.length, categories: countByCategory(active) };
+    return { items, total: items.length, categories };
   }
 }
