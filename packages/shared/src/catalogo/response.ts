@@ -1,3 +1,17 @@
 import { z } from "zod";
+import { cervejaCardSchema } from "./cerveja-card.js";
 
-export const catalogoResponseSchema = z.object({});
+export const categoriaComContadorSchema = z.object({
+  slug: z.string(),
+  nome: z.string(),
+  ordem: z.int(),
+  quantidade: z.int().nonnegative(),
+});
+
+export const catalogoResponseSchema = z.object({
+  itens: z.array(cervejaCardSchema),
+  total: z.int().nonnegative(),
+  categorias: z.array(categoriaComContadorSchema),
+});
+
+export type CatalogoResponse = z.infer<typeof catalogoResponseSchema>;
