@@ -24,4 +24,8 @@ describe("calcularDesconto", () => {
   it("desconto que arredonda para 0% não é desconto: R$ 32,01 para R$ 32,00 não mostra selo", () => {
     expect(calcularDesconto(3201, 3200)).toBeNull();
   });
+
+  it("multiplica antes de dividir: R$ 40,00 para R$ 17,00 é exatamente 57,5% e arredonda para 58", () => {
+    expect(calcularDesconto(4000, 1700)).toBe(58);
+  });
 });
