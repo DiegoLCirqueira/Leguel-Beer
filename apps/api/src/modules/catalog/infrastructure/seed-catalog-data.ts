@@ -25,6 +25,11 @@ export interface SeedCategory {
   beers: SeedBeer[];
 }
 
+/** Descrição e preço anterior de exemplo da página de produto (LB-40 e LB-41), por slug. */
+const DETAILS: Record<string, Pick<SeedBeer, "description" | "previousPriceCents">> = {
+  "mare-alta": { previousPriceCents: 3690 },
+};
+
 const beer = (
   slug: string,
   name: string,
@@ -46,6 +51,7 @@ const beer = (
   featured,
   stock,
   createdAt: new Date(createdAt),
+  ...DETAILS[slug],
 });
 
 export const SEED_CATEGORIES: SeedCategory[] = [
@@ -59,7 +65,7 @@ export const SEED_CATEGORIES: SeedCategory[] = [
         "Maré Alta",
         "American IPA",
         6.5,
-        55,
+        65,
         3200,
         true,
         24,
