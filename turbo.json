@@ -19,6 +19,12 @@
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "dev": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
+    "@leguele/shared#dev": {
+      "dependsOn": ["build"],
       "cache": false,
       "persistent": true
     },
