@@ -13,7 +13,7 @@ const MAX_ACTIVE_BEERS = 200;
 export class PrismaBeerRepository implements BeerRepository {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly logger?: Pick<AppLogger, "warn">,
+    private readonly logger: Pick<AppLogger, "warn">,
   ) {}
 
   async findActive(): Promise<Beer[]> {
@@ -24,7 +24,7 @@ export class PrismaBeerRepository implements BeerRepository {
       take: MAX_ACTIVE_BEERS,
     });
     if (rows.length === MAX_ACTIVE_BEERS) {
-      this.logger?.warn(
+      this.logger.warn(
         `Leitura do catálogo no teto de ${MAX_ACTIVE_BEERS} cervejas: pode haver cervejas ativas fora da lista`,
       );
     }
