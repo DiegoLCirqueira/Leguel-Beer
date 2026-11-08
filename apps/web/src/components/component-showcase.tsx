@@ -19,6 +19,7 @@ const swatches = [
   { name: "fundo", className: "bg-fundo" },
   { name: "superficie", className: "bg-superficie" },
   { name: "superficie-elevada", className: "bg-superficie-elevada" },
+  { name: "veu", className: "bg-veu" },
   { name: "borda", className: "bg-borda" },
   { name: "borda-campo", className: "bg-borda-campo" },
   { name: "texto", className: "bg-texto" },

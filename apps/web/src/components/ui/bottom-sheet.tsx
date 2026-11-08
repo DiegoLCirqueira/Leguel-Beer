@@ -70,7 +70,7 @@ export function BottomSheet({ aberto, aoFechar, titulo, children, rodape }: Bott
       onClick={(evento) => {
         if (evento.target === evento.currentTarget) aoFechar();
       }}
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-veu"
     >
       <div
         ref={painel}
