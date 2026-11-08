@@ -54,4 +54,17 @@ describe("filterBeers", () => {
 
     expect(names(resultado)).toEqual(["25"]);
   });
+
+  it("sÃ³ disponÃ­veis esconde as esgotadas; desligado, elas ficam", () => {
+    const disponivel = makeBeer({ name: "DisponÃ­vel", stock: 3 });
+    const esgotada = makeBeer({ name: "Esgotada", stock: 0 });
+
+    expect(names(filterBeers([disponivel, esgotada], { onlyAvailable: true }))).toEqual([
+      "DisponÃ­vel",
+    ]);
+    expect(names(filterBeers([disponivel, esgotada], { onlyAvailable: false }))).toEqual([
+      "DisponÃ­vel",
+      "Esgotada",
+    ]);
+  });
 });
