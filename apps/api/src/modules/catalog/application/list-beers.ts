@@ -1,8 +1,9 @@
-import type { CatalogoQuery } from "@leguele/shared";
+import { faixasDeFiltro, type CatalogoQuery, type Faixa } from "@leguele/shared";
 import type { Beer } from "../domain/beer.js";
 import { filterBeers } from "../domain/catalog-filter.js";
 import { sortBeers } from "../domain/catalog-order.js";
 import type { BeerRepository } from "../domain/beer-repository.js";
+import type { Range } from "../domain/catalog-filter.js";
 
 export interface CategoryCount {
   slug: string;
@@ -28,12 +29,21 @@ function countByCategory(beers: readonly Beer[]): CategoryCount[] {
   return [...counts.values()].sort((a, b) => a.order - b.order);
 }
 
+/** O id da faixa vem da URL; id que não existe não filtra nada. */
+function rangeOf(faixas: readonly Faixa[], id: string | undefined): Range | undefined {
+  const faixa = faixas.find((candidate) => candidate.id === id);
+  return faixa && { min: faixa.minimo, max: faixa.maximo };
+}
+
 export class ListBeers {
   constructor(private readonly beers: BeerRepository) {}
 
   async execute(query: CatalogoQuery): Promise<CatalogResult> {
     const active = await this.beers.findActive();
-    const filtered = filterBeers(active, { categorySlug: query.categoria });
+    const filtered = filterBeers(active, {
+      categorySlug: query.categoria,
+      abv: rangeOf(faixasDeFiltro.teor, query.teor),
+    });
     const items = sortBeers(filtered, "relevancia");
     return { items, total: items.length, categories: countByCategory(active) };
   }
