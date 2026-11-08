@@ -121,4 +121,16 @@ describe("BottomSheet", () => {
 
     expect(campo).toHaveFocus();
   });
+
+  it("não fecha quando o toque começou dentro do painel e terminou no fundo (arrasto de seleção)", async () => {
+    const aoFechar = vi.fn();
+    abrir(aoFechar);
+
+    await userEvent.pointer([
+      { keys: "[MouseLeft>]", target: screen.getByRole("dialog") },
+      { keys: "[/MouseLeft]", target: screen.getByTestId("fundo-do-sheet") },
+    ]);
+
+    expect(aoFechar).not.toHaveBeenCalled();
+  });
 });
