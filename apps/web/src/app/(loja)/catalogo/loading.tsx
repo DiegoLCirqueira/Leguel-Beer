@@ -7,7 +7,7 @@ export default function CarregandoCatalogo() {
       <p role="status" className="sr-only">
         Carregando o catálogo
       </p>
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-titulo text-4xl text-texto">Catálogo</h1>
         <Skeleton className="h-11 w-24 rounded-full" />
       </div>

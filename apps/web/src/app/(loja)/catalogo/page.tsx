@@ -20,7 +20,7 @@ export default async function Catalogo({ searchParams }: Props) {
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 px-4 pb-6 pt-2">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-titulo text-4xl text-texto">Catálogo</h1>
         <FiltrosDoCatalogo query={query} />
       </div>
