@@ -52,5 +52,21 @@ for (const medida of MEDIDAS) {
         expect(linha?.right ?? 0, `${texto}: direita`).toBeLessThanOrEqual(caixa.right + 1);
       }
     });
+
+    test("a dica do (i) abre 100% dentro da tela, em cima e embaixo", async ({ page }) => {
+      await page.goto("/boas-vindas");
+      const info = page.getByRole("button", { name: "Saiba mais sobre Manter-me conectado" });
+      await info.scrollIntoViewIfNeeded();
+
+      await info.click();
+
+      const dica = await page.getByText(/Sua sessão continua ativa/).boundingBox();
+      expect(dica).not.toBeNull();
+      expect(dica?.y ?? -1, "topo da dica").toBeGreaterThanOrEqual(0);
+      // 1 px de folga: a base da dica encosta no fim da rolagem e o layout tem frações de pixel.
+      expect((dica?.y ?? 0) + (dica?.height ?? 0), "base da dica").toBeLessThanOrEqual(
+        medida.height + 1,
+      );
+    });
   });
 }
