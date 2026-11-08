@@ -24,6 +24,8 @@ export function makeBeer(overrides: Partial<Beer> = {}): Beer {
     priceCents: 2800,
     featured: false,
     stock: 10,
+    description: null,
+    previousPriceCents: null,
     imageUrl: null,
     createdAt: new Date("2026-10-01T12:00:00Z"),
     ...overrides,

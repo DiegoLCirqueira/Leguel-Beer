@@ -40,6 +40,8 @@ export class PrismaBeerRepository implements BeerRepository {
       priceCents: row.priceCents,
       featured: row.featured,
       stock: row.stock,
+      description: row.description,
+      previousPriceCents: row.previousPriceCents,
       imageUrl: row.imageUrl,
       createdAt: row.createdAt,
     }));
