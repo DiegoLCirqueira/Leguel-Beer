@@ -8,6 +8,8 @@ export const categoriaComContadorSchema = z.object({
   quantidade: z.int().positive(),
 });
 
+export type CategoriaComContador = z.infer<typeof categoriaComContadorSchema>;
+
 export const catalogoResponseSchema = z.object({
   itens: z.array(cervejaCardSchema),
   total: z.int().nonnegative(),

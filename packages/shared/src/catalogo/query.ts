@@ -8,6 +8,8 @@ export const ORDENS_DO_CATALOGO = [
   "mais-novas",
 ] as const;
 
+export type OrdemDoCatalogo = (typeof ORDENS_DO_CATALOGO)[number];
+
 const slugSchema = z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/);
 
 function idDeFaixa(faixas: readonly Faixa[]) {
@@ -23,3 +25,5 @@ export const catalogoQuerySchema = z.object({
   disponiveis: z.stringbool({ truthy: ["true"], falsy: ["false"], case: "sensitive" }).catch(false),
   ordem: z.enum(ORDENS_DO_CATALOGO).catch("relevancia"),
 });
+
+export type CatalogoQuery = z.infer<typeof catalogoQuerySchema>;
