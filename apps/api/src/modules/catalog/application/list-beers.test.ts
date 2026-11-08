@@ -53,4 +53,17 @@ describe("ListBeers", () => {
       ["lager", 1],
     ]);
   });
+
+  it("traduz a faixa de teor da query: 4,5 entra em '4,5% a menos de 6%' e 6 jÃ¡ Ã© '6% ou mais'", async () => {
+    const repository = new InMemoryBeerRepository([
+      makeBeer({ name: "4,4", abv: 4.4 }),
+      makeBeer({ name: "4,5", abv: 4.5 }),
+      makeBeer({ name: "5,9", abv: 5.9 }),
+      makeBeer({ name: "6", abv: 6 }),
+    ]);
+
+    const result = await new ListBeers(repository).execute(query({ teor: "4-5-a-6" }));
+
+    expect(names(result.items).sort()).toEqual(["4,5", "5,9"]);
+  });
 });
