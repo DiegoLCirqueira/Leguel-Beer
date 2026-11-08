@@ -14,8 +14,13 @@ export interface CatalogFilters {
   onlyAvailable?: boolean;
 }
 
+const within = (value: number, range: Range | undefined) =>
+  !range || (value >= range.min && value < range.max);
+
 export function filterBeers(beers: readonly Beer[], filters: CatalogFilters): Beer[] {
   return beers.filter(
-    (beer) => !filters.categorySlug || beer.category.slug === filters.categorySlug,
+    (beer) =>
+      (!filters.categorySlug || beer.category.slug === filters.categorySlug) &&
+      within(beer.abv, filters.abv),
   );
 }
