@@ -1,7 +1,7 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export type ToastProps = {
@@ -18,6 +18,10 @@ export type ToastProps = {
 export function Toast({ mensagem, acao, aoFechar, duracaoMs = 5000, className }: ToastProps) {
   const fechar = useRef(aoFechar);
   const fechado = useRef(false);
+  const restante = useRef(duracaoMs);
+  const [sobre, setSobre] = useState(false);
+  const [comFoco, setComFoco] = useState(false);
+  const pausado = sobre || comFoco;
   useEffect(() => {
     fechar.current = aoFechar;
   });
@@ -28,19 +32,35 @@ export function Toast({ mensagem, acao, aoFechar, duracaoMs = 5000, className }:
     fechar.current();
   };
 
+  // Mensagem nova (ou duração nova): o contador recomeça e o toast pode fechar de novo.
   useEffect(() => {
+    restante.current = duracaoMs;
+    fechado.current = false;
+  }, [mensagem, duracaoMs]);
+
+  // Conta o tempo que resta; com mouse ou foco em cima o relógio para e guarda o que sobrou.
+  useEffect(() => {
+    if (pausado) return;
+    const inicio = Date.now();
     const espera = setTimeout(() => {
       if (fechado.current) return;
       fechado.current = true;
       fechar.current();
-    }, duracaoMs);
-    return () => clearTimeout(espera);
-  }, [duracaoMs]);
+    }, restante.current);
+    return () => {
+      clearTimeout(espera);
+      restante.current -= Date.now() - inicio;
+    };
+  }, [mensagem, duracaoMs, pausado]);
 
   return (
     <div
       role="status"
       aria-live="polite"
+      onMouseEnter={() => setSobre(true)}
+      onMouseLeave={() => setSobre(false)}
+      onFocus={() => setComFoco(true)}
+      onBlur={() => setComFoco(false)}
       className={cn(
         "fixed inset-x-4 bottom-[calc(57px+env(safe-area-inset-bottom,0px)+0.75rem)] z-40 mx-auto flex max-w-md items-center gap-3 rounded-2xl border-2 border-primaria bg-fundo px-4 py-3 text-texto shadow-lg",
         className,
