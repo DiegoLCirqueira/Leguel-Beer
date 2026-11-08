@@ -149,7 +149,7 @@ Os demais já existem: `StyleBadge`, `Stepper`, `Toast` e `Button`.
 | # | Card | Dono | O que entrega |
 | --- | --- | --- | --- |
 | 1 | Contrato (LB-40, #82) | Back | PR só em `@leguele/shared`, com testes: `cervejaDetalheSchema`, `calcularDesconto` e `estoqueBaixo` |
-| 2 | LB-40 e LB-41 (#82, #83), API | Back | Campos `descricao` e `precoAnterior` no modelo da cerveja, migration, seed com descrição de exemplo e um preço anterior; `GET /catalogo/:slug` |
+| 2 | LB-40 e LB-41 (#82, #83), API | Back | Campos `descricao` e `precoAnterior` no modelo da cerveja, migration, seed com as 16 descrições de exemplo e 2 preços anteriores (Maré Alta e Cajupá Sour, ver [[catalogo]], "Catálogo do MVP"); `GET /catalogo/:slug` |
 | 3 | LB-40 e LB-41, tela | Front | `/catalogo/[slug]`, já com o layout sem a barra inferior (grupo de rotas próprio ou variante do layout da loja): título, ficha, preço com desconto, aviso de estoque, frete grátis e estado "não encontrada"; o card passa a abrir esta página |
 | 4 | LB-42 (#84) | Front | Seletor de quantidade e botão fixo; o botão só funciona depois do LB-47 (item 3 da [[sequencia-telas]]) |
 

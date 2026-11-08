@@ -298,7 +298,7 @@ Onde rótulo e design divergem, o Diego delegou e vale (decisão do Spec, vetáv
 | Leguelé Comendador (`leguele-comendador`) | Helles (inventado) | Lager | 4,9% | 500 ml | R$ 25,90 | 17 | não (esgotada) | Munich Helles: 4,5–5%, 16–22 IBU |
 | Ponta Verde Pilsen (`ponta-verde-pilsen`) | German Pilsner | Lager | 4,6% | 500 ml | R$ 23,90 | 28 | não | German Pils: 4,4–5,2%, 22–40 IBU |
 
-Valores inventados para o seed; a coluna "Referência de estilo" mostra só a faixa típica do estilo em cervejas artesanais existentes, sem nome nem marca de terceiros. O preço anterior (Maré Alta, Cajupá Sour) só alimenta o dado; o preço riscado na tela não tem spec ainda.
+Valores inventados para o seed; a coluna "Referência de estilo" mostra só a faixa típica do estilo em cervejas artesanais existentes, sem nome nem marca de terceiros. O preço anterior (Maré Alta, Cajupá Sour) só alimenta o dado; o preço riscado no card não tem spec ainda (na página de produto tem, ver [[produto]]).
 
 **Para todas as cervejas:** descrições abaixo (1 a 2 frases); estoque de exemplo definido pelo Back no seed, com **1 esgotada** (Leguelé Comendador, estoque 0, para exercitar o selo e a ordem) e as outras 15 com estoque; imagem do rótulo da pasta de garrafas quando já for da marca, senão a padrão da categoria.
 
