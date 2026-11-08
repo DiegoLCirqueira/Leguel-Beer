@@ -14,8 +14,18 @@ type Props = { searchParams: Promise<Record<string, string | string[] | undefine
 
 /** Catálogo no servidor: filtros e ordem vêm da URL (valor inválido é ignorado) e a busca é na API. */
 export default async function Catalogo({ searchParams }: Props) {
-  const query = catalogoQuerySchema.parse(await searchParams);
-  const resultado = await buscarCatalogo(query);
+  const pedida = catalogoQuerySchema.parse(await searchParams);
+  let query = pedida;
+  let resultado = await buscarCatalogo(query);
+  // Categoria que não existe é ignorada: abre sem aquele filtro (a interface não a mantém).
+  if (
+    resultado.ok &&
+    query.categoria &&
+    !resultado.dados.categorias.some((c) => c.slug === query.categoria)
+  ) {
+    query = { ...pedida, categoria: undefined };
+    resultado = await buscarCatalogo(query);
+  }
   const queryString = paraQueryString(query);
 
   return (
