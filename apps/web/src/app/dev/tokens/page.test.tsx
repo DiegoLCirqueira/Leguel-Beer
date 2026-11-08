@@ -62,4 +62,15 @@ describe("/dev/tokens", () => {
 
     expect(() => DevTokens()).toThrow("NEXT_NOT_FOUND");
   });
+
+  it("em produção só existe quando o E2E do CI liga VITRINE_E2E=1 (sem a variável continua 404)", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("VITRINE_E2E", "1");
+
+    render(<DevTokens />);
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Tokens e componentes" }),
+    ).toBeInTheDocument();
+  });
 });
