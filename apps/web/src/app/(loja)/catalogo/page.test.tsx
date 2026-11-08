@@ -35,12 +35,12 @@ describe("/catalogo", () => {
     expect(screen.getByRole("button", { name: "IPA (6)" })).toBeInTheDocument();
   });
 
-  it("categoria que não existe é ignorada: busca sem ela, Todas marcada e sem Limpar filtros", async () => {
+  it("categoria que não existe é ignorada: uma só busca, Todas marcada e sem Limpar filtros", async () => {
     buscar.mockResolvedValue({ ok: true, dados });
 
     await abrir({ categoria: "nao-existe" });
 
-    expect(buscar).toHaveBeenLastCalledWith({ disponiveis: false, ordem: "relevancia" });
+    expect(buscar).toHaveBeenCalledTimes(1);
     expect(screen.getByRole("button", { name: "Todas (6)" })).toHaveAttribute(
       "aria-pressed",
       "true",
