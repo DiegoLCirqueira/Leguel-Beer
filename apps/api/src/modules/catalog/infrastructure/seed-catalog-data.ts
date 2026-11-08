@@ -13,6 +13,8 @@ export interface SeedBeer {
   priceCents: number;
   featured: boolean;
   stock: number;
+  description?: string | null;
+  previousPriceCents?: number | null;
   createdAt: Date;
 }
 

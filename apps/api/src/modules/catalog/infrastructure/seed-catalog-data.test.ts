@@ -1,4 +1,4 @@
-import { faixasDeFiltro, pertenceAFaixa } from "@leguele/shared";
+import { calcularDesconto, faixasDeFiltro, pertenceAFaixa } from "@leguele/shared";
 import { describe, expect, it } from "vitest";
 import { SEED_CATEGORIES } from "./seed-catalog-data.js";
 
@@ -46,5 +46,12 @@ describe("dados do seed do catálogo", () => {
     ]);
     expect(beers.filter((beer) => beer.name.startsWith("Teste "))).toHaveLength(7);
     expect(beers.filter((beer) => beer.featured)).toHaveLength(8);
+  });
+
+  it("a Maré Alta traz o exemplo da página de produto: IBU 65 e R$ 36,90 para R$ 32,00, 13% de desconto", () => {
+    const mareAlta = beers.find((beer) => beer.slug === "mare-alta");
+
+    expect(mareAlta).toMatchObject({ ibu: 65, priceCents: 3200, previousPriceCents: 3690 });
+    expect(calcularDesconto(mareAlta?.previousPriceCents, mareAlta?.priceCents ?? 0)).toBe(13);
   });
 });
