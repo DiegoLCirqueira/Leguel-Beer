@@ -1,5 +1,6 @@
 import type { CatalogoQuery } from "@leguele/shared";
 import type { Beer } from "../domain/beer.js";
+import { sortBeers } from "../domain/catalog-order.js";
 import type { BeerRepository } from "../domain/beer-repository.js";
 
 export interface CategoryCount {
@@ -20,7 +21,7 @@ export class ListBeers {
 
   async execute(query: CatalogoQuery): Promise<CatalogResult> {
     void query;
-    await this.beers.findActive();
-    return { items: [], total: 0, categories: [] };
+    const items = sortBeers(await this.beers.findActive(), "relevancia");
+    return { items, total: items.length, categories: [] };
   }
 }
