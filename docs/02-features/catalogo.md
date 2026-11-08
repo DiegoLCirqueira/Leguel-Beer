@@ -88,7 +88,7 @@ Funcionalidade: Catálogo de cervejas
 ## Regras de negócio
 
 - **Página:** `/catalogo` com todas as cervejas ativas. Cervejas inativas nunca aparecem, nem pelo link direto.
-- **Tamanho do catálogo no MVP:** 9 cervejas em 4 categorias (IPA 3, Frutas 2, Malt 1, Lager 3), as dos rótulos em `Imagens/figma/cervejas/` (decisão do Diego, 08/11; ver "Catálogo do MVP"), sem Stout. As categorias vêm do cadastro e podem mudar.
+- **Tamanho do catálogo no MVP:** 16 cervejas em 4 categorias, 4 por categoria, todas da marca (decisão do Diego, 08/11; ver "Catálogo do MVP"), sem Stout. As categorias vêm do cadastro e podem mudar.
 - **Filtros:** categoria, teor alcoólico, IBU, faixa de preço e "só disponíveis", num bottom sheet.
   - Categoria: uma por vez; o chip "Todas" remove o filtro.
   - Teor alcoólico, IBU e preço usam **faixas fixas** (valores em "Faixas de filtro"). Cada faixa inclui o limite inferior e exclui o superior (ex.: uma faixa de 30 a 60 inclui IBU 30 e não inclui IBU 60). Uma faixa por atributo; "Qualquer" remove o filtro.
@@ -107,7 +107,7 @@ Funcionalidade: Catálogo de cervejas
 ## Faixas de filtro
 
 > [!info] Recomendação aplicada, vetável (08/11)
-> O Diego decidiu o formato (faixas fixas, limite inferior incluído e superior excluído) em 2026-10-28; os limites são produto e não estavam definidos. Aplicada a opção mais simples e reversível: 3 faixas por atributo, calibradas pelos números do design e conferidas contra as 9 cervejas de "Catálogo do MVP". Trocar os limites é mudar uma constante em `@leguele/shared`, sem migration.
+> O Diego decidiu o formato (faixas fixas, limite inferior incluído e superior excluído) em 2026-10-28; os limites são produto e não estavam definidos. Aplicada a opção mais simples e reversível: 3 faixas por atributo, calibradas pelos números do design e conferidas contra as 16 cervejas de "Catálogo do MVP". Trocar os limites é mudar uma constante em `@leguele/shared`, sem migration.
 
 | Atributo | Faixas (id na URL: intervalo) |
 | --- | --- |
@@ -131,7 +131,7 @@ Telas do design (fora do repo, em `Imagens/figma/telas/`), só como referência 
 **Entra:** lista em grade de 2 colunas; faixa de categorias com contador; bottom sheet com categoria, três faixas, "Só disponíveis", "Ordenar por", "Limpar filtros" e "Aplicar"; card esgotado com selo e "Adicionar" desabilitado; estado vazio com "Limpar filtros".
 
 **Não entra (o design diverge da spec; vale a spec):**
-- "Stouts" e o total "23": o catálogo tem 4 categorias e 9 cervejas, sem Stout.
+- "Stouts" e o total "23": o catálogo tem 4 categorias e 16 cervejas, sem Stout.
 - Sliders de teor, IBU e preço: viram faixas fixas.
 - "Mais vendidos": a ordenação padrão é "Relevância" (não há dado de venda no MVP).
 - "Só disponíveis" ligado: começa desligado.
@@ -158,7 +158,7 @@ Telas do design (fora do repo, em `Imagens/figma/telas/`), só como referência 
 
 ## Fora de escopo
 
-- Paginação (desnecessária para 9 cervejas).
+- Paginação (desnecessária para 16 cervejas).
 - Busca textual (LB-37, #26, milestone MVP+).
 - Banner rotativo de destaques (LB-32, #21, milestone MVP+).
 - Página de produto (épico E10: LB-40, LB-41, LB-42), que terá spec própria.
@@ -178,7 +178,7 @@ Telas do design (fora do repo, em `Imagens/figma/telas/`), só como referência 
 
 Os números são os da entrevista; a pergunta 6 foi decidida pelo Orchestrator (ver "Decisões tomadas sem consulta").
 
-- **Pergunta 1:** catálogo do MVP com 4 categorias (IPA, Frutas, Malt, Lager), sem Stout; categorias vêm do cadastro. Eram 16 cervejas; em 08/11 o Diego trocou por 9: as dos rótulos (ver "Catálogo do MVP").
+- **Pergunta 1:** catálogo do MVP com 4 categorias (IPA, Frutas, Malt, Lager), sem Stout; categorias vêm do cadastro. Eram 16 cervejas; em 08/11 o Diego trocou por 9 (as dos rótulos) e depois fechou 16, 4 por categoria, todas da marca (ver "Catálogo do MVP").
 - **Pergunta 2:** escopo é o épico E3 do milestone MVP inteiro (LB-33, 34, 35, 36, 38), sem a página de produto (E10), a busca (LB-37) e o banner (LB-32).
 - **Pergunta 3:** relevância é a ordenação padrão: destaques, depois a ordem das categorias, depois o nome.
 - **Pergunta 4:** esgotadas sempre no fim; a ordenação vale dentro de cada grupo; "só disponíveis" esconde esgotadas.
@@ -214,7 +214,7 @@ Reconciliação com as issues migradas do milestone MVP, para as três specs do 
 | #27 | [LB-38] Sinalizar cervejas esgotadas | Título mantido. Descrição: link para a spec e definição de quantidade disponível do [[GLOSSARY]]. Critérios: cenário "Cerveja esgotada por reservas vai para o fim"; esgotadas no fim com qualquer ordenação; "só disponíveis" esconde esgotadas. Dependência explícita de #32 (LB-56, reserva de estoque). | A regra de ordem das esgotadas com outras ordenações e a interação com "só disponíveis" não estavam definidas. |
 | #23 | [LB-34] Exibir cervejas em destaque na home | Título mantido. Descrição: link para `docs/02-features/destaques-home.md`. Critérios: os cenários da spec (até 6 destaques, ordem de relevância, esgotada no fim com selo, seção some sem destaques). | A issue não traz critério; a ordem dos destaques e o caso sem destaques não estavam definidos. |
 | #24 | [LB-35] Adicionar cerveja à geladeira direto do card | Título: "[LB-35] Adicionar cerveja à Geladeira direto do card" (Geladeira com maiúscula, termo oficial). Descrição: link para `docs/02-features/adicionar-do-card.md`. Critérios: os cenários da spec, incluindo convidado sem login, limite pela quantidade disponível e botão desabilitado para esgotada. | O papel do convidado e o limite pela quantidade disponível (com reservas) não estavam explícitos. |
-| #13 | [LB-4] Modelar schema inicial do catálogo e seed com cervejas de exemplo | Título mantido. Critério adicional: a cerveja guarda a data de cadastro (para "mais novas"). Seed: as 9 cervejas dos rótulos, em 4 categorias (IPA, Frutas, Malt, Lager); eram 16 até 08/11 (ver "Catálogo do MVP"). | "Mais novas" precisa de uma data que não está na lista de campos do card. |
+| #13 | [LB-4] Modelar schema inicial do catálogo e seed com cervejas de exemplo | Título mantido. Critério adicional: a cerveja guarda a data de cadastro (para "mais novas"). Seed: as 16 cervejas de "Catálogo do MVP", 4 por categoria (IPA, Frutas, Malt, Lager). | "Mais novas" precisa de uma data que não está na lista de campos do card. |
 
 Dependências que já existem e não mudam: #64 (LB-12, chip de categoria), #65 (LB-13, card de produto), #66 (LB-14, bottom sheet e toast) e #54 (LB-47, Geladeira persistida). O estado vazio do catálogo fica em #25, sem depender de #70 (LB-18, MVP+).
 
@@ -247,7 +247,7 @@ Ordem dos cards do grupo B do [[roteiro-mvp]], em fatias verticais:
 | # | Card | Dono | O que entrega |
 | --- | --- | --- | --- |
 | 1 | Contrato (LB-4, #13) | Back | PR só em `@leguele/shared`, com testes: os schemas de "Contrato compartilhado" e `faixasDeFiltro`; sai antes de qualquer outra fatia |
-| 2 | LB-4 (#13) | Back | Modelos de categoria (com `ordem`, inteiro, usada pela relevância) e de cerveja (ativa, destaque, estoque, data de cadastro), migration e seed das 9 cervejas de "Catálogo do MVP", em 4 categorias, com 1 esgotada. No mesmo PR, o Back atualiza os testes e o E2E que contam 16 (`seed-catalog-data.test.ts`, `seed-catalog.integration.test.ts`, `catalogo.spec.ts` e `home-destaques.spec.ts`) |
+| 2 | LB-4 (#13) | Back | Modelos de categoria (com `ordem`, inteiro, usada pela relevância) e de cerveja (ativa, destaque, estoque, data de cadastro), migration e seed das 16 cervejas de "Catálogo do MVP", 4 por categoria, com 1 esgotada e 8 em destaque. No mesmo PR, o Back atualiza os testes e o E2E que contam 9 (`seed-catalog-data.test.ts`, `seed-catalog.integration.test.ts`, `catalogo.spec.ts` e `home-destaques.spec.ts`) |
 | 3 | LB-36 (#25), API | Back | `GET /catalogo`: filtros, faixas, ordenação por relevância, menor e maior preço e mais novas, esgotadas no fim; contagem por categoria (LB-33, #22) e `esgotada` (LB-38, #27, sem reservas ainda); é o módulo de referência `ListBeers` e o `Money` previstos em [[api-base]] |
 | 4 | LB-34 (#23), API | Back | `GET /catalogo/destaques`, com ordem e corte em 6 |
 | 5 | LB-15 (#67) | Front | Layout compartilhado da loja: cabeçalho (logo e contador da Geladeira, recebido por prop) e barra inferior de 4 abas (ver abaixo) |
@@ -273,51 +273,62 @@ Depois do contrato (fatia 1), as fatias 2 a 4 (Back) e 5 a 7 (Front) andam em pa
 
 > [!todo] Preencher: imagens das garrafas dos cards. Sem `imagemUrl`, o card usa a imagem padrão da categoria; as imagens recortadas vêm do LB-124 (item 3 da [[sequencia-telas]]).
 
-## Catálogo do MVP (fonte: rótulos)
+## Catálogo do MVP (16 cervejas da marca)
 
-Decisão do Diego em 08/11: o catálogo do MVP são as **9 cervejas das garrafas** em `Imagens/figma/cervejas/` (fora do repo; arquivos de 30/10/2026), não 16. Nome, estilo, teor e volume vêm do rótulo quando legível; preço, IBU e descrição vêm das telas do design (02, 03, 16, 22, 26 e 04, de 30/10 e 08/11/2026) quando a cerveja aparece lá. O que nenhuma imagem mostra é **provisório, vetável e a confirmar com o Diego**. A categoria sai do estilo (vetável). Valores provisórios podem entrar no seed como dado de exemplo e serão trocados pelo cadastro (admin, LB-73).
+Decisão do Diego em 08/11: o catálogo do MVP tem **16 cervejas, 4 por categoria, todas da marca Leguelé Beer** ("trocar, tudo deve ser da nossa marca (leguelé beer)"). As 9 dos rótulos em `Imagens/figma/cervejas/` (fora do repo) ficam como base; as outras 7 são novas. Sobre as novas ("Falta criar o resto das cervejas que vão fechar 4 por categoria; quanto ao rótulo ou design faça o que ficar melhor; esses dados vão ser completamente inventados então tem liberdade pra fazê-los, pegue cervejas existentes como base pras pesquisas"), os dados são **inventados, de exemplo**, e serão trocados pelo cadastro (admin, LB-73). Comendador: "Não tenho certeza"; o Spec inventou estilo e dados (Helles, Lager).
 
-| Cerveja (slug) | Estilo | Categoria | Teor | Volume | Preço | IBU | Fonte |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Maré Alta (`mare-alta`) | American IPA | IPA | 6,5% | 330 ml | R$ 32,00 (anterior R$ 36,90*) | 65 | rótulo (nome, estilo, teor, volume); telas 03, 22 e 28 (preço, IBU, descrição) |
-| Leguelé Carnaval (`leguele-carnaval`) | Session IPA | IPA | 4,2%† | 330 ml† | R$ 30,00† | 30† | rótulo (nome, estilo); o resto provisório |
-| Leguelé Maceió IPA (`leguele-maceio-ipa`) | IPA | IPA | 6,0%† | 330 ml† | R$ 31,00† | 55† | rótulo (nome, estilo; volume cortado no rótulo, "…0 ml"); o resto provisório |
-| Cupuaçu Ale (`cupuacu-ale`) | Amazonian Fruit Ale | Frutas | 5,8% | 500 ml | R$ 26,50 | 15† | rótulo (nome, estilo, teor, volume); telas 02, 04 e 16 (preço) |
-| Cajupá Sour (`cajupa-sour`) | Sour Ale com cajá | Frutas | 6,5% | 500 ml | R$ 26,00† | 8† | rótulo (nome, estilo, teor, volume); preço provisório pelo "Cupuaçu Sour" da tela 02 |
-| Avermelhou (`avermelhou`) | Red Ale (hibisco e frutas vermelhas) | Malt† | 5,8% | 330 ml | R$ 29,00† | 20† | rótulo (nome, estilo, teor, volume); preço provisório pelo "Aurenhõsu Red" da tela 02 |
-| Leguelé Cream Ale (`leguele-cream-ale`) | Cream Ale | Lager† | 5,2% | 330 ml† | R$ 25,00† | 18† | rótulo (nome, estilo, teor); o resto provisório |
-| Leguelé Kölsch (`leguele-kolsch`) | Kölsch | Lager† | 4,8%† | 330 ml† | R$ 24,90† | 22† | rótulo (nome, estilo); o resto provisório |
-| Leguelé Comendador (`leguele-comendador`) | a confirmar | Lager† | 5,0%† | 500 ml† | R$ 25,00† | 15† | só o arquivo da imagem (o rótulo não traz nome, estilo, teor nem volume); o resto provisório |
+Onde rótulo e design divergem, o Diego delegou e vale (decisão do Spec, vetável): o **rótulo** para nome, estilo, teor e volume (Maré Alta 330 ml, Cupuaçu Ale 5,8%); o **design** para preço, preço anterior, IBU e descrição da Maré Alta (R$ 32,00, anterior R$ 36,90, IBU 65). As imagens dos rótulos atuais trazem marcas de terceiros e **precisam ser refeitas com a marca Leguelé** (follow-up de arte, LB-124); até lá, o site usa a imagem padrão da categoria nas cervejas cujo rótulo tenha marca de terceiros.
 
-† valor provisório, a confirmar com o Diego. \* o preço anterior da Maré Alta é R$ 36,90 nas telas 03 e 28 e R$ 36,00 nas telas 02, 16, 22 e 26; vale R$ 36,90 (decisão provisória, a confirmar).
+| Cerveja (slug) | Estilo | Categoria | Teor | Vol. | Preço | IBU | Destaque | Referência de estilo |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Maré Alta (`mare-alta`) | American IPA | IPA | 6,5% | 330 ml | R$ 32,00 (anterior R$ 36,90) | 65 | sim | American IPA artesanal: 6–7%, 55–70 IBU |
+| Leguelé Carnaval (`leguele-carnaval`) | Session IPA | IPA | 4,2% | 330 ml | R$ 30,00 | 30 | sim | Session IPA: 4–4,5%, 25–40 IBU |
+| Leguelé Maceió IPA (`leguele-maceio-ipa`) | IPA | IPA | 6,0% | 330 ml | R$ 31,00 | 55 | não | IPA clássica nacional: 6–6,5%, 50–60 IBU |
+| Jaraguá Hazy IPA (`jaragua-hazy-ipa`) | New England IPA | IPA | 6,8% | 500 ml | R$ 33,50 | 42 | sim | NEIPA artesanal nacional: 6,5–7%, 30–50 IBU |
+| Cupuaçu Ale (`cupuacu-ale`) | Amazonian Fruit Ale | Frutas | 5,8% | 500 ml | R$ 26,50 | 15 | sim | Fruit ale com fruta amazônica: 5–6%, 10–20 IBU |
+| Cajupá Sour (`cajupa-sour`) | Sour Ale com cajá | Frutas | 6,5% | 500 ml | R$ 26,00 (anterior R$ 29,90) | 8 | sim | Fruited sour: 4,5–6,5%, 5–10 IBU |
+| Umbu Gose (`umbu-gose`) | Gose com umbu | Frutas | 4,0% | 330 ml | R$ 27,50 | 6 | não | Gose frutada: 4–4,5%, 5–10 IBU |
+| Graviola Witbier (`graviola-witbier`) | Witbier com graviola | Frutas | 4,8% | 500 ml | R$ 28,00 | 12 | não | Witbier com fruta: 4,5–5%, 10–15 IBU |
+| Avermelhou (`avermelhou`) | Red Ale (hibisco e frutas vermelhas) | Malt | 5,8% | 330 ml | R$ 29,00 | 20 | sim | Irish/American Red Ale: 5–6%, 20–28 IBU |
+| Rapadura Brown Ale (`rapadura-brown-ale`) | Brown Ale com rapadura | Malt | 5,5% | 330 ml | R$ 28,50 | 24 | não | American Brown Ale: 5–6%, 20–35 IBU |
+| Barra Nova Porter (`barra-nova-porter`) | Robust Porter | Malt | 6,4% | 330 ml | R$ 31,50 | 35 | sim | Robust Porter: 5,5–7%, 30–45 IBU |
+| Pajuçara Amber Ale (`pajucara-amber-ale`) | American Amber Ale | Malt | 5,0% | 330 ml | R$ 27,00 | 25 | não | American Amber: 4,5–5,5%, 25–35 IBU |
+| Leguelé Kölsch (`leguele-kolsch`) | Kölsch | Lager | 4,8% | 330 ml | R$ 24,90 | 22 | sim | Kölsch: 4,5–5%, 18–25 IBU |
+| Leguelé Cream Ale (`leguele-cream-ale`) | Cream Ale | Lager | 5,2% | 330 ml | R$ 25,00 | 18 | não | Cream Ale: 4,5–5,5%, 10–20 IBU |
+| Leguelé Comendador (`leguele-comendador`) | Helles (inventado) | Lager | 4,9% | 500 ml | R$ 25,90 | 17 | não (esgotada) | Munich Helles: 4,5–5%, 16–22 IBU |
+| Ponta Verde Pilsen (`ponta-verde-pilsen`) | German Pilsner | Lager | 4,6% | 500 ml | R$ 23,90 | 28 | não | German Pils: 4,4–5,2%, 22–40 IBU |
 
-**Para todas as cervejas:** descrição nula, exceto a Maré Alta, cujo texto está na tela 22 ("Uma American IPA de respeito! Com um amargor marcante, aroma cítrico e notas tropicais, a Maré Alta é perfeita para quem busca uma experiência intensa e refrescante."); sem preço anterior, exceto a Maré Alta; estoque de exemplo definido pelo Back no seed, com **1 cerveja esgotada** (Leguelé Comendador, estoque 0, provisória) para exercitar o selo e a ordem; as outras 8 têm estoque; imagem do rótulo da pasta de garrafas (ou a padrão da categoria).
+Valores inventados para o seed; a coluna "Referência de estilo" mostra só a faixa típica do estilo em cervejas artesanais existentes, sem nome nem marca de terceiros. O preço anterior (Maré Alta, Cajupá Sour) só alimenta o dado; o preço riscado na tela não tem spec ainda.
 
-**Cobertura das faixas com os valores acima:** teor, "Abaixo de 4,5%" (Carnaval 4,2%), "4,5% a menos de 6%" (Cupuaçu Ale, Avermelhou, Cream Ale, Kölsch, Comendador) e "6% ou mais" (Maré Alta, Cajupá Sour, Maceió IPA); IBU, "Abaixo de 20" (Cupuaçu Ale, Cajupá Sour, Cream Ale, Comendador), "20 a menos de 40" (Avermelhou, Kölsch, Carnaval) e "40 ou mais" (Maré Alta, Maceió IPA); preço, "Abaixo de R$ 25" (Kölsch, R$ 24,90), "R$ 25 a menos de R$ 30" (Cupuaçu Ale, Cajupá Sour, Avermelhou, Cream Ale, Comendador) e "R$ 30 ou mais" (Maré Alta, Carnaval, Maceió IPA). Todas as 9 faixas têm cerveja; os valores que garantem isso são provisórios e vetáveis.
+**Para todas as cervejas:** descrições abaixo (1 a 2 frases); estoque de exemplo definido pelo Back no seed, com **1 esgotada** (Leguelé Comendador, estoque 0, para exercitar o selo e a ordem) e as outras 15 com estoque; imagem do rótulo da pasta de garrafas quando já for da marca, senão a padrão da categoria.
 
-**Destaques (provisório):** 6 cervejas em destaque no seed: Maré Alta, Cupuaçu Ale, Cajupá Sour, Avermelhou, Leguelé Carnaval e Leguelé Kölsch. Com 6, a home mostra todas e o corte em 6 só se exercita nos testes com dados próprios.
+| Cerveja | Descrição |
+| --- | --- |
+| Maré Alta | Uma American IPA de respeito! Com um amargor marcante, aroma cítrico e notas tropicais, a Maré Alta é perfeita para quem busca uma experiência intensa e refrescante. |
+| Leguelé Carnaval | Leve e aromática, para brindar o dia todo sem pesar. Lúpulo cítrico e final seco, feita para a folia. |
+| Leguelé Maceió IPA | O sabor da nossa cidade em uma IPA firme. Amargor equilibrado e notas de maracujá e casca de laranja. |
+| Jaraguá Hazy IPA | Turva, suculenta e macia, com aroma de manga e pêssego. Pouco amargor e muito lúpulo no nariz. |
+| Cupuaçu Ale | Ale frutada com a cremosidade ácida do cupuaçu. Refrescante, com final levemente adocicado. |
+| Cajupá Sour | Sour de acidez viva e perfume de cajá. Pede gelo e um dia de sol. |
+| Umbu Gose | Gose salina com o azedinho do umbu, fruta do sertão. Leve, ácida e fácil de beber. |
+| Graviola Witbier | Witbier de trigo com coentro, casca de laranja e graviola. Cremosa e refrescante. |
+| Avermelhou | Red Ale com hibisco e frutas vermelhas. Malte caramelado, cor rubi e toque floral. |
+| Rapadura Brown Ale | Brown Ale com rapadura nordestina. Notas de caramelo, nozes e um doce discreto no final. |
+| Barra Nova Porter | Porter encorpada com malte torrado, chocolate amargo e café. Para os dias de chuva e de conversa. |
+| Pajuçara Amber Ale | Amber Ale equilibrada, de malte tostado e lúpulo cítrico. A cerveja de todo dia, com personalidade. |
+| Leguelé Kölsch | Dourada, limpa e delicada, com frutado suave. Leve como a brisa da orla. |
+| Leguelé Cream Ale | Cremosa, macia e fácil de beber. Corpo leve, milho no malte e final suave. |
+| Leguelé Comendador | Helles dourada de malte macio e amargor discreto. Uma lager clássica com a assinatura da casa. |
+| Ponta Verde Pilsen | Pilsen crocante, de amargor nobre e aroma floral. Gelada na medida. |
 
-### Categorias (vetável)
+**Cobertura das faixas:** teor, "Abaixo de 4,5%" (Carnaval 4,2%, Umbu Gose 4,0%), "4,5% a menos de 6%" (Cupuaçu Ale, Graviola Witbier, Avermelhou, Rapadura, Pajuçara, Kölsch, Cream Ale, Comendador, Ponta Verde) e "6% ou mais" (Maré Alta, Maceió IPA, Jaraguá, Cajupá Sour, Barra Nova); IBU, "Abaixo de 20" (Cupuaçu Ale, Cajupá Sour, Umbu Gose, Graviola, Cream Ale, Comendador), "20 a menos de 40" (Carnaval, Avermelhou, Rapadura, Barra Nova, Pajuçara, Kölsch, Ponta Verde) e "40 ou mais" (Maré Alta, Maceió IPA, Jaraguá); preço, "Abaixo de R$ 25" (Kölsch, Ponta Verde), "R$ 25 a menos de R$ 30" (Cupuaçu Ale, Cajupá Sour, Umbu Gose, Graviola, Avermelhou, Rapadura, Pajuçara, Cream Ale, Comendador) e "R$ 30 ou mais" (Maré Alta, Carnaval, Maceió IPA, Jaraguá, Barra Nova). Todas as 9 faixas têm cerveja.
 
-- **IPA (3):** Maré Alta, Leguelé Carnaval e Leguelé Maceió IPA.
-- **Frutas (2):** Cupuaçu Ale e Cajupá Sour.
-- **Malt (1):** Avermelhou. Um Red Ale com hibisco e frutas vermelhas também cabe em Frutas; fica em Malt porque o design põe os red ales na prateleira Malt (tela 04).
-- **Lager (3):** Leguelé Kölsch, Leguelé Cream Ale e Leguelé Comendador. Kölsch e Cream Ale são ales de perfil limpo, mais próximas das lagers; o Comendador é provisório até o estilo ser confirmado.
-- Nenhuma categoria ficou vazia, e nenhum estilo pede uma categoria fora das 4.
+**Destaques:** 8 cervejas em destaque, para exercitar o corte em 6 da home: Maré Alta, Leguelé Carnaval, Jaraguá Hazy IPA, Cupuaçu Ale, Cajupá Sour, Avermelhou, Barra Nova Porter e Leguelé Kölsch. Pela relevância (ordem das categorias, depois o nome), a home mostra Jaraguá Hazy IPA, Leguelé Carnaval, Maré Alta, Cajupá Sour, Cupuaçu Ale e Avermelhou; Barra Nova Porter e Leguelé Kölsch ficam de fora.
 
-### A confirmar com o Diego
+### Categorias
 
-**Preciso de resposta do Diego** (decisão de marca e de produto; o seed segue com o provisório enquanto isso):
+4 por categoria: **IPA** (Maré Alta, Leguelé Carnaval, Leguelé Maceió IPA, Jaraguá Hazy IPA), **Frutas** (Cupuaçu Ale, Cajupá Sour, Umbu Gose, Graviola Witbier), **Malt** (Avermelhou, Rapadura Brown Ale, Barra Nova Porter, Pajuçara Amber Ale) e **Lager** (Leguelé Kölsch, Leguelé Cream Ale, Leguelé Comendador, Ponta Verde Pilsen). Sem Stout. Kölsch e Cream Ale são ales de perfil limpo, postas em Lager por decisão do Diego.
 
-1. **Marcas de terceiros nos rótulos:** os rótulos de Cupuaçu Ale ("Floresta Beer Co."), Avermelhou ("São Paulo Brew Co."), Cajupá Sour ("Cajupá Brew Co.") e Maré Alta ("produzido e engarrafado em Portugal") trazem outra cervejaria ou origem. Confirmar se vão assim para o site (marca e conteúdo são do Diego).
-2. **Leguelé Comendador:** nome e estilo (hoje só o nome do arquivo). Também é a cerveja marcada como esgotada no seed provisório.
-3. **Categorias** acima (principalmente Avermelhou em Malt e Comendador em Lager).
-4. **Divergência rótulo × design:** o design mostra a Maré Alta com 500 ml e o Cupuaçu Ale com 5,0%; vale o rótulo (330 ml e 5,8%).
+### A confirmar
 
-**Dados de cadastro que o Diego manda quando puder** (provisórios e vetáveis; entram pelo cadastro, LB-73, sem travar o seed):
-
-5. **Teor e volume que o rótulo não mostra:** Comendador, Carnaval, Maceió IPA, Kölsch e o volume do Cream Ale.
-6. **IBU:** só a Maré Alta (65) tem valor no design; os outros oito são provisórios.
-7. **Preços:** valem os do design onde a cerveja aparece (Maré Alta e Cupuaçu Ale); os outros sete são provisórios. Preço anterior da Maré Alta: R$ 36,90 ou R$ 36,00.
-8. **Descrições** das 8 cervejas sem texto no design (a seção some enquanto forem nulas).
-9. **Faixas de filtro:** os valores provisórios cobrem as 9 faixas (ver "Cobertura das faixas"), mas com teor, IBU e preço reais as faixas podem precisar de ajuste.
+- **Arte dos rótulos** (LB-124): refazer com a marca Leguelé os rótulos de Cupuaçu Ale, Avermelhou, Cajupá Sour e Maré Alta, que trazem outra cervejaria ou origem, e criar os das 7 cervejas novas (Jaraguá Hazy IPA, Umbu Gose, Graviola Witbier, Rapadura Brown Ale, Barra Nova Porter, Pajuçara Amber Ale e Ponta Verde Pilsen). O design dos rótulos novos é livre (o Diego delegou).
