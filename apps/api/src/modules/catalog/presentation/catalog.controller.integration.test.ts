@@ -285,4 +285,49 @@ describe("GET /catalogo (banco real)", () => {
       esgotada: false,
     });
   });
+
+  it("sem preço anterior, ou com anterior igual ao atual, não há desconto; sem descrição, descricao é nula", async () => {
+    await addBeer("ipa", "sem-anterior");
+    await addBeer("ipa", "anterior-igual", { priceCents: 3200, previousPriceCents: 3200 });
+
+    const sem = cervejaDetalheSchema.parse((await getDetalhe("sem-anterior")).body);
+    const igual = cervejaDetalheSchema.parse((await getDetalhe("anterior-igual")).body);
+
+    expect(sem).toMatchObject({
+      descricao: null,
+      precoAnteriorCentavos: null,
+      descontoPercentual: null,
+    });
+    expect(igual).toMatchObject({ precoAnteriorCentavos: 3200, descontoPercentual: null });
+  });
+
+  it("cerveja esgotada tem detalhe com esgotada verdadeira", async () => {
+    await addBeer("ipa", "esgotada", { stock: 0 });
+
+    const body = cervejaDetalheSchema.parse((await getDetalhe("esgotada")).body);
+
+    expect(body).toMatchObject({ quantidadeDisponivel: 0, esgotada: true });
+  });
+
+  it("slug inexistente ou de cerveja inativa responde 404 no contrato de erros", async () => {
+    await addBeer("ipa", "ipa-inativa", { active: false });
+
+    for (const slug of ["nao-existe", "ipa-inativa"]) {
+      const response = await getDetalhe(slug);
+
+      expect(response.status).toBe(404);
+      expect(response.body).toMatchObject({ code: "NOT_FOUND" });
+    }
+  });
+
+  it("a rota fixa /catalogo/destaques continua valendo: não é lida como slug", async () => {
+    await addBeer("ipa", "ipa-destaque", { featured: true });
+
+    const response = await getDestaques();
+
+    expect(response.status).toBe(200);
+    expect(destaquesResponseSchema.parse(response.body).itens.map((i) => i.slug)).toEqual([
+      "ipa-destaque",
+    ]);
+  });
 });
