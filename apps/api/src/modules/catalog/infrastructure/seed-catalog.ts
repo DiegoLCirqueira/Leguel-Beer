@@ -20,7 +20,12 @@ export async function seedCatalog(
   prisma: PrismaService,
   env: { DATABASE_URL?: string | undefined } = process.env,
 ): Promise<void> {
-  if (env.DATABASE_URL && !isLocal(env.DATABASE_URL)) {
+  if (!env.DATABASE_URL) {
+    throw new Error(
+      "O seed do catálogo exige DATABASE_URL: sem ela não dá para saber que o banco é local",
+    );
+  }
+  if (!isLocal(env.DATABASE_URL)) {
     throw new Error("O seed do catálogo só roda contra o banco local: DATABASE_URL não é local");
   }
   await prisma.$transaction(async (tx) => {
