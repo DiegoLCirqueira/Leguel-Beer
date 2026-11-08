@@ -45,6 +45,7 @@ export class ListBeers {
       abv: rangeOf(faixasDeFiltro.teor, query.teor),
       ibu: rangeOf(faixasDeFiltro.ibu, query.ibu),
       priceCents: rangeOf(faixasDeFiltro.preco, query.preco),
+      onlyAvailable: query.disponiveis,
     });
     const items = sortBeers(filtered, "relevancia");
     return { items, total: items.length, categories: countByCategory(active) };
