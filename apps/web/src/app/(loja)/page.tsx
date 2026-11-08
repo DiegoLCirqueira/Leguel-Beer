@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { SiteFooter } from "@/components/site/site-footer";
 import { COOKIE_ACESSO } from "@/lib/auth/cookies";
 import { GUEST_COOKIE } from "@/lib/guest";
 import { resolveHomeRoute } from "@/lib/home-route";
@@ -18,7 +17,7 @@ export default async function Home({ searchParams }: Props = {}) {
 
   return (
     <>
-      <main className="flex min-h-dvh flex-col items-center justify-center gap-4 p-6">
+      <main className="flex flex-1 flex-col items-center justify-center gap-4 p-6">
         {aviso === "senha-alterada" ? (
           <p
             role="status"
@@ -29,7 +28,6 @@ export default async function Home({ searchParams }: Props = {}) {
         ) : null}
         <h1 className="font-titulo text-4xl text-primaria">Leguelé Beer</h1>
       </main>
-      <SiteFooter />
     </>
   );
 }
