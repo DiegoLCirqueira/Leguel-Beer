@@ -18,7 +18,12 @@ export const faixasDeFiltro = {
     { id: "20-a-40", rotulo: "20 a menos de 40", minimo: 20, maximo: 40 },
     { id: "40-ou-mais", rotulo: "40 ou mais", minimo: 40, maximo: Infinity },
   ] as Faixa[],
-  preco: [] as Faixa[],
+  /** Limites em centavos, a mesma unidade de `precoCentavos`. */
+  preco: [
+    { id: "abaixo-de-25", rotulo: "Abaixo de R$ 25", minimo: -Infinity, maximo: 2500 },
+    { id: "25-a-30", rotulo: "R$ 25 a menos de R$ 30", minimo: 2500, maximo: 3000 },
+    { id: "30-ou-mais", rotulo: "R$ 30 ou mais", minimo: 3000, maximo: Infinity },
+  ] as Faixa[],
 };
 
 export function pertenceAFaixa(faixa: Faixa, valor: number): boolean {
