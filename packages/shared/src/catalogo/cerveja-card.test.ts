@@ -33,4 +33,13 @@ describe("cervejaCardSchema", () => {
     expect(recusa({ ibu: 55.5 })).toBe(false);
     expect(recusa({ volumeMl: 500.5 })).toBe(false);
   });
+
+  it("exige esgotada verdadeira só quando a quantidade disponível é 0", () => {
+    const recusa = (campos: object) =>
+      cervejaCardSchema.safeParse({ ...cervejaValida, ...campos }).success;
+
+    expect(recusa({ quantidadeDisponivel: 0, esgotada: true })).toBe(true);
+    expect(recusa({ quantidadeDisponivel: 0, esgotada: false })).toBe(false);
+    expect(recusa({ quantidadeDisponivel: 3, esgotada: true })).toBe(false);
+  });
 });
