@@ -20,7 +20,7 @@ describe("FiltrosDoCatalogo", () => {
 
     const sheet = screen.getByRole("dialog", { name: "Filtros e ordenação" });
     for (const grupo of ["Teor alcoólico", "IBU (amargor)", "Faixa de preço"]) {
-      expect(within(sheet).getByRole("radiogroup", { name: grupo })).toBeInTheDocument();
+      expect(within(sheet).getByRole("group", { name: grupo })).toBeInTheDocument();
     }
     expect(within(sheet).getByRole("radio", { name: "6% ou mais" })).toBeChecked();
     expect(within(sheet).getByRole("switch", { name: "Somente disponíveis" })).toBeChecked();
