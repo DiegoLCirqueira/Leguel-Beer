@@ -1,4 +1,4 @@
-import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { PrismaService } from "../../../common/prisma/prisma.service.js";
 import { resetDatabase } from "../../../common/testing/database.js";
 import { PrismaBeerRepository } from "./prisma-beer-repository.js";
@@ -70,5 +70,50 @@ describe("PrismaBeerRepository (banco real)", () => {
     const beers = await repository.findActive();
 
     expect(beers).toHaveLength(200);
+  });
+
+  it("avisa no log quando a leitura bate o teto, porque o catálogo pode estar truncado", async () => {
+    const ipa = await prisma.category.create({ data: { slug: "ipa", name: "IPAs", order: 1 } });
+    await prisma.beer.createMany({
+      data: Array.from({ length: 201 }, (_, index) => ({
+        slug: `cerveja-${String(index).padStart(3, "0")}`,
+        name: `Cerveja ${index}`,
+        style: "American IPA",
+        categoryId: ipa.id,
+        abv: 5,
+        ibu: 30,
+        volumeMl: 500,
+        priceCents: 2800,
+        stock: 1,
+      })),
+    });
+    const logger = { warn: vi.fn() };
+
+    await new PrismaBeerRepository(prisma, logger).findActive();
+
+    expect(logger.warn).toHaveBeenCalledTimes(1);
+    expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining("200"));
+  });
+
+  it("não avisa quando a leitura fica abaixo do teto", async () => {
+    const ipa = await prisma.category.create({ data: { slug: "ipa", name: "IPAs", order: 1 } });
+    await prisma.beer.create({
+      data: {
+        slug: "ipa-a",
+        name: "IPA A",
+        style: "American IPA",
+        categoryId: ipa.id,
+        abv: 5,
+        ibu: 30,
+        volumeMl: 500,
+        priceCents: 2800,
+        stock: 1,
+      },
+    });
+    const logger = { warn: vi.fn() };
+
+    await new PrismaBeerRepository(prisma, logger).findActive();
+
+    expect(logger.warn).not.toHaveBeenCalled();
   });
 });
