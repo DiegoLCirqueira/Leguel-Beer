@@ -74,4 +74,30 @@ describe("regras do schema do catálogo (banco real)", () => {
       prisma.beer.create({ data: beer(categoryId, { slug: "e", volumeMl: 0 }) }),
     ).rejects.toThrow();
   });
+
+  it("recusa preço anterior negativo, descrição vazia e o slug reservado 'destaques'", async () => {
+    await expect(
+      prisma.beer.create({ data: beer(categoryId, { slug: "f", previousPriceCents: -1 }) }),
+    ).rejects.toThrow();
+    await expect(
+      prisma.beer.create({ data: beer(categoryId, { slug: "g", description: "" }) }),
+    ).rejects.toThrow();
+    await expect(
+      prisma.beer.create({ data: beer(categoryId, { slug: "destaques" }) }),
+    ).rejects.toThrow();
+  });
+
+  it("aceita cerveja sem descrição nem preço anterior e com os dois preenchidos", async () => {
+    const sem = await prisma.beer.create({ data: beer(categoryId, { slug: "sem" }) });
+    const com = await prisma.beer.create({
+      data: beer(categoryId, {
+        slug: "com",
+        description: "Uma IPA cítrica.",
+        previousPriceCents: 3690,
+      }),
+    });
+
+    expect(sem).toMatchObject({ description: null, previousPriceCents: null });
+    expect(com).toMatchObject({ description: "Uma IPA cítrica.", previousPriceCents: 3690 });
+  });
 });
