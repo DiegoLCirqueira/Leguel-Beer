@@ -79,4 +79,25 @@ describe("sortBeers", () => {
       "Frutas B",
     ]);
   });
+
+  it("esgotadas sempre no fim, mesmo a mais barata ou em destaque; a ordem vale dentro de cada grupo", () => {
+    const esgotadaBarata = makeBeer({ name: "Esgotada Barata", stock: 0, priceCents: 1000 });
+    const esgotadaDestaque = makeBeer({ name: "Esgotada Destaque", stock: 0, featured: true });
+    const disponivelCara = makeBeer({ name: "DisponÃ­vel Cara", priceCents: 4000 });
+    const disponivelBarata = makeBeer({ name: "DisponÃ­vel Barata", priceCents: 2000 });
+    const todas = [esgotadaBarata, disponivelCara, esgotadaDestaque, disponivelBarata];
+
+    expect(names(sortBeers(todas, "menor-preco"))).toEqual([
+      "DisponÃ­vel Barata",
+      "DisponÃ­vel Cara",
+      "Esgotada Barata",
+      "Esgotada Destaque",
+    ]);
+    expect(names(sortBeers(todas, "relevancia"))).toEqual([
+      "DisponÃ­vel Barata",
+      "DisponÃ­vel Cara",
+      "Esgotada Destaque",
+      "Esgotada Barata",
+    ]);
+  });
 });
