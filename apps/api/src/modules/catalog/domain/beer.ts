@@ -22,12 +22,11 @@ export interface Beer {
   createdAt: Date;
 }
 
+/** Estoque menos reservas de pedidos pendentes; até o LB-56 (reserva de estoque) é só o estoque. */
 export function availableQuantity(beer: Beer): number {
-  void beer;
-  return -1;
+  return beer.stock;
 }
 
 export function isSoldOut(beer: Beer): boolean {
-  void beer;
-  return false;
+  return availableQuantity(beer) === 0;
 }
