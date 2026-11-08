@@ -67,4 +67,16 @@ describe("sortBeers", () => {
       "Baratinha",
     ]);
   });
+
+  it("maior preÃ§o: do mais caro ao mais barato, e o empate cai na relevÃ¢ncia", () => {
+    const cara = makeBeer({ name: "Lager Cara", category: CATEGORIES.lager, priceCents: 4000 });
+    const barataA = makeBeer({ name: "IPA A", category: CATEGORIES.ipa, priceCents: 2000 });
+    const barataB = makeBeer({ name: "Frutas B", category: CATEGORIES.frutas, priceCents: 2000 });
+
+    expect(names(sortBeers([barataB, cara, barataA], "maior-preco"))).toEqual([
+      "Lager Cara",
+      "IPA A",
+      "Frutas B",
+    ]);
+  });
 });
