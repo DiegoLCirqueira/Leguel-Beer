@@ -53,7 +53,7 @@
       position: relative;
       left: auto;
       bottom: auto;
-      width: max(min(100vw, 440px), 320px);
+      width: min(100vw, 440px);
       margin-inline: auto;
       transform: none;
     }
