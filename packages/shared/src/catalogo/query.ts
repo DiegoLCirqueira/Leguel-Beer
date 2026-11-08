@@ -20,6 +20,6 @@ export const catalogoQuerySchema = z.object({
   teor: idDeFaixa(faixasDeFiltro.teor).optional().catch(undefined),
   ibu: idDeFaixa(faixasDeFiltro.ibu).optional().catch(undefined),
   preco: idDeFaixa(faixasDeFiltro.preco).optional().catch(undefined),
-  disponiveis: z.stringbool({ truthy: ["true"], falsy: ["false"] }).catch(false),
+  disponiveis: z.stringbool({ truthy: ["true"], falsy: ["false"], case: "sensitive" }).catch(false),
   ordem: z.enum(ORDENS_DO_CATALOGO).catch("relevancia"),
 });
