@@ -1,5 +1,6 @@
 import type { CatalogoQuery } from "@leguele/shared";
 import type { Beer } from "../domain/beer.js";
+import { filterBeers } from "../domain/catalog-filter.js";
 import { sortBeers } from "../domain/catalog-order.js";
 import type { BeerRepository } from "../domain/beer-repository.js";
 
@@ -31,9 +32,9 @@ export class ListBeers {
   constructor(private readonly beers: BeerRepository) {}
 
   async execute(query: CatalogoQuery): Promise<CatalogResult> {
-    void query;
     const active = await this.beers.findActive();
-    const items = sortBeers(active, "relevancia");
+    const filtered = filterBeers(active, { categorySlug: query.categoria });
+    const items = sortBeers(filtered, "relevancia");
     return { items, total: items.length, categories: countByCategory(active) };
   }
 }
