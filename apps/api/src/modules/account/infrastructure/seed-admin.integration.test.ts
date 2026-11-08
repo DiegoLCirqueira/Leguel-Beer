@@ -13,6 +13,7 @@ describe("seedAdmin (banco real)", () => {
     ADMIN_SEED_PASSWORD: "senha-de-teste-123456",
     SUPABASE_URL: "http://127.0.0.1:54321",
     SUPABASE_SERVICE_ROLE_KEY: "chave-de-teste",
+    DATABASE_URL: "postgresql://postgres:postgres@127.0.0.1:54322/leguele_test",
   };
 
   afterAll(async () => {
