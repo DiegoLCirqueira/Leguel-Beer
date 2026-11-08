@@ -15,7 +15,7 @@ Ordem das telas no [[ADR-016-ciclo-continuo-da-banda|ciclo contínuo da banda]],
 4. **Conta e entrega**: dados pessoais, endereços, área de entrega (grupos E e F: LB-29, 62, 30, 31, 20, 63, 64, 66), telas 19, 20, 29.
 5. **Checkout**: spike do Mercado Pago (LB-54) e depois LB-55, 56, 38, telas 05 a 07: [[checkout]].
 6. **Pagamento**: Pix e cartão (LB-57 a 60), telas 17, 18, 30.
-7. **Pedido confirmado e histórico** (LB-61, 67; o e-mail LB-81 depende de provedor), telas 08, 09, 13.
+7. **Pedido confirmado e histórico** (LB-61, 67; o e-mail LB-81 depende de provedor), telas 08 e 13. A tela 09 (Acompanhar pedido) fica fora do item 7: é referência visual adiada, porque o detalhe com linha do tempo (LB-68) está no MVP+ e o tempo real (LB-69) no Pós-MVP ([[mvp-corte]]).
 8. **Admin** (grupo I: LB-72, 73, 75, 76, 77), telas 21, 22, 23.
 9. **Qualidade** (LB-111, 112): segurança e E2E da compra.
 
