@@ -42,6 +42,18 @@ describe("/dev/tokens", () => {
     );
   });
 
+  it("mostra o card de cerveja (disponível e esgotado) e o stepper, para conferir", async () => {
+    render(<DevTokens />);
+
+    expect(screen.getAllByRole("heading", { level: 3, name: "Maré Alta IPA" })).toHaveLength(1);
+    expect(screen.getByText("Esgotado")).toBeInTheDocument();
+    const grupo = screen.getByRole("group", { name: "Quantidade de exemplo" });
+    expect(grupo).toHaveTextContent("1");
+    await userEvent.click(screen.getByRole("button", { name: "Aumentar quantidade" }));
+
+    expect(grupo).toHaveTextContent("2");
+  });
+
   it("abre o bottom sheet e o toast de exemplo e mostra um skeleton, para conferir cada um", async () => {
     render(<DevTokens />);
 

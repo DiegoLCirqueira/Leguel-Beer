@@ -1,15 +1,18 @@
 "use client";
 
+import type { CervejaCard } from "@leguele/shared";
 import { ArrowRight, Link2, Lock, UserRound } from "lucide-react";
 import { useState } from "react";
 import {
   BottomSheet,
   Button,
+  CardCerveja,
   Campo,
   CategoryChips,
   DivisorOu,
   LojaHeader,
   LojaTabBar,
+  Stepper,
   Skeleton,
   StyleBadge,
   Toast,
@@ -29,6 +32,36 @@ const swatches = [
   { name: "erro", className: "bg-erro" },
   { name: "aviso", className: "bg-aviso" },
 ];
+
+const cervejaExemplo: CervejaCard = {
+  id: "1",
+  slug: "mare-alta-ipa",
+  nome: "Maré Alta IPA",
+  estilo: "American IPA",
+  categoria: { slug: "ipa", nome: "IPA", ordem: 1 },
+  teorAlcoolico: 6.5,
+  ibu: 65,
+  volumeMl: 500,
+  precoCentavos: 3200,
+  destaque: true,
+  quantidadeDisponivel: 12,
+  esgotada: false,
+  imagemUrl: null,
+  cadastradaEm: "2026-10-01T10:00:00.000Z",
+};
+
+const cervejaEsgotada: CervejaCard = {
+  ...cervejaExemplo,
+  id: "2",
+  slug: "cupuacu-ale",
+  nome: "Cupuaçu Ale",
+  estilo: "Fruit Ale",
+  categoria: { slug: "frutas", nome: "Frutas", ordem: 2 },
+  teorAlcoolico: 5,
+  precoCentavos: 2650,
+  quantidadeDisponivel: 0,
+  esgotada: true,
+};
 
 const categories = [
   { id: "todas", label: "Todas", count: 16 },
@@ -56,6 +89,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 // Vitrine para conferência visual dos componentes; usada só em /dev/tokens.
 export function ComponentShowcase() {
   const [category, setCategory] = useState("todas");
+  const [quantidade, setQuantidade] = useState(1);
   const [sheetAberto, setSheetAberto] = useState(false);
   const [toastAberto, setToastAberto] = useState(false);
 
@@ -72,7 +106,7 @@ export function ComponentShowcase() {
         <Button variant="ghost" iconLeft={<Link2 className="size-5" />}>
           Continuar como convidado
         </Button>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <Button size="sm">Adicionar</Button>
           <Button loading>Carregando</Button>
           <Button disabled variant="ghost">
@@ -102,6 +136,18 @@ export function ComponentShowcase() {
         <div className="relative h-16 overflow-hidden rounded-2xl border border-borda">
           <LojaTabBar className="absolute" />
         </div>
+      </Section>
+      <Section title="Card de cerveja (disponível e esgotado) e stepper">
+        <div className="grid grid-cols-1 gap-3 min-[360px]:grid-cols-2">
+          <CardCerveja cerveja={cervejaExemplo} />
+          <CardCerveja cerveja={cervejaEsgotada} />
+        </div>
+        <Stepper
+          valor={quantidade}
+          aoAlterar={setQuantidade}
+          max={12}
+          rotulo="Quantidade de exemplo"
+        />
       </Section>
       <Section title="Bottom sheet, toast e skeleton">
         <div className="flex flex-wrap gap-3">
