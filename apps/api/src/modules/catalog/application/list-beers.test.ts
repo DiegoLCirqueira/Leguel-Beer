@@ -96,14 +96,14 @@ describe("ListBeers", () => {
 
   it("ordena pela ordem da query, com as esgotadas no fim", async () => {
     const repository = new InMemoryBeerRepository([
-      makeBeer({ name: "Cara", priceCents: 4000 }),
+      makeBeer({ name: "A Cara", priceCents: 4000 }),
       makeBeer({ name: "Esgotada barata", priceCents: 1000, stock: 0 }),
-      makeBeer({ name: "Barata", priceCents: 2000 }),
+      makeBeer({ name: "Z Barata", priceCents: 2000 }),
     ]);
 
     const result = await new ListBeers(repository).execute(query({ ordem: "menor-preco" }));
 
-    expect(names(result.items)).toEqual(["Barata", "Cara", "Esgotada barata"]);
+    expect(names(result.items)).toEqual(["Z Barata", "A Cara", "Esgotada barata"]);
   });
 
   it("categoria que nÃ£o existe no catÃ¡logo Ã© ignorada, como qualquer parÃ¢metro invÃ¡lido", async () => {
