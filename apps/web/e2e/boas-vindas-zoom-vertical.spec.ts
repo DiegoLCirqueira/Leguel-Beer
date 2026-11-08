@@ -68,5 +68,33 @@ for (const medida of MEDIDAS) {
         medida.height + 1,
       );
     });
+
+    test("a dica continua aberta depois de um gesto de rolagem no celular", async ({
+      page,
+      context,
+    }) => {
+      await page.goto("/boas-vindas");
+      const info = page.getByRole("button", { name: "Saiba mais sobre Manter-me conectado" });
+      await info.scrollIntoViewIfNeeded();
+      await info.click();
+      const dica = page.getByText(/Sua sessão continua ativa/);
+      await expect(dica).toBeVisible();
+
+      // Gesto real: toque fora da dica e arrasto de 60 px para cima (acima da tolerância de toque, não é um clique).
+      const cdp = await context.newCDPSession(page);
+      const x = 20;
+      const y = 40;
+      await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y }] });
+      for (const passo of [15, 30, 45, 60]) {
+        await cdp.send("Input.dispatchTouchEvent", {
+          type: "touchMove",
+          touchPoints: [{ x, y: y - passo }],
+        });
+      }
+      await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+
+      await expect(info).toHaveAttribute("aria-expanded", "true");
+      await expect(dica).toBeVisible();
+    });
   });
 }
