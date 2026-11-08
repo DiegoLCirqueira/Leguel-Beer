@@ -34,14 +34,14 @@ Resumo em [[2026-11-08]].
 1. Auditoria final do Codex sobre e393f50..(main depois deste PR): #207, #208, #209 e este.
 2. Item 1 de [[sequencia-telas]]: contrato (Back) → LB-4, LB-36 e LB-34 na API (Back) em paralelo com LB-15, LB-14 e LB-13 (Front) → telas do catálogo e do início. Depois, item 2 (página de produto).
 3. Inspeção pendente do Diego: `/entrar`, `/criar-conta`, `/conta`, `/entregas`.
-4. PR do Devops com `@leguele/shared` em watch no `pnpm dev`. LB-8 (nuvem) espera o Diego (contas).
+4. PR do Devops com `@leguele/shared` em watch no `pnpm dev`. LB-8 (nuvem) espera o Diego (contas). O spike LB-54 abre o checkout (item 5).
 
 ## Follow-ups
 
 - Próximo refino do Codex (minors do Reviewer no #203 e no #204):
   - `/nova-senha` e `/auth/confirmar` fora de `acesso-refluxo.spec.ts` (rodapé e alcance em 360x600 e 195x422);
   - `e2e/support/playwright.acesso.config.ts` com `reuseExistingServer` em :3001 pode rodar contra outra branch; melhor parametrizar a porta no `playwright.config.ts` e apagar o segundo config;
-  - a posição "abaixo" da dica do (i) só é testada em 180x390; incluir 360x599 e outra altura baixa.
+  - "a dica não cobre Entrar, Criar conta, checkbox nem (i)" (boas-vindas-arte.spec.ts) só roda em 180x390; incluir 195x422 e 360x599.
 - Front (boas-vindas, minors do #208): tirar os `?.` de `matchMedia`/`scrollIntoView` em `welcome-actions.tsx` e usar stub no setup do Vitest (regra da lição de 08/11); folga à direita do texto do "Criar conta" em 180x390 (hoje 1 px da borda); o teste do gesto deve assertar que o ponto tocado não é um controle.
 - Spec da boas-vindas: uma frase sobre onde a dica do (i) abre em telas baixas.
 - Spec de checkout: regras de pagamento recusado e erro do gateway, juros acima de 3x; listas vazias (Geladeira, histórico, admin) e skeleton sem regra.
