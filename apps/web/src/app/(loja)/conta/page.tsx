@@ -1,7 +1,6 @@
 import { LogOut } from "lucide-react";
 import type { Metadata } from "next";
 import { Button } from "@/components/ui";
-import { SiteFooter } from "@/components/site/site-footer";
 import { sairAction } from "../../sair/actions";
 
 export const metadata: Metadata = {
@@ -13,7 +12,7 @@ export const metadata: Metadata = {
 export default function Conta() {
   return (
     <>
-      <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col gap-6 px-6 pb-12 pt-14 text-texto">
+      <main className="mx-auto flex w-full flex-1 max-w-sm flex-col gap-6 px-6 pb-12 pt-14 text-texto">
         <h1 className="font-titulo text-balance text-4xl">Minha conta</h1>
         <form action={sairAction}>
           <Button
@@ -25,7 +24,6 @@ export default function Conta() {
           </Button>
         </form>
       </main>
-      <SiteFooter />
     </>
   );
 }
