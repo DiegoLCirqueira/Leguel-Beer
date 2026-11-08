@@ -16,6 +16,11 @@ export class PrismaBeerRepository implements BeerRepository {
     private readonly logger: Pick<AppLogger, "warn">,
   ) {}
 
+  findActiveBySlug(slug: string): Promise<Beer | null> {
+    void slug;
+    return Promise.resolve(null);
+  }
+
   async findActive(): Promise<Beer[]> {
     const rows = await this.prisma.beer.findMany({
       where: { active: true },
