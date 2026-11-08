@@ -116,7 +116,7 @@ describe("GET /catalogo (banco real)", () => {
     ]);
   });
 
-  it("combina categoria, faixa de IBU e menor preÃ§o pela URL e conta o resultado", async () => {
+  it("combina categoria, faixa de IBU e menor preço pela URL e conta o resultado", async () => {
     await addBeer("ipa", "a-ipa-cara", { ibu: 35, priceCents: 3300 });
     await addBeer("ipa", "ipa-barata", { ibu: 25, priceCents: 2700 });
     await addBeer("ipa", "ipa-amarga", { ibu: 60, priceCents: 2000 });
@@ -133,7 +133,7 @@ describe("GET /catalogo (banco real)", () => {
     ]);
   });
 
-  it("nunca mostra cerveja inativa, nem filtrando pela categoria dela, e nÃ£o a conta", async () => {
+  it("nunca mostra cerveja inativa, nem filtrando pela categoria dela, e não a conta", async () => {
     await addBeer("ipa", "ipa-ativa");
     await addBeer("ipa", "ipa-inativa", { active: false });
     await addBeer("frutas", "frutas-inativa", { active: false });
@@ -146,7 +146,7 @@ describe("GET /catalogo (banco real)", () => {
     expect(frutas.itens.map((item) => item.slug)).toEqual(["ipa-ativa"]);
   });
 
-  it("ignora parÃ¢metro invÃ¡lido em vez de rejeitar: abre o catÃ¡logo sem aquele filtro", async () => {
+  it("ignora parâmetro inválido em vez de rejeitar: abre o catálogo sem aquele filtro", async () => {
     await addBeer("ipa", "ipa-a");
     await addBeer("lager", "lager-b");
 
@@ -161,7 +161,7 @@ describe("GET /catalogo (banco real)", () => {
     ]);
   });
 
-  it("esgotadas vÃ£o para o fim e 'sÃ³ disponÃ­veis' as esconde", async () => {
+  it("esgotadas vão para o fim e 'só disponíveis' as esconde", async () => {
     await addBeer("ipa", "esgotada-barata", { priceCents: 1000, stock: 0 });
     await addBeer("ipa", "disponivel-cara", { priceCents: 4000 });
 
@@ -174,6 +174,34 @@ describe("GET /catalogo (banco real)", () => {
     ]);
     expect(soDisponiveis.body.itens.map((item: { slug: string }) => item.slug)).toEqual([
       "disponivel-cara",
+    ]);
+  });
+
+  it("parâmetro repetido na URL é inválido e ignorado: ?categoria=ipa&categoria=frutas não filtra", async () => {
+    await addBeer("ipa", "ipa-a");
+    await addBeer("frutas", "frutas-b");
+    await addBeer("lager", "lager-c");
+
+    const response = await get("?categoria=ipa&categoria=frutas");
+
+    expect(response.status).toBe(200);
+    expect(response.body.itens.map((item: { slug: string }) => item.slug)).toEqual([
+      "ipa-a",
+      "frutas-b",
+      "lager-c",
+    ]);
+  });
+
+  it("disponiveis=TRUE (fora de true ou false em minúsculas) é inválido e não esconde as esgotadas", async () => {
+    await addBeer("ipa", "disponivel");
+    await addBeer("ipa", "esgotada", { stock: 0 });
+
+    const response = await get("?disponiveis=TRUE");
+
+    expect(response.status).toBe(200);
+    expect(response.body.itens.map((item: { slug: string }) => item.slug)).toEqual([
+      "disponivel",
+      "esgotada",
     ]);
   });
 });

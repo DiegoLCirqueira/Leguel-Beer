@@ -18,7 +18,7 @@ describe("filterBeers", () => {
     expect(names(filterBeers([ipa, lager], { categorySlug: "ipa" }))).toEqual(["IPA"]);
   });
 
-  it("filtra por faixa de teor: o limite inferior entra e o superior nÃ£o", () => {
+  it("filtra por faixa de teor: o limite inferior entra e o superior não", () => {
     const abaixo = makeBeer({ name: "4,4", abv: 4.4 });
     const noLimiteInferior = makeBeer({ name: "4,5", abv: 4.5 });
     const dentro = makeBeer({ name: "5,9", abv: 5.9 });
@@ -31,7 +31,7 @@ describe("filterBeers", () => {
     expect(names(resultado)).toEqual(["4,5", "5,9"]);
   });
 
-  it("filtra por faixa de IBU: o limite inferior entra e o superior nÃ£o", () => {
+  it("filtra por faixa de IBU: o limite inferior entra e o superior não", () => {
     const abaixo = makeBeer({ name: "19", ibu: 19 });
     const noLimiteInferior = makeBeer({ name: "20", ibu: 20 });
     const noLimiteSuperior = makeBeer({ name: "40", ibu: 40 });
@@ -43,7 +43,7 @@ describe("filterBeers", () => {
     expect(names(resultado)).toEqual(["20"]);
   });
 
-  it("filtra por faixa de preÃ§o em centavos: o limite inferior entra e o superior nÃ£o", () => {
+  it("filtra por faixa de preço em centavos: o limite inferior entra e o superior não", () => {
     const barata = makeBeer({ name: "24,99", priceCents: 2499 });
     const noLimiteInferior = makeBeer({ name: "25", priceCents: 2500 });
     const noLimiteSuperior = makeBeer({ name: "30", priceCents: 3000 });
@@ -55,15 +55,15 @@ describe("filterBeers", () => {
     expect(names(resultado)).toEqual(["25"]);
   });
 
-  it("sÃ³ disponÃ­veis esconde as esgotadas; desligado, elas ficam", () => {
-    const disponivel = makeBeer({ name: "DisponÃ­vel", stock: 3 });
+  it("só disponíveis esconde as esgotadas; desligado, elas ficam", () => {
+    const disponivel = makeBeer({ name: "Disponível", stock: 3 });
     const esgotada = makeBeer({ name: "Esgotada", stock: 0 });
 
     expect(names(filterBeers([disponivel, esgotada], { onlyAvailable: true }))).toEqual([
-      "DisponÃ­vel",
+      "Disponível",
     ]);
     expect(names(filterBeers([disponivel, esgotada], { onlyAvailable: false }))).toEqual([
-      "DisponÃ­vel",
+      "Disponível",
       "Esgotada",
     ]);
   });

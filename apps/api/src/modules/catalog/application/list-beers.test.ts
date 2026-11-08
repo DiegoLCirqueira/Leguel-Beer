@@ -21,7 +21,7 @@ describe("ListBeers", () => {
     expect(result.total).toBe(3);
   });
 
-  it("conta as cervejas ativas por categoria, esgotadas incluÃ­das, na ordem das categorias e sem as vazias", async () => {
+  it("conta as cervejas ativas por categoria, esgotadas incluídas, na ordem das categorias e sem as vazias", async () => {
     const repository = new InMemoryBeerRepository([
       makeBeer({ category: CATEGORIES.lager }),
       makeBeer({ category: CATEGORIES.ipa }),
@@ -54,7 +54,7 @@ describe("ListBeers", () => {
     ]);
   });
 
-  it("traduz a faixa de teor da query: 4,5 entra em '4,5% a menos de 6%' e 6 jÃ¡ Ã© '6% ou mais'", async () => {
+  it("traduz a faixa de teor da query: 4,5 entra em '4,5% a menos de 6%' e 6 já é '6% ou mais'", async () => {
     const repository = new InMemoryBeerRepository([
       makeBeer({ name: "4,4", abv: 4.4 }),
       makeBeer({ name: "4,5", abv: 4.5 }),
@@ -67,7 +67,7 @@ describe("ListBeers", () => {
     expect(names(result.items).sort()).toEqual(["4,5", "5,9"]);
   });
 
-  it("traduz as faixas de IBU e de preÃ§o da query", async () => {
+  it("traduz as faixas de IBU e de preço da query", async () => {
     const repository = new InMemoryBeerRepository([
       makeBeer({ name: "A", ibu: 20, priceCents: 2500 }),
       makeBeer({ name: "B", ibu: 40, priceCents: 2500 }),
@@ -82,15 +82,15 @@ describe("ListBeers", () => {
     expect(names(porPreco.items).sort()).toEqual(["A", "B"]);
   });
 
-  it("sÃ³ disponÃ­veis esconde as esgotadas, mas elas continuam nos contadores", async () => {
+  it("só disponíveis esconde as esgotadas, mas elas continuam nos contadores", async () => {
     const repository = new InMemoryBeerRepository([
-      makeBeer({ name: "DisponÃ­vel", stock: 4 }),
+      makeBeer({ name: "Disponível", stock: 4 }),
       makeBeer({ name: "Esgotada", stock: 0 }),
     ]);
 
     const result = await new ListBeers(repository).execute(query({ disponiveis: "true" }));
 
-    expect(names(result.items)).toEqual(["DisponÃ­vel"]);
+    expect(names(result.items)).toEqual(["Disponível"]);
     expect(result.categories[0]?.quantity).toBe(2);
   });
 
@@ -106,7 +106,7 @@ describe("ListBeers", () => {
     expect(names(result.items)).toEqual(["Z Barata", "A Cara", "Esgotada barata"]);
   });
 
-  it("categoria que nÃ£o existe no catÃ¡logo Ã© ignorada, como qualquer parÃ¢metro invÃ¡lido", async () => {
+  it("categoria que não existe no catálogo é ignorada, como qualquer parâmetro inválido", async () => {
     const repository = new InMemoryBeerRepository([
       makeBeer({ name: "IPA", category: CATEGORIES.ipa }),
       makeBeer({ name: "Lager", category: CATEGORIES.lager }),
