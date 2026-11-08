@@ -1,4 +1,4 @@
-import type { Beer } from "./beer.js";
+import { isSoldOut, type Beer } from "./beer.js";
 
 /** Intervalo com o limite inferior incluído e o superior excluído. */
 export interface Range {
@@ -23,6 +23,7 @@ export function filterBeers(beers: readonly Beer[], filters: CatalogFilters): Be
       (!filters.categorySlug || beer.category.slug === filters.categorySlug) &&
       within(beer.abv, filters.abv) &&
       within(beer.ibu, filters.ibu) &&
-      within(beer.priceCents, filters.priceCents),
+      within(beer.priceCents, filters.priceCents) &&
+      !(filters.onlyAvailable && isSoldOut(beer)),
   );
 }
