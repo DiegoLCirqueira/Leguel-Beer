@@ -75,3 +75,25 @@ for (const medida of [
     expect(excesso).toBeLessThanOrEqual(0);
   });
 }
+
+for (const medida of [
+  { width: 667, height: 375 },
+  { width: 195, height: 422 },
+]) {
+  test(`em ${medida.width}x${medida.height}, ao rolar até o fim nenhum controle fica atrás da barra`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(medida);
+    await page.goto("/");
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    const barra = await page.getByRole("navigation", { name: "Menu da loja" }).boundingBox();
+
+    const controles = page.locator("main a, main button, footer a");
+    for (const controle of await controles.all()) {
+      const caixa = await controle.boundingBox();
+      expect((caixa?.y ?? 0) + (caixa?.height ?? 0), "base do controle").toBeLessThanOrEqual(
+        (barra?.y ?? 0) + 1,
+      );
+    }
+  });
+}
