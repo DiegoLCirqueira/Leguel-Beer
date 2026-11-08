@@ -30,4 +30,16 @@ describe("filterBeers", () => {
 
     expect(names(resultado)).toEqual(["4,5", "5,9"]);
   });
+
+  it("filtra por faixa de IBU: o limite inferior entra e o superior nÃ£o", () => {
+    const abaixo = makeBeer({ name: "19", ibu: 19 });
+    const noLimiteInferior = makeBeer({ name: "20", ibu: 20 });
+    const noLimiteSuperior = makeBeer({ name: "40", ibu: 40 });
+
+    const resultado = filterBeers([abaixo, noLimiteInferior, noLimiteSuperior], {
+      ibu: { min: 20, max: 40 },
+    });
+
+    expect(names(resultado)).toEqual(["20"]);
+  });
 });
