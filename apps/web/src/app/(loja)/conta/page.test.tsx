@@ -11,4 +11,10 @@ describe("/conta", () => {
     expect(sair).toHaveAttribute("type", "submit");
     expect(sair.closest("form")).not.toBeNull();
   });
+
+  it("mantém o rodapé com os avisos e os links legais", () => {
+    render(<Conta />);
+
+    expect(screen.getByRole("contentinfo")).toBeInTheDocument();
+  });
 });
