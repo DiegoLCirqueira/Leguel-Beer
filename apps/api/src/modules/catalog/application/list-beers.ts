@@ -43,6 +43,8 @@ export class ListBeers {
     const filtered = filterBeers(active, {
       categorySlug: query.categoria,
       abv: rangeOf(faixasDeFiltro.teor, query.teor),
+      ibu: rangeOf(faixasDeFiltro.ibu, query.ibu),
+      priceCents: rangeOf(faixasDeFiltro.preco, query.preco),
     });
     const items = sortBeers(filtered, "relevancia");
     return { items, total: items.length, categories: countByCategory(active) };
