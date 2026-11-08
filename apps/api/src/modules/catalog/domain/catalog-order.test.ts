@@ -57,4 +57,14 @@ describe("sortBeers", () => {
       "Frutas B",
     ]);
   });
+
+  it("relevÃ¢ncia nÃ£o olha o preÃ§o: um destaque caro vem antes de uma cerveja barata", () => {
+    const destaqueCaro = makeBeer({ name: "Destaque Caro", featured: true, priceCents: 4000 });
+    const baratinha = makeBeer({ name: "Baratinha", priceCents: 1500 });
+
+    expect(names(sortBeers([baratinha, destaqueCaro], "relevancia"))).toEqual([
+      "Destaque Caro",
+      "Baratinha",
+    ]);
+  });
 });
