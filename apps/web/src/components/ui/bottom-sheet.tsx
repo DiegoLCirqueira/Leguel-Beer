@@ -27,6 +27,7 @@ export function BottomSheet({ aberto, aoFechar, titulo, children, rodape }: Bott
   });
 
   const painel = useRef<HTMLDivElement>(null);
+  const comecouNoFundo = useRef(false);
 
   // Ao abrir: trava a rolagem da página e leva o foco para dentro; ao fechar, devolve os dois.
   useEffect(() => {
@@ -70,8 +71,13 @@ export function BottomSheet({ aberto, aoFechar, titulo, children, rodape }: Bott
   return (
     <div
       data-testid="fundo-do-sheet"
+      onPointerDown={(evento) => {
+        comecouNoFundo.current = evento.target === evento.currentTarget;
+      }}
       onClick={(evento) => {
-        if (evento.target === evento.currentTarget) aoFechar();
+        // Só fecha se o toque começou no fundo: arrastar de dentro do painel até o fundo não conta.
+        if (evento.target === evento.currentTarget && comecouNoFundo.current) aoFechar();
+        comecouNoFundo.current = false;
       }}
       className="fixed inset-0 z-50 flex items-end justify-center bg-veu"
     >
