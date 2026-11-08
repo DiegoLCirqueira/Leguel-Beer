@@ -17,4 +17,17 @@ describe("filterBeers", () => {
 
     expect(names(filterBeers([ipa, lager], { categorySlug: "ipa" }))).toEqual(["IPA"]);
   });
+
+  it("filtra por faixa de teor: o limite inferior entra e o superior nÃ£o", () => {
+    const abaixo = makeBeer({ name: "4,4", abv: 4.4 });
+    const noLimiteInferior = makeBeer({ name: "4,5", abv: 4.5 });
+    const dentro = makeBeer({ name: "5,9", abv: 5.9 });
+    const noLimiteSuperior = makeBeer({ name: "6", abv: 6 });
+
+    const resultado = filterBeers([abaixo, noLimiteInferior, dentro, noLimiteSuperior], {
+      abv: { min: 4.5, max: 6 },
+    });
+
+    expect(names(resultado)).toEqual(["4,5", "5,9"]);
+  });
 });
