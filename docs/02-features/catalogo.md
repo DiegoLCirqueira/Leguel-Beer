@@ -4,7 +4,7 @@ modulo: catalogo
 card-notion: https://app.notion.com/p/3fd490a7ac7d81c5ba2cf6a3db8448c6
 prioridade: P0
 criado: 2026-10-28
-atualizado: 2026-10-28
+atualizado: 2026-11-08
 issues:
   - "#25 LB-36"
   - "#22 LB-33"
@@ -16,7 +16,7 @@ tags:
 # Catálogo
 
 > [!info] Origem
-> Derivada dos cards do Notion **LB-36** (#25), **LB-33** (#22) e **LB-38** (#27) e do schema do **LB-4** (#13), com as decisões do Diego na entrevista de 2026-10-28. Só os valores das faixas de filtro estão em aberto. Os termos seguem o [[GLOSSARY]]. Outras partes do épico E3: [[destaques-home]] (LB-34) e [[adicionar-do-card]] (LB-35).
+> Derivada dos cards do Notion **LB-36** (#25), **LB-33** (#22) e **LB-38** (#27) e do schema do **LB-4** (#13), com as decisões do Diego na entrevista de 2026-10-28. Os valores das faixas de filtro foram propostos em 08/11 (recomendação aplicada, vetável). Os termos seguem o [[GLOSSARY]]. Outras partes do épico E3: [[destaques-home]] (LB-34) e [[adicionar-do-card]] (LB-35).
 
 ## História de usuário
 
@@ -91,7 +91,7 @@ Funcionalidade: Catálogo de cervejas
 - **Tamanho do catálogo no MVP:** 16 cervejas em 4 categorias (IPA, Frutas, Malt, Lager), 4 por categoria, sem Stout. As categorias vêm do cadastro e podem mudar.
 - **Filtros:** categoria, teor alcoólico, IBU, faixa de preço e "só disponíveis", num bottom sheet.
   - Categoria: uma por vez; o chip "Todas" remove o filtro.
-  - Teor alcoólico, IBU e preço usam **faixas fixas**. Cada faixa inclui o limite inferior e exclui o superior (ex.: uma faixa de 30 a 60 inclui IBU 30 e não inclui IBU 60).
+  - Teor alcoólico, IBU e preço usam **faixas fixas** (valores em "Faixas de filtro"). Cada faixa inclui o limite inferior e exclui o superior (ex.: uma faixa de 30 a 60 inclui IBU 30 e não inclui IBU 60). Uma faixa por atributo; "Qualquer" remove o filtro.
   - "Só disponíveis" esconde as cervejas esgotadas.
 - **Ordenação:** relevância (padrão), menor preço, maior preço, mais novas.
   - **Relevância:** cervejas em destaque primeiro, depois a ordem das categorias e, por fim, o nome.
@@ -104,15 +104,50 @@ Funcionalidade: Catálogo de cervejas
 - **Esgotada:** cerveja ativa com quantidade disponível (estoque menos reservas de pedidos pendentes) igual a zero. Mostra o selo "Esgotado" e o botão "Adicionar" desabilitado.
 - **Convidado:** navega pelo catálogo e monta a Geladeira sem conta; só precisa entrar na conta para finalizar a compra (ver [[adicionar-do-card]] e [[visao]]).
 
-## Em aberto
+## Faixas de filtro
 
-> [!todo] Preencher: os valores das faixas fixas de teor alcoólico, IBU e preço. O formato (faixas fixas, limite inferior incluído e superior excluído) foi decidido pelo Diego em 2026-10-28; os limites de cada faixa, não.
+> [!info] Recomendação aplicada, vetável (08/11)
+> O Diego decidiu o formato (faixas fixas, limite inferior incluído e superior excluído) em 2026-10-28; os limites são produto e não estavam definidos. Aplicada a opção mais simples e reversível: 3 faixas por atributo, calibradas pelos números do design (teor de 4,5% a 6,5%; preço de R$ 24,90 a R$ 32,00). Trocar os limites é mudar uma constante em `@leguele/shared`, sem migration.
+
+| Atributo | Faixas (id na URL: intervalo) |
+| --- | --- |
+| Teor alcoólico (`teor`) | `abaixo-de-4-5`: "Abaixo de 4,5%" · `4-5-a-6`: "4,5% a menos de 6%" · `6-ou-mais`: "6% ou mais" |
+| IBU (`ibu`) | `abaixo-de-20`: "Abaixo de 20" · `20-a-40`: "20 a menos de 40" · `40-ou-mais`: "40 ou mais" |
+| Preço (`preco`) | `abaixo-de-25`: "Abaixo de R$ 25" · `25-a-30`: "R$ 25 a menos de R$ 30" · `30-ou-mais`: "R$ 30 ou mais" |
+
+O rótulo mostrado e o intervalo (limite inferior incluído, superior excluído) são sempre o mesmo: não há "até" nem "a" ambíguo. Id de faixa desconhecido na URL é ignorado, como qualquer parâmetro inválido.
+
+## Referência visual
+
+Telas do design (fora do repo, em `Imagens/figma/telas/`), só como referência visual: regras e textos vêm desta spec, normalizados ao padrão aprovado (Figtree e Kaushan Script, tokens do `globals.css`, `Button`, `Campo`, `StyleBadge`, `CategoryChips`, alvos de 44 px; ver [[identidade-visual]]).
+
+| Tela | Data do arquivo | Vale para |
+| --- | --- | --- |
+| `16-catalogo.png` | 08/11/2026 | Catálogo: cabeçalho, faixa de categorias, grade de cards e bottom sheet "Filtros e ordenação" |
+| `25-catalogo-sem-resultado.png` | 08/11/2026 | Estado vazio dos filtros |
+| `26-card-esgotado.png` | 08/11/2026 | Card esgotado |
+| `02-inicio.png` | 30/10/2026 | Home: faixa de categorias e seção de destaques (ver [[destaques-home]]) |
+
+**Entra:** lista em grade de 2 colunas; faixa de categorias com contador; bottom sheet com categoria, três faixas, "Só disponíveis", "Ordenar por", "Limpar filtros" e "Aplicar"; card esgotado com selo e "Adicionar" desabilitado; estado vazio com "Limpar filtros".
+
+**Não entra (o design diverge da spec; vale a spec):**
+- "Stouts" e o total "23": o catálogo tem 4 categorias e 16 cervejas, sem Stout.
+- Sliders de teor, IBU e preço: viram faixas fixas.
+- "Mais vendidos": a ordenação padrão é "Relevância" (não há dado de venda no MVP).
+- "Só disponíveis" ligado: começa desligado.
+- Busca e a lupa (LB-37, MVP+), coração de favoritar (Pós-MVP), "Mix & Match", abas extras e o banner do Clube.
+- "Carrinho": o termo é Geladeira.
+- Preço riscado: promoção ainda não tem spec (vem com o admin).
+- Barra de status do iPhone.
+- Estado vazio: vale o texto da spec ("Nenhuma cerveja encontrada com esses filtros."), com a contagem e os filtros ativos visíveis, que faltam na tela 25.
+- Cabeçalho e barra inferior da loja: são o LB-15 (ver "Contrato e fatias").
 
 ## Seams de teste
 
 > [!info] Proposta, ainda não combinada com o Diego
 > Tirada dos planos de teste dos cards.
 
+- **Faixas de filtro:** `faixasDeFiltro` nos limites (teste unitário): teor 4,5 cai em "4,5% a menos de 6%" e 6 cai em "6% ou mais"; IBU 20 e 40 e preço R$ 25 e R$ 30 do mesmo jeito.
 - **Leitura dos parâmetros da URL:** transforma a URL em filtros e ordenação válidos (teste unitário).
 - **Ordenação do catálogo:** relevância e esgotadas no fim como regra pura (teste unitário).
 - **Consulta do catálogo na API:** filtra, ordena e devolve só cervejas ativas (integração com banco real e teste da rota).
@@ -147,7 +182,7 @@ Os números são os da entrevista; a pergunta 6 foi decidida pelo Orchestrator (
 - **Pergunta 2:** escopo é o épico E3 do milestone MVP inteiro (LB-33, 34, 35, 36, 38), sem a página de produto (E10), a busca (LB-37) e o banner (LB-32).
 - **Pergunta 3:** relevância é a ordenação padrão: destaques, depois a ordem das categorias, depois o nome.
 - **Pergunta 4:** esgotadas sempre no fim; a ordenação vale dentro de cada grupo; "só disponíveis" esconde esgotadas.
-- **Pergunta 5:** filtros de teor alcoólico, IBU e preço com faixas fixas, limite inferior incluído e superior excluído (valores em aberto).
+- **Pergunta 5:** filtros de teor alcoólico, IBU e preço com faixas fixas, limite inferior incluído e superior excluído (valores propostos em 08/11, ver "Faixas de filtro").
 - **Pergunta 7:** textos dos cards aprovados; estado vazio "Nenhuma cerveja encontrada com esses filtros."; contagem "N cervejas" / "1 cerveja".
 - **Pergunta 8:** o convidado adiciona à Geladeira e só entra na conta no checkout; o [[visao]] foi ajustado.
 - **Uma categoria por vez:** proposta do Spec, confirmada pelo Diego.
@@ -174,7 +209,7 @@ Reconciliação com as issues migradas do milestone MVP, para as três specs do 
 | Issue | Título atual | Ajuste proposto | Motivo |
 | --- | --- | --- | --- |
 | #20 | [Épico] Catálogo fácil de explorar | Título mantido. Descrição: links para [[catalogo]], [[destaques-home]] e [[adicionar-do-card]]. | O épico não aponta para as specs. |
-| #25 | [LB-36] Criar página de catálogo com filtros e ordenação | Título mantido. Descrição: link para `docs/02-features/catalogo.md`. Critérios: cenários "Combinar filtros e ordenação", "Abrir um link compartilhado com filtros", "Filtros sem nenhum resultado" e "Ordem padrão por relevância e 'mais novas'"; relevância como ordenação padrão (destaques, ordem das categorias, nome); "mais novas" pela data de cadastro; faixas fixas com limite inferior incluído e superior excluído; parâmetro inválido ignorado; textos de contagem e estado vazio. Valores das faixas: pendentes. | A issue não traz critério nenhum; a spec define relevância, faixas, estado vazio e textos, que o card não tinha. |
+| #25 | [LB-36] Criar página de catálogo com filtros e ordenação | Título mantido. Descrição: link para `docs/02-features/catalogo.md`. Critérios: cenários "Combinar filtros e ordenação", "Abrir um link compartilhado com filtros", "Filtros sem nenhum resultado" e "Ordem padrão por relevância e 'mais novas'"; relevância como ordenação padrão (destaques, ordem das categorias, nome); "mais novas" pela data de cadastro; faixas fixas com limite inferior incluído e superior excluído; parâmetro inválido ignorado; textos de contagem e estado vazio. Valores das faixas: propostos em 08/11 (ver "Faixas de filtro"). | A issue não traz critério nenhum; a spec define relevância, faixas, estado vazio e textos, que o card não tinha. |
 | #22 | [LB-33] Filtrar cervejas por categoria com contadores | Título mantido. Descrição: link para a spec; faixa com "Todas" + IPA, Frutas, Malt e Lager (sem Stouts). Critérios: cenário "Filtrar pela faixa de categorias com contador"; uma categoria por vez; chip na home abre `/catalogo` filtrado; contador fixo, incluindo esgotadas. | O card lista Stouts, que saíram do catálogo; seleção e contador não estavam definidos. |
 | #27 | [LB-38] Sinalizar cervejas esgotadas | Título mantido. Descrição: link para a spec e definição de quantidade disponível do [[GLOSSARY]]. Critérios: cenário "Cerveja esgotada por reservas vai para o fim"; esgotadas no fim com qualquer ordenação; "só disponíveis" esconde esgotadas. Dependência explícita de #32 (LB-56, reserva de estoque). | A regra de ordem das esgotadas com outras ordenações e a interação com "só disponíveis" não estavam definidas. |
 | #23 | [LB-34] Exibir cervejas em destaque na home | Título mantido. Descrição: link para `docs/02-features/destaques-home.md`. Critérios: os cenários da spec (até 6 destaques, ordem de relevância, esgotada no fim com selo, seção some sem destaques). | A issue não traz critério; a ordem dos destaques e o caso sem destaques não estavam definidos. |
@@ -186,3 +221,54 @@ Dependências que já existem e não mudam: #64 (LB-12, chip de categoria), #65 
 ### Issues novas
 
 Nenhuma. Todos os comportamentos das três specs cabem em #25, #22, #27, #23, #24 e #13; criar outra issue duplicaria uma migrada.
+
+## Contrato e fatias
+
+Estado do código em 08/11 (`main` 65d4c35): `apps/api` só tem os módulos `account` e `health`; o `schema.prisma` só tem `Profile`; o `seed.ts` só cria o admin; `@leguele/shared` só tem `conta`, `erros` e `formatPriceBRL`; `apps/web` tem os componentes `Button`, `Campo`, `CategoryChips`, `StyleBadge`, `DivisorOu` e `OlhoDaSenha`, e a home ainda é um espaço reservado. Não existe cerveja, categoria, endpoint nem tela de catálogo.
+
+### Contrato compartilhado (`@leguele/shared`, pasta `catalogo/`)
+
+Front e Back fixam estes schemas Zod, com testes, antes de começar: um **PR próprio e primeiro**, só em `@leguele/shared`, feito pelo Back, antes do LB-4 (modelos, migration e seed). Ver [[ADR-010-validacao-com-zod]]:
+
+- **`cervejaCardSchema`:** `id`, `slug`, `nome`, `estilo` (ex.: "American IPA"), `categoria` (`slug`, `nome` e `ordem`), `teorAlcoolico` (número, em %), `ibu` (inteiro), `volumeMl` (inteiro), `precoCentavos` (inteiro; formatado por `formatPriceBRL`), `destaque` (booleano), `quantidadeDisponivel` (inteiro), `esgotada` (booleano, verdadeiro quando `quantidadeDisponivel` é 0), `imagemUrl` (texto ou nulo; nulo usa a imagem padrão da categoria) e `cadastradaEm` (data ISO).
+- **`catalogoQuerySchema`:** `categoria` (slug), `teor`, `ibu`, `preco` (ids das faixas), `disponiveis` (booleano) e `ordem` (`relevancia` padrão, `menor-preco`, `maior-preco`, `mais-novas`). Valor inválido é ignorado, não rejeitado (decisão desta spec).
+- **`faixasDeFiltro`:** as 3 faixas de cada atributo da tabela acima (id, rótulo, mínimo, máximo) e a função que diz se um valor pertence à faixa.
+- **`catalogoResponseSchema`:** `itens` (lista de `cervejaCard`, já filtrada e ordenada pela API), `total` e `categorias` (lista de `slug`, `nome`, `ordem` (inteiro) e `quantidade`: só as com cerveja ativa, ordenada por `ordem`; o contador não muda com os outros filtros e inclui as esgotadas).
+- **`destaquesResponseSchema`:** `itens`, até 6 `cervejaCard`.
+
+Endpoints públicos, porque o convidado navega ([[ADR-009-guard-global-fechado]], com `@Public()`): `GET /catalogo` e `GET /catalogo/destaques`. Filtro, ordenação e corte em 6 moram na API (camadas `domain` e `application`, funções puras); o site só renderiza e escreve a URL.
+
+Fora deste contrato: reserva de estoque (LB-56, #32). Até ela existir, `quantidadeDisponivel` é o estoque; a subtração das reservas de pedidos pendentes entra com o LB-56, sem mudar o contrato.
+
+### Fatias, com dono e ordem
+
+Ordem dos cards do grupo B do [[roteiro-mvp]], em fatias verticais:
+
+| # | Card | Dono | O que entrega |
+| --- | --- | --- | --- |
+| 1 | Contrato (LB-4, #13) | Back | PR só em `@leguele/shared`, com testes: os schemas de "Contrato compartilhado" e `faixasDeFiltro`; sai antes de qualquer outra fatia |
+| 2 | LB-4 (#13) | Back | Modelos de categoria (com `ordem`, inteiro, usada pela relevância) e de cerveja (ativa, destaque, estoque, data de cadastro), migration e seed de 16 cervejas em 4 categorias |
+| 3 | LB-36 (#25), API | Back | `GET /catalogo`: filtros, faixas, ordenação por relevância, menor e maior preço e mais novas, esgotadas no fim; contagem por categoria (LB-33, #22) e `esgotada` (LB-38, #27, sem reservas ainda); é o módulo de referência `ListBeers` e o `Money` previstos em [[api-base]] |
+| 4 | LB-34 (#23), API | Back | `GET /catalogo/destaques`, com ordem e corte em 6 |
+| 5 | LB-15 (#67) | Front | Layout compartilhado da loja: cabeçalho (logo e contador da Geladeira, recebido por prop) e barra inferior de 4 abas (ver abaixo) |
+| 6 | LB-14 (#66) | Front | Bottom sheet, toast com "Desfazer" e skeleton (o sheet dos filtros depende dele) |
+| 7 | LB-13 (#65) | Front | Card de produto (nome, estilo, teor, volume, preço, `StyleBadge`, Adicionar) com a variante esgotada, e o stepper de quantidade, que o produto e a Geladeira reusam |
+| 8 | LB-33 (#22) e LB-36 (#25), telas | Front | Faixa de categorias, `/catalogo` com filtros e ordem na URL, contagem e estado vazio |
+| 9 | LB-34 (#23), tela | Front | Home com a seção "Cervejas em destaque" ([[destaques-home]]) |
+
+Depois do contrato (fatia 1), as fatias 2 a 4 (Back) e 5 a 7 (Front) andam em paralelo; o LB-4 (fatia 2) fica pronto antes de o card (fatia 7) usar dado real. As fatias 8 e 9 dependem da API.
+
+> [!info] LB-15 sem spec própria (recomendação aplicada, vetável, 08/11)
+> O LB-15 não tem spec. Escopo mínimo: cabeçalho com o logo e o contador da Geladeira, e barra inferior com Início, Catálogo, Geladeira e Perfil, nos alvos de 44 px. Sem lupa (busca é MVP+) e sem "Mix & Match". O contador mostra 0 até a Geladeira persistida (LB-47, item 3 da ordem) existir.
+
+### Ajustes do Front (revisão de 08/11, recomendações aplicadas, vetáveis)
+
+- **Ordem do Front:** LB-15, LB-14, LB-13, LB-33 (chips), LB-36 (filtros e ordem) e LB-34 (destaques), como na tabela.
+- **Adicionar desabilitado:** o botão do card fica desabilitado até o LB-47 e o LB-35 (item 3 da [[sequencia-telas]], onde o Adicionar passa a funcionar); o esgotado já nasce desabilitado.
+- **Fora:** busca (LB-37) e a ordenação "Mais vendidos".
+- **Selo "Esgotado":** feito com os tokens existentes, sem cor nova.
+- **Rodapé da loja** ([[termos-privacidade]]): fica no fim da rolagem, acima da barra inferior fixa.
+- **Bottom sheet:** em tela baixa ou com zoom de 200% rola por dentro e fecha com Esc.
+- **Componentes novos** em `apps/web/src/components/ui`, cada um na vitrine `/dev/tokens` ([[identidade-visual]], "Componentes reutilizáveis"): cabeçalho da loja, barra inferior, card de cerveja, stepper, bottom sheet, toast com "Desfazer", skeleton, select, faixa, switch, estado vazio, título de página e selo "Esgotado".
+
+> [!todo] Preencher: imagens das garrafas dos cards. Sem `imagemUrl`, o card usa a imagem padrão da categoria; as imagens recortadas vêm do LB-124 (item 3 da [[sequencia-telas]]).
