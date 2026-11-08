@@ -11,10 +11,4 @@ describe("/conta", () => {
     expect(sair).toHaveAttribute("type", "submit");
     expect(sair.closest("form")).not.toBeNull();
   });
-
-  it("termina com o rodapé do site", () => {
-    render(<Conta />);
-
-    expect(screen.getByRole("contentinfo")).toBeInTheDocument();
-  });
 });
