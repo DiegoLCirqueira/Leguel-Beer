@@ -54,6 +54,7 @@ A descrição visual da Geladeira, que estava no papel do Front, foi movida para
 
 Fluxo: **spec → teste → implementação (com rascunho de ADR, se houver) → revisão → diário → auditoria final e refino de testes (Codex)**. São 5 especialistas Claude (mais o Orchestrator, que coordena) para 5 etapas, e o Codex (Testes) na etapa 6.
 
+- **Ciclo contínuo** (desde 2026-11-08, [[ADR-016-ciclo-continuo-da-banda]]): terminada a auditoria do Codex e corrigidos os achados, a banda pega a próxima tarefa da sequência combinada sem esperar o Diego. Decisão dele vai ao cartão "Decisões pendentes" e a banda segue com outra tarefa; a recomendada é aplicada e reportada como vetável.
 - **Teste e implementação ficam no mesmo agente.** A skill `/tdd` exige fatias verticais (um teste falhando → implementação mínima → repetir). Separar "testador" de "implementador" quebraria esse ciclo. Front e Back fazem as duas etapas, cada um na sua camada.
 - **Refatoração** (regra do CLAUDE.md): passo separado do loop red → green, só com todos os testes verdes, sem mudar comportamento e em commit próprio.
 - **Devops** é o dono dos cards de infraestrutura e do "portão" de CI verde antes do merge.

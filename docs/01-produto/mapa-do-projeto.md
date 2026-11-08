@@ -53,6 +53,7 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[ADR-013-link-gasto-so-no-post]]: link do e-mail só é gasto no POST.
 - [[ADR-014-admin-so-com-email-confirmado]]: admin só com e-mail confirmado, lido pela API no banco.
 - [[ADR-015-ferramentas-monorepo]]: pnpm + Turborepo, `@leguele/shared` compilado com `tsc`, Vitest em todos os pacotes e dependency-cruiser no CI.
+- [[ADR-016-ciclo-continuo-da-banda]]: a ordem vira ciclo contínuo; decisão do Diego vai ao cartão de pendências e a banda segue; recomendada é aplicada e vetável.
 
 ## Arquitetura
 
