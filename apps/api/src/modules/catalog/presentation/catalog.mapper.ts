@@ -1,4 +1,10 @@
-import type { CatalogoResponse, CervejaCard, DestaquesResponse } from "@leguele/shared";
+import {
+  calcularDesconto,
+  type CatalogoResponse,
+  type CervejaCard,
+  type CervejaDetalhe,
+  type DestaquesResponse,
+} from "@leguele/shared";
 import type { CatalogResult } from "../application/list-beers.js";
 import { availableQuantity, isSoldOut, type Beer } from "../domain/beer.js";
 
@@ -18,6 +24,16 @@ export function toCervejaCard(beer: Beer): CervejaCard {
     esgotada: isSoldOut(beer),
     imagemUrl: beer.imageUrl,
     cadastradaEm: beer.createdAt.toISOString(),
+  };
+}
+
+/** O detalhe é o card mais a descrição, o preço anterior e o desconto calculado a partir dos dois preços. */
+export function toCervejaDetalhe(beer: Beer): CervejaDetalhe {
+  return {
+    ...toCervejaCard(beer),
+    descricao: beer.description,
+    precoAnteriorCentavos: beer.previousPriceCents,
+    descontoPercentual: calcularDesconto(beer.previousPriceCents, beer.priceCents),
   };
 }
 
