@@ -39,3 +39,39 @@ test("as telas de acesso não têm a barra da loja", async ({ page }) => {
   await expect(page.getByRole("navigation", { name: "Menu da loja" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: /Geladeira, / })).toHaveCount(0);
 });
+
+for (const medida of [
+  { width: 360, height: 600 },
+  { width: 195, height: 422 },
+]) {
+  test(`em ${medida.width}x${medida.height}, a barra mostra todos os rótulos inteiros e não corta nenhum alvo`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(medida);
+    await page.goto("/");
+    const barra = page.getByRole("navigation", { name: "Menu da loja" });
+
+    const rotulos = await barra.locator("a span").evaluateAll((spans) =>
+      spans.map((s) => ({
+        texto: s.textContent,
+        cortado: s.scrollWidth > s.clientWidth,
+        direita: s.getBoundingClientRect().right,
+      })),
+    );
+
+    for (const rotulo of rotulos) {
+      expect(rotulo.cortado, `rótulo ${rotulo.texto} cortado`).toBe(false);
+      expect(rotulo.direita, `rótulo ${rotulo.texto} fora da tela`).toBeLessThanOrEqual(
+        medida.width,
+      );
+    }
+    for (const aba of await barra.getByRole("link").all()) {
+      const caixa = await aba.boundingBox();
+      expect(caixa?.height ?? 0).toBeGreaterThanOrEqual(44);
+    }
+    const excesso = await page.evaluate(
+      () => document.documentElement.scrollWidth - window.innerWidth,
+    );
+    expect(excesso).toBeLessThanOrEqual(0);
+  });
+}
