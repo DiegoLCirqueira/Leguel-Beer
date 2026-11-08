@@ -48,4 +48,10 @@ describe("ListFeaturedBeers", () => {
       "Destaque 6",
     ]);
   });
+
+  it("sem nenhum destaque devolve lista vazia (a seção some na home)", async () => {
+    const repository = new InMemoryBeerRepository([makeBeer(), makeBeer({ stock: 0 })]);
+
+    expect(await new ListFeaturedBeers(repository).execute()).toEqual([]);
+  });
 });
