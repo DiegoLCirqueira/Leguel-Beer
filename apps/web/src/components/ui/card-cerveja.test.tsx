@@ -1,6 +1,7 @@
 import type { CervejaCard } from "@leguele/shared";
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 import { CardCerveja } from "./card-cerveja";
 
 const cerveja = (extra: Partial<CervejaCard> = {}): CervejaCard => ({
@@ -46,5 +47,24 @@ describe("CardCerveja", () => {
     rerender(<CardCerveja cerveja={cerveja({ imagemUrl: null })} />);
 
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
+  });
+
+  it("sem ação de adicionar o botão fica desabilitado, com o motivo para leitores de tela", () => {
+    render(<CardCerveja cerveja={cerveja()} />);
+
+    const botao = screen.getByRole("button", { name: "Adicionar" });
+    expect(botao).toBeDisabled();
+    expect(botao).toHaveAccessibleDescription("A Geladeira ainda não está disponível.");
+  });
+
+  it("com a ação de adicionar o botão fica habilitado e a dispara ao tocar", async () => {
+    const aoAdicionar = vi.fn();
+    render(<CardCerveja cerveja={cerveja()} aoAdicionar={aoAdicionar} />);
+
+    const botao = screen.getByRole("button", { name: "Adicionar" });
+    await userEvent.click(botao);
+
+    expect(botao).toBeEnabled();
+    expect(aoAdicionar).toHaveBeenCalledOnce();
   });
 });
