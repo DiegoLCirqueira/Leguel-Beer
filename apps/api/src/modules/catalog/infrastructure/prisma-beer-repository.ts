@@ -1,4 +1,5 @@
 import type { AppLogger } from "../../../common/logging/app-logger.js";
+import type { Prisma } from "../../../generated/prisma/client.js";
 import type { PrismaService } from "../../../common/prisma/prisma.service.js";
 import type { Beer } from "../domain/beer.js";
 import type { BeerRepository } from "../domain/beer-repository.js";
@@ -10,11 +11,41 @@ import type { BeerRepository } from "../domain/beer-repository.js";
  */
 const MAX_ACTIVE_BEERS = 200;
 
+type BeerRow = Prisma.BeerGetPayload<{ include: { category: true } }>;
+
+function toBeer(row: BeerRow): Beer {
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    style: row.style,
+    category: { slug: row.category.slug, name: row.category.name, order: row.category.order },
+    abv: row.abv.toNumber(),
+    ibu: row.ibu,
+    volumeMl: row.volumeMl,
+    priceCents: row.priceCents,
+    featured: row.featured,
+    stock: row.stock,
+    description: row.description,
+    previousPriceCents: row.previousPriceCents,
+    imageUrl: row.imageUrl,
+    createdAt: row.createdAt,
+  };
+}
+
 export class PrismaBeerRepository implements BeerRepository {
   constructor(
     private readonly prisma: PrismaService,
     private readonly logger: Pick<AppLogger, "warn">,
   ) {}
+
+  async findActiveBySlug(slug: string): Promise<Beer | null> {
+    const row = await this.prisma.beer.findFirst({
+      where: { slug, active: true },
+      include: { category: true },
+    });
+    return row && toBeer(row);
+  }
 
   async findActive(): Promise<Beer[]> {
     const rows = await this.prisma.beer.findMany({
@@ -28,20 +59,6 @@ export class PrismaBeerRepository implements BeerRepository {
         `Leitura do catálogo no teto de ${MAX_ACTIVE_BEERS} cervejas: pode haver cervejas ativas fora da lista`,
       );
     }
-    return rows.map((row) => ({
-      id: row.id,
-      slug: row.slug,
-      name: row.name,
-      style: row.style,
-      category: { slug: row.category.slug, name: row.category.name, order: row.category.order },
-      abv: row.abv.toNumber(),
-      ibu: row.ibu,
-      volumeMl: row.volumeMl,
-      priceCents: row.priceCents,
-      featured: row.featured,
-      stock: row.stock,
-      imageUrl: row.imageUrl,
-      createdAt: row.createdAt,
-    }));
+    return rows.map(toBeer);
   }
 }

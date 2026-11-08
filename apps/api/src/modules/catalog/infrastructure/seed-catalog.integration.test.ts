@@ -65,4 +65,15 @@ describe("seedCatalog (banco real)", () => {
     await expect(attempt).rejects.toThrow(/DATABASE_URL/);
     expect(await prisma.category.count()).toBe(0);
   });
+
+  it("grava a descrição e o preço anterior: Maré Alta com 36,90, cerveja de teste sem nenhum dos dois", async () => {
+    await seedCatalog(prisma);
+
+    const mareAlta = await prisma.beer.findUniqueOrThrow({ where: { slug: "mare-alta" } });
+    const deTeste = await prisma.beer.findUniqueOrThrow({ where: { slug: "teste-lager-1" } });
+
+    expect(mareAlta).toMatchObject({ priceCents: 3200, previousPriceCents: 3690 });
+    expect(mareAlta.description).toContain("(texto de exemplo)");
+    expect(deTeste).toMatchObject({ description: null, previousPriceCents: null });
+  });
 });

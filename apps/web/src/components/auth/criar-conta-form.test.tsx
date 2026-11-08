@@ -154,6 +154,14 @@ describe("CriarContaForm", () => {
     expect(screen.getByRole("link", { name: "Entrar" })).toHaveAttribute("href", "/entrar");
   });
 
+  it("põe o convite para entrar numa faixa de fundo escuro, legível sobre a folhagem", () => {
+    renderizar();
+
+    const faixa = screen.getByText("Já tem uma conta?").parentElement;
+    expect(faixa).toHaveClass("bg-fundo/85");
+    expect(faixa).toContainElement(screen.getByRole("link", { name: "Entrar" }));
+  });
+
   it("leva o foco ao primeiro campo com erro ao enviar", async () => {
     renderizar();
     await userEvent.type(screen.getByLabelText("Nome completo"), "Ana Souza");

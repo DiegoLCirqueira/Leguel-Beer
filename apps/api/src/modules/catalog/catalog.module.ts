@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { AppLogger } from "../../common/logging/app-logger.js";
 import { PrismaService } from "../../common/prisma/prisma.service.js";
+import { GetBeer } from "./application/get-beer.js";
 import { ListBeers } from "./application/list-beers.js";
 import { ListFeaturedBeers } from "./application/list-featured-beers.js";
 import { BEER_REPOSITORY } from "./catalog.tokens.js";
@@ -16,6 +17,11 @@ import { CatalogController } from "./presentation/catalog.controller.js";
       useFactory: (prisma: PrismaService, logger: AppLogger) =>
         new PrismaBeerRepository(prisma, logger),
       inject: [PrismaService, AppLogger],
+    },
+    {
+      provide: GetBeer,
+      useFactory: (beers: BeerRepository) => new GetBeer(beers),
+      inject: [BEER_REPOSITORY],
     },
     {
       provide: ListFeaturedBeers,

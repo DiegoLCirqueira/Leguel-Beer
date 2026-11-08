@@ -224,7 +224,7 @@ export function CriarContaForm({ criar }: Props) {
         Criar conta
       </Button>
 
-      <div className="flex flex-wrap items-center justify-center gap-x-2 text-sm text-texto">
+      <div className="flex flex-wrap items-center justify-center gap-x-2 self-center rounded-full bg-fundo/85 px-5 text-sm text-texto">
         <p>Já tem uma conta?</p>
         <Link
           href="/entrar"

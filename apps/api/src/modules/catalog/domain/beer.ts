@@ -18,6 +18,10 @@ export interface Beer {
   priceCents: number;
   featured: boolean;
   stock: number;
+  /** Texto curto da página de produto; nulo some a seção. */
+  description: string | null;
+  /** Preço anterior em centavos, opcional: só vira desconto se for maior que o atual. */
+  previousPriceCents: number | null;
   imageUrl: string | null;
   createdAt: Date;
 }
