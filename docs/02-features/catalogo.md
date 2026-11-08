@@ -107,7 +107,7 @@ Funcionalidade: Catálogo de cervejas
 ## Faixas de filtro
 
 > [!info] Recomendação aplicada, vetável (08/11)
-> O Diego decidiu o formato (faixas fixas, limite inferior incluído e superior excluído) em 2026-10-28; os limites são produto e não estavam definidos. Aplicada a opção mais simples e reversível: 3 faixas por atributo, calibradas pelos números do design (teor de 4,5% a 6,5%; preço de R$ 24,90 a R$ 32,00). Trocar os limites é mudar uma constante em `@leguele/shared`, sem migration.
+> O Diego decidiu o formato (faixas fixas, limite inferior incluído e superior excluído) em 2026-10-28; os limites são produto e não estavam definidos. Aplicada a opção mais simples e reversível: 3 faixas por atributo, calibradas pelos números do design e conferidas contra as 9 cervejas de "Catálogo do MVP". Trocar os limites é mudar uma constante em `@leguele/shared`, sem migration.
 
 | Atributo | Faixas (id na URL: intervalo) |
 | --- | --- |
@@ -247,7 +247,7 @@ Ordem dos cards do grupo B do [[roteiro-mvp]], em fatias verticais:
 | # | Card | Dono | O que entrega |
 | --- | --- | --- | --- |
 | 1 | Contrato (LB-4, #13) | Back | PR só em `@leguele/shared`, com testes: os schemas de "Contrato compartilhado" e `faixasDeFiltro`; sai antes de qualquer outra fatia |
-| 2 | LB-4 (#13) | Back | Modelos de categoria (com `ordem`, inteiro, usada pela relevância) e de cerveja (ativa, destaque, estoque, data de cadastro), migration e seed das 9 cervejas de "Catálogo do MVP", em 4 categorias |
+| 2 | LB-4 (#13) | Back | Modelos de categoria (com `ordem`, inteiro, usada pela relevância) e de cerveja (ativa, destaque, estoque, data de cadastro), migration e seed das 9 cervejas de "Catálogo do MVP", em 4 categorias, com 1 esgotada. No mesmo PR, o Back atualiza os testes e o E2E que contam 16 (`seed-catalog-data.test.ts`, `seed-catalog.integration.test.ts`, `catalogo.spec.ts` e `home-destaques.spec.ts`) |
 | 3 | LB-36 (#25), API | Back | `GET /catalogo`: filtros, faixas, ordenação por relevância, menor e maior preço e mais novas, esgotadas no fim; contagem por categoria (LB-33, #22) e `esgotada` (LB-38, #27, sem reservas ainda); é o módulo de referência `ListBeers` e o `Money` previstos em [[api-base]] |
 | 4 | LB-34 (#23), API | Back | `GET /catalogo/destaques`, com ordem e corte em 6 |
 | 5 | LB-15 (#67) | Front | Layout compartilhado da loja: cabeçalho (logo e contador da Geladeira, recebido por prop) e barra inferior de 4 abas (ver abaixo) |
@@ -280,18 +280,20 @@ Decisão do Diego em 08/11: o catálogo do MVP são as **9 cervejas das garrafas
 | Cerveja (slug) | Estilo | Categoria | Teor | Volume | Preço | IBU | Fonte |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Maré Alta (`mare-alta`) | American IPA | IPA | 6,5% | 330 ml | R$ 32,00 (anterior R$ 36,90*) | 65 | rótulo (nome, estilo, teor, volume); telas 03, 22 e 28 (preço, IBU, descrição) |
-| Leguelé Carnaval (`leguele-carnaval`) | Session IPA | IPA | 4,5%† | 330 ml† | R$ 30,00† | 30† | rótulo (nome, estilo); o resto provisório |
+| Leguelé Carnaval (`leguele-carnaval`) | Session IPA | IPA | 4,2%† | 330 ml† | R$ 30,00† | 30† | rótulo (nome, estilo); o resto provisório |
 | Leguelé Maceió IPA (`leguele-maceio-ipa`) | IPA | IPA | 6,0%† | 330 ml† | R$ 31,00† | 55† | rótulo (nome, estilo; volume cortado no rótulo, "…0 ml"); o resto provisório |
 | Cupuaçu Ale (`cupuacu-ale`) | Amazonian Fruit Ale | Frutas | 5,8% | 500 ml | R$ 26,50 | 15† | rótulo (nome, estilo, teor, volume); telas 02, 04 e 16 (preço) |
 | Cajupá Sour (`cajupa-sour`) | Sour Ale com cajá | Frutas | 6,5% | 500 ml | R$ 26,00† | 8† | rótulo (nome, estilo, teor, volume); preço provisório pelo "Cupuaçu Sour" da tela 02 |
 | Avermelhou (`avermelhou`) | Red Ale (hibisco e frutas vermelhas) | Malt† | 5,8% | 330 ml | R$ 29,00† | 20† | rótulo (nome, estilo, teor, volume); preço provisório pelo "Aurenhõsu Red" da tela 02 |
 | Leguelé Cream Ale (`leguele-cream-ale`) | Cream Ale | Lager† | 5,2% | 330 ml† | R$ 25,00† | 18† | rótulo (nome, estilo, teor); o resto provisório |
-| Leguelé Kölsch (`leguele-kolsch`) | Kölsch | Lager† | 4,8%† | 330 ml† | R$ 25,00† | 22† | rótulo (nome, estilo); o resto provisório |
+| Leguelé Kölsch (`leguele-kolsch`) | Kölsch | Lager† | 4,8%† | 330 ml† | R$ 24,90† | 22† | rótulo (nome, estilo); o resto provisório |
 | Leguelé Comendador (`leguele-comendador`) | a confirmar | Lager† | 5,0%† | 500 ml† | R$ 25,00† | 15† | só o arquivo da imagem (o rótulo não traz nome, estilo, teor nem volume); o resto provisório |
 
 † valor provisório, a confirmar com o Diego. \* o preço anterior da Maré Alta é R$ 36,90 nas telas 03 e 28 e R$ 36,00 nas telas 02, 16, 22 e 26; vale R$ 36,90 (decisão provisória, a confirmar).
 
-**Para todas as cervejas:** descrição nula, exceto a Maré Alta, cujo texto está na tela 22 ("Uma American IPA de respeito! Com um amargor marcante, aroma cítrico e notas tropicais, a Maré Alta é perfeita para quem busca uma experiência intensa e refrescante."); sem preço anterior, exceto a Maré Alta; estoque de exemplo definido pelo Back no seed; imagem do rótulo da pasta de garrafas (ou a padrão da categoria).
+**Para todas as cervejas:** descrição nula, exceto a Maré Alta, cujo texto está na tela 22 ("Uma American IPA de respeito! Com um amargor marcante, aroma cítrico e notas tropicais, a Maré Alta é perfeita para quem busca uma experiência intensa e refrescante."); sem preço anterior, exceto a Maré Alta; estoque de exemplo definido pelo Back no seed, com **1 cerveja esgotada** (Leguelé Comendador, estoque 0, provisória) para exercitar o selo e a ordem; as outras 8 têm estoque; imagem do rótulo da pasta de garrafas (ou a padrão da categoria).
+
+**Cobertura das faixas com os valores acima:** teor, "Abaixo de 4,5%" (Carnaval 4,2%), "4,5% a menos de 6%" (Cupuaçu Ale, Avermelhou, Cream Ale, Kölsch, Comendador) e "6% ou mais" (Maré Alta, Cajupá Sour, Maceió IPA); IBU, "Abaixo de 20" (Cupuaçu Ale, Cajupá Sour, Cream Ale, Comendador), "20 a menos de 40" (Avermelhou, Kölsch, Carnaval) e "40 ou mais" (Maré Alta, Maceió IPA); preço, "Abaixo de R$ 25" (Kölsch, R$ 24,90), "R$ 25 a menos de R$ 30" (Cupuaçu Ale, Cajupá Sour, Avermelhou, Cream Ale, Comendador) e "R$ 30 ou mais" (Maré Alta, Carnaval, Maceió IPA). Todas as 9 faixas têm cerveja; os valores que garantem isso são provisórios e vetáveis.
 
 **Destaques (provisório):** 6 cervejas em destaque no seed: Maré Alta, Cupuaçu Ale, Cajupá Sour, Avermelhou, Leguelé Carnaval e Leguelé Kölsch. Com 6, a home mostra todas e o corte em 6 só se exercita nos testes com dados próprios.
 
@@ -305,12 +307,17 @@ Decisão do Diego em 08/11: o catálogo do MVP são as **9 cervejas das garrafas
 
 ### A confirmar com o Diego
 
+**Preciso de resposta do Diego** (decisão de marca e de produto; o seed segue com o provisório enquanto isso):
+
 1. **Marcas de terceiros nos rótulos:** os rótulos de Cupuaçu Ale ("Floresta Beer Co."), Avermelhou ("São Paulo Brew Co."), Cajupá Sour ("Cajupá Brew Co.") e Maré Alta ("produzido e engarrafado em Portugal") trazem outra cervejaria ou origem. Confirmar se vão assim para o site (marca e conteúdo são do Diego).
-2. **Leguelé Comendador:** nome e estilo (hoje só o nome do arquivo) e o teor e o volume.
-3. **Teor e volume que o rótulo não mostra:** Leguelé Carnaval, Leguelé Maceió IPA, Leguelé Kölsch e Leguelé Cream Ale (volume).
+2. **Leguelé Comendador:** nome e estilo (hoje só o nome do arquivo). Também é a cerveja marcada como esgotada no seed provisório.
+3. **Categorias** acima (principalmente Avermelhou em Malt e Comendador em Lager).
 4. **Divergência rótulo × design:** o design mostra a Maré Alta com 500 ml e o Cupuaçu Ale com 5,0%; vale o rótulo (330 ml e 5,8%).
-5. **IBU:** só a Maré Alta (65) tem valor no design; os demais são provisórios.
-6. **Preços:** valem os do design onde a cerveja aparece (Maré Alta, Cupuaçu Ale); os demais são provisórios. O preço anterior da Maré Alta: R$ 36,90 ou R$ 36,00.
-7. **Descrições** das 8 cervejas sem texto no design (a seção some enquanto forem nulas).
-8. **Faixas de filtro:** com os valores provisórios, "Abaixo de 4,5%" tem só a Session IPA e "Abaixo de R$ 25" nenhuma cerveja; as faixas de [[catalogo]] ("Faixas de filtro") podem precisar de ajuste quando teor, IBU e preço forem confirmados.
-9. **Categorias** acima (principalmente Avermelhou em Malt e o Comendador em Lager).
+
+**Dados de cadastro que o Diego manda quando puder** (provisórios e vetáveis; entram pelo cadastro, LB-73, sem travar o seed):
+
+5. **Teor e volume que o rótulo não mostra:** Comendador, Carnaval, Maceió IPA, Kölsch e o volume do Cream Ale.
+6. **IBU:** só a Maré Alta (65) tem valor no design; os outros oito são provisórios.
+7. **Preços:** valem os do design onde a cerveja aparece (Maré Alta e Cupuaçu Ale); os outros sete são provisórios. Preço anterior da Maré Alta: R$ 36,90 ou R$ 36,00.
+8. **Descrições** das 8 cervejas sem texto no design (a seção some enquanto forem nulas).
+9. **Faixas de filtro:** os valores provisórios cobrem as 9 faixas (ver "Cobertura das faixas"), mas com teor, IBU e preço reais as faixas podem precisar de ajuste.

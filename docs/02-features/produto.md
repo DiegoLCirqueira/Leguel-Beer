@@ -30,10 +30,10 @@ tags:
 Funcionalidade: Página de produto
 
   Cenário: Ver a ficha da cerveja
-    Dado a cerveja "Maré Alta" da categoria IPA, estilo "American IPA", teor 6,5%, IBU 65, 500 ml e preço R$ 32,00
+    Dado a cerveja "Maré Alta" da categoria IPA, estilo "American IPA", teor 6,5%, IBU 65, 330 ml e preço R$ 32,00
     Quando abro a página dela a partir do card
     Então vejo o nome, o estilo, o selo da categoria e a imagem
-    E vejo a ficha com teor alcoólico 6,5%, IBU 65 e volume 500 ml
+    E vejo a ficha com teor alcoólico 6,5%, IBU 65 e volume 330 ml
     E vejo o preço R$ 32,00 e a descrição da cerveja
 
   Esquema do Cenário: Desconto calculado a partir do preço anterior
