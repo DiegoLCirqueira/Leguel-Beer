@@ -81,4 +81,16 @@ describe("ListBeers", () => {
     expect(names(porIbu.items).sort()).toEqual(["A", "C"]);
     expect(names(porPreco.items).sort()).toEqual(["A", "B"]);
   });
+
+  it("sÃ³ disponÃ­veis esconde as esgotadas, mas elas continuam nos contadores", async () => {
+    const repository = new InMemoryBeerRepository([
+      makeBeer({ name: "DisponÃ­vel", stock: 4 }),
+      makeBeer({ name: "Esgotada", stock: 0 }),
+    ]);
+
+    const result = await new ListBeers(repository).execute(query({ disponiveis: "true" }));
+
+    expect(names(result.items)).toEqual(["DisponÃ­vel"]);
+    expect(result.categories[0]?.quantity).toBe(2);
+  });
 });
