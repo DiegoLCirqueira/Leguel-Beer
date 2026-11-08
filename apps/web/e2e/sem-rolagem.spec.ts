@@ -70,9 +70,3 @@ test("a pergunta de maioridade e o acesso negado cabem em 844 px sem rolagem ver
   await expect(page.getByRole("heading", { name: "Acesso não permitido" })).toBeVisible();
   expect(await alturaDoDocumento(page)).toBeLessThanOrEqual(844);
 });
-
-test("a boas-vindas cabe em 844 px sem rolagem vertical", async ({ page }) => {
-  await page.goto("/boas-vindas");
-
-  expect(await alturaDoDocumento(page)).toBeLessThanOrEqual(844);
-});

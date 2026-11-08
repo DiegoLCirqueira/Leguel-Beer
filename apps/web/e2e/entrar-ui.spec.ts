@@ -16,10 +16,11 @@ test("a tela de entrar não tem rolagem horizontal e os controles têm 44 px de 
     page.getByRole("button", { name: "Mostrar senha" }),
     page.getByRole("link", { name: "Esqueci minha senha" }),
     page.getByRole("button", { name: "Entrar" }),
-    page.getByRole("link", { name: "Criar conta" }).first(),
+    page.getByRole("link", { name: "Criar conta", exact: true }),
   ]) {
     const caixa = await controle.boundingBox();
-    expect(caixa?.height ?? 0).toBeGreaterThanOrEqual(43);
+    expect(caixa?.width ?? 0, "largura do alvo de toque").toBeGreaterThanOrEqual(43);
+    expect(caixa?.height ?? 0, "altura do alvo de toque").toBeGreaterThanOrEqual(43);
   }
 });
 
