@@ -15,6 +15,7 @@ export interface CatalogFilters {
 }
 
 export function filterBeers(beers: readonly Beer[], filters: CatalogFilters): Beer[] {
-  void filters;
-  return [...beers];
+  return beers.filter(
+    (beer) => !filters.categorySlug || beer.category.slug === filters.categorySlug,
+  );
 }
