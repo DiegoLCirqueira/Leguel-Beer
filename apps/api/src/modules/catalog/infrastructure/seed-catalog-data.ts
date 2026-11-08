@@ -37,9 +37,11 @@ const DETAILS: Record<string, Pick<SeedBeer, "description" | "previousPriceCents
   },
   "leguele-carnaval": {
     description: "Uma Session IPA leve e refrescante, boa para a festa. (texto de exemplo)",
+    previousPriceCents: 3190,
   },
   "cupuacu-ale": {
     description: "Uma ale de fruta com o azedinho e o aroma do cupuaçu. (texto de exemplo)",
+    previousPriceCents: 2990,
   },
   cajupa: {
     description: "Uma ale de fruta com caju e um toque de acidez. (texto de exemplo)",
@@ -53,6 +55,7 @@ const DETAILS: Record<string, Pick<SeedBeer, "description" | "previousPriceCents
   kolsch: {
     description: "Uma Kölsch limpa e delicada, de corpo leve. (texto de exemplo)",
   },
+  "teste-malt-1": { previousPriceCents: 3050 },
   "leguele-comendador": {
     description: "Uma lager clara e fácil de beber, a cara do Comendador. (texto de exemplo)",
   },
