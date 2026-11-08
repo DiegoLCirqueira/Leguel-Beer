@@ -3,7 +3,7 @@ export function calcularDesconto(
   anteriorCentavos: number | null | undefined,
   atualCentavos: number,
 ): number | null {
-  void anteriorCentavos;
-  void atualCentavos;
-  return null;
+  return Math.floor(
+    (((anteriorCentavos as number) - atualCentavos) / (anteriorCentavos as number)) * 100,
+  );
 }
