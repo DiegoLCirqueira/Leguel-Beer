@@ -1,3 +1,4 @@
+import type { AppLogger } from "../../../common/logging/app-logger.js";
 import type { PrismaService } from "../../../common/prisma/prisma.service.js";
 import type { Beer } from "../domain/beer.js";
 import type { BeerRepository } from "../domain/beer-repository.js";
@@ -10,7 +11,12 @@ import type { BeerRepository } from "../domain/beer-repository.js";
 const MAX_ACTIVE_BEERS = 200;
 
 export class PrismaBeerRepository implements BeerRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly logger?: Pick<AppLogger, "warn">,
+  ) {
+    void this.logger;
+  }
 
   async findActive(): Promise<Beer[]> {
     const rows = await this.prisma.beer.findMany({
