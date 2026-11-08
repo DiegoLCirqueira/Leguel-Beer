@@ -7,7 +7,7 @@ export const cervejaCardSchema = z
     nome: z.string(),
     estilo: z.string(),
     categoria: z.object({ slug: z.string(), nome: z.string(), ordem: z.int() }),
-    teorAlcoolico: z.number(),
+    teorAlcoolico: z.number().nonnegative(),
     ibu: z.int().nonnegative(),
     volumeMl: z.int().positive(),
     precoCentavos: z.int().nonnegative(),
