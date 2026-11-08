@@ -7,18 +7,19 @@ atualizado: 2026-11-08
 
 Sobrescrito pelo Orchestrator ao fim de cada ordem. A próxima conversa começa lendo este arquivo, a daily note mais recente em `docs/05-diario/` e [[licoes-aprendidas]].
 
-## Última ordem: refino do Codex, zoom de 200%, telas sem design e auditoria final (08/11)
+## Última ordem: refino do Codex, zoom de 200%, telas do design, auditoria final e ciclo contínuo (08/11)
 
 Resumo em [[2026-11-08]].
 
 - #203 (Codex): refino dos E2E das telas de acesso; achou o BUG-ACESSO-ZOOM.
 - #204 (Front): corrige o corte do Entrar e a dica do (i) no zoom de 200% da boas-vindas.
-- Levantamento das telas sem design no cartão "Telas sem design" do canvas (fichário "Fichário"). O Diego já adicionou as telas 16 a 24 em `Imagens/figma/telas`; o cartão precisa ser atualizado.
-- Auditoria final de cada ordem pelo Codex (decisão do Diego), registrada no `CLAUDE.md` e em [[maestri-banda]]. A primeira roda sobre esta ordem (#203 a #206).
+- Levantamento das telas sem design no cartão "Telas sem design" do canvas (fichário "Fichário"). O Diego adicionou as telas 16 a 30 em `Imagens/figma/telas` (a revisar com o Front); a Geladeira segue `Imagens/estudio-garrafas.html`.
+- Auditoria final de cada ordem pelo Codex (decisão do Diego), registrada no `CLAUDE.md` e em [[maestri-banda]]. A primeira (297bb03..e393f50) deu "Ordem com achados": dois major de zoom na boas-vindas, devolvidos ao Front.
+- Ciclo contínuo: [[ADR-016-ciclo-continuo-da-banda]]. A banda não espera ordem entre tarefas; decisões do Diego ficam no cartão "🗳️ Decisões pendentes do Diego".
 
 ## Estado
 
-- Ambiente a partir da `main` (3a7dd99), em processos separados: API em :3333 (`pnpm --filter @leguele/api dev`, log `%TEMP%/leguele-api-dev.log`) e site em :3000 (`next dev -p 3000` em `apps/web`, log `%TEMP%/leguele-web-dev.log`). Supabase local e Mailpit no Docker. Preview :3001 ainda no ar servindo o worktree `leguele-zoom` (já mergeado); pode ser desligado. Para religar: Docker, `pnpm db:start` e os dois comandos.
+- Ambiente a partir da `main` (código em 3a7dd99), em processos separados: API em :3333 (`pnpm --filter @leguele/api dev`, log `%TEMP%/leguele-api-dev.log`) e site em :3000 (`next dev -p 3000` em `apps/web`, log `%TEMP%/leguele-web-dev.log`). Supabase local e Mailpit no Docker. Preview :3001 ainda no ar servindo o worktree `leguele-zoom` (já mergeado); pode ser desligado. Para religar: Docker, `pnpm db:start` e os dois comandos.
 - O watch da API não reinicia quando muda o `.env`: reiniciar o processo.
 - `apps/api/.env` da working copy principal foi copiado do worktree `leguele-api` (sem as chaves do seed).
 - Portais "Leguelé iPhone 390" e "Leguelé Android" apontam para :3000.
@@ -29,8 +30,8 @@ Resumo em [[2026-11-08]].
 
 ## Próximo
 
-1. Auditoria final desta ordem (Codex).
-2. Conferir as telas 16 a 24 contra as specs e o corte do MVP (a 24 mostra cupom e favoritos, que são MVP+ e Pós-MVP).
+1. Front: corrigir os achados da auditoria na boas-vindas (texto do "Criar conta" em 180x390; dica do (i) fora da tela na vertical), com testes que medem a vertical.
+2. Revisão das telas 16 a 30 com o Front (pré-revisão do Codex) e sequência numerada de implementação por importância; depois, implementar pela ordem, sem esperar o Diego.
 3. Inspeção pendente do Diego: `/entrar`, `/criar-conta`, `/conta`, `/entregas`.
 4. PR do Devops com `@leguele/shared` em watch no `pnpm dev`; fase 2 do [[roteiro-mvp]] (bloco A e depois B). O spike LB-54 abre o checkout.
 
