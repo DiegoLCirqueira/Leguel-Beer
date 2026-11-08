@@ -16,7 +16,7 @@ Monorepo pnpm + Turborepo (spec: docs/02-features/base-monorepo.md).
 ### Comandos (dev, teste, build, lint)
 Todos na raiz, com Node do `.nvmrc` e pnpm do `packageManager`.
 - `pnpm install`: instala (o CI usa `--frozen-lockfile`).
-- `pnpm dev`: sobe web e API.
+- `pnpm dev`: sobe web e API e compila o `@leguele/shared` em watch (turbo: `shared#build` antes; #224).
 - `pnpm test`: Vitest nos pacotes. `pnpm test:e2e`: Playwright (sobe web e API sozinho).
 - `pnpm lint`: ESLint + dependency-cruiser. `pnpm arch`: só o dependency-cruiser.
 - `pnpm format:check` / `pnpm format`: Prettier.

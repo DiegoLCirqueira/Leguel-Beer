@@ -111,7 +111,7 @@ export function EntrarForm({ entrar, reenviar, emailInicial = "", manterConectad
           acao={<OlhoDaSenha visivel={verSenha} alternar={() => setVerSenha((v) => !v)} />}
         />
 
-        <div className="flex items-center justify-between gap-3 text-sm text-texto">
+        <div className="flex flex-wrap items-center justify-between gap-x-3 text-sm text-texto min-[360px]:flex-nowrap">
           <label className="flex cursor-pointer items-center gap-3">
             <span className="relative block size-6 shrink-0">
               <input

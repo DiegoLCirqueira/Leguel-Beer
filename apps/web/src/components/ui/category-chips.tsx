@@ -13,7 +13,7 @@ type CategoryChipsProps = {
 
 export function CategoryChips({ items, value, onChange }: CategoryChipsProps) {
   return (
-    <div className="flex gap-2 overflow-x-auto">
+    <div className="flex flex-wrap gap-2 min-[360px]:flex-nowrap min-[360px]:overflow-x-auto">
       {items.map((item) => {
         const selected = item.id === value;
         return (

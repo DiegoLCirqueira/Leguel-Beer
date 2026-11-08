@@ -18,6 +18,10 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
+vi.mock("@/components/home/destaques-servidor", () => ({
+  DestaquesServidor: () => <section aria-label="Destaques de exemplo" />,
+}));
+
 import Home from "./page";
 
 describe("Home", () => {
@@ -62,5 +66,14 @@ describe("Home", () => {
     render(await Home());
 
     expect(screen.queryByRole("status")).toBeNull();
+  });
+
+  it("a home traz a seção de destaques depois do título principal", async () => {
+    cookieStore.guest = true;
+
+    render(await Home());
+
+    expect(screen.getByRole("heading", { level: 1, name: "Leguelé Beer" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Destaques de exemplo" })).toBeInTheDocument();
   });
 });

@@ -9,8 +9,8 @@ tags: [planejamento, telas]
 
 Ordem das telas no [[ADR-016-ciclo-continuo-da-banda|ciclo contínuo da banda]], copiada do cartão "🧭 Ordem de implementação" do canvas do Maestri (revisado pelo Orchestrator em 08/11). Pré-revisão do Codex sobre as telas 16 a 30 e o estúdio; validação com o Front em seguida. Segue o [[roteiro-mvp]] (caminho de compra primeiro).
 
-1. **Catálogo e início** (grupo B: LB-4, 13, 14, 15, 33, 36, 34), telas 16, 25, 26, 27: [[catalogo]], [[destaques-home]].
-2. **Página de produto** (grupo D: LB-40, 41; o LB-42 depende do LB-47 e ativa no item 3), telas 03 e 28: [[produto]].
+1. **Catálogo e início** (grupo B: LB-4, 13, 14, 15, 33, 36, 34), telas 16, 25, 26, 27 (concluído, ver "Andamento"): [[catalogo]], [[destaques-home]].
+2. **Página de produto** (grupo D: LB-40, 41; o LB-42 depende do LB-47 e ativa no item 3), telas 03 e 28 (em andamento, ver "Andamento"): [[produto]].
 3. **Geladeira** no estúdio de garrafas e resumo em gaveta (grupo C: LB-124, 47, 49, 50, 51, 52, 35; depois LB-42), estudio-garrafas e tela 24: [[geladeira]], [[adicionar-do-card]].
 4. **Conta e entrega**: dados pessoais, endereços, área de entrega (grupos E e F: LB-29, 62, 30, 31, 20, 63, 64, 66), telas 19, 20, 29.
 5. **Checkout**: spike do Mercado Pago (LB-54) e depois LB-55, 56, 38, telas 05 a 07: [[checkout]].
@@ -18,6 +18,11 @@ Ordem das telas no [[ADR-016-ciclo-continuo-da-banda|ciclo contínuo da banda]],
 7. **Pedido confirmado e histórico** (LB-61, 67; o e-mail LB-81 depende de provedor), telas 08 e 13. A tela 09 (Acompanhar pedido) fica fora do item 7: é referência visual adiada, porque o detalhe com linha do tempo (LB-68) está no MVP+ e o tempo real (LB-69) no Pós-MVP ([[mvp-corte]]).
 8. **Admin** (grupo I: LB-72, 73, 75, 76, 77), telas 21, 22, 23.
 9. **Qualidade** (LB-111, 112): segurança e E2E da compra.
+
+## Andamento (08/11)
+
+- **Item 1, concluído:** PRs #210, #212, #214, #215, #216, #218, #219, #221 e #226. **Pendência:** a faixa de categorias na home (cenário "Filtrar pela faixa de categorias com contador" do [[catalogo]]) ainda não tem tela (minor do Reviewer no #226).
+- **Item 2, em andamento:** o contrato (#223) está mergeado. A fatia 2 da API (campos, migration, seed e `GET /catalogo/:slug`) está guardada na branch `feat/produto-api`, ainda sem PR. A tela e o seletor com o botão fixo vêm depois ([[produto]]).
 
 ## Item 1: ordem e decisões do Front
 
