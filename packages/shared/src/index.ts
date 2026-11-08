@@ -18,3 +18,12 @@ export {
 export type { CriarPerfilRequest, Papel, PapelResponse, PerfilResponse } from "./conta/perfil.js";
 export { senhaSchema } from "./conta/senha.js";
 export { telefoneSchema } from "./conta/telefone.js";
+export { cervejaCardSchema } from "./catalogo/cerveja-card.js";
+export type { CervejaCard } from "./catalogo/cerveja-card.js";
+export { destaquesResponseSchema } from "./catalogo/destaques.js";
+export type { DestaquesResponse } from "./catalogo/destaques.js";
+export { faixasDeFiltro, pertenceAFaixa } from "./catalogo/faixas.js";
+export type { Faixa } from "./catalogo/faixas.js";
+export { catalogoQuerySchema, ORDENS_DO_CATALOGO } from "./catalogo/query.js";
+export { catalogoResponseSchema, categoriaComContadorSchema } from "./catalogo/response.js";
+export type { CatalogoResponse } from "./catalogo/response.js";
