@@ -42,4 +42,11 @@ describe("cervejaCardSchema", () => {
     expect(recusa({ quantidadeDisponivel: 0, esgotada: false })).toBe(false);
     expect(recusa({ quantidadeDisponivel: 3, esgotada: true })).toBe(false);
   });
+
+  it("recusa teor alcoólico negativo", () => {
+    expect(cervejaCardSchema.safeParse({ ...cervejaValida, teorAlcoolico: -0.5 }).success).toBe(
+      false,
+    );
+    expect(cervejaCardSchema.safeParse({ ...cervejaValida, teorAlcoolico: 0 }).success).toBe(true);
+  });
 });
