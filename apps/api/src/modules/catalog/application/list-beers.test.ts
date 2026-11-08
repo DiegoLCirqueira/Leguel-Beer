@@ -20,4 +20,20 @@ describe("ListBeers", () => {
     expect(names(result.items)).toEqual(["Frutas Caju", "IPA Aratu", "Lager Sol"]);
     expect(result.total).toBe(3);
   });
+
+  it("conta as cervejas ativas por categoria, esgotadas incluÃ­das, na ordem das categorias e sem as vazias", async () => {
+    const repository = new InMemoryBeerRepository([
+      makeBeer({ category: CATEGORIES.lager }),
+      makeBeer({ category: CATEGORIES.ipa }),
+      makeBeer({ category: CATEGORIES.ipa, stock: 0 }),
+      makeBeer({ category: CATEGORIES.ipa }),
+    ]);
+
+    const result = await new ListBeers(repository).execute(query());
+
+    expect(result.categories).toEqual([
+      { slug: "ipa", name: "IPAs", order: 1, quantity: 3 },
+      { slug: "lager", name: "Lager", order: 4, quantity: 1 },
+    ]);
+  });
 });
