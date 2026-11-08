@@ -122,6 +122,8 @@ Estas regras têm prioridade sobre os caminhos padrão descritos nos SKILL.md em
 
 Os agentes têm autonomia para decidir e executar a maior parte do trabalho sem consultar o Diego. Só o procure nos casos listados em "Decisões que são do Diego".
 
+Ciclo contínuo ([[ADR-016-ciclo-continuo-da-banda]]): a banda segue de uma tarefa para a próxima sem esperar ordem do Diego; decisão dele vai ao cartão "Decisões pendentes" do canvas e o trabalho continua em outra tarefa. A recomendada vale só para os itens 1, 2 e 9 de "Decisões que são do Diego" (produto e negócio, marca e conteúdo, dúvida real): o Orchestrator a aplica e reporta como decisão vetável. Os itens 3 a 8 da mesma lista continuam parando no Diego: vão ao cartão de pendências e a banda segue com outra tarefa. O merge segue só pelas 4 condições do [[ADR-006-merge-por-agentes]].
+
 **O agente decide sozinho** (exemplos, não é lista fechada):
 - Escolhas técnicas com resposta razoavelmente clara: estrutura de código, nomes, padrões, bibliotecas já presentes no projeto, formato de arquivos, organização de pastas.
 - Planejamento: ordem das tarefas, divisão em branches e PRs, qual especialista recebe o quê.
