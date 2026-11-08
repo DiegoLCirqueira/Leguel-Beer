@@ -201,7 +201,7 @@ export function WelcomeActions() {
           id={hintId}
           aria-live="polite"
           style={{ width: "min(100vw - 16px, max(100cqw - 16px, 21rem))" }}
-          className="absolute bottom-full left-1/2 z-30 mb-1 -translate-x-1/2 rounded-campo border border-arte-borda bg-arte-vidro px-3 py-1.5 text-center text-xs leading-snug text-texto empty:hidden"
+          className="absolute bottom-full left-1/2 z-30 mb-1 -translate-x-1/2 [@media(max-height:599px)]:bottom-auto [@media(max-height:599px)]:top-full [@media(max-height:599px)]:mb-0 [@media(max-height:599px)]:mt-3 rounded-campo border border-arte-borda bg-arte-vidro px-3 py-1.5 text-center text-xs leading-snug text-texto empty:hidden"
         >
           {showHint ? HINT : null}
         </div>
