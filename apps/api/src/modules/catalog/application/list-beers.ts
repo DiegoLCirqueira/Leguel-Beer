@@ -16,12 +16,24 @@ export interface CatalogResult {
   categories: CategoryCount[];
 }
 
+/** Conta as cervejas ativas de cada categoria (esgotadas incluídas), na ordem das categorias; sem cerveja, sem linha. */
+function countByCategory(beers: readonly Beer[]): CategoryCount[] {
+  const counts = new Map<string, CategoryCount>();
+  for (const { category } of beers) {
+    const found = counts.get(category.slug);
+    if (found) found.quantity += 1;
+    else counts.set(category.slug, { ...category, quantity: 1 });
+  }
+  return [...counts.values()].sort((a, b) => a.order - b.order);
+}
+
 export class ListBeers {
   constructor(private readonly beers: BeerRepository) {}
 
   async execute(query: CatalogoQuery): Promise<CatalogResult> {
     void query;
-    const items = sortBeers(await this.beers.findActive(), "relevancia");
-    return { items, total: items.length, categories: [] };
+    const active = await this.beers.findActive();
+    const items = sortBeers(active, "relevancia");
+    return { items, total: items.length, categories: countByCategory(active) };
   }
 }
