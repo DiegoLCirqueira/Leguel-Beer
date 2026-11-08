@@ -40,7 +40,7 @@ export function WelcomeActions() {
       setShowHint(false);
       infoRef.current?.focus();
     }
-    function closeOnOutsidePress(event: PointerEvent) {
+    function closeOnOutsidePress(event: MouseEvent) {
       const target = event.target as Node;
       if (hintRef.current?.contains(target) || infoRef.current?.contains(target)) return;
       setShowHint(false);
@@ -51,11 +51,12 @@ export function WelcomeActions() {
     }
     const autoClose = setTimeout(() => setShowHint(false), HINT_DURATION_MS);
     document.addEventListener("keydown", closeOnEscape);
-    document.addEventListener("pointerdown", closeOnOutsidePress);
+    // "click", não "pointerdown": o gesto de rolagem não gera clique e não pode fechar a dica.
+    document.addEventListener("click", closeOnOutsidePress);
     return () => {
       clearTimeout(autoClose);
       document.removeEventListener("keydown", closeOnEscape);
-      document.removeEventListener("pointerdown", closeOnOutsidePress);
+      document.removeEventListener("click", closeOnOutsidePress);
     };
   }, [showHint]);
 
