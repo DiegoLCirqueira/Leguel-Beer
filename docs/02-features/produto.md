@@ -81,7 +81,7 @@ Funcionalidade: Página de produto
 
 - **Página:** `/catalogo/<slug>`, aberta pelo card do catálogo e dos destaques. Só cerveja ativa; inativa ou inexistente mostra o estado do cenário "não existe" (a API responde 404).
 - **Ficha (LB-40):** nome, estilo, categoria (`StyleBadge`), imagem (a padrão da categoria, se não houver), descrição, teor alcoólico, IBU, volume e preço. A descrição é um texto curto de cadastro; sem descrição, a seção não aparece.
-- **Desconto (LB-41):** o preço anterior é opcional. Com preço anterior maior que o atual, mostra o anterior riscado e o selo "-N%", em que N é `(anterior - atual) / anterior` arredondado ao inteiro mais próximo (32 de 36,90 dá 13%). Com preço anterior igual ou menor que o atual, ou sem valor, não mostra nada (o design da tela 28 mostra -11%, que não bate com os números). O desconto só vale para a página de produto; o card e a Geladeira seguem com o preço atual.
+- **Desconto (LB-41):** o preço anterior é opcional. Com preço anterior maior que o atual, mostra o anterior riscado e o selo "-N%", em que N é `(anterior - atual) / anterior` arredondado ao inteiro mais próximo (32 de 36,90 dá 13%). Com preço anterior igual ou menor que o atual, ou sem valor, não mostra nada (o design da tela 28 mostra -11%, que não bate com os números). Quando o desconto arredondado dá menos de 1% (ex.: 32,01 e 32,00), também não há selo nem preço riscado: a tela decide pelo `descontoPercentual` do contrato (nulo ou zero esconde tudo), nunca pela comparação de preços. O desconto só vale para a página de produto; o card e a Geladeira seguem com o preço atual.
 - **Estoque baixo:** com quantidade disponível de 1 a 5, mostra "Últimas N unidades em estoque!" ("Última unidade em estoque!" para 1). O limiar de 5 é uma constante em `@leguele/shared`.
 - **Quantidade (LB-42):** seletor de 1 até a quantidade disponível, começando em 1. O total na Geladeira de uma cerveja não passa da quantidade disponível; ao passar, mostra "Só temos N unidades" (singular: "Só temos 1 unidade") e nada muda, igual a [[adicionar-do-card]].
 - **Botão fixo:** "Adicionar à geladeira" fica fixo no rodapé da tela, sempre visível. A página não tem a barra inferior da loja, para o botão ocupar o lugar dela. O cabeçalho tem o botão de voltar e o contador da Geladeira. A barra fixa publica a própria altura numa variável CSS, para o toast ficar acima dela, e o rodapé da loja ([[termos-privacidade]]) fica no fim da rolagem, acima do botão.
@@ -139,7 +139,7 @@ Os demais já existem: `StyleBadge`, `Stepper`, `Toast` e `Button`.
 
 > [!info] Proposta, ainda não combinada com o Diego
 
-- **Desconto:** `calcularDesconto` nos casos 36,90 → 13, igual, menor e nulo (teste unitário).
+- **Desconto:** `calcularDesconto` nos casos 36,90 → 13, igual, menor, nulo e abaixo de 1% (32,01 → nulo) (teste unitário).
 - **Estoque baixo:** `estoqueBaixo` nos limites 0, 1, 5 e 6 (teste unitário).
 - **Consulta por slug na API:** devolve a cerveja ativa e 404 para inativa e inexistente (integração com banco real e teste da rota).
 - **Tela:** ficha, desconto, aviso, esgotada e não encontrada (testes de componente); cenários desta spec (E2E).
@@ -176,7 +176,7 @@ Depois do contrato (fatia 1), as fatias 2 e 3 andam em paralelo, e o Front usa d
 Recomendações aplicadas pelo Spec em 08/11, fáceis de reverter; qualquer uma pode ser vetada.
 
 - **Limiar de estoque baixo:** 5 unidades (de 1 a 5), uma constante.
-- **Desconto:** arredondado ao inteiro mais próximo; só aparece quando o preço anterior é maior que o atual; só na página de produto.
+- **Desconto:** arredondado ao inteiro mais próximo; só aparece quando o preço anterior é maior que o atual e o desconto arredondado é de pelo menos 1% (decisão vetável do Back, 08/11); só na página de produto.
 - **Descrição e preço anterior:** campos opcionais novos na cerveja; o texto do seed é de exemplo, e o conteúdo final vem do cadastro (admin).
 - **Rota:** `/catalogo/<slug>`.
 - **Sem barra inferior da loja** na página, para o botão fixo ocupar o lugar dela.
