@@ -10,7 +10,7 @@ tags: [planejamento, telas]
 Ordem das telas no [[ADR-016-ciclo-continuo-da-banda|ciclo contínuo da banda]], copiada do cartão "🧭 Ordem de implementação" do canvas do Maestri (revisado pelo Orchestrator em 08/11). Pré-revisão do Codex sobre as telas 16 a 30 e o estúdio; validação com o Front em seguida. Segue o [[roteiro-mvp]] (caminho de compra primeiro).
 
 1. **Catálogo e início** (grupo B: LB-4, 13, 14, 15, 33, 36, 34), telas 16, 25, 26, 27: [[catalogo]], [[destaques-home]].
-2. **Página de produto** (grupo D: LB-40, 41), tela 28.
+2. **Página de produto** (grupo D: LB-40, 41; o LB-42 depende do LB-47 e ativa no item 3), telas 03 e 28: [[produto]].
 3. **Geladeira** no estúdio de garrafas e resumo em gaveta (grupo C: LB-124, 47, 49, 50, 51, 52, 35; depois LB-42), estudio-garrafas e tela 24: [[geladeira]], [[adicionar-do-card]].
 4. **Conta e entrega**: dados pessoais, endereços, área de entrega (grupos E e F: LB-29, 62, 30, 31, 20, 63, 64, 66), telas 19, 20, 29.
 5. **Checkout**: spike do Mercado Pago (LB-54) e depois LB-55, 56, 38, telas 05 a 07: [[checkout]].
@@ -27,6 +27,14 @@ Detalhes em "Contrato e fatias" de [[catalogo]].
 - Adicionar desabilitado até o LB-47 e o LB-35: o Adicionar ativa no item 3. Busca (LB-37) e "Mais vendidos" ficam fora.
 - Selo "Esgotado" com tokens existentes; rodapé da loja no fim da rolagem, acima da barra inferior fixa; bottom sheet rola por dentro em tela baixa ou zoom de 200% e fecha com Esc.
 - Componentes novos em `components/ui`, com vitrine em `/dev/tokens`: cabeçalho da loja, barra inferior, card, stepper, bottom sheet, toast com "Desfazer", skeleton, select, faixa, switch, estado vazio, título de página e selo "Esgotado".
+
+## Item 2: página de produto
+
+Detalhes em [[produto]] (contrato, fatias e decisões vetáveis).
+
+- Ordem: contrato em PR próprio e primeiro (Back, só `@leguele/shared`); depois o Back (`GET /catalogo/:slug`, campos de descrição e preço anterior) e o Front (`/catalogo/[slug]`) em paralelo; o seletor de quantidade e o botão fixo (LB-42) por último, com o botão desabilitado até o LB-47 (item 3).
+- Desconto calculado (32 de 36,90 = 13%), só na página de produto; aviso de estoque baixo de 1 a 5 unidades; frete grátis só como linha informativa.
+- Fora: favoritar, avaliações, abas e blocos de ingredientes e harmonização (LB-43), "quanto falta" do frete (LB-44) e "Amargor".
 
 ## Regra da revisão
 
