@@ -1,6 +1,11 @@
+"use client";
+
 import { formatPriceBRL, type CervejaCard } from "@leguele/shared";
+import { Plus, Refrigerator } from "lucide-react";
 import Image from "next/image";
+import { useId } from "react";
 import { cn } from "@/lib/utils";
+import { Button } from "./button";
 import { StyleBadge } from "./style-badge";
 
 export type CardCervejaProps = {
@@ -18,7 +23,8 @@ const teor = (valor: number) =>
   );
 
 /** Card de cerveja da grade do catálogo e da home: imagem, nome, estilo, preço e ação. */
-export function CardCerveja({ cerveja, className }: CardCervejaProps) {
+export function CardCerveja({ cerveja, aoAdicionar, className }: CardCervejaProps) {
+  const idMotivo = useId();
   const { nome, estilo, categoria, teorAlcoolico, volumeMl, precoCentavos, imagemUrl } = cerveja;
   return (
     <article
@@ -43,6 +49,24 @@ export function CardCerveja({ cerveja, className }: CardCervejaProps) {
       <h3 className="text-lg font-semibold leading-tight">{nome}</h3>
       <p className="text-sm text-texto-suave">{`${estilo} • ${teor(teorAlcoolico)}% • ${volumeMl}ml`}</p>
       <p className="text-xl font-bold text-primaria">{formatPriceBRL(precoCentavos)}</p>
+      <Button
+        disabled={!aoAdicionar}
+        onClick={aoAdicionar}
+        aria-describedby={aoAdicionar ? undefined : idMotivo}
+        iconLeft={
+          <>
+            <Plus aria-hidden="true" className="size-4" />
+            <Refrigerator aria-hidden="true" className="size-5" />
+          </>
+        }
+      >
+        Adicionar
+      </Button>
+      {aoAdicionar ? null : (
+        <span id={idMotivo} className="sr-only">
+          A Geladeira ainda não está disponível.
+        </span>
+      )}
     </article>
   );
 }
