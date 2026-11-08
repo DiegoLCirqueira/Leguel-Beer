@@ -7,19 +7,20 @@ atualizado: 2026-11-08
 
 Sobrescrito pelo Orchestrator ao fim de cada ordem. A próxima conversa começa lendo este arquivo, a daily note mais recente em `docs/05-diario/` e [[licoes-aprendidas]].
 
-## Última ordem: refino do Codex, zoom de 200%, telas do design, auditoria final e ciclo contínuo (08/11)
+## Última ordem: auditoria, telas do design, ciclo contínuo e início do item 1 (08/11)
 
 Resumo em [[2026-11-08]].
 
 - #203 (Codex): refino dos E2E das telas de acesso; achou o BUG-ACESSO-ZOOM.
 - #204 (Front): corrige o corte do Entrar e a dica do (i) no zoom de 200% da boas-vindas.
 - Levantamento das telas sem design no cartão "Telas sem design" do canvas (fichário "Fichário"). O Diego adicionou as telas 16 a 30 em `Imagens/figma/telas` (a revisar com o Front); a Geladeira segue `Imagens/estudio-garrafas.html`.
-- Auditoria final de cada ordem pelo Codex (decisão do Diego), registrada no `CLAUDE.md` e em [[maestri-banda]]. A primeira (297bb03..e393f50) deu "Ordem com achados": dois major de zoom na boas-vindas, devolvidos ao Front.
+- Auditoria final de cada ordem pelo Codex (decisão do Diego), registrada no `CLAUDE.md` e em [[maestri-banda]]. A primeira (297bb03..e393f50) deu "Ordem com achados": dois major de zoom na boas-vindas, corrigidos no #208 (d4263b5), que também falhou uma vez no CI do Linux (fonte mais larga) e passou a não depender da largura da fonte.
+- Ordem de implementação 1 a 9 em [[sequencia-telas]] (revisada com o Front); item 1 (catálogo e início) com a spec pronta (#209): Back no contrato em `@leguele/shared`, Front no LB-15 (cabeçalho e barra de baixo da loja).
 - Ciclo contínuo: [[ADR-016-ciclo-continuo-da-banda]]. A banda não espera ordem entre tarefas; decisões do Diego ficam no cartão "🗳️ Decisões pendentes do Diego".
 
 ## Estado
 
-- Ambiente a partir da `main` (código em 3a7dd99), em processos separados: API em :3333 (`pnpm --filter @leguele/api dev`, log `%TEMP%/leguele-api-dev.log`) e site em :3000 (`next dev -p 3000` em `apps/web`, log `%TEMP%/leguele-web-dev.log`). Supabase local e Mailpit no Docker. Preview :3001 ainda no ar servindo o worktree `leguele-zoom` (já mergeado); pode ser desligado. Para religar: Docker, `pnpm db:start` e os dois comandos.
+- Ambiente a partir da `main` (d4263b5), em processos separados: API em :3333 (`pnpm --filter @leguele/api dev`, log `%TEMP%/leguele-api-dev.log`) e site em :3000 (`next dev -p 3000` em `apps/web`, log `%TEMP%/leguele-web-dev.log`). Supabase local e Mailpit no Docker. Preview :3001 no ar com o worktree `leguele-zoom2` (já mergeado); o Front o troca pelo worktree da tarefa atual. Para religar: Docker, `pnpm db:start` e os dois comandos.
 - O watch da API não reinicia quando muda o `.env`: reiniciar o processo.
 - `apps/api/.env` da working copy principal foi copiado do worktree `leguele-api` (sem as chaves do seed).
 - Portais "Leguelé iPhone 390" e "Leguelé Android" apontam para :3000.
@@ -30,10 +31,10 @@ Resumo em [[2026-11-08]].
 
 ## Próximo
 
-1. Front: corrigir os achados da auditoria na boas-vindas (texto do "Criar conta" em 180x390; dica do (i) fora da tela na vertical), com testes que medem a vertical.
-2. Revisão das telas 16 a 30 com o Front (pré-revisão do Codex) e sequência numerada de implementação por importância; depois, implementar pela ordem, sem esperar o Diego.
+1. Auditoria final do Codex sobre e393f50..(main depois deste PR): #207, #208, #209 e este.
+2. Item 1 de [[sequencia-telas]]: contrato (Back) → LB-4, LB-36 e LB-34 na API (Back) em paralelo com LB-15, LB-14 e LB-13 (Front) → telas do catálogo e do início. Depois, item 2 (página de produto).
 3. Inspeção pendente do Diego: `/entrar`, `/criar-conta`, `/conta`, `/entregas`.
-4. PR do Devops com `@leguele/shared` em watch no `pnpm dev`; fase 2 do [[roteiro-mvp]] (bloco A e depois B). O spike LB-54 abre o checkout.
+4. PR do Devops com `@leguele/shared` em watch no `pnpm dev`. LB-8 (nuvem) espera o Diego (contas).
 
 ## Follow-ups
 
@@ -41,7 +42,7 @@ Resumo em [[2026-11-08]].
   - `/nova-senha` e `/auth/confirmar` fora de `acesso-refluxo.spec.ts` (rodapé e alcance em 360x600 e 195x422);
   - `e2e/support/playwright.acesso.config.ts` com `reuseExistingServer` em :3001 pode rodar contra outra branch; melhor parametrizar a porta no `playwright.config.ts` e apagar o segundo config;
   - a posição "abaixo" da dica do (i) só é testada em 180x390; incluir 360x599 e outra altura baixa.
-- Front (refactor separado): o breakpoint `max-height: 599px` se repete em `globals.css`, `boas-vindas/page.tsx` e `welcome-actions.tsx`; nomear a regra num lugar só.
+- Front (boas-vindas, minors do #208): tirar os `?.` de `matchMedia`/`scrollIntoView` em `welcome-actions.tsx` e usar stub no setup do Vitest (regra da lição de 08/11); folga à direita do texto do "Criar conta" em 180x390 (hoje 1 px da borda); o teste do gesto deve assertar que o ponto tocado não é um controle.
 - Spec da boas-vindas: uma frase sobre onde a dica do (i) abre em telas baixas.
 - Spec de checkout: regras de pagamento recusado e erro do gateway, juros acima de 3x; listas vazias (Geladeira, histórico, admin) e skeleton sem regra.
 - Minors do Reviewer no #195/#196: boas-vindas deveria usar o `pinIconRight`; a vitrine `/dev/tokens` não mostra o `pinIconRight`; o cenário "Rodapé com avisos e links" da loja ganha teste com o catálogo.
