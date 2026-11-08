@@ -31,4 +31,16 @@ describe("catalogoResponseSchema", () => {
   it("aceita os itens, o total e as categorias com ordem e contador", () => {
     expect(catalogoResponseSchema.parse(resposta)).toEqual(resposta);
   });
+
+  it("recusa categoria sem cerveja ativa: ela não entra na faixa de categorias", () => {
+    const comCategoriaVazia = {
+      ...resposta,
+      categorias: [
+        ...resposta.categorias,
+        { slug: "stout", nome: "Stouts", ordem: 5, quantidade: 0 },
+      ],
+    };
+
+    expect(catalogoResponseSchema.safeParse(comCategoriaVazia).success).toBe(false);
+  });
 });
