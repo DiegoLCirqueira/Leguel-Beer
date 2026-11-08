@@ -24,7 +24,7 @@ Ordem das telas no [[ADR-016-ciclo-continuo-da-banda|ciclo contínuo da banda]],
 Detalhes em "Contrato e fatias" de [[catalogo]].
 
 - Ordem do Front: LB-15 (cabeçalho com contador por prop e barra inferior de 4 abas, layout compartilhado da loja), LB-14 (bottom sheet, toast, skeleton), LB-13 (card com variante esgotada e stepper), LB-33 (chips), LB-36 (filtros e ordem), LB-34 (destaques). O LB-4 do Back anda em paralelo, antes do card com dado real.
-- Adicionar desabilitado até o LB-47 e o LB-35 (item 3). Busca (LB-37) e "Mais vendidos" ficam fora.
+- Adicionar desabilitado até o LB-47 e o LB-35: o Adicionar ativa no item 3. Busca (LB-37) e "Mais vendidos" ficam fora.
 - Selo "Esgotado" com tokens existentes; rodapé da loja no fim da rolagem, acima da barra inferior fixa; bottom sheet rola por dentro em tela baixa ou zoom de 200% e fecha com Esc.
 - Componentes novos em `components/ui`, com vitrine em `/dev/tokens`: cabeçalho da loja, barra inferior, card, stepper, bottom sheet, toast com "Desfazer", skeleton, select, faixa, switch, estado vazio, título de página e selo "Esgotado".
 
