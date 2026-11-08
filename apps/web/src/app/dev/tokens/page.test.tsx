@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -6,6 +6,7 @@ vi.mock("next/navigation", () => ({
   notFound: vi.fn(() => {
     throw new Error("NEXT_NOT_FOUND");
   }),
+  usePathname: () => "/catalogo",
 }));
 
 import DevTokens from "./page";
@@ -28,6 +29,17 @@ describe("/dev/tokens", () => {
     render(<DevTokens />);
 
     expect(screen.getByLabelText("Senha de exemplo")).toBeInTheDocument();
+  });
+
+  it("mostra o cabeçalho e a barra inferior da loja, para conferir o contador e a aba atual", () => {
+    render(<DevTokens />);
+
+    expect(screen.getByRole("link", { name: "Geladeira, 2 itens" })).toBeInTheDocument();
+    const barra = screen.getByRole("navigation", { name: "Menu da loja" });
+    expect(within(barra).getByRole("link", { name: "Catálogo" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
   });
 
   it("abre o bottom sheet e o toast de exemplo e mostra um skeleton, para conferir cada um", async () => {

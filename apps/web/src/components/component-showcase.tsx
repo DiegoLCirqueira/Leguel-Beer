@@ -8,6 +8,8 @@ import {
   Campo,
   CategoryChips,
   DivisorOu,
+  LojaHeader,
+  LojaTabBar,
   Skeleton,
   StyleBadge,
   Toast,
@@ -93,6 +95,12 @@ export function ComponentShowcase() {
       </Section>
       <Section title="Divisor ou">
         <DivisorOu />
+      </Section>
+      <Section title="Cabeçalho e barra inferior da loja">
+        <LojaHeader count={2} className="px-0" />
+        <div className="relative h-16 overflow-hidden rounded-2xl border border-borda">
+          <LojaTabBar className="absolute" />
+        </div>
       </Section>
       <Section title="Bottom sheet, toast e skeleton">
         <div className="flex flex-wrap gap-3">
