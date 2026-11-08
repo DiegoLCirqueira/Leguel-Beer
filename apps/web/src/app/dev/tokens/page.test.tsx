@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("next/navigation", () => ({
@@ -27,6 +28,21 @@ describe("/dev/tokens", () => {
     render(<DevTokens />);
 
     expect(screen.getByLabelText("Senha de exemplo")).toBeInTheDocument();
+  });
+
+  it("abre o bottom sheet e o toast de exemplo e mostra um skeleton, para conferir cada um", async () => {
+    render(<DevTokens />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Abrir bottom sheet" }));
+    expect(screen.getByRole("dialog", { name: "Filtros e ordenação" })).toBeInTheDocument();
+    await userEvent.keyboard("{Escape}");
+    await userEvent.click(screen.getByRole("button", { name: "Mostrar toast" }));
+
+    expect(
+      screen.getByText("Munich Lager foi para a geladeira").closest('[role="status"]'),
+    ).not.toBeNull();
+    expect(screen.getByRole("button", { name: "Desfazer" })).toBeInTheDocument();
+    expect(screen.getByTestId("exemplo-skeleton")).toBeInTheDocument();
   });
 
   it("em produção não existe", () => {
