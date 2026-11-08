@@ -12,6 +12,12 @@ export type BottomSheetProps = {
   rodape?: ReactNode;
 };
 
+const FOCAVEIS =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+const focaveis = (raiz: HTMLElement | null) =>
+  Array.from(raiz?.querySelectorAll<HTMLElement>(FOCAVEIS) ?? []);
+
 /** Painel que sobe da base da tela: diálogo modal que fecha com Esc e ao tocar no fundo. */
 export function BottomSheet({ aberto, aoFechar, titulo, children, rodape }: BottomSheetProps) {
   const idTitulo = useId();
@@ -20,10 +26,37 @@ export function BottomSheet({ aberto, aoFechar, titulo, children, rodape }: Bott
     fechar.current = aoFechar;
   });
 
+  const painel = useRef<HTMLDivElement>(null);
+
+  // Ao abrir: trava a rolagem da página e leva o foco para dentro; ao fechar, devolve os dois.
+  useEffect(() => {
+    if (!aberto) return;
+    const anterior = document.activeElement as HTMLElement | null;
+    const overflowAnterior = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    (focaveis(painel.current)[0] ?? painel.current)?.focus();
+    return () => {
+      document.body.style.overflow = overflowAnterior;
+      anterior?.focus();
+    };
+  }, [aberto]);
+
   useEffect(() => {
     if (!aberto) return;
     function aoApertar(evento: KeyboardEvent) {
       if (evento.key === "Escape") fechar.current();
+      if (evento.key !== "Tab") return;
+      const itens = focaveis(painel.current);
+      const primeiro = itens[0];
+      const ultimo = itens[itens.length - 1];
+      if (!primeiro || !ultimo) return;
+      if (evento.shiftKey && document.activeElement === primeiro) {
+        evento.preventDefault();
+        ultimo.focus();
+      } else if (!evento.shiftKey && document.activeElement === ultimo) {
+        evento.preventDefault();
+        primeiro.focus();
+      }
     }
     document.addEventListener("keydown", aoApertar);
     return () => document.removeEventListener("keydown", aoApertar);
@@ -40,10 +73,12 @@ export function BottomSheet({ aberto, aoFechar, titulo, children, rodape }: Bott
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/60"
     >
       <div
+        ref={painel}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-labelledby={idTitulo}
-        className="flex max-h-[calc(100dvh-0.5rem)] w-full max-w-md flex-col rounded-t-3xl border border-b-0 border-primaria/60 bg-fundo text-texto"
+        className="flex max-h-[calc(100dvh-0.5rem)] outline-none w-full max-w-md flex-col rounded-t-3xl border border-b-0 border-primaria/60 bg-fundo text-texto"
       >
         <div aria-hidden="true" className="mx-auto mt-2 h-1 w-12 rounded-full bg-texto/70" />
         <h2 id={idTitulo} className="px-5 pb-3 pt-3 text-xl font-semibold">
