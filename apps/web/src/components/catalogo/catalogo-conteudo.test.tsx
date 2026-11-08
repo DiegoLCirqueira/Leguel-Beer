@@ -87,7 +87,9 @@ describe("CatalogoConteudo", () => {
   it("sem resultado mostra o texto da spec e Limpar filtros, que volta ao catálogo inteiro", async () => {
     render(<CatalogoConteudo query={{ ...padrao, teor: "6-ou-mais" }} dados={dados([])} />);
 
+    expect(screen.getByRole("heading", { level: 2, name: "0 cervejas" })).toBeInTheDocument();
     expect(screen.getByText("Nenhuma cerveja encontrada com esses filtros.")).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "Limpar filtros" })).toHaveLength(1);
     await userEvent.click(screen.getByRole("button", { name: "Limpar filtros" }));
 
     expect(push).toHaveBeenCalledWith("/catalogo");
