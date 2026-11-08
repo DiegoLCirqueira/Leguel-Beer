@@ -77,6 +77,7 @@ export function FiltrosDoCatalogo({
               onClick={() =>
                 ir({
                   ...query,
+                  categoria: undefined,
                   teor: undefined,
                   ibu: undefined,
                   preco: undefined,
