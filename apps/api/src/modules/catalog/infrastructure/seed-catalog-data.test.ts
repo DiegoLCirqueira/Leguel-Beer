@@ -54,4 +54,15 @@ describe("dados do seed do catálogo", () => {
     expect(mareAlta).toMatchObject({ ibu: 65, priceCents: 3200, previousPriceCents: 3690 });
     expect(calcularDesconto(mareAlta?.previousPriceCents, mareAlta?.priceCents ?? 0)).toBe(13);
   });
+
+  it("as 9 cervejas do design têm descrição de exemplo e as de teste ficam sem (a seção some)", () => {
+    const doDesign = beers.filter((beer) => !beer.name.startsWith("Teste "));
+    const deTeste = beers.filter((beer) => beer.name.startsWith("Teste "));
+
+    expect(doDesign).toHaveLength(9);
+    expect(doDesign.every((beer) => (beer.description ?? "").includes("(texto de exemplo)"))).toBe(
+      true,
+    );
+    expect(deTeste.every((beer) => !beer.description)).toBe(true);
+  });
 });
