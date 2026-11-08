@@ -11,4 +11,10 @@ describe("GetBeer", () => {
 
     expect(await new GetBeer(repository).execute("mare-alta")).toBe(mareAlta);
   });
+
+  it("slug sem cerveja ativa (inexistente ou inativa) é NotFoundError", async () => {
+    const repository = new InMemoryBeerRepository([makeBeer({ slug: "outra" })]);
+
+    await expect(new GetBeer(repository).execute("mare-alta")).rejects.toThrow(NotFoundError);
+  });
 });
