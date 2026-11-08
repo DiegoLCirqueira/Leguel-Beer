@@ -72,7 +72,7 @@ Todos os comandos na raiz do repositório:
 | Comando | O que faz |
 | --- | --- |
 | `pnpm install` | Instala as dependências |
-| `pnpm dev` | Sobe o site (http://localhost:3000) e a API (http://localhost:3333/health) |
+| `pnpm dev` | Sobe o site (http://localhost:3000) e a API (http://localhost:3333/health) e compila o `@leguele/shared` em watch (turbo: `shared#build` antes) |
 | `pnpm test` | Testes unitários e de componente (Vitest) |
 | `pnpm test:e2e` | Testes E2E (Playwright); sobe web e API sozinho |
 | `pnpm lint` | ESLint e regra de camadas (dependency-cruiser) |
