@@ -46,10 +46,6 @@ for (const screen of screens) {
       page,
     }) => {
       // 195x422 equivale à área CSS de 390x844 com zoom de 200%; deviceScaleFactor só muda pixels físicos.
-      test.fixme(
-        screen.name === "boas-vindas" && viewport.width === 195,
-        "BUG-ACESSO-ZOOM (297bb03, reportado ao Orchestrator): Entrar mede 260,92px em viewport 195px; main tem overflow-x:hidden. Mesmo rolando, nenhuma posição exibe 100%; clique no centro funciona",
-      );
       await page.setViewportSize(viewport);
       await openScreen(page, screen);
       expect(
