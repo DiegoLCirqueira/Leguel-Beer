@@ -62,4 +62,41 @@ describe("Toast", () => {
 
     expect(aoFechar).toHaveBeenCalledOnce();
   });
+
+  it("pausa o contador com o mouse em cima e retoma só com o que restava", async () => {
+    const aoFechar = vi.fn();
+    const usuario = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    render(<Toast mensagem="Foi" aoFechar={aoFechar} />);
+
+    act(() => vi.advanceTimersByTime(3000));
+    await usuario.hover(screen.getByRole("status"));
+    act(() => vi.advanceTimersByTime(10_000));
+    expect(aoFechar).not.toHaveBeenCalled();
+    await usuario.unhover(screen.getByRole("status"));
+    act(() => vi.advanceTimersByTime(1900));
+    expect(aoFechar).not.toHaveBeenCalled();
+    act(() => vi.advanceTimersByTime(200));
+
+    expect(aoFechar).toHaveBeenCalledOnce();
+  });
+
+  it("pausa o contador enquanto o foco está na ação", async () => {
+    const aoFechar = vi.fn();
+    const usuario = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    render(
+      <Toast
+        mensagem="Foi"
+        acao={{ rotulo: "Desfazer", aoAcionar: vi.fn() }}
+        aoFechar={aoFechar}
+      />,
+    );
+
+    await usuario.tab();
+    act(() => vi.advanceTimersByTime(10_000));
+    expect(aoFechar).not.toHaveBeenCalled();
+    await usuario.tab();
+    act(() => vi.advanceTimersByTime(5100));
+
+    expect(aoFechar).toHaveBeenCalledOnce();
+  });
 });
