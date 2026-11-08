@@ -22,7 +22,10 @@ export default async function Catalogo({ searchParams }: Props) {
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 px-4 pb-6 pt-2">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-titulo text-4xl text-texto">Catálogo</h1>
-        <FiltrosDoCatalogo query={query} />
+        <FiltrosDoCatalogo
+          query={query}
+          categorias={resultado.ok ? resultado.dados.categorias : undefined}
+        />
       </div>
       {resultado.ok ? (
         <CatalogoConteudo query={query} dados={resultado.dados} />
