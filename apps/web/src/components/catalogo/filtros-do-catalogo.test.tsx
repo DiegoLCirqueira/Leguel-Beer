@@ -10,6 +10,11 @@ import { FiltrosDoCatalogo } from "./filtros-do-catalogo";
 
 const padrao: CatalogoQuery = { disponiveis: false, ordem: "relevancia" };
 
+const categorias = [
+  { slug: "ipa", nome: "IPA", ordem: 1, quantidade: 6 },
+  { slug: "frutas", nome: "Frutas", ordem: 2, quantidade: 4 },
+];
+
 describe("FiltrosDoCatalogo", () => {
   beforeEach(() => push.mockReset());
 
@@ -25,6 +30,29 @@ describe("FiltrosDoCatalogo", () => {
     expect(within(sheet).getByRole("radio", { name: "6% ou mais" })).toBeChecked();
     expect(within(sheet).getByRole("switch", { name: "Somente disponíveis" })).toBeChecked();
     expect(within(sheet).getByRole("combobox", { name: "Ordenar por" })).toHaveValue("relevancia");
+  });
+
+  it("o sheet oferece a categoria (Todas e cada uma), marcada pela URL, e Aplicar a leva para a URL", async () => {
+    render(<FiltrosDoCatalogo query={{ ...padrao, categoria: "ipa" }} categorias={categorias} />);
+    await userEvent.click(screen.getByRole("button", { name: "Filtrar" }));
+
+    const grupo = within(screen.getByRole("dialog")).getByRole("group", { name: "Categoria" });
+    expect(within(grupo).getByRole("radio", { name: "IPA" })).toBeChecked();
+    expect(within(grupo).getByRole("radio", { name: "Todas" })).not.toBeChecked();
+    await userEvent.click(within(grupo).getByRole("radio", { name: "Frutas" }));
+    await userEvent.click(screen.getByRole("button", { name: "Aplicar" }));
+
+    expect(push).toHaveBeenLastCalledWith("/catalogo?categoria=frutas");
+  });
+
+  it("escolher Todas na categoria tira a categoria da URL", async () => {
+    render(<FiltrosDoCatalogo query={{ ...padrao, categoria: "ipa" }} categorias={categorias} />);
+    await userEvent.click(screen.getByRole("button", { name: "Filtrar" }));
+
+    await userEvent.click(screen.getByRole("radio", { name: "Todas" }));
+    await userEvent.click(screen.getByRole("button", { name: "Aplicar" }));
+
+    expect(push).toHaveBeenLastCalledWith("/catalogo");
   });
 
   it("Aplicar leva as escolhas para a URL, mantendo a categoria, e fecha o sheet", async () => {
