@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Telas baixas (paisagem, zoom alto): único lugar do corte de altura; em TS, ver TELAS_BAIXAS em lib/arte-login.ts. */
+@custom-variant telas-baixas (@media (max-height: 599px));
+
 /* Tokens da marca (tema escuro). Único lugar com valores de cor; componentes usam só as classes geradas. */
 @theme {
   --color-*: initial;
@@ -48,8 +51,8 @@
     container-type: inline-size;
   }
   /* Telas baixas (paisagem, zoom alto): coluna legível com rolagem vertical. */
-  @media (max-height: 599px) {
-    .palco-arte {
+  .palco-arte {
+    @variant telas-baixas {
       position: relative;
       left: auto;
       bottom: auto;

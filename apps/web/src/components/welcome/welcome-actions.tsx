@@ -3,7 +3,18 @@
 import { ArrowRight, Check, Info, Link as LinkIcon, UserPlus, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
-import { CONTROLS, OR_ROW, cq, fl, pctH, pctW, pctX, pctY, rectStyle } from "@/lib/arte-login";
+import {
+  CONTROLS,
+  OR_ROW,
+  TELAS_BAIXAS,
+  cq,
+  fl,
+  pctH,
+  pctW,
+  pctX,
+  pctY,
+  rectStyle,
+} from "@/lib/arte-login";
 import { markGuest } from "@/lib/guest";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +29,17 @@ const TOUCH_AREA =
 
 const CONTROL_BASE =
   "absolute flex items-center justify-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaria";
+
+// Recuo do texto da ação (o do Figma) como espaçador que encolhe até zero: o rótulo (ícone, vão e
+// texto) nunca quebra nem sai da caixa, qualquer que seja a largura da fonte no sistema.
+function ActionIndent({ px, gap }: { px: number; gap: number }) {
+  return (
+    <span
+      aria-hidden="true"
+      style={{ flex: `0 1 ${cq(px)}`, minWidth: 0, marginRight: `calc(-1 * ${cq(gap)})` }}
+    />
+  );
+}
 
 const OR_ROW_WIDTH = OR_ROW.right.x + OR_ROW.right.w - OR_ROW.left.x;
 const pctOfOrRow = (part: number) => `${((part / OR_ROW_WIDTH) * 100).toFixed(3)}%`;
@@ -36,18 +58,23 @@ export function WelcomeActions() {
       setShowHint(false);
       infoRef.current?.focus();
     }
-    function closeOnOutsidePress(event: PointerEvent) {
+    function closeOnOutsidePress(event: MouseEvent) {
       const target = event.target as Node;
       if (hintRef.current?.contains(target) || infoRef.current?.contains(target)) return;
       setShowHint(false);
     }
+    // Em telas baixas a dica abre abaixo da linha, fora da tela: rola até ela para a pessoa ver.
+    if (window.matchMedia?.(TELAS_BAIXAS).matches) {
+      hintRef.current?.scrollIntoView?.({ block: "nearest" });
+    }
     const autoClose = setTimeout(() => setShowHint(false), HINT_DURATION_MS);
     document.addEventListener("keydown", closeOnEscape);
-    document.addEventListener("pointerdown", closeOnOutsidePress);
+    // "click", não "pointerdown": o gesto de rolagem não gera clique e não pode fechar a dica.
+    document.addEventListener("click", closeOnOutsidePress);
     return () => {
       clearTimeout(autoClose);
       document.removeEventListener("keydown", closeOnEscape);
-      document.removeEventListener("pointerdown", closeOnOutsidePress);
+      document.removeEventListener("click", closeOnOutsidePress);
     };
   }, [showHint]);
 
@@ -59,18 +86,19 @@ export function WelcomeActions() {
           ...rectStyle(CONTROLS.enter),
           fontSize: fl(14, 26.1),
           gap: cq(21.7),
-          paddingLeft: cq(256.3),
         }}
         className={cn(
           CONTROL_BASE,
           TOUCH_AREA,
-          "justify-start bg-primaria font-bold text-texto-na-primaria hover:brightness-105",
+          "justify-start whitespace-nowrap bg-primaria font-bold text-texto-na-primaria hover:brightness-105",
         )}
       >
+        <ActionIndent px={256.3} gap={21.7} />
         <UserRound
           aria-hidden="true"
           strokeWidth={1.6}
           style={{ width: fl(20, 52), height: fl(20, 52) }}
+          className="shrink-0"
         />
         Entrar
         <ArrowRight
@@ -86,20 +114,20 @@ export function WelcomeActions() {
           ...rectStyle(CONTROLS.signUp),
           fontSize: fl(14, 24.1),
           gap: cq(23.1),
-          paddingLeft: cq(233.4),
           borderWidth: cq(2.5),
         }}
         className={cn(
           CONTROL_BASE,
           TOUCH_AREA,
-          "justify-start border-primaria font-bold text-texto hover:bg-primaria/10",
+          "justify-start whitespace-nowrap border-primaria font-bold text-texto hover:bg-primaria/10",
         )}
       >
+        <ActionIndent px={233.4} gap={23.1} />
         <UserPlus
           aria-hidden="true"
           strokeWidth={1.6}
           style={{ width: fl(20, 49), height: fl(20, 49) }}
-          className="text-primaria"
+          className="shrink-0 text-primaria"
         />
         Criar conta
       </Link>
@@ -201,7 +229,7 @@ export function WelcomeActions() {
           id={hintId}
           aria-live="polite"
           style={{ width: "min(100vw - 16px, max(100cqw - 16px, 21rem))" }}
-          className="absolute bottom-full left-1/2 z-30 mb-1 -translate-x-1/2 [@media(max-height:599px)]:bottom-auto [@media(max-height:599px)]:top-full [@media(max-height:599px)]:mb-0 [@media(max-height:599px)]:mt-3 rounded-campo border border-arte-borda bg-arte-vidro px-3 py-1.5 text-center text-xs leading-snug text-texto empty:hidden"
+          className="absolute bottom-full left-1/2 z-30 mb-1 -translate-x-1/2 telas-baixas:bottom-auto telas-baixas:top-full telas-baixas:mb-0 telas-baixas:mt-3 rounded-campo border border-arte-borda bg-arte-vidro px-3 py-1.5 text-center text-xs leading-snug text-texto empty:hidden"
         >
           {showHint ? HINT : null}
         </div>
