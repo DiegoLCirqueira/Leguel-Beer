@@ -7,22 +7,17 @@ atualizado: 2026-11-08
 
 Sobrescrito pelo Orchestrator ao fim de cada ordem. A próxima conversa começa lendo este arquivo, a daily note mais recente em `docs/05-diario/` e [[licoes-aprendidas]].
 
-## Última ordem: item 1 em andamento (catálogo e início) e regra da daily (08/11)
+## Última ordem: item 1 concluído (catálogo e início) e início do item 2 (08/11)
 
-Resumo em [[2026-11-08]].
+Resumo em [[2026-11-08]]. O Diego pediu para terminar o que estava aberto e parar até novas ordens.
 
-- #203 (Codex): refino dos E2E das telas de acesso; achou o BUG-ACESSO-ZOOM.
-- #204 (Front): corrige o corte do Entrar e a dica do (i) no zoom de 200% da boas-vindas.
-- Levantamento das telas sem design no cartão "Telas sem design" do canvas (fichário "Fichário"). O Diego adicionou as telas 16 a 30 em `Imagens/figma/telas` (a revisar com o Front); a Geladeira segue `Imagens/estudio-garrafas.html`.
-- Auditoria final de cada ordem pelo Codex (decisão do Diego), registrada no `CLAUDE.md` e em [[maestri-banda]]. A primeira (297bb03..e393f50) deu "Ordem com achados": dois major de zoom na boas-vindas, corrigidos no #208 (d4263b5), que também falhou uma vez no CI do Linux (fonte mais larga) e passou a não depender da largura da fonte.
-- Ordem de implementação 1 a 9 em [[sequencia-telas]] (revisada com o Front); item 1 (catálogo e início) com a spec pronta (#209): Back no contrato em `@leguele/shared`, Front no LB-15 (cabeçalho e barra de baixo da loja).
-- Item 1: mergeados contrato (#210), layout da loja (#212) e modelos/seed (#214); terceira auditoria aprovada. Em revisão: #215 (bottom sheet, toast, skeleton; CI falhou no E2E contra o build) e #216 (GET /catalogo).
-- PR de código não edita mais a daily (regra de 08/11): o Orchestrator passa o resumo da descrição do PR para a daily.
-- Ciclo contínuo: [[ADR-016-ciclo-continuo-da-banda]]. A banda não espera ordem entre tarefas; decisões do Diego ficam no cartão "🗳️ Decisões pendentes do Diego".
+- Item 1 de [[sequencia-telas]] concluído: contrato, modelos/seed, GET /catalogo e /catalogo/destaques, layout da loja, bottom sheet/toast/skeleton, card com stepper, tela /catalogo e destaques na home (#210 a #226).
+- Item 2 (página de produto) começou: spec [[produto]] (#220, #225), contrato (#223). A fatia 2 da API (campos descrição e preço anterior, migration, seed, GET /catalogo/:slug) está pronta em `feat/produto-api`, sem PR: falta trazer a main e abrir o PR.
+- Processo: auditoria final do Codex a cada ordem; ciclo contínuo ([[ADR-016-ciclo-continuo-da-banda]]); PR de código não edita a daily.
 
 ## Estado
 
-- Ambiente a partir da `main` (d4263b5), em processos separados: API em :3333 (`pnpm --filter @leguele/api dev`, log `%TEMP%/leguele-api-dev.log`) e site em :3000 (`next dev -p 3000` em `apps/web`, log `%TEMP%/leguele-web-dev.log`). Supabase local e Mailpit no Docker. Preview :3001 no ar com o worktree `leguele-zoom2` (já mergeado); o Front o troca pelo worktree da tarefa atual. Para religar: Docker, `pnpm db:start` e os dois comandos.
+- Ambiente a partir da `main` (e69f484) com um único `pnpm dev` na raiz (shared em watch, site :3000, API :3333; log `%TEMP%/leguele-dev.log`). Supabase local e Mailpit no Docker. O :3001 serve o worktree da tarefa atual do Front. Para religar: Docker, `pnpm db:start` e os dois comandos.
 - O watch da API não reinicia quando muda o `.env`: reiniciar o processo.
 - `apps/api/.env` da working copy principal foi copiado do worktree `leguele-api` (sem as chaves do seed).
 - Portais "Leguelé iPhone 390" e "Leguelé Android" apontam para :3000.
@@ -33,16 +28,21 @@ Resumo em [[2026-11-08]].
 
 ## Próximo
 
-1. Fechar #215 (Front: E2E do sheet no CI) e #216 (Back: mojibake nos testes, `take` de segurança, casos pela rota).
-2. Item 1 de [[sequencia-telas]]: Back nos destaques (LB-34 na API); Front no card com stepper (LB-13), depois chips/filtros (LB-33/36) e destaques da home (LB-34). Auditoria do Codex quando o item 1 fechar. Depois, item 2 (página de produto).
-3. Inspeção pendente do Diego: `/entrar`, `/criar-conta`, `/conta`, `/entregas`.
-4. PR do Devops com `@leguele/shared` em watch no `pnpm dev`. LB-8 (nuvem) espera o Diego (contas). O spike LB-54 abre o checkout (item 5).
+1. Aguardar novas ordens do Diego (pedido de 08/11).
+2. Quando retomar: auditoria do Codex sobre 3482c9a..(main depois do PR de fechamento), se ainda não tiver rodado; abrir o PR da fatia 2 do item 2 (`feat/produto-api`); depois a tela de produto (fatias 3 e 4, Front).
+3. Inspeção pendente do Diego: `/entrar`, `/criar-conta`, `/conta`, `/entregas`, e agora `/catalogo` e a home com destaques.
+4. LB-8 (nuvem) espera o Diego (contas). O spike LB-54 abre o checkout (item 5).
 
 ## Follow-ups
 
 - Do #212: registrar a mutação dos testes de loja-layout que nasceram verdes; a exceção da barra fixa no `responsivo.spec.ts` vale para qualquer rolagem (rever quando /catalogo e /geladeira usarem o layout); rótulo da barra até 12 px; fragmentos `<>` sobrando; a barra e a variável `--altura-barra-loja` têm o 57 px em dois lugares.
-- Do #214: guarda de banco local também no `seed-admin` (falhar fechado sem `DATABASE_URL`); `categories.order` único quando o admin escrever categorias (LB-73).
-- Do #215: tornar o resto da página inerte e usar portal quando o sheet entrar na loja.
+- Do #214: `categories.order` único quando o admin escrever categorias (LB-73).
+- Do #215: tornar o resto da página inerte e usar portal quando o sheet entrar na loja; a vitrine /dev/tokens abre em produção com VITRINE_E2E=1: recusar também com VERCEL_ENV=production ou documentar que a variável nunca vai ao deploy.
+- Do #218: `images.remotePatterns` no next.config.ts quando `imagemUrl` vier absoluta (LB-124); alt da imagem repete o nome.
+- Do #221/#226: faixa de categorias na home (cenário do [[catalogo]] sem tela); E2E opcional do estado de erro do catálogo com API_URL inválida; motivo da falha no aviso dos destaques; esqueleto de 4 blocos para até 6 cards.
+- Do #225: exemplo "R$ 32,01 | não vejo preço anterior nem desconto" no Esquema do Cenário de desconto de [[produto]].
+- Do #222: os warns do Nest agora saem com nível warn (quem filtra logs por nível vê mais linhas).
+- Do #219: o teto de 200 cervejas na leitura do catálogo registra aviso; perto do teto, filtrar no banco e paginar.
 
 - Próximo refino do Codex (minors do Reviewer no #203 e no #204):
   - `/nova-senha` e `/auth/confirmar` fora de `acesso-refluxo.spec.ts` (rodapé e alcance em 360x600 e 195x422);
@@ -59,7 +59,7 @@ Resumo em [[2026-11-08]].
 - API, segurança (achado do Reviewer no #200): o `ThrottlerModule` em `apps/api/src/app.module.ts` guarda a contagem em memória (100 por 60 s); numa API serverless conta por instância. O Back avalia junto do LB-8 e, se mantiver, registra o ADR.
 - API: `DATABASE_URL` obrigatória no seed; código fixo no log de falha do `signOutOthers`.
 - `src/lib/erro-de-redirect.ts` usa caminho interno do Next: conferir a cada upgrade.
-- Limpeza dos worktrees e pastas em `C:\Users\Arthur\Desktop\leguele\` e `C:\lb-*` fica com o Diego (inclui `C:/lb-adrp`, `C:/lb-adrr`, `C:/lb-adr15`, `C:/lb-codex`, `C:/lb-testes-acesso`, `leguele-zoom` e `C:/lb-doc0811` depois do merge).
+- Limpeza dos worktrees e pastas em `C:\Users\Arthur\Desktop\leguele\` e `C:\lb-*` fica com o Diego (inclui `C:/lb-adrp`, `C:/lb-adrr`, `C:/lb-adr15`, `C:/lb-codex`, `C:/lb-testes-acesso`, `leguele-zoom`, `C:/lb-doc0811` e os worktrees desta rodada: `leguele-zoom2`, `leguele-loja-layout`, `leguele-sheet`, `leguele-card`, `leguele-catalogo`, `leguele-home`, `leguele-catalogo-*`, `leguele-produto-contrato`, `leguele-seed-admin`, `C:/lb-doc0811b`, `C:/lb-auditoria`, `C:/lb-ciclo`, `C:/lb-spec-*`, `C:/lb-seq-09`, `C:/lb-docs-daily`, `C:/lb-sharedwatch`, `C:/lb-produto-desc`, `C:/lb-fecho-0811` e a pasta vazia `C:/lb-auditoria-0811`; NÃO limpar o `feat/produto-api` (trabalho sem PR) nem o `leguele-g2` (branch refactor/components-ui-g2 com 5 arquivos não commitados e 1 commit fora da main)).
 
 ## Skills sugeridas
 
