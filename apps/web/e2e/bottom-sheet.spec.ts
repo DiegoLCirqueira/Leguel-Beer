@@ -62,3 +62,18 @@ test("o véu do sheet escurece a página: o fundo não é transparente", async (
   expect(cor).not.toBe("rgba(0, 0, 0, 0)");
   expect(cor).not.toBe("transparent");
 });
+
+test("fora da loja o toast fica a 12 px do fim da tela, sem reservar o espaço da barra", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/dev/tokens");
+  await page.getByRole("button", { name: "Mostrar toast" }).click();
+
+  const toast = await page
+    .getByRole("status")
+    .filter({ hasText: "foi para a geladeira" })
+    .boundingBox();
+
+  expect(844 - ((toast?.y ?? 0) + (toast?.height ?? 0))).toBeCloseTo(12, 0);
+});
