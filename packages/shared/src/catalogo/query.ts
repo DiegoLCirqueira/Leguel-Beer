@@ -14,11 +14,12 @@ function idDeFaixa(faixas: readonly Faixa[]) {
   return z.string().refine((id) => faixas.some((faixa) => faixa.id === id));
 }
 
+/** Valor inválido na URL é ignorado (volta ao padrão), nunca rejeitado: vale a spec do catálogo. */
 export const catalogoQuerySchema = z.object({
-  categoria: slugSchema.optional(),
-  teor: idDeFaixa(faixasDeFiltro.teor).optional(),
-  ibu: idDeFaixa(faixasDeFiltro.ibu).optional(),
-  preco: idDeFaixa(faixasDeFiltro.preco).optional(),
-  disponiveis: z.stringbool({ truthy: ["true"], falsy: ["false"] }).default(false),
-  ordem: z.enum(ORDENS_DO_CATALOGO).default("relevancia"),
+  categoria: slugSchema.optional().catch(undefined),
+  teor: idDeFaixa(faixasDeFiltro.teor).optional().catch(undefined),
+  ibu: idDeFaixa(faixasDeFiltro.ibu).optional().catch(undefined),
+  preco: idDeFaixa(faixasDeFiltro.preco).optional().catch(undefined),
+  disponiveis: z.stringbool({ truthy: ["true"], falsy: ["false"] }).catch(false),
+  ordem: z.enum(ORDENS_DO_CATALOGO).catch("relevancia"),
 });
