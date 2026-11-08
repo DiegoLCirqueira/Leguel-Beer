@@ -2,7 +2,7 @@ import { LogOut } from "lucide-react";
 import type { Metadata } from "next";
 import { Button } from "@/components/ui";
 import { SiteFooter } from "@/components/site/site-footer";
-import { sairAction } from "../sair/actions";
+import { sairAction } from "../../sair/actions";
 
 export const metadata: Metadata = {
   title: "Minha conta | Leguelé Beer",
