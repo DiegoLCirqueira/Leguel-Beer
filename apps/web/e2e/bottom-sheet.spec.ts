@@ -49,3 +49,16 @@ test("o sheet fecha com Esc e no fundo, e o foco volta ao botão que abriu", asy
   await page.getByTestId("fundo-do-sheet").click({ position: { x: 5, y: 5 } });
   await expect(page.getByRole("dialog")).toHaveCount(0);
 });
+
+test("o véu do sheet escurece a página: o fundo não é transparente", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/dev/tokens");
+  await page.getByRole("button", { name: "Abrir bottom sheet" }).click();
+
+  const cor = await page
+    .getByTestId("fundo-do-sheet")
+    .evaluate((el) => getComputedStyle(el).backgroundColor);
+
+  expect(cor).not.toBe("rgba(0, 0, 0, 0)");
+  expect(cor).not.toBe("transparent");
+});
