@@ -16,4 +16,17 @@ describe("schema do catálogo (banco real)", () => {
 
     expect(tables.map((t) => t.table_name)).toEqual(["beers", "categories"]);
   });
+
+  it("a cerveja tem descrição e preço anterior opcionais (colunas nulas)", async () => {
+    const columns = await prisma.$queryRaw<{ column_name: string; is_nullable: string }[]>`
+      SELECT column_name, is_nullable FROM information_schema.columns
+      WHERE table_schema = 'public' AND table_name = 'beers'
+        AND column_name IN ('description', 'previous_price_cents')
+      ORDER BY column_name`;
+
+    expect(columns).toEqual([
+      { column_name: "description", is_nullable: "YES" },
+      { column_name: "previous_price_cents", is_nullable: "YES" },
+    ]);
+  });
 });

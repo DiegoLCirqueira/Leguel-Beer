@@ -1,4 +1,4 @@
-import { faixasDeFiltro, pertenceAFaixa } from "@leguele/shared";
+import { calcularDesconto, faixasDeFiltro, pertenceAFaixa } from "@leguele/shared";
 import { describe, expect, it } from "vitest";
 import { SEED_CATEGORIES } from "./seed-catalog-data.js";
 
@@ -46,5 +46,39 @@ describe("dados do seed do catálogo", () => {
     ]);
     expect(beers.filter((beer) => beer.name.startsWith("Teste "))).toHaveLength(7);
     expect(beers.filter((beer) => beer.featured)).toHaveLength(8);
+  });
+
+  it("a Maré Alta traz o exemplo da página de produto: IBU 65 e R$ 36,90 para R$ 32,00, 13% de desconto", () => {
+    const mareAlta = beers.find((beer) => beer.slug === "mare-alta");
+
+    expect(mareAlta).toMatchObject({ ibu: 65, priceCents: 3200, previousPriceCents: 3690 });
+    expect(calcularDesconto(mareAlta?.previousPriceCents, mareAlta?.priceCents ?? 0)).toBe(13);
+  });
+
+  it("as 9 cervejas do design têm descrição de exemplo e as de teste ficam sem (a seção some)", () => {
+    const doDesign = beers.filter((beer) => !beer.name.startsWith("Teste "));
+    const deTeste = beers.filter((beer) => beer.name.startsWith("Teste "));
+
+    expect(doDesign).toHaveLength(9);
+    expect(doDesign.every((beer) => (beer.description ?? "").includes("(texto de exemplo)"))).toBe(
+      true,
+    );
+    expect(deTeste.every((beer) => !beer.description)).toBe(true);
+  });
+
+  it("tem 3 cervejas com desconto e uma com preço anterior igual ao atual (sem desconto)", () => {
+    const comDesconto = beers.filter(
+      (beer) => calcularDesconto(beer.previousPriceCents, beer.priceCents) !== null,
+    );
+    const anteriorIgual = beers.filter(
+      (beer) => beer.previousPriceCents != null && beer.previousPriceCents === beer.priceCents,
+    );
+
+    expect(comDesconto.map((beer) => beer.slug).sort()).toEqual([
+      "cupuacu-ale",
+      "leguele-carnaval",
+      "mare-alta",
+    ]);
+    expect(anteriorIgual.map((beer) => beer.slug)).toEqual(["teste-malt-1"]);
   });
 });
