@@ -140,7 +140,7 @@ async function medir(page: Page) {
         const ra = a.getBoundingClientRect();
         const rb = b.getBoundingClientRect();
         // Barra fixa da loja: cobre parte do conteúdo em qualquer posição de rolagem, e ao rolar até o
-        // fim o rodapé e os controles ficam acima dela (conferido em loja-layout.spec.ts).
+        // fim os controles ficam acima dela (conferido em loja-layout.spec.ts).
         const fixo = (e: Element) => e.closest("nav[aria-label='Menu da loja']") !== null;
         if (fixo(a) !== fixo(b)) continue;
         const largura = Math.min(ra.right, rb.right) - Math.max(ra.left, rb.left);

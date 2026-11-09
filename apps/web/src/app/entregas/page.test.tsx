@@ -22,6 +22,6 @@ describe("/entregas", () => {
       ),
     ).toBeInTheDocument();
     expect(screen.getByText("Não há retirada no local.")).toBeInTheDocument();
-    expect(screen.getByRole("contentinfo")).toBeInTheDocument();
+    expect(screen.queryByRole("contentinfo")).not.toBeInTheDocument();
   });
 });

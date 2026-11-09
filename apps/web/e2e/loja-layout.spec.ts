@@ -8,7 +8,7 @@ test.beforeEach(async ({ context, baseURL }) => {
   ]);
 });
 
-test("a home tem cabeçalho com a Geladeira, barra inferior fixa e o rodapé acima da barra no fim", async ({
+test("a home tem cabeçalho com a Geladeira, barra inferior fixa, sem rodapé, e o conteúdo acima da barra no fim", async ({
   page,
 }) => {
   await page.goto("/");
@@ -19,11 +19,12 @@ test("a home tem cabeçalho com a Geladeira, barra inferior fixa e o rodapé aci
   await expect(barra.getByRole("link", { name: "Início" })).toHaveAttribute("aria-current", "page");
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
   const caixaBarra = await barra.boundingBox();
-  const caixaRodape = await page.getByRole("contentinfo").boundingBox();
+  const caixaConteudo = await page.getByRole("main").boundingBox();
 
   expect(caixaBarra).not.toBeNull();
   expect((caixaBarra?.y ?? 0) + (caixaBarra?.height ?? 0)).toBeCloseTo(844, 0);
-  expect((caixaRodape?.y ?? 0) + (caixaRodape?.height ?? 0)).toBeLessThanOrEqual(
+  await expect(page.getByRole("contentinfo")).toHaveCount(0);
+  expect((caixaConteudo?.y ?? 0) + (caixaConteudo?.height ?? 0)).toBeLessThanOrEqual(
     (caixaBarra?.y ?? 0) + 0.01,
   );
   for (const aba of await barra.getByRole("link").all()) {
@@ -32,6 +33,15 @@ test("a home tem cabeçalho com a Geladeira, barra inferior fixa e o rodapé aci
     expect(caixa?.width ?? 0).toBeGreaterThanOrEqual(44);
   }
 });
+
+for (const caminho of ["/", "/catalogo", "/entregas"]) {
+  test(`${caminho} não tem rodapé`, async ({ page }) => {
+    await page.goto(caminho);
+
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.getByRole("contentinfo")).toHaveCount(0);
+  });
+}
 
 test("as telas de acesso não têm a barra da loja", async ({ page }) => {
   await page.goto("/entrar");
@@ -88,7 +98,7 @@ for (const medida of [
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
     const barra = await page.getByRole("navigation", { name: "Menu da loja" }).boundingBox();
 
-    const controles = page.locator("main a, main button, footer a");
+    const controles = page.locator("main a, main button");
     for (const controle of await controles.all()) {
       const caixa = await controle.boundingBox();
       expect((caixa?.y ?? 0) + (caixa?.height ?? 0), "base do controle").toBeLessThanOrEqual(

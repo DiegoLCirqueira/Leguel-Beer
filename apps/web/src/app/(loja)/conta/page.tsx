@@ -1,5 +1,6 @@
 import { LogOut } from "lucide-react";
 import type { Metadata } from "next";
+import { SiteFooter } from "@/components/site/site-footer";
 import { Button } from "@/components/ui";
 import { sairAction } from "../../sair/actions";
 
@@ -24,6 +25,7 @@ export default function Conta() {
           </Button>
         </form>
       </main>
+      <SiteFooter />
     </>
   );
 }

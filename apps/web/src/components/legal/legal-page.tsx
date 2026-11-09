@@ -8,11 +8,13 @@ type Props = {
   // Data da versão do texto, no formato AAAA-MM-DD.
   atualizadoEm: string;
   secoes: SecaoLegal[];
+  // Páginas dentro da loja (Entregas) não têm rodapé; Termos e Privacidade têm.
+  semRodape?: boolean;
 };
 
 const formatarData = new Intl.DateTimeFormat("pt-BR", { dateStyle: "long", timeZone: "UTC" });
 
-export function LegalPage({ titulo, atualizadoEm, secoes }: Props) {
+export function LegalPage({ titulo, atualizadoEm, secoes, semRodape = false }: Props) {
   return (
     <>
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-6 pb-12 pt-4 text-texto">
@@ -33,7 +35,7 @@ export function LegalPage({ titulo, atualizadoEm, secoes }: Props) {
           </section>
         ))}
       </main>
-      <SiteFooter />
+      {semRodape ? null : <SiteFooter />}
     </>
   );
 }
