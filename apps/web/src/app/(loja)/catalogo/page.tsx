@@ -14,15 +14,23 @@ type Props = { searchParams: Promise<Record<string, string | string[] | undefine
 
 /** Catálogo no servidor: filtros e ordem vêm da URL (valor inválido é ignorado) e a busca é na API. */
 export default async function Catalogo({ searchParams }: Props) {
-  const query = catalogoQuerySchema.parse(await searchParams);
-  const resultado = await buscarCatalogo(query);
+  const pedida = catalogoQuerySchema.parse(await searchParams);
+  // A API já ignora categoria desconhecida; a interface também não a mantém (Todas marcada).
+  const resultado = await buscarCatalogo(pedida);
+  const query =
+    resultado.ok && !resultado.dados.categorias.some((c) => c.slug === pedida.categoria)
+      ? { ...pedida, categoria: undefined }
+      : pedida;
   const queryString = paraQueryString(query);
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 px-4 pb-6 pt-2">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-titulo text-4xl text-texto">Catálogo</h1>
-        <FiltrosDoCatalogo query={query} />
+        <FiltrosDoCatalogo
+          query={query}
+          categorias={resultado.ok ? resultado.dados.categorias : undefined}
+        />
       </div>
       {resultado.ok ? (
         <CatalogoConteudo query={query} dados={resultado.dados} />

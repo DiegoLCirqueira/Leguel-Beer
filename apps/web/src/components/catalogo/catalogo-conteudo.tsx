@@ -32,31 +32,24 @@ export function CatalogoConteudo({
   return (
     <div className="flex flex-col gap-4">
       <CategoryChips items={chips} value={query.categoria ?? TODAS} onChange={escolherCategoria} />
-      {itens.length === 0 ? (
-        <div className="flex flex-col items-center gap-4 py-8 text-center">
-          <p className="text-texto">Nenhuma cerveja encontrada com esses filtros.</p>
-          <Button size="sm" onClick={() => router.push("/catalogo")}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-sm font-normal text-texto-suave">
+          {itens.length === 1 ? "1 cerveja" : `${itens.length} cervejas`}
+        </h2>
+        {filtrado ? (
+          <Button size="sm" variant="ghost" onClick={() => router.push("/catalogo")}>
             Limpar filtros
           </Button>
-        </div>
+        ) : null}
+      </div>
+      {itens.length === 0 ? (
+        <p className="py-8 text-center text-texto">Nenhuma cerveja encontrada com esses filtros.</p>
       ) : (
-        <>
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-sm font-normal text-texto-suave">
-              {itens.length === 1 ? "1 cerveja" : `${itens.length} cervejas`}
-            </h2>
-            {filtrado ? (
-              <Button size="sm" variant="ghost" onClick={() => router.push("/catalogo")}>
-                Limpar filtros
-              </Button>
-            ) : null}
-          </div>
-          <div className="grid grid-cols-1 gap-3 min-[360px]:grid-cols-2">
-            {itens.map((cerveja) => (
-              <CardCerveja key={cerveja.id} cerveja={cerveja} />
-            ))}
-          </div>
-        </>
+        <div className="grid grid-cols-1 gap-3 min-[360px]:grid-cols-2">
+          {itens.map((cerveja) => (
+            <CardCerveja key={cerveja.id} cerveja={cerveja} />
+          ))}
+        </div>
       )}
     </div>
   );

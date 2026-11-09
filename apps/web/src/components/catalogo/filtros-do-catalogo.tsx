@@ -3,6 +3,7 @@
 import {
   faixasDeFiltro,
   type CatalogoQuery,
+  type CategoriaComContador,
   type Faixa,
   type OrdemDoCatalogo,
 } from "@leguele/shared";
@@ -31,7 +32,13 @@ const OPCAO =
   "flex min-h-11 cursor-pointer items-center gap-3 text-texto has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primaria";
 
 /** "Filtrar (n)" e o bottom sheet com as faixas, "Somente disponíveis" e a ordem; tudo vai para a URL. */
-export function FiltrosDoCatalogo({ query }: { query: CatalogoQuery }) {
+export function FiltrosDoCatalogo({
+  query,
+  categorias = [],
+}: {
+  query: CatalogoQuery;
+  categorias?: CategoriaComContador[];
+}) {
   const router = useRouter();
   const [aberto, setAberto] = useState(false);
   const [rascunho, setRascunho] = useState(query);
@@ -70,6 +77,7 @@ export function FiltrosDoCatalogo({ query }: { query: CatalogoQuery }) {
               onClick={() =>
                 ir({
                   ...query,
+                  categoria: undefined,
                   teor: undefined,
                   ibu: undefined,
                   preco: undefined,
@@ -84,6 +92,33 @@ export function FiltrosDoCatalogo({ query }: { query: CatalogoQuery }) {
         }
       >
         <div className="flex flex-col gap-4 pb-3">
+          {categorias.length > 0 ? (
+            <fieldset className="flex flex-col">
+              <legend className="text-sm font-semibold text-texto-suave">Categoria</legend>
+              <label className={OPCAO}>
+                <input
+                  type="radio"
+                  name="categoria"
+                  checked={rascunho.categoria === undefined}
+                  onChange={() => setRascunho({ ...rascunho, categoria: undefined })}
+                  className="size-5 accent-primaria"
+                />
+                Todas
+              </label>
+              {categorias.map((categoria) => (
+                <label key={categoria.slug} className={OPCAO}>
+                  <input
+                    type="radio"
+                    name="categoria"
+                    checked={rascunho.categoria === categoria.slug}
+                    onChange={() => setRascunho({ ...rascunho, categoria: categoria.slug })}
+                    className="size-5 accent-primaria"
+                  />
+                  {categoria.nome}
+                </label>
+              ))}
+            </fieldset>
+          ) : null}
           {GRUPOS.map(({ id, rotulo }) => (
             <fieldset key={id} className="flex flex-col">
               <legend className="text-sm font-semibold text-texto-suave">{rotulo}</legend>

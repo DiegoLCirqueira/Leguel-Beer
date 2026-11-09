@@ -74,6 +74,7 @@ test("sem resultado mostra a mensagem e Limpar filtros volta ao catálogo inteir
   await page.goto("/catalogo?teor=6-ou-mais&ibu=abaixo-de-20");
 
   await expect(page.getByText("Nenhuma cerveja encontrada com esses filtros.")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "0 cervejas" })).toBeVisible();
   await page.getByRole("button", { name: "Limpar filtros" }).click();
 
   await expect(page).toHaveURL(/\/catalogo$/);
@@ -127,4 +128,33 @@ test("combinar categoria, faixa e ordem mostra a lista certa e Limpar filtros ao
   await expect(page).toHaveURL(/\/catalogo$/);
   await expect(page.getByRole("heading", { level: 2, name: "16 cervejas" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Limpar filtros" })).toHaveCount(0);
+});
+
+test("o sheet oferece a categoria e Aplicar a leva para a URL", async ({ page }) => {
+  await page.goto("/catalogo");
+
+  await page.getByRole("button", { name: "Filtrar" }).click();
+  const sheet = page.getByRole("dialog", { name: "Filtros e ordenação" });
+  await expect(sheet.getByRole("radio", { name: "Todas" })).toBeChecked();
+  await sheet.getByRole("radio", { name: "Frutas" }).check();
+  await sheet.getByRole("button", { name: "Aplicar" }).click();
+
+  await expect(page).toHaveURL(/\/catalogo\?categoria=frutas$/);
+  await expect(page.getByRole("button", { name: /^Frutas \(\d+\)$/ })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+});
+
+test("categoria que não existe na URL é ignorada: Todas marcada e sem Limpar filtros", async ({
+  page,
+}) => {
+  await page.goto("/catalogo?categoria=nao-existe");
+
+  await expect(page.getByRole("button", { name: /^Todas \(\d+\)$/ })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect(page.getByRole("button", { name: "Limpar filtros" })).toHaveCount(0);
+  await expect(cards(page).first()).toBeVisible();
 });

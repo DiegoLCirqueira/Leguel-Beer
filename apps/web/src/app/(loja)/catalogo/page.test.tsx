@@ -35,6 +35,31 @@ describe("/catalogo", () => {
     expect(screen.getByRole("button", { name: "IPA (6)" })).toBeInTheDocument();
   });
 
+  it("categoria que não existe é ignorada: uma só busca, Todas marcada e sem Limpar filtros", async () => {
+    buscar.mockResolvedValue({ ok: true, dados });
+
+    await abrir({ categoria: "nao-existe" });
+
+    expect(buscar).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("button", { name: "Todas (6)" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "IPA (6)" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+    expect(screen.queryByRole("button", { name: "Limpar filtros" })).not.toBeInTheDocument();
+  });
+
+  it("categoria que existe continua marcada", async () => {
+    buscar.mockResolvedValue({ ok: true, dados });
+
+    await abrir({ categoria: "ipa" });
+
+    expect(screen.getByRole("button", { name: "IPA (6)" })).toHaveAttribute("aria-pressed", "true");
+  });
+
   it("se a API falha mostra o erro com Tentar de novo na mesma URL, sem lançar", async () => {
     buscar.mockResolvedValue({ ok: false });
 
