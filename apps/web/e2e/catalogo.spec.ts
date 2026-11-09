@@ -1,6 +1,6 @@
 import { expect, test } from "./support/maior-de-idade";
 
-// Contra a API real com o seed do catálogo: 16 cervejas, 4 por categoria, 1 esgotada (Teste Frutas 1).
+// Contra a API real com o seed do catálogo: 16 cervejas, 4 por categoria, 1 esgotada (Leguelé Comendador).
 test.use({ isMobile: false, hasTouch: false, viewport: { width: 390, height: 844 } });
 
 const cards = (page: import("@playwright/test").Page) => page.getByRole("article");
@@ -35,9 +35,10 @@ test("tocar num chip filtra pela categoria na URL e o contador dos chips não mu
 test("filtros por faixa vêm da URL e Filtrar mostra quantos estão ativos", async ({ page }) => {
   await page.goto("/catalogo?teor=6-ou-mais&ibu=40-ou-mais");
 
-  await expect(page.getByText("2 cervejas")).toBeVisible();
+  await expect(page.getByText("3 cervejas")).toBeVisible();
   await expect(cards(page).filter({ hasText: "Maré Alta" })).toHaveCount(1);
-  await expect(cards(page).filter({ hasText: "Teste IPA 1" })).toHaveCount(1);
+  await expect(cards(page).filter({ hasText: "Leguelé Maceió IPA" })).toHaveCount(1);
+  await expect(cards(page).filter({ hasText: "Jaraguá Hazy IPA" })).toHaveCount(1);
   await expect(page.getByRole("button", { name: "Filtrar (2)" })).toBeVisible();
 });
 
@@ -58,7 +59,7 @@ test("a esgotada vai para o fim com o selo e o Adicionar desabilitado; só dispo
   await page.goto("/catalogo");
 
   const ultimo = cards(page).last();
-  await expect(ultimo).toContainText("Teste Frutas 1");
+  await expect(ultimo).toContainText("Leguelé Comendador");
   await expect(ultimo.getByText("Esgotado")).toBeVisible();
   await expect(ultimo.getByRole("button", { name: "Adicionar" })).toBeDisabled();
 
@@ -71,7 +72,7 @@ test("a esgotada vai para o fim com o selo e o Adicionar desabilitado; só dispo
 test("sem resultado mostra a mensagem e Limpar filtros volta ao catálogo inteiro", async ({
   page,
 }) => {
-  await page.goto("/catalogo?teor=6-ou-mais&ibu=abaixo-de-20");
+  await page.goto("/catalogo?teor=abaixo-de-4-5&ibu=40-ou-mais");
 
   await expect(page.getByText("Nenhuma cerveja encontrada com esses filtros.")).toBeVisible();
   await expect(page.getByRole("heading", { level: 2, name: "0 cervejas" })).toBeVisible();
@@ -121,7 +122,7 @@ test("combinar categoria, faixa e ordem mostra a lista certa e Limpar filtros ao
 
   await expect(page.getByRole("heading", { level: 2, name: "3 cervejas" })).toBeVisible();
   const nomes = await cards(page).getByRole("heading", { level: 3 }).allTextContents();
-  expect(nomes).toEqual(["Leguelé IPA", "Teste IPA 1", "Maré Alta"]);
+  expect(nomes).toEqual(["Leguelé Maceió IPA", "Maré Alta", "Jaraguá Hazy IPA"]);
 
   await page.getByRole("button", { name: "Limpar filtros" }).click();
 

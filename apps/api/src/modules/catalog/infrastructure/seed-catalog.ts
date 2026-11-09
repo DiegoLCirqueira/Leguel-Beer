@@ -12,9 +12,9 @@ function isLocal(url: string): boolean {
 }
 
 /**
- * Seed de desenvolvimento do catálogo: 4 categorias e 16 cervejas. Idempotente: casa por `slug` e
- * reaplica os dados do seed (o seed é a fonte dos dados de desenvolvimento). Só toca categorias e
- * cervejas; contas e perfis não são lidos nem alterados.
+ * Seed de desenvolvimento do catálogo: 4 categorias e 16 cervejas. Idempotente: casa por `slug`, reaplica
+ * os dados do seed (a fonte dos dados de desenvolvimento) e remove as cervejas de outros slugs, para o
+ * banco local ficar com exatamente as do seed. Só toca categorias e cervejas; contas e perfis não são lidos nem alterados.
  */
 export async function seedCatalog(
   prisma: PrismaService,
@@ -28,7 +28,9 @@ export async function seedCatalog(
   if (!isLocal(env.DATABASE_URL)) {
     throw new Error("O seed do catálogo só roda contra o banco local: DATABASE_URL não é local");
   }
+  const slugs = SEED_CATEGORIES.flatMap((category) => category.beers.map((beer) => beer.slug));
   await prisma.$transaction(async (tx) => {
+    await tx.beer.deleteMany({ where: { slug: { notIn: slugs } } });
     for (const { beers, ...category } of SEED_CATEGORIES) {
       const { id: categoryId } = await tx.category.upsert({
         where: { slug: category.slug },
