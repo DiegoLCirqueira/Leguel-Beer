@@ -29,7 +29,7 @@ tags:
 Funcionalidade: Termos, privacidade e entregas
 
   Cenário: Rodapé com avisos e links
-    Dado que confirmei a maioridade e continuei como convidado
+    Dado que confirmei a maioridade e estou com sessão iniciada
     Quando abro /conta e rolo até o fim
     Então vejo "Aprecie com moderação" e "Venda proibida para menores de 18 anos"
     E vejo os links "Termos de Uso", "Política de Privacidade" e "Entregas"
