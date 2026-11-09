@@ -31,7 +31,7 @@ E-commerce mobile-first (PWA) da cervejaria artesanal **Leguelé Beer**: catálo
 - **Conta:** e-mail/senha, Google e Facebook. Convidado navega e monta a Geladeira; finalizar a compra exige conta (decisão do Diego, 2026-10-28; ver [[adicionar-do-card]]).
 
 > [!info] Tamanho do catálogo
-> 9 cervejas em 4 categorias (IPA, Frutas, Malt, Lager), sem Stout: as dos rótulos em `Imagens/figma/cervejas/` (decisão do Diego, 2026-11-08; eram 16 desde o LB-4, 2026-10-28). As categorias vêm do cadastro e podem mudar. Ver [[catalogo]], "Catálogo do MVP".
+> 16 cervejas em 4 categorias (IPA, Frutas, Malt, Lager; 4 por categoria), todas da marca Leguelé Beer, sem Stout (decisão do Diego, 2026-11-08). Dados de exemplo inventados; as imagens dos rótulos com marca de terceiros serão refeitas (LB-124). As categorias vêm do cadastro e podem mudar. Ver [[catalogo]], "Catálogo do MVP".
 
 ## Depois do MVP
 
