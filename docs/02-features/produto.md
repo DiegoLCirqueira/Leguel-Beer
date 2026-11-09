@@ -180,7 +180,7 @@ Recomendações aplicadas pelo Spec em 08/11, fáceis de reverter; qualquer uma 
 - **Descrição e preço anterior:** campos opcionais novos na cerveja; o texto do seed é de exemplo, e o conteúdo final vem do cadastro (admin).
 - **Rota:** `/catalogo/<slug>`.
 - **Sem barra inferior da loja** na página, para o botão fixo ocupar o lugar dela.
-- **Barra fixa, toast e rodapé:** a barra publica a altura numa variável CSS (o toast fica acima dela) e o rodapé da loja fica no fim da rolagem, acima do botão.
+- **Barra fixa, toast e rodapé:** a barra publica a altura numa variável CSS (o toast fica acima dela). A página de produto não tem rodapé, como o resto da loja ([[termos-privacidade]], decisão do Diego, 2026-11-08).
 - **Toast:** o mesmo do card, com o nome da cerveja e 5 segundos, mesmo com várias unidades.
 - **Linha de frete grátis:** informativa, sem "quanto falta".
 - **Sem "Amargor":** só o IBU.

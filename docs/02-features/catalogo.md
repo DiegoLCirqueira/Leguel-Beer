@@ -267,7 +267,7 @@ Depois do contrato (fatia 1), as fatias 2 a 4 (Back) e 5 a 7 (Front) andam em pa
 - **Adicionar desabilitado:** o botão do card fica desabilitado até o LB-47 e o LB-35 (item 3 da [[sequencia-telas]], onde o Adicionar passa a funcionar); o esgotado já nasce desabilitado.
 - **Fora:** busca (LB-37) e a ordenação "Mais vendidos".
 - **Selo "Esgotado":** feito com os tokens existentes, sem cor nova.
-- **Rodapé da loja** ([[termos-privacidade]]): fica no fim da rolagem, acima da barra inferior fixa.
+- **Sem rodapé na loja** (decisão do Diego, 2026-11-08, [[termos-privacidade]]): a barra inferior fixa fica sem rodapé acima dela.
 - **Bottom sheet:** em tela baixa ou com zoom de 200% rola por dentro e fecha com Esc.
 - **Componentes novos** em `apps/web/src/components/ui`, cada um na vitrine `/dev/tokens` ([[identidade-visual]], "Componentes reutilizáveis"): cabeçalho da loja, barra inferior, card de cerveja, stepper, bottom sheet, toast com "Desfazer", skeleton, select, faixa, switch, estado vazio, título de página e selo "Esgotado".
 

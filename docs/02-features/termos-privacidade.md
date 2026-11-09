@@ -29,12 +29,12 @@ tags:
 Funcionalidade: Termos, privacidade e entregas
 
   Cenário: Rodapé com avisos e links
-    Dado que confirmei a maioridade e continuei como convidado
-    Quando abro a loja (/) e rolo até o fim
+    Dado que confirmei a maioridade e estou com sessão iniciada
+    Quando abro /conta e rolo até o fim
     Então vejo "Aprecie com moderação" e "Venda proibida para menores de 18 anos"
     E vejo os links "Termos de Uso", "Política de Privacidade" e "Entregas"
     E não vejo a razão social nem o CNPJ da empresa
-    E em /entrar e /criar-conta não vejo o rodapé
+    E em /, /catalogo, /entregas, /entrar e /criar-conta não vejo o rodapé
 
   Cenário: Termos abertos do cadastro não apagam o formulário
     Dado que preenchi parte de "Criar sua conta"
@@ -57,12 +57,13 @@ Funcionalidade: Termos, privacidade e entregas
 
 - **Páginas:** `/termos` (Termos de Uso), `/privacidade` (Política de Privacidade) e `/entregas` (Entregas). Conteúdo estático, versionado no repositório, com a data da última atualização.
 - **Sem aviso de portfólio:** nenhuma página do site mostra faixa, nota ou texto dizendo que o site é um projeto de portfólio (decisão do Diego, 2026-10-30).
-- **Rodapé:** na loja (`/`, catálogo e demais páginas de compra), em `/conta` e nas páginas legais (`/termos`, `/privacidade` e `/entregas`); fora das telas de acesso (ver "Rodapé fora das telas de acesso"): os avisos (texto em "Textos", linha "Rodapé, avisos", fonte única também para o checkout), e os links para as três páginas. A linha da empresa (razão social, CNPJ e cidade) sai do rodapé (decisão do Diego, 2026-10-31).
+- **Rodapé:** só em `/conta`, `/termos` e `/privacidade`; sem rodapé na loja (`/`, `/catalogo` e demais páginas de compra), em `/entregas` nem nas telas de acesso (ver "Rodapé fora da loja e de /entregas" e "Rodapé fora das telas de acesso"): os avisos (texto em "Textos", linha "Rodapé, avisos", fonte única também para o checkout), e os links para as três páginas. A linha da empresa (razão social, CNPJ e cidade) sai do rodapé (decisão do Diego, 2026-10-31).
   - **Rodapé discreto:** pequeno, praticamente um detalhe (decisão do Diego, 2026-10-31). Por isso os links do rodapé têm área de toque de 24 px (WCAG 2.5.8, nível AA), e não os 44 px dos botões. É deliberado: não aumentar para 44 px.
 - **Sem pergunta de maioridade** em `/termos` e `/privacidade`, para quem quer ler antes de entrar ([[maioridade-entrada]]). `/entregas` segue a regra normal.
-- **Sem avisos nas telas de maioridade:** nem a pergunta de maioridade nem "Acesso não permitido" ([[maioridade-entrada]]) mostram os avisos do rodapé (decisões do Diego, 2026-11-02: "Acesso não permitido" na 1ª rodada, a pergunta na 2ª). Os avisos ficam só no rodapé das demais páginas e no resumo do checkout. Os Termos e a Privacidade, aprovados sem mudança na inspeção, não mudam.
-- **Rodapé fora das telas de acesso:** o Diego pediu "retire o footer de todas as páginas" (2026-11-03) e, avisado de que o rodapé tem os avisos legais e os links de Termos, Privacidade e Entregas, escolheu a opção A ("1- A"): retirar só das telas de acesso (`/entrar`, `/criar-conta`, `/recuperar-senha`, `/nova-senha` e `/auth/confirmar`). Continua na loja, em `/conta` e nas páginas legais. Maioridade, acesso negado e boas-vindas já não tinham rodapé. Isso substitui a regra "Rodapé e rolagem" de 2026-11-02 (conteúdo mais rodapé em 100dvh). Os links dos Termos e da Privacidade continuam no aceite de `/criar-conta` ([[cadastro-login]]).
-- **Boas-vindas sem rodapé:** além da pergunta de maioridade, a [[boas-vindas]] também fica sem o rodapé, porque não tem rolagem (decisão do Diego, 2026-10-30). Os links legais continuam nas páginas que têm rodapé e no aceite do cadastro.
+- **Sem avisos nas telas de maioridade:** nem a pergunta de maioridade nem "Acesso não permitido" ([[maioridade-entrada]]) mostram os avisos do rodapé (decisões do Diego, 2026-11-02: "Acesso não permitido" na 1ª rodada, a pergunta na 2ª). Os avisos ficam só em `/conta`, `/termos`, `/privacidade` e no resumo do checkout. Os Termos e a Privacidade, aprovados sem mudança na inspeção, não mudam.
+- **Rodapé fora das telas de acesso:** o Diego pediu "retire o footer de todas as páginas" (2026-11-03) e, avisado de que o rodapé tem os avisos legais e os links de Termos, Privacidade e Entregas, escolheu a opção A ("1- A"): retirar só das telas de acesso (`/entrar`, `/criar-conta`, `/recuperar-senha`, `/nova-senha` e `/auth/confirmar`). Continuava na loja, em `/conta` e nas páginas legais (a loja e `/entregas` saíram em 2026-11-08). Maioridade, acesso negado e boas-vindas já não tinham rodapé. Isso substitui a regra "Rodapé e rolagem" de 2026-11-02 (conteúdo mais rodapé em 100dvh). Os links dos Termos e da Privacidade continuam no aceite de `/criar-conta` ([[cadastro-login]]).
+- **Rodapé fora da loja e de /entregas:** o Diego aprovou na inspeção "Home, catálogo, entregas: ok (retire o footer)" (2026-11-08), já avisado em 2026-11-03 de que o rodapé tem os avisos legais e os links. Sem rodapé em `/`, `/catalogo`, demais páginas de compra e `/entregas`; continua em `/termos`, `/privacidade` e `/conta`. Os avisos ("Aprecie com moderação." e "Venda proibida para menores de 18 anos.") e os links legais continuam em `/conta` e no resumo do checkout (abaixo). Na loja, a barra inferior fixa fica sem rodapé acima dela. Substitui, para a loja e `/entregas`, a regra de 2026-11-03 que mantinha o rodapé ali.
+- **Boas-vindas sem rodapé:** além da pergunta de maioridade, a [[boas-vindas]] também fica sem o rodapé, porque não tem rolagem (decisão do Diego, 2026-10-30). Os links legais continuam nas páginas que têm rodapé e no aceite do cadastro. Consequência da decisão de 2026-11-08 (o Diego aceitou ao tirar o rodapé da loja): o convidado só vê os avisos em `/termos`, `/privacidade` e no checkout, porque `/conta` exige login.
 - **Links do cadastro** abrem em nova aba.
 - **Checkout:** o resumo do pedido mostra o primeiro aviso do rodapé e o link dos Termos de Uso. Vale quando o checkout existir; o teste entra com o LB-55 (#31, [[checkout]]).
 - **Revisão jurídica:** fora do escopo, como no card. Os textos são de um projeto de portfólio.
@@ -132,6 +133,10 @@ Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adic
 ### Decisões do Diego (2026-10-30)
 
 - **Sem aviso de portfólio:** "quero que retire o 'Projeto de portfóio pagamentos em modo de teste', isso não deve aparecer em lugar algum já que é desnecessário". Saem a faixa do topo, a nota do rodapé e o item "Projeto de portfólio." de Entregas. O rodapé e as páginas legais continuam, e a empresa segue marcada como fictícia.
+
+### Decisões do Diego (2026-11-08)
+
+- **Sem rodapé na loja nem em /entregas:** "Home, catálogo, entregas: ok (retire o footer)". Rodapé só em `/conta`, `/termos` e `/privacidade`. O cenário "Rodapé com avisos e links" passou a abrir `/conta` e confere a ausência em `/`, `/catalogo`, `/entregas`, `/entrar` e `/criar-conta`.
 
 ### Decisões do Diego (2026-11-03)
 
