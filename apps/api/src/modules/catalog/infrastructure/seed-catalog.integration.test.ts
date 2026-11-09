@@ -66,14 +66,48 @@ describe("seedCatalog (banco real)", () => {
     expect(await prisma.category.count()).toBe(0);
   });
 
-  it("grava a descrição e o preço anterior: Maré Alta com 36,90, cerveja de teste sem nenhum dos dois", async () => {
+  it("grava a descrição e o preço anterior: Maré Alta com 36,90, Umbu Gose sem preço anterior", async () => {
     await seedCatalog(prisma);
 
     const mareAlta = await prisma.beer.findUniqueOrThrow({ where: { slug: "mare-alta" } });
-    const deTeste = await prisma.beer.findUniqueOrThrow({ where: { slug: "teste-lager-1" } });
+    const umbu = await prisma.beer.findUniqueOrThrow({ where: { slug: "umbu-gose" } });
 
     expect(mareAlta).toMatchObject({ priceCents: 3200, previousPriceCents: 3690 });
-    expect(mareAlta.description).toContain("(texto de exemplo)");
-    expect(deTeste).toMatchObject({ description: null, previousPriceCents: null });
+    expect(mareAlta.description).toMatch(/^Uma American IPA de respeito!/);
+    expect(umbu.previousPriceCents).toBeNull();
+    expect(umbu.description).toBeTruthy();
+  });
+
+  it("deixa o banco local com exatamente as 16 do seed: remove as de rodadas anteriores", async () => {
+    const lager = await prisma.category.create({
+      data: { slug: "lager", name: "Lager", order: 4 },
+    });
+    const base = {
+      style: "x",
+      abv: 5,
+      ibu: 10,
+      volumeMl: 500,
+      priceCents: 2500,
+      categoryId: lager.id,
+    };
+    await prisma.beer.createMany({
+      data: [
+        { slug: "teste-lager-1", name: "Teste Lager 1", ...base },
+        { slug: "cajupa", name: "Cajupá", ...base },
+        { slug: "leguele-cream-ale", name: "Antiga", ...base },
+      ],
+    });
+
+    await seedCatalog(prisma);
+
+    const slugs = (await prisma.beer.findMany({ select: { slug: true } })).map((b) => b.slug);
+    expect(slugs).toHaveLength(16);
+    expect(slugs).not.toContain("teste-lager-1");
+    expect(slugs).not.toContain("cajupa");
+    expect(
+      await prisma.beer.findUniqueOrThrow({ where: { slug: "leguele-cream-ale" } }),
+    ).toMatchObject({
+      name: "Leguelé Cream Ale",
+    });
   });
 });
