@@ -7,18 +7,18 @@ atualizado: 2026-11-08
 
 Sobrescrito pelo Orchestrator ao fim de cada ordem. A próxima conversa começa lendo este arquivo, a daily note mais recente em `docs/05-diario/` e [[licoes-aprendidas]].
 
-## Última ordem: item 1 concluído (catálogo e início) e início do item 2 (08/11)
+## Última ordem: inspeção do Diego, catálogo de 16 cervejas e API do produto (08/11)
 
-Resumo em [[2026-11-08]]. O Diego pediu para terminar o que estava aberto e parar até novas ordens.
+Resumo em [[2026-11-08]]. O Diego pediu para terminar o que estava aberto e não iniciar outra tarefa.
 
-- Item 1 de [[sequencia-telas]] concluído: contrato, modelos/seed, GET /catalogo e /catalogo/destaques, layout da loja, bottom sheet/toast/skeleton, card com stepper, tela /catalogo e destaques na home (#210 a #226).
-- Item 2 (página de produto) começou: spec [[produto]] (#220, #225), contrato (#223). A fatia 2 da API (campos descrição e preço anterior, migration, seed, GET /catalogo/:slug) está pronta em `feat/produto-api`, sem PR: falta trazer a main e abrir o PR.
-- Auditoria final do Codex (154d1fe..5a104a9): **Ordem com achados**: 3 minors de Front no catálogo (abaixo, em Follow-ups) e um teste frágil de ordenação por preço, corrigido pelo próprio Codex no #228. Lint, typecheck, build, 710 testes, 69 de integração e 471 E2E verdes (3 pulados sem a senha do seed); /catalogo e / conferidos no Windows e no Linux.
-- Processo: auditoria final do Codex a cada ordem; ciclo contínuo ([[ADR-016-ciclo-continuo-da-banda]]); PR de código não edita a daily.
+- Inspeção aprovada: Home, catálogo, entregas, conta e entrar. Rodapé fora da loja e de /entregas (#231, #234). /criar-conta legível (#235).
+- Catálogo do MVP: 16 cervejas da marca, 4 por categoria (spec #232, seed #237); falta só a arte nova dos rótulos com marca de terceiros (LB-124).
+- Item 1 fechado, com os achados da auditoria corrigidos (#236) e o refino do Codex (#228). Item 2: spec, contrato e API (GET /catalogo/:slug, #233) prontos; falta a tela (fatias 3 e 4, Front).
+- Processo: auditoria final do Codex a cada ordem; ciclo contínuo ([[ADR-016-ciclo-continuo-da-banda]]); PR de código não edita a daily; terminais limpos (/clear) no fim de cada ordem.
 
 ## Estado
 
-- Ambiente a partir da `main` (e69f484) com um único `pnpm dev` na raiz (shared em watch, site :3000, API :3333; log `%TEMP%/leguele-dev.log`). Supabase local e Mailpit no Docker. O :3001 serve o worktree da tarefa atual do Front. Para religar: Docker, `pnpm db:start` e os dois comandos.
+- Ambiente a partir da `main` (8b6d816) com um único `pnpm dev` na raiz (shared em watch, site :3000, API :3333; log `%TEMP%/leguele-dev.log`). Supabase local e Mailpit no Docker. O :3001 serve o worktree da tarefa atual do Front. Para religar: Docker, `pnpm db:start` e os dois comandos.
 - O watch da API não reinicia quando muda o `.env`: reiniciar o processo.
 - `apps/api/.env` da working copy principal foi copiado do worktree `leguele-api` (sem as chaves do seed).
 - Portais "Leguelé iPhone 390" e "Leguelé Android" apontam para :3000.
@@ -29,14 +29,13 @@ Resumo em [[2026-11-08]]. O Diego pediu para terminar o que estava aberto e para
 
 ## Próximo
 
-1. Aguardar novas ordens do Diego (pedido de 08/11).
-2. Quando retomar: Front corrige os 3 achados do catálogo (Follow-ups, primeiro item); abrir o PR da fatia 2 do item 2 (`feat/produto-api`); depois a tela de produto (fatias 3 e 4, Front).
-3. Inspeção pendente do Diego: `/entrar`, `/criar-conta`, `/conta`, `/entregas`, e agora `/catalogo` e a home com destaques.
-4. LB-8 (nuvem) espera o Diego (contas). O spike LB-54 abre o checkout (item 5).
+1. Aguardar novas ordens do Diego.
+2. Quando retomar: tela da página de produto (item 2, fatias 3 e 4, Front) e, depois, item 3 (Geladeira).
+3. Arte dos rótulos com a marca Leguelé (Diego ou design) para as cervejas que hoje usam a imagem padrão.
+4. LB-8 (nuvem) espera o Diego (contas); "merge = deploy" vira ADR nele. O spike LB-54 abre o checkout (item 5).
 
 ## Follow-ups
 
-- Achados da auditoria final no catálogo (dono: Front), contra [[catalogo]]: (1) estado vazio sem a contagem "0 cervejas" (`catalogo-conteudo.tsx:35`; spec linha ~142); (2) o bottom sheet de filtros não oferece categoria (`filtros-do-catalogo.tsx:87`; spec linhas ~92 e ~131); (3) `?categoria=nao-existe` mostra as 16 cervejas mas nenhum chip fica marcado e "Limpar filtros" continua (`catalogo-conteudo.tsx:20,34`; spec linha ~195 manda ignorar o parâmetro e abrir sem aquele filtro).
 
 - Do #212: registrar a mutação dos testes de loja-layout que nasceram verdes; a exceção da barra fixa no `responsivo.spec.ts` vale para qualquer rolagem (rever quando /catalogo e /geladeira usarem o layout); rótulo da barra até 12 px; fragmentos `<>` sobrando; a barra e a variável `--altura-barra-loja` têm o 57 px em dois lugares.
 - Do #214: `categories.order` único quando o admin escrever categorias (LB-73).
