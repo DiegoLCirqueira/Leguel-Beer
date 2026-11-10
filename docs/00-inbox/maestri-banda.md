@@ -83,7 +83,7 @@ Definidos pelo Diego em 2026-10-28. Use sempre os aliases, nunca nomes completos
 | Back | sonnet | `claude --model sonnet` | usar `opusplan` só em fatias com decisão de desenho difícil, com autorização do Diego |
 | Devops | sonnet | `claude --model sonnet` | pode descer para haiku depois que estrutura, CI e deploy estiverem estáveis |
 | Reviewer | opus | `claude --model opus` | único candidato a ultracode, e só com autorização |
-| Testes (Codex) | modelo do Codex, sem troca | `codex` | auditoria final de cada ordem e refino de testes; não muda código de produção nem docs |
+| Testes (Codex) | `gpt-6.1-sol`, esforço `high` | `codex` | auditoria final de cada ordem e refino de testes; não muda código de produção nem docs. Fixado em `~/.codex/config.toml` em 2026-11-10, a pedido do Diego (antes: padrão do Codex, esforço `low`, fraco para auditoria). `gpt-6-astra` é a alternativa mais forte, mais lenta e mais cara |
 
 - **Comando no Maestri:** cada terminal da banda troca o comando atual `claude` pelo da tabela.
 - **Troca de modelo:** nenhum agente troca de modelo por conta própria (regra do CLAUDE.md).

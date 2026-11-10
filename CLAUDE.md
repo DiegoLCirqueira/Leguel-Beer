@@ -105,7 +105,7 @@ Estas regras têm prioridade sobre os caminhos padrão descritos nos SKILL.md em
   - O `pnpm-workspace.yaml` nega as agent skills do `@playwright/cli` (`permissions`); não aprove, para não surgir cópia que se atualiza sozinha.
 - Issue tracker: GitHub Issues é o tracker do MVP.
   - `to-spec` e `to-tickets` gravam a spec em `docs/02-features/` e só publicam issues depois que a migração do backlog tiver sido feita. Enquanto não existirem issues migradas no repositório (issues com o marcador `notion-id` no corpo), apenas listam os tickets propostos no fim da spec.
-  - O Notion guarda as ideias do Pós-MVP e não deve ser alterado pelos agentes.
+  - O Notion guarda as ideias do Pós-MVP. Por ordem do Diego em 2026-11-10, o Orchestrator mantém o backlog do Notion (database Backlog) atualizado junto com o andamento do projeto (status dos cards: Em andamento, Em revisão, Concluído), sem apagar cards nem mudar escopo; as ideias do Pós-MVP continuam só lá. Os demais agentes não alteram o Notion.
   - Corte do MVP: [[mvp-corte]] (`docs/01-produto/mvp-corte.md`). A migração do backlog foi feita em 2026-10-28: 110 issues com o marcador `notion-id` (14 épicos + 96 cards) nos milestones "MVP" e "MVP+".
 - Ultracode e workflows: não use `/effort ultracode` nem execute tarefas como workflow sem autorização explícita do Diego.
   - Uso previsto: auditorias amplas e pontuais pelo Reviewer, como a revisão de segurança antes de fechar o milestone "MVP".
