@@ -4,6 +4,7 @@ export { BlocoDePreco } from "./bloco-de-preco";
 export { BottomSheet } from "./bottom-sheet";
 export { Button, buttonVariants } from "./button";
 export { CardCerveja } from "./card-cerveja";
+export { CervejaNaoEncontrada } from "./cerveja-nao-encontrada";
 export { CategoryChips } from "./category-chips";
 export { Campo } from "./campo";
 export { DivisorOu } from "./divisor-ou";
