@@ -88,4 +88,17 @@ describe("CardCerveja", () => {
 
     expect(screen.queryByText("Esgotado")).not.toBeInTheDocument();
   });
+
+  it("o nome da cerveja é um link para a página dela e o Adicionar continua clicável", async () => {
+    const aoAdicionar = vi.fn();
+    render(<CardCerveja cerveja={cerveja()} aoAdicionar={aoAdicionar} />);
+
+    expect(screen.getByRole("link", { name: "Maré Alta IPA" })).toHaveAttribute(
+      "href",
+      "/catalogo/mare-alta-ipa",
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Adicionar" }));
+
+    expect(aoAdicionar).toHaveBeenCalledOnce();
+  });
 });
