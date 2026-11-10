@@ -15,7 +15,13 @@ export default async function Produto({ params }: Props) {
   const { slug } = await params;
   const resultado = await buscarCerveja(slug);
 
-  if (resultado.tipo === "nao-encontrada") return <CervejaNaoEncontrada />;
+  if (resultado.tipo === "nao-encontrada") {
+    return (
+      <main className="flex flex-1 flex-col">
+        <CervejaNaoEncontrada />
+      </main>
+    );
+  }
   if (resultado.tipo === "erro") {
     return (
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center px-4 py-10">
