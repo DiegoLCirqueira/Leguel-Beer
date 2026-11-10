@@ -73,7 +73,7 @@ Fluxo: **spec → teste → implementação (com rascunho de ADR, se houver) →
 
 ## Modelos e esforço
 
-Definidos pelo Diego em 2026-10-28. Use sempre os aliases, nunca nomes completos de modelo. No Claude Code instalado (v2.1.312), `opus` resolve para Opus 5.5 (exige v2.1.280+) e `sonnet` para Sonnet 5.5 (exige v2.1.284+).
+Definidos pelo Diego em 2026-10-28. Use sempre os aliases, nunca nomes completos de modelo. A única exceção é o Codex: ele não tem alias, então o nome completo `gpt-6.1-sol` é usado (troca de 2026-11-10). No Claude Code instalado (v2.1.312), `opus` resolve para Opus 5.5 (exige v2.1.280+) e `sonnet` para Sonnet 5.5 (exige v2.1.284+).
 
 | Agente | Modelo | Comando de inicialização | Observação |
 | --- | --- | --- | --- |
