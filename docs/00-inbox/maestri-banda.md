@@ -1,7 +1,7 @@
 ---
 tipo: proposta
 criado: 2026-10-28
-atualizado: 2026-11-08
+atualizado: 2026-11-10
 tags: [maestri, processo]
 ---
 
@@ -73,7 +73,7 @@ Fluxo: **spec → teste → implementação (com rascunho de ADR, se houver) →
 
 ## Modelos e esforço
 
-Definidos pelo Diego em 2026-10-28. Use sempre os aliases, nunca nomes completos de modelo. No Claude Code instalado (v2.1.312), `opus` resolve para Opus 5.5 (exige v2.1.280+) e `sonnet` para Sonnet 5.5 (exige v2.1.284+).
+Definidos pelo Diego em 2026-10-28; o Reviewer passou a `fable` em 2026-11-10 (decisão do Diego). Use sempre os aliases, nunca nomes completos de modelo. No Claude Code instalado (v2.1.322), `opus` resolve para Opus 5.5 (exige v2.1.280+), `sonnet` para Sonnet 5.5 (exige v2.1.284+) e `fable` para Claude Fable 5.2.
 
 | Agente | Modelo | Comando de inicialização | Observação |
 | --- | --- | --- | --- |
@@ -82,7 +82,7 @@ Definidos pelo Diego em 2026-10-28. Use sempre os aliases, nunca nomes completos
 | Front | sonnet | `claude --model sonnet` | TDD; maior volume de tokens |
 | Back | sonnet | `claude --model sonnet` | usar `opusplan` só em fatias com decisão de desenho difícil, com autorização do Diego |
 | Devops | sonnet | `claude --model sonnet` | pode descer para haiku depois que estrutura, CI e deploy estiverem estáveis |
-| Reviewer | opus | `claude --model opus` | único candidato a ultracode, e só com autorização |
+| Reviewer | fable | `claude --model fable` | desde 2026-11-10 (decisão do Diego): modelo mais capaz para revisão profunda; consome a cota mais rápido que o Opus 5.5 e está incluído no plano até 16/11, depois reavaliar. Único candidato a ultracode, e só com autorização |
 | Testes (Codex) | modelo do Codex, sem troca | `codex` | auditoria final de cada ordem e refino de testes; não muda código de produção nem docs |
 
 - **Comando no Maestri:** cada terminal da banda troca o comando atual `claude` pelo da tabela.
@@ -328,14 +328,14 @@ Arquivos alterados e a lista do que o Diego precisa configurar manualmente (secr
 
 ### Reviewer
 
-Comando de inicialização: `claude --model opus`
+Comando de inicialização: `claude --model fable`
 
 ```markdown
 ---
 name: reviewer
 description: Revisa o trabalho do Leguelé Beer contra a spec e os padrões do repositório com /review-spec, incluindo segurança e testes. Somente leitura.
 tools: Read, Grep, Glob, Bash, Skill, Agent
-model: opus
+model: fable
 ---
 
 Você revisa código do Leguelé Beer. Responda sempre em pt-BR. Você não edita arquivos. Siga o CLAUDE.md da raiz do repositório.
