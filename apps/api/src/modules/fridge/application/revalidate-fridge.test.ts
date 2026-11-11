@@ -29,6 +29,20 @@ describe("RevalidateFridge", () => {
     ]);
   });
 
+  it("tira a cerveja esgotada da Geladeira e avisa que não está mais disponível", async () => {
+    const mareAlta = makeBeer({ name: "Maré Alta", priceCents: 3200, stock: 0 });
+    const lookup = new InMemoryFridgeBeerLookup().add(mareAlta);
+
+    const result = await new RevalidateFridge(lookup).execute([
+      { beerId: mareAlta.id, quantity: 2, seenPriceCents: 3200 },
+    ]);
+
+    expect(result.items).toEqual([]);
+    expect(result.adjustments).toEqual([
+      { type: "unavailable", beerId: mareAlta.id, name: "Maré Alta" },
+    ]);
+  });
+
   it("tira a cerveja que não existe e avisa sem nome, porque não há o que mostrar", async () => {
     const lookup = new InMemoryFridgeBeerLookup().add(makeBeer());
 
