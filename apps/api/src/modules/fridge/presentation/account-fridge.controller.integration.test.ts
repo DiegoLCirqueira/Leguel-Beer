@@ -113,4 +113,109 @@ describe("GET e PUT /me/geladeira (banco real)", () => {
     expect(body.subtotalCentavos).toBe(9050);
     expect(read.body).toEqual(saved.body);
   });
+
+  it.each([
+    ["sem token", undefined],
+    ["com token adulterado", "token-invalido"],
+  ])("recusa com 401 o GET e o PUT %s", async (_name, token) => {
+    expect((await get(token)).status).toBe(401);
+    expect((await put(token, { itens: [] })).status).toBe(401);
+  });
+
+  it("cada conta vê e altera só a própria Geladeira", async () => {
+    await prisma.profile.create({ data: { id: tokens.adminId, email: "admin@leguele.test" } });
+    const mareAlta = await addBeer("mare-alta", { name: "Maré Alta" });
+    const cupuacu = await addBeer("cupuacu-ale", { name: "Cupuaçu Ale" });
+    await put(tokens.customer(), { itens: [entry(mareAlta, 2)] });
+
+    await put(tokens.admin(), { itens: [entry(cupuacu, 5)] });
+
+    const cliente = geladeiraResponseSchema.parse((await get(tokens.customer())).body);
+    const outra = geladeiraResponseSchema.parse((await get(tokens.admin())).body);
+    expect(cliente.itens.map((i) => [i.cerveja.nome, i.quantidade])).toEqual([["Maré Alta", 2]]);
+    expect(outra.itens.map((i) => [i.cerveja.nome, i.quantidade])).toEqual([["Cupuaçu Ale", 5]]);
+  });
+
+  it("repetir o PUT dá o mesmo resultado", async () => {
+    const mareAlta = await addBeer("mare-alta", { priceCents: 3000, stock: 1 });
+    const body = { itens: [entry(mareAlta, 3, 3200)] };
+
+    const first = await put(tokens.customer(), body);
+    const second = await put(tokens.customer(), body);
+
+    expect(second.status).toBe(200);
+    expect(second.body).toEqual(first.body);
+    expect((await get(tokens.customer())).body.itens).toEqual(first.body.itens);
+    expect(await prisma.fridgeItem.count()).toBe(1);
+  });
+
+  it("o GET grava os ajustes: a cerveja desativada sai e o aviso aparece uma vez só", async () => {
+    const mareAlta = await addBeer("mare-alta", { name: "Maré Alta" });
+    const velha = await addBeer("velha", { name: "Velha" });
+    await put(tokens.customer(), { itens: [entry(velha), entry(mareAlta, 2)] });
+    await prisma.beer.update({ where: { id: velha.id }, data: { active: false } });
+    await prisma.beer.update({ where: { id: mareAlta.id }, data: { priceCents: 3000 } });
+
+    const first = geladeiraResponseSchema.parse((await get(tokens.customer())).body);
+    const second = geladeiraResponseSchema.parse((await get(tokens.customer())).body);
+
+    expect(first.ajustes.map((a) => [a.tipo, a.nome])).toEqual([
+      ["indisponivel", "Velha"],
+      ["preco-mudou", "Maré Alta"],
+    ]);
+    expect(first.itens.map((i) => i.cerveja.precoCentavos)).toEqual([3000]);
+    expect(second.ajustes).toEqual([]);
+    expect(second.itens).toEqual(first.itens);
+  });
+
+  it("aceita o id em maiúsculas e conta uma só vez a cerveja repetida com maiúsculas diferentes", async () => {
+    const mareAlta = await addBeer("mare-alta", { name: "Maré Alta" });
+    const id = mareAlta.id;
+
+    const response = await put(tokens.customer(), {
+      itens: [
+        { cervejaId: id.toUpperCase(), quantidade: 2, precoVistoCentavos: 3200 },
+        { cervejaId: id, quantidade: 4, precoVistoCentavos: 3200 },
+      ],
+    });
+
+    expect(response.status).toBe(200);
+    const body = geladeiraResponseSchema.parse(response.body);
+    expect(body.itens.map((i) => [i.cerveja.id, i.quantidade])).toEqual([[id, 2]]);
+    expect(body.ajustes).toEqual([]);
+  });
+
+  it("conta sem perfil recebe 409 no PUT e a Geladeira vazia no GET", async () => {
+    await prisma.profile.delete({ where: { id: tokens.customerId } });
+    const mareAlta = await addBeer("mare-alta");
+
+    const saved = await put(tokens.customer(), { itens: [entry(mareAlta)] });
+
+    expect(saved.status).toBe(409);
+    expect(saved.body).toMatchObject({ code: "CONFLICT" });
+    expect((await get(tokens.customer())).body.itens).toEqual([]);
+    expect(await prisma.fridge.count()).toBe(0);
+  });
+
+  it("recusa com 400 o corpo fora do contrato, com o campo apontado", async () => {
+    const mareAlta = await addBeer("mare-alta");
+
+    const zero = await put(tokens.customer(), { itens: [entry(mareAlta, 0)] });
+    const fracionaria = await put(tokens.customer(), { itens: [entry(mareAlta, 1.5)] });
+    const muitos = await put(tokens.customer(), {
+      itens: Array.from({ length: 51 }, (_, i) => ({
+        cervejaId: `cerveja-${i}`,
+        quantidade: 1,
+        precoVistoCentavos: 100,
+      })),
+    });
+
+    for (const response of [zero, fracionaria, muitos]) {
+      expect(response.status).toBe(400);
+      expect(response.body).toMatchObject({ code: "VALIDATION_ERROR" });
+      expect(response.body.details[0].field).toMatch(/^itens/);
+    }
+    expect(zero.body.details[0].field).toBe("itens.0.quantidade");
+    expect(await prisma.fridge.count()).toBe(0);
+  });
 });
