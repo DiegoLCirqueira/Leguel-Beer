@@ -18,10 +18,12 @@ export class RevalidateFridge {
   constructor(private readonly lookup: FridgeBeerLookup) {}
 
   async execute(entries: readonly FridgeEntry[]): Promise<FridgeRevalidation> {
-    const found = await this.lookup.findByIds(entries.map((entry) => entry.beerId));
+    // O UUID vale igual em maiúsculas e minúsculas, mas o banco devolve minúsculas: compara-se assim.
+    const normalized = entries.map((entry) => ({ ...entry, beerId: entry.beerId.toLowerCase() }));
+    const found = await this.lookup.findByIds(normalized.map((entry) => entry.beerId));
     const items: ValidatedItem[] = [];
     const adjustments: FridgeAdjustment[] = [];
-    for (const entry of entries) {
+    for (const entry of normalized) {
       const match = found.find((candidate) => candidate.beer.id === entry.beerId);
       if (!match) {
         adjustments.push({ type: "unavailable", beerId: entry.beerId, name: null });
