@@ -25,4 +25,45 @@ describe("toGeladeiraResponse", () => {
     expect(response.quantidadeTotal).toBe(3);
     expect(response.subtotalCentavos).toBe(9050);
   });
+
+  it("traduz os três tipos de ajuste para o contrato, mantendo a ordem", () => {
+    const response = toGeladeiraResponse({
+      items: [],
+      adjustments: [
+        {
+          type: "price-changed",
+          beerId: "a",
+          name: "Maré Alta",
+          seenPriceCents: 3200,
+          currentPriceCents: 3000,
+        },
+        { type: "unavailable", beerId: "b", name: null },
+        {
+          type: "quantity-reduced",
+          beerId: "c",
+          name: "Cupuaçu Ale",
+          previousQuantity: 3,
+          currentQuantity: 1,
+        },
+      ],
+    });
+
+    expect(geladeiraResponseSchema.parse(response).ajustes).toEqual([
+      {
+        tipo: "preco-mudou",
+        cervejaId: "a",
+        nome: "Maré Alta",
+        precoVistoCentavos: 3200,
+        precoAtualCentavos: 3000,
+      },
+      { tipo: "indisponivel", cervejaId: "b", nome: null },
+      {
+        tipo: "quantidade-reduzida",
+        cervejaId: "c",
+        nome: "Cupuaçu Ale",
+        quantidadeAnterior: 3,
+        quantidadeAtual: 1,
+      },
+    ]);
+  });
 });
