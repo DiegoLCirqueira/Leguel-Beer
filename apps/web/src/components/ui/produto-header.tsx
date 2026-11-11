@@ -7,7 +7,7 @@ import { cliqueSimples, destinoNoNavegador } from "@/lib/destino-no-navegador";
 import { ESTILO_BOTAO_VOLTAR } from "./estilo-botao-voltar";
 import { LinkGeladeira } from "./link-geladeira";
 
-type Props = { count: number; voltarHref?: string };
+type Props = { count?: number; voltarHref?: string };
 
 const semAssinatura = () => () => {};
 
