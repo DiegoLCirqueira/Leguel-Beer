@@ -14,6 +14,12 @@ describe("geladeiraRequestSchema", () => {
     ]);
   });
 
+  it("recusa a mesma cerveja em dois itens", () => {
+    const corpo = { itens: [item("a"), item("b"), item("a")] };
+
+    expect(geladeiraRequestSchema.safeParse(corpo).success).toBe(false);
+  });
+
   it("aceita a Geladeira vazia", () => {
     expect(geladeiraRequestSchema.parse({ itens: [] })).toEqual({ itens: [] });
   });
