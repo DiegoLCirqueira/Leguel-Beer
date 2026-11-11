@@ -34,4 +34,11 @@ describe("AppModule com banco real", () => {
       { tipo: "indisponivel", cervejaId: "nao-sou-uuid", nome: null },
     ]);
   });
+
+  it("GET e PUT /me/geladeira estão no ar e exigem token (401 sem ele)", async () => {
+    expect((await request(app.getHttpServer()).get("/me/geladeira")).status).toBe(401);
+    expect(
+      (await request(app.getHttpServer()).put("/me/geladeira").send({ itens: [] })).status,
+    ).toBe(401);
+  });
 });

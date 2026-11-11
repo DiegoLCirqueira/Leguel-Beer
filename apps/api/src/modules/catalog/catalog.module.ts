@@ -10,6 +10,7 @@ import { PrismaBeerRepository } from "./infrastructure/prisma-beer-repository.js
 import { CatalogController } from "./presentation/catalog.controller.js";
 
 @Module({
+  exports: [BEER_REPOSITORY],
   controllers: [CatalogController],
   providers: [
     {

@@ -1,0 +1,185 @@
+import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { PrismaService } from "../../../common/prisma/prisma.service.js";
+import { resetDatabase } from "../../../common/testing/database.js";
+import { FridgeOwnerNotFoundError } from "../domain/account-fridge-repository.js";
+import { PrismaAccountFridgeRepository } from "./prisma-account-fridge-repository.js";
+
+describe("PrismaAccountFridgeRepository (banco real)", () => {
+  const prisma = new PrismaService();
+  const repository = new PrismaAccountFridgeRepository(prisma);
+  let profileId: string;
+  let otherProfileId: string;
+  let beerIds: string[];
+
+  beforeEach(async () => {
+    await resetDatabase(prisma);
+    profileId = (
+      await prisma.profile.create({ data: { id: crypto.randomUUID(), email: "a@x.test" } })
+    ).id;
+    otherProfileId = (
+      await prisma.profile.create({ data: { id: crypto.randomUUID(), email: "b@x.test" } })
+    ).id;
+    const category = await prisma.category.create({
+      data: { slug: "ipa", name: "IPAs", order: 1 },
+    });
+    beerIds = [];
+    for (const slug of ["mare-alta", "ponta-verde", "cupuacu"]) {
+      const beer = await prisma.beer.create({
+        data: {
+          slug,
+          name: slug,
+          style: "American IPA",
+          categoryId: category.id,
+          abv: 5,
+          ibu: 30,
+          volumeMl: 500,
+          priceCents: 3200,
+          stock: 10,
+        },
+      });
+      beerIds.push(beer.id);
+    }
+  });
+
+  afterAll(() => prisma.onModuleDestroy());
+
+  const stored = (index: number, quantity = 1) => ({
+    beerId: beerIds[index] as string,
+    quantity,
+    seenPriceCents: 3200,
+  });
+
+  it("guarda os itens e os devolve na ordem de entrada, não na do id", async () => {
+    await repository.replace(profileId, [stored(2), stored(0, 3), stored(1)]);
+
+    expect(await repository.find(profileId)).toEqual([stored(2), stored(0, 3), stored(1)]);
+  });
+
+  it("substituir troca a Geladeira inteira, sem tocar na de outro perfil, e vazio esvazia", async () => {
+    await repository.replace(profileId, [stored(0), stored(1)]);
+    await repository.replace(otherProfileId, [stored(2, 5)]);
+
+    await repository.replace(profileId, [stored(1, 4)]);
+
+    expect(await repository.find(profileId)).toEqual([stored(1, 4)]);
+    expect(await repository.find(otherProfileId)).toEqual([stored(2, 5)]);
+
+    await repository.replace(profileId, []);
+
+    expect(await repository.find(profileId)).toEqual([]);
+    expect(await repository.find(otherProfileId)).toEqual([stored(2, 5)]);
+  });
+
+  it("perfil sem Geladeira guardada devolve vazio", async () => {
+    expect(await repository.find(profileId)).toEqual([]);
+  });
+
+  it("se a gravação falha no meio, a Geladeira anterior continua intacta", async () => {
+    await repository.replace(profileId, [stored(0, 2)]);
+
+    await expect(repository.replace(profileId, [stored(1), stored(2, 0)])).rejects.toThrow();
+
+    expect(await repository.find(profileId)).toEqual([stored(0, 2)]);
+  });
+
+  it("conta sem perfil não tem onde guardar a Geladeira", async () => {
+    await expect(repository.replace(crypto.randomUUID(), [stored(0)])).rejects.toThrow(
+      FridgeOwnerNotFoundError,
+    );
+  });
+
+  it("PUTs simultâneos da mesma conta não falham: vale uma das gravações inteira, a última a entrar", async () => {
+    await repository.replace(profileId, [stored(0)]);
+    const versions = [
+      [stored(0, 2), stored(1), stored(2)],
+      [stored(2, 3), stored(1, 2)],
+      [stored(1, 4), stored(0, 5), stored(2, 6)],
+      [stored(2), stored(0, 7)],
+      [stored(0, 8), stored(2, 2), stored(1, 3)],
+      [stored(1)],
+    ];
+
+    const results = await Promise.allSettled(versions.map((v) => repository.replace(profileId, v)));
+
+    expect(results.filter((r) => r.status === "rejected")).toEqual([]);
+    expect(versions).toContainEqual(await repository.find(profileId));
+    expect(await prisma.fridge.count()).toBe(1);
+  });
+
+  it("o primeiro PUT da conta, em corrida, também não falha e cria uma só Geladeira", async () => {
+    const versions = [[stored(0, 2), stored(1)], [stored(2, 3)], [stored(1, 4), stored(0)]];
+
+    const results = await Promise.allSettled(versions.map((v) => repository.replace(profileId, v)));
+
+    expect(results.filter((r) => r.status === "rejected")).toEqual([]);
+    expect(versions).toContainEqual(await repository.find(profileId));
+    expect(await prisma.fridge.count()).toBe(1);
+  });
+
+  it("PUTs simultâneos de conta sem perfil recusam todos, sem erro de banco", async () => {
+    const results = await Promise.allSettled(
+      [1, 2, 3].map(() => repository.replace(crypto.randomUUID(), [stored(0)])),
+    );
+
+    for (const result of results) {
+      expect(result).toMatchObject({
+        status: "rejected",
+        reason: expect.any(FridgeOwnerNotFoundError),
+      });
+    }
+  });
+
+  it("update lê a Geladeira, deixa quem chama decidir e grava o que ele devolver; nulo não grava", async () => {
+    await repository.replace(profileId, [stored(0, 2), stored(1)]);
+
+    const seen = await repository.update(profileId, (current) => ({
+      items: current.filter((item) => item.beerId !== beerIds[0]),
+      result: current.length,
+    }));
+
+    expect(seen).toBe(2);
+    expect(await repository.find(profileId)).toEqual([stored(1)]);
+
+    const kept = await repository.update(profileId, () => ({ items: null, result: "intacta" }));
+
+    expect(kept).toBe("intacta");
+    expect(await repository.find(profileId)).toEqual([stored(1)]);
+  });
+
+  it("update de conta sem perfil ou sem Geladeira chama quem decide com a lista vazia", async () => {
+    const lists: unknown[] = [];
+
+    await repository.update(profileId, (current) => {
+      lists.push(current);
+      return { items: null, result: undefined };
+    });
+    await repository.update(crypto.randomUUID(), (current) => {
+      lists.push(current);
+      return { items: null, result: undefined };
+    });
+
+    expect(lists).toEqual([[], []]);
+    expect(await prisma.fridge.count()).toBe(0);
+  });
+
+  it("um PUT que chega no meio de um update espera a vez: a gravação mais nova não é sobrescrita pela versão antiga", async () => {
+    await repository.replace(profileId, [stored(0)]);
+    let releaseDecision: () => void = () => undefined;
+    let markStarted: () => void = () => undefined;
+    const decisionStarted = new Promise<void>((resolve) => (markStarted = resolve));
+    const gate = new Promise<void>((resolve) => (releaseDecision = resolve));
+
+    const updating = repository.update(profileId, async (current) => {
+      markStarted();
+      await gate;
+      return { items: [...current, stored(1)], result: undefined };
+    });
+    await decisionStarted;
+    const replacing = repository.replace(profileId, [stored(2, 9)]);
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    releaseDecision();
+    await Promise.all([updating, replacing]);
+
+    expect(await repository.find(profileId)).toEqual([stored(2, 9)]);
+  });
+});
