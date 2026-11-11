@@ -17,11 +17,12 @@ describe("toGeladeiraResponse", () => {
     });
 
     expect(geladeiraResponseSchema.parse(response)).toEqual(response);
-    expect(response.itens.map((item) => [item.cerveja.nome, item.quantidade, item.totalCentavos]))
-      .toEqual([
-        ["Maré Alta", 2, 6400],
-        ["Cupuaçu Ale", 1, 2650],
-      ]);
+    expect(
+      response.itens.map((item) => [item.cerveja.nome, item.quantidade, item.totalCentavos]),
+    ).toEqual([
+      ["Maré Alta", 2, 6400],
+      ["Cupuaçu Ale", 1, 2650],
+    ]);
     expect(response.quantidadeTotal).toBe(3);
     expect(response.subtotalCentavos).toBe(9050);
   });

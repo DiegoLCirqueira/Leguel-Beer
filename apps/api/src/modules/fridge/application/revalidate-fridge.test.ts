@@ -123,9 +123,7 @@ describe("RevalidateFridge", () => {
     ]);
 
     expect(result.items).toEqual([]);
-    expect(result.adjustments).toEqual([
-      { type: "unavailable", beerId: "nao-existe", name: null },
-    ]);
+    expect(result.adjustments).toEqual([{ type: "unavailable", beerId: "nao-existe", name: null }]);
   });
 
   it("usa o preço atual e avisa quando o preço mudou desde que o cliente viu", async () => {

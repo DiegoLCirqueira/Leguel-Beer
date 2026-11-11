@@ -1,8 +1,4 @@
-import {
-  resumirGeladeira,
-  type AjusteDaGeladeira,
-  type GeladeiraResponse,
-} from "@leguele/shared";
+import { resumirGeladeira, type AjusteDaGeladeira, type GeladeiraResponse } from "@leguele/shared";
 import { toCervejaCard } from "../../catalog/presentation/catalog.mapper.js";
 import type { FridgeAdjustment, FridgeRevalidation } from "../domain/fridge-revalidation.js";
 
