@@ -126,6 +126,19 @@ describe("RevalidateFridge", () => {
     expect(result.adjustments).toEqual([{ type: "unavailable", beerId: "nao-existe", name: null }]);
   });
 
+  it("reconhece o id em maiúsculas: o UUID é o mesmo e o aviso devolve o id em minúsculas", async () => {
+    const mareAlta = makeBeer({ id: "0a1b2c3d-0000-4000-8000-00000000abcd", priceCents: 3200 });
+    const lookup = new InMemoryFridgeBeerLookup().add(mareAlta);
+
+    const result = await new RevalidateFridge(lookup).execute([
+      { beerId: mareAlta.id.toUpperCase(), quantity: 2, seenPriceCents: 3200 },
+      { beerId: "NAO-EXISTE", quantity: 1, seenPriceCents: 3200 },
+    ]);
+
+    expect(result.items).toEqual([{ beer: mareAlta, quantity: 2 }]);
+    expect(result.adjustments).toEqual([{ type: "unavailable", beerId: "nao-existe", name: null }]);
+  });
+
   it("usa o preço atual e avisa quando o preço mudou desde que o cliente viu", async () => {
     const mareAlta = makeBeer({ name: "Maré Alta", priceCents: 3000, stock: 10 });
     const lookup = new InMemoryFridgeBeerLookup().add(mareAlta);
