@@ -9,6 +9,7 @@ export { CategoryChips } from "./category-chips";
 export { Campo } from "./campo";
 export { DivisorOu } from "./divisor-ou";
 export { ESTILO_BOTAO_VOLTAR } from "./estilo-botao-voltar";
+export { LinkGeladeira } from "./link-geladeira";
 export { LojaHeader } from "./loja-header";
 export { LojaTabBar } from "./loja-tab-bar";
 export { OlhoDaSenha } from "./olho-da-senha";
