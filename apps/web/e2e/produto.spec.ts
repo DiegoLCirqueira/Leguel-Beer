@@ -98,3 +98,52 @@ test("em 195x422 (zoom de 200%) não há rolagem horizontal e o botão fixo segu
     ratio: 1,
   });
 });
+
+test("/catalogo/destaques não é cerveja: mostra Cerveja não encontrada, não erro", async ({
+  page,
+}) => {
+  await page.goto("/catalogo/destaques");
+
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Cerveja não encontrada" }),
+  ).toBeVisible();
+  await expect(page.getByRole("alert")).toHaveCount(0);
+});
+
+test("Voltar da página de produto volta ao catálogo quando veio dele", async ({ page }) => {
+  await page.goto("/catalogo");
+  await page.getByRole("link", { name: "Maré Alta" }).click();
+  await expect(page).toHaveURL(/\/catalogo\/mare-alta$/);
+
+  await page.getByRole("link", { name: "Voltar" }).click();
+
+  await expect(page).toHaveURL(/\/catalogo$/);
+});
+
+test("Voltar volta à home para quem abriu a cerveja pelos destaques", async ({
+  page,
+  context,
+  baseURL,
+}) => {
+  await context.addCookies([
+    { name: "leguele_convidado", value: "1", url: baseURL ?? "http://localhost:3000" },
+  ]);
+  await page.goto("/");
+  await page
+    .getByRole("region", { name: "Cervejas em destaque" })
+    .getByRole("link", { name: "Maré Alta" })
+    .click();
+  await expect(page).toHaveURL(/\/catalogo\/mare-alta$/);
+
+  await page.getByRole("link", { name: "Voltar" }).click();
+
+  await expect(page).toHaveURL(/localhost:\d+\/$/);
+});
+
+test("Voltar em link direto (sem página anterior do site) vai ao catálogo", async ({ page }) => {
+  await page.goto("/catalogo/mare-alta");
+
+  await page.getByRole("link", { name: "Voltar" }).click();
+
+  await expect(page).toHaveURL(/\/catalogo$/);
+});
