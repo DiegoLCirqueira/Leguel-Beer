@@ -23,12 +23,12 @@ class GeladeiraRequestDto extends zodDto(geladeiraRequestSchema) {}
 const jsonSchema = (schema: z.ZodType, io: "input" | "output"): SchemaObject =>
   z.toJSONSchema(schema, { io, unrepresentable: "any" }) as SchemaObject;
 
-@Public()
 @ApiTags("geladeira")
 @Controller("geladeira")
 export class FridgeController {
   constructor(private readonly revalidateFridge: RevalidateFridge) {}
 
+  @Public()
   @Post("validar")
   @HttpCode(200)
   @ApiOperation({
