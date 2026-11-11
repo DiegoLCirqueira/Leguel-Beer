@@ -35,4 +35,38 @@ describe("SaveAccountFridge", () => {
       "price-changed",
     ]);
   });
+
+  it("repetir o mesmo envio dá o mesmo resultado e a mesma Geladeira guardada", async () => {
+    const mareAlta = makeBeer({ name: "Maré Alta", priceCents: 3000, stock: 1 });
+    const repository = new InMemoryAccountFridgeRepository();
+    const save = new SaveAccountFridge(
+      new RevalidateFridge(new InMemoryFridgeBeerLookup().add(mareAlta)),
+      repository,
+    );
+    const entries = [{ beerId: mareAlta.id, quantity: 3, seenPriceCents: 3200 }];
+
+    const first = await save.execute("perfil-1", entries);
+    const stored = await repository.find("perfil-1");
+    const second = await save.execute("perfil-1", entries);
+
+    expect(second).toEqual(first);
+    expect(await repository.find("perfil-1")).toEqual(stored);
+  });
+
+  it("enviar a Geladeira vazia esvazia a guardada, sem tocar na de outra conta", async () => {
+    const mareAlta = makeBeer({ priceCents: 3200 });
+    const repository = new InMemoryAccountFridgeRepository();
+    const save = new SaveAccountFridge(
+      new RevalidateFridge(new InMemoryFridgeBeerLookup().add(mareAlta)),
+      repository,
+    );
+    const entries = [{ beerId: mareAlta.id, quantity: 1, seenPriceCents: 3200 }];
+    await save.execute("perfil-1", entries);
+    await save.execute("perfil-2", entries);
+
+    await save.execute("perfil-1", []);
+
+    expect(await repository.find("perfil-1")).toEqual([]);
+    expect(await repository.find("perfil-2")).toHaveLength(1);
+  });
 });
