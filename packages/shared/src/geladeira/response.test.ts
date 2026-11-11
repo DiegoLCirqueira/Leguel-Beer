@@ -38,4 +38,10 @@ describe("geladeiraResponseSchema", () => {
       false,
     );
   });
+
+  it("recusa o subtotal que não é a soma dos totais das linhas", () => {
+    expect(geladeiraResponseSchema.safeParse({ ...resposta, subtotalCentavos: 9000 }).success).toBe(
+      false,
+    );
+  });
 });
