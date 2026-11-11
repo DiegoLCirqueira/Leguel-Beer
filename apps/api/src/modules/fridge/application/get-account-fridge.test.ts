@@ -39,4 +39,21 @@ describe("GetAccountFridge", () => {
     expect(second.adjustments).toEqual([]);
     expect(second.items).toEqual(first.items);
   });
+
+  it("não grava nada quando a revalidação não ajusta nada", async () => {
+    const mareAlta = makeBeer({ priceCents: 3200, stock: 10 });
+    const repository = new InMemoryAccountFridgeRepository();
+    await repository.replace("perfil-1", [
+      { beerId: mareAlta.id, quantity: 2, seenPriceCents: 3200 },
+    ]);
+    const writesBefore = repository.replaceCalls;
+
+    const result = await new GetAccountFridge(
+      new RevalidateFridge(new InMemoryFridgeBeerLookup().add(mareAlta)),
+      repository,
+    ).execute("perfil-1");
+
+    expect(result.items).toEqual([{ beer: mareAlta, quantity: 2 }]);
+    expect(repository.replaceCalls).toBe(writesBefore);
+  });
 });
