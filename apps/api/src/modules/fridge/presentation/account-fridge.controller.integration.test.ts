@@ -218,4 +218,27 @@ describe("GET e PUT /me/geladeira (banco real)", () => {
     expect(zero.body.details[0].field).toBe("itens.0.quantidade");
     expect(await prisma.fridge.count()).toBe(0);
   });
+
+  it("PUTs e GETs simultâneos da mesma conta respondem todos 200 e a Geladeira fica com uma das versões", async () => {
+    const mareAlta = await addBeer("mare-alta");
+    const cupuacu = await addBeer("cupuacu-ale");
+    const versions = [
+      [entry(mareAlta, 2), entry(cupuacu, 1)],
+      [entry(cupuacu, 4), entry(mareAlta, 3)],
+      [entry(mareAlta, 5)],
+    ];
+
+    const responses = await Promise.all([
+      ...versions.map((itens) => put(tokens.customer(), { itens })),
+      get(tokens.customer()),
+      get(tokens.customer()),
+    ]);
+
+    expect(responses.map((r) => r.status)).toEqual([200, 200, 200, 200, 200]);
+    const final = geladeiraResponseSchema.parse((await get(tokens.customer())).body);
+    expect(versions.map((itens) => itens.map((i) => [i.cervejaId, i.quantidade]))).toContainEqual(
+      final.itens.map((i) => [i.cerveja.id, i.quantidade]),
+    );
+    expect(await prisma.fridge.count()).toBe(1);
+  });
 });
