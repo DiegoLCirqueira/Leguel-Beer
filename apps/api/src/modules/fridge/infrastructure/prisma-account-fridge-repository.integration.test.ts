@@ -54,4 +54,10 @@ describe("PrismaAccountFridgeRepository (banco real)", () => {
 
     expect(await repository.find(profileId)).toEqual([stored(2), stored(0, 3), stored(1)]);
   });
+
+  it("conta sem perfil não tem onde guardar a Geladeira", async () => {
+    await expect(repository.replace(crypto.randomUUID(), [stored(0)])).rejects.toThrow(
+      FridgeOwnerNotFoundError,
+    );
+  });
 });
