@@ -29,6 +29,19 @@ describe("RevalidateFridge", () => {
     ]);
   });
 
+  it("tira a cerveja que não existe e avisa sem nome, porque não há o que mostrar", async () => {
+    const lookup = new InMemoryFridgeBeerLookup().add(makeBeer());
+
+    const result = await new RevalidateFridge(lookup).execute([
+      { beerId: "nao-existe", quantity: 1, seenPriceCents: 3200 },
+    ]);
+
+    expect(result.items).toEqual([]);
+    expect(result.adjustments).toEqual([
+      { type: "unavailable", beerId: "nao-existe", name: null },
+    ]);
+  });
+
   it("usa o preço atual e avisa quando o preço mudou desde que o cliente viu", async () => {
     const mareAlta = makeBeer({ name: "Maré Alta", priceCents: 3000, stock: 10 });
     const lookup = new InMemoryFridgeBeerLookup().add(mareAlta);
