@@ -89,7 +89,7 @@ Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adic
 
 ### Política de Privacidade (`/privacidade`)
 
-1. **Quais dados coletamos.** Os que você informa ao criar a conta (nome, e-mail, telefone e senha) e, quando usar o checkout, endereço de entrega. A senha é guardada pelo serviço de autenticação apenas como hash; ninguém do projeto tem acesso a ela.
+1. **Quais dados coletamos.** Os que você informa ao criar a conta (nome, e-mail, telefone e senha) e, quando usar o checkout, endereço de entrega. A senha é guardada pelo serviço de autenticação apenas como hash; ninguém do projeto tem acesso a ela. Também guardamos as cervejas e as quantidades que você coloca na Geladeira: com a conta, elas ficam salvas na conta, para a Geladeira valer em outros aparelhos, e o navegador guarda uma cópia que é apagada quando você sai da conta; sem conta, ficam só no armazenamento do navegador deste aparelho.
 2. **Para que usamos.** Só para o funcionamento do site: entrar na conta, simular pedidos e enviar e-mails da conta (confirmação de cadastro e recuperação de senha).
 3. **Com quem compartilhamos.** Com os serviços que hospedam o site, o banco de dados, a autenticação e o envio de e-mails, só na medida necessária para o site funcionar. Não vendemos nem cedemos dados a terceiros.
 4. **Cookies.** Usamos cookies necessários: a confirmação de maioridade (30 dias) e a sessão da conta.
@@ -133,6 +133,10 @@ Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adic
 ### Decisões do Diego (2026-10-30)
 
 - **Sem aviso de portfólio:** "quero que retire o 'Projeto de portfóio pagamentos em modo de teste', isso não deve aparecer em lugar algum já que é desnecessário". Saem a faixa do topo, a nota do rodapé e o item "Projeto de portfólio." de Entregas. O rodapé e as páginas legais continuam, e a empresa segue marcada como fictícia.
+
+### Decisões do Diego (2026-11-11)
+
+- **Geladeira na Política de Privacidade (opção A, LGPD):** "Quais dados coletamos" passa a citar as cervejas e as quantidades da Geladeira: salvas na conta do cliente logado, para valer em outros aparelhos, com cópia no navegador apagada ao sair; do convidado, só no armazenamento do navegador. Origem: pendência 1 de [[geladeira]]. O texto espelhado no site e a data de "última atualização" de `/privacidade` são acertados pelo Front no código.
 
 ### Decisões do Diego (2026-11-08)
 
