@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { marcarNavegouNoSite } from "@/lib/navegacao";
 import { ProdutoHeader } from "./produto-header";
 
 describe("ProdutoHeader", () => {
@@ -28,12 +29,24 @@ describe("ProdutoHeader", () => {
       Object.defineProperty(document, "referrer", { value: valor, configurable: true });
     afterEach(() => {
       definirReferrer("");
+      sessionStorage.clear();
       vi.restoreAllMocks();
     });
 
     it("volta pelo histórico quando a pessoa chegou de uma página do próprio site (ex.: a home)", async () => {
       const voltar = vi.spyOn(window.history, "back").mockImplementation(() => undefined);
       definirReferrer(`${window.location.origin}/`);
+      render(<ProdutoHeader count={0} />);
+
+      await userEvent.click(screen.getByRole("link", { name: "Voltar" }));
+
+      expect(voltar).toHaveBeenCalledOnce();
+    });
+
+    it("volta pelo histórico quando houve navegação dentro do app, mesmo sem referrer (a home abriu direto)", async () => {
+      const voltar = vi.spyOn(window.history, "back").mockImplementation(() => undefined);
+      definirReferrer("");
+      marcarNavegouNoSite();
       render(<ProdutoHeader count={0} />);
 
       await userEvent.click(screen.getByRole("link", { name: "Voltar" }));
