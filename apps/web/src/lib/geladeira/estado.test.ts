@@ -1,10 +1,13 @@
-import type { CervejaCard } from "@leguele/shared";
+import type { CervejaCard, GeladeiraResponse } from "@leguele/shared";
 import { describe, expect, it } from "vitest";
 import {
   GELADEIRA_VAZIA,
   adicionar,
   alterarQuantidade,
+  aplicarResposta,
+  desfazer,
   paraRequest,
+  remover,
   quantidadeTotal,
 } from "./estado";
 
@@ -115,5 +118,69 @@ describe("quantidadeTotal e paraRequest", () => {
 
   it("Geladeira vazia soma 0", () => {
     expect(quantidadeTotal(GELADEIRA_VAZIA)).toBe(0);
+  });
+});
+
+describe("remover e desfazer", () => {
+  const tres = () => {
+    let { estado } = adicionar(GELADEIRA_VAZIA, cerveja("a"), 2);
+    ({ estado } = adicionar(estado, cerveja("b")));
+    ({ estado } = adicionar(estado, cerveja("c"), 3));
+    return estado;
+  };
+
+  it("remover tira a cerveja e guarda o que precisa para desfazer, com a posição", () => {
+    const { estado, desfazer: d } = remover(tres(), "b");
+
+    expect(estado.itens.map((i) => i.cerveja.id)).toEqual(["a", "c"]);
+    expect(d?.posicao).toBe(1);
+    expect(d?.item.quantidade).toBe(1);
+  });
+
+  it("desfazer devolve a cerveja com a quantidade e na mesma posição", () => {
+    const { estado, desfazer: d } = remover(tres(), "a");
+
+    const volta = desfazer(estado, d!);
+
+    expect(volta.itens.map((i) => [i.cerveja.id, i.quantidade])).toEqual([
+      ["a", 2],
+      ["b", 1],
+      ["c", 3],
+    ]);
+  });
+
+  it("remover cerveja que não está na Geladeira não muda nada e não há o que desfazer", () => {
+    const antes = tres();
+
+    const { estado, desfazer: d } = remover(antes, "x");
+
+    expect(estado).toEqual(antes);
+    expect(d).toBeNull();
+  });
+});
+
+describe("aplicarResposta", () => {
+  it("a Geladeira passa a ser a que a API devolveu: itens validados, na ordem de entrada, sem os removidos", () => {
+    const a = cerveja("a", { precoCentavos: 3000 });
+    const c = cerveja("c");
+    let { estado } = adicionar(GELADEIRA_VAZIA, cerveja("a"), 2);
+    ({ estado } = adicionar(estado, cerveja("b")));
+    ({ estado } = adicionar(estado, c));
+    const resposta: GeladeiraResponse = {
+      itens: [
+        { cerveja: a, quantidade: 2, totalCentavos: 6000 },
+        { cerveja: c, quantidade: 1, totalCentavos: 3200 },
+      ],
+      ajustes: [],
+      quantidadeTotal: 3,
+      subtotalCentavos: 9200,
+    };
+
+    const novo = aplicarResposta(estado, resposta);
+
+    expect(novo.itens.map((i) => [i.cerveja.id, i.cerveja.precoCentavos, i.quantidade])).toEqual([
+      ["a", 3000, 2],
+      ["c", 3200, 1],
+    ]);
   });
 });

@@ -3,6 +3,7 @@ import {
   QUANTIDADE_MAXIMA_POR_ITEM,
   type CervejaCard,
   type GeladeiraRequest,
+  type GeladeiraResponse,
 } from "@leguele/shared";
 
 export type ItemLocal = { cerveja: CervejaCard; quantidade: number };
@@ -71,4 +72,27 @@ export function paraRequest(estado: EstadoDaGeladeira): GeladeiraRequest {
       precoVistoCentavos: i.cerveja.precoCentavos,
     })),
   };
+}
+
+export type Desfazer = { item: ItemLocal; posicao: number };
+
+export function remover(
+  estado: EstadoDaGeladeira,
+  cervejaId: string,
+): { estado: EstadoDaGeladeira; desfazer: Desfazer | null } {
+  void cervejaId;
+  return { estado, desfazer: null };
+}
+
+export function desfazer(estado: EstadoDaGeladeira, d: Desfazer): EstadoDaGeladeira {
+  void d;
+  return estado;
+}
+
+export function aplicarResposta(
+  estado: EstadoDaGeladeira,
+  resposta: GeladeiraResponse,
+): EstadoDaGeladeira {
+  void resposta;
+  return estado;
 }
