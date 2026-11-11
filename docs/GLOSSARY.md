@@ -1,6 +1,6 @@
 ---
 tipo: glossario
-atualizado: 2026-10-29
+atualizado: 2026-11-10
 tags:
   - glossario
 ---
@@ -76,3 +76,15 @@ _Evite_: menu de categorias, abas
 **Geladeira**:
 O carrinho da loja, exibido como uma geladeira com uma prateleira por categoria. Ver [[geladeira]].
 _Evite_: carrinho, sacola, cesta
+
+**Prateleira**:
+Faixa da Geladeira que guarda as cervejas de uma categoria, na ordem das categorias do catálogo. Ver [[geladeira]].
+_Evite_: seção, linha
+
+**Garrafa fantasma**:
+Silhueta tracejada com "+" numa posição livre da prateleira; ao tocar, abre o catálogo filtrado pela categoria da prateleira. Ver [[geladeira]].
+_Evite_: placeholder, slot vazio
+
+**Revalidação**:
+Conferência da Geladeira pela API (preço, cerveja ativa e quantidade disponível) ao abrir a Geladeira e ao iniciar o checkout; o que muda vira um aviso para o cliente. Ver [[geladeira]].
+_Evite_: sincronização (quando se quer dizer a conferência de preço e estoque)
