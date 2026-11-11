@@ -24,4 +24,16 @@ describe("itemValidadoSchema", () => {
   it("aceita a cerveja, a quantidade e o total da linha", () => {
     expect(itemValidadoSchema.parse(item)).toEqual(item);
   });
+
+  it.each([0, 6])("recusa a quantidade %i: vai de 1 até a quantidade disponível (5)", (quantidade) => {
+    const invalido = { ...item, quantidade, totalCentavos: quantidade * 3200 };
+
+    expect(itemValidadoSchema.safeParse(invalido).success).toBe(false);
+  });
+
+  it("aceita a quantidade igual à disponível", () => {
+    const noLimite = { ...item, quantidade: 5, totalCentavos: 16000 };
+
+    expect(itemValidadoSchema.safeParse(noLimite).success).toBe(true);
+  });
 });
