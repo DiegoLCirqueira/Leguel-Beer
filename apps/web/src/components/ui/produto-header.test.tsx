@@ -1,7 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { marcarNavegouNoSite } from "@/lib/navegacao";
 import { ProdutoHeader } from "./produto-header";
 
 describe("ProdutoHeader", () => {
@@ -25,17 +24,24 @@ describe("ProdutoHeader", () => {
   });
 
   describe("Voltar", () => {
-    const definirReferrer = (valor: string) =>
-      Object.defineProperty(document, "referrer", { value: valor, configurable: true });
+    const origem = window.location.origin;
+    const definir = (referrer: string, historico: number, carga?: string) => {
+      Object.defineProperty(document, "referrer", { value: referrer, configurable: true });
+      Object.defineProperty(window.history, "length", { value: historico, configurable: true });
+      vi.spyOn(performance, "getEntriesByType").mockReturnValue(
+        carga ? ([{ name: `${origem}${carga}` }] as unknown as PerformanceEntryList) : [],
+      );
+    };
     afterEach(() => {
-      definirReferrer("");
-      sessionStorage.clear();
+      Object.defineProperty(document, "referrer", { value: "", configurable: true });
+      window.history.pushState({}, "", "/");
       vi.restoreAllMocks();
     });
 
-    it("volta pelo histórico quando a pessoa chegou de uma página do próprio site (ex.: a home)", async () => {
+    it("depois de navegar no app (a página atual não é a da carga) volta pelo histórico", async () => {
       const voltar = vi.spyOn(window.history, "back").mockImplementation(() => undefined);
-      definirReferrer(`${window.location.origin}/`);
+      window.history.pushState({}, "", "/catalogo/mare-alta");
+      definir("", 3, "/");
       render(<ProdutoHeader count={0} />);
 
       await userEvent.click(screen.getByRole("link", { name: "Voltar" }));
@@ -43,23 +49,38 @@ describe("ProdutoHeader", () => {
       expect(voltar).toHaveBeenCalledOnce();
     });
 
-    it("volta pelo histórico quando houve navegação dentro do app, mesmo sem referrer (a home abriu direto)", async () => {
+    it("aba nova (histórico de 1) cai no catálogo: o botão não fica morto", async () => {
       const voltar = vi.spyOn(window.history, "back").mockImplementation(() => undefined);
-      definirReferrer("");
-      marcarNavegouNoSite();
+      definir(`${origem}/`, 1);
       render(<ProdutoHeader count={0} />);
 
-      await userEvent.click(screen.getByRole("link", { name: "Voltar" }));
+      const link = screen.getByRole("link", { name: "Voltar" });
+      expect(link).toHaveAttribute("href", "/catalogo");
+      await userEvent.click(link);
 
-      expect(voltar).toHaveBeenCalledOnce();
+      expect(voltar).not.toHaveBeenCalled();
     });
 
-    it("sem página anterior do site (link direto) segue o link de reserva para o catálogo", async () => {
+    it("link direto, sem página anterior do site, segue o link para o catálogo", async () => {
       const voltar = vi.spyOn(window.history, "back").mockImplementation(() => undefined);
-      definirReferrer("https://outro-site.test/");
+      definir("", 4);
       render(<ProdutoHeader count={0} />);
 
       await userEvent.click(screen.getByRole("link", { name: "Voltar" }));
+
+      expect(voltar).not.toHaveBeenCalled();
+    });
+
+    it("Ctrl ou Cmd e clique do meio deixam o navegador abrir o link, sem voltar na história", async () => {
+      const voltar = vi.spyOn(window.history, "back").mockImplementation(() => undefined);
+      window.history.pushState({}, "", "/catalogo/mare-alta");
+      definir("", 3, "/");
+      render(<ProdutoHeader count={0} />);
+      const link = screen.getByRole("link", { name: "Voltar" });
+
+      fireEvent.click(link, { ctrlKey: true });
+      fireEvent.click(link, { metaKey: true });
+      fireEvent.click(link, { button: 1 });
 
       expect(voltar).not.toHaveBeenCalled();
     });
