@@ -38,6 +38,21 @@ describe("API pública de @leguele/shared", () => {
     );
   });
 
+  it("exporta o contrato da Geladeira: schemas, limites e o resumo", () => {
+    expect(Object.keys(shared)).toEqual(
+      expect.arrayContaining([
+        "QUANTIDADE_MAXIMA_POR_ITEM",
+        "ITENS_MAXIMOS_NA_GELADEIRA",
+        "itemDaGeladeiraSchema",
+        "geladeiraRequestSchema",
+        "ajusteDaGeladeiraSchema",
+        "itemValidadoSchema",
+        "geladeiraResponseSchema",
+        "resumirGeladeira",
+      ]),
+    );
+  });
+
   it("exporta os tipos do contrato do catálogo", () => {
     expectTypeOf<OrdemDoCatalogo>().toEqualTypeOf<
       "relevancia" | "menor-preco" | "maior-preco" | "mais-novas"

@@ -1,0 +1,2 @@
+export const QUANTIDADE_MAXIMA_POR_ITEM = 99;
+export const ITENS_MAXIMOS_NA_GELADEIRA = 50;
