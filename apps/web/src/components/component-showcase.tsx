@@ -4,14 +4,18 @@ import type { CervejaCard } from "@leguele/shared";
 import { ArrowRight, Link2, Lock, UserRound } from "lucide-react";
 import { useState } from "react";
 import {
+  BarraFixa,
+  BlocoDePreco,
   BottomSheet,
   Button,
   CardCerveja,
   Campo,
+  CervejaNaoEncontrada,
   CategoryChips,
   DivisorOu,
   LojaHeader,
   LojaTabBar,
+  ProdutoHeader,
   Stepper,
   Skeleton,
   StyleBadge,
@@ -136,6 +140,16 @@ export function ComponentShowcase() {
         <div className="relative h-16 overflow-hidden rounded-2xl border border-borda">
           <LojaTabBar className="absolute" />
         </div>
+      </Section>
+      <Section title="Página de produto: preço, cabeçalho, barra fixa e não encontrada">
+        <BlocoDePreco precoCentavos={3200} precoAnteriorCentavos={3690} descontoPercentual={13} />
+        <ProdutoHeader count={3} />
+        <div className="relative h-24 overflow-hidden rounded-2xl border border-borda">
+          <BarraFixa className="absolute">
+            <Button disabled>Adicionar à geladeira</Button>
+          </BarraFixa>
+        </div>
+        <CervejaNaoEncontrada />
       </Section>
       <Section title="Card de cerveja (disponível e esgotado) e stepper">
         <div className="grid grid-cols-1 gap-3 min-[360px]:grid-cols-2">

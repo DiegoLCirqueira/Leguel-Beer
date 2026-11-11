@@ -69,6 +69,15 @@ describe("/dev/tokens", () => {
     expect(screen.getByTestId("exemplo-skeleton")).toBeInTheDocument();
   });
 
+  it("mostra o bloco de preço com desconto, o cabeçalho do produto, a barra fixa e o estado não encontrado", () => {
+    render(<DevTokens />);
+
+    expect(screen.getByText("-13%")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Geladeira, 3 itens" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Adicionar à geladeira" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Cerveja não encontrada" })).toBeInTheDocument();
+  });
+
   it("em produção não existe", () => {
     vi.stubEnv("NODE_ENV", "production");
 

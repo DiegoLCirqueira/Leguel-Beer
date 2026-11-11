@@ -66,6 +66,7 @@ const PAGINAS: Pagina[] = [
   },
   { nome: "criar conta", caminho: "/criar-conta", precisaMaioridade: true },
   { nome: "catálogo", caminho: "/catalogo", precisaMaioridade: true },
+  { nome: "produto", caminho: "/catalogo/mare-alta", precisaMaioridade: true },
   { nome: "recuperar senha", caminho: "/recuperar-senha", precisaMaioridade: true },
   {
     nome: "nova senha",
@@ -139,9 +140,14 @@ async function medir(page: Page) {
         if (a.contains(b) || b.contains(a)) continue;
         const ra = a.getBoundingClientRect();
         const rb = b.getBoundingClientRect();
-        // Barra fixa da loja: cobre parte do conteúdo em qualquer posição de rolagem, e ao rolar até o
+        // Barra fixa (menu da loja ou botão do produto): cobre parte do conteúdo em qualquer posição de rolagem, e ao rolar até o
         // fim os controles ficam acima dela (conferido em loja-layout.spec.ts).
-        const fixo = (e: Element) => e.closest("nav[aria-label='Menu da loja']") !== null;
+        const fixo = (e: Element) => {
+          for (let no: Element | null = e; no; no = no.parentElement) {
+            if (getComputedStyle(no).position === "fixed") return true;
+          }
+          return false;
+        };
         if (fixo(a) !== fixo(b)) continue;
         const largura = Math.min(ra.right, rb.right) - Math.max(ra.left, rb.left);
         const altura = Math.min(ra.bottom, rb.bottom) - Math.max(ra.top, rb.top);
