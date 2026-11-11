@@ -62,4 +62,54 @@ describe("regras do schema da Geladeira da conta (banco real)", () => {
       [beerIds[0], 3, 3200, 1],
     ]);
   });
+
+  it("recusa uma segunda Geladeira para o mesmo perfil", async () => {
+    await prisma.fridge.create({ data: { profileId } });
+
+    await expect(prisma.fridge.create({ data: { profileId } })).rejects.toThrow();
+  });
+
+  it.each([0, -1])(
+    "recusa a quantidade %i: quantidade é sempre maior que zero",
+    async (quantity) => {
+      await expect(
+        prisma.fridge.create({ data: { profileId, items: { create: [item(0, { quantity })] } } }),
+      ).rejects.toThrow();
+    },
+  );
+
+  it("recusa o preço visto negativo e aceita zero", async () => {
+    await expect(
+      prisma.fridge.create({
+        data: { profileId, items: { create: [item(0, { seenPriceCents: -1 })] } },
+      }),
+    ).rejects.toThrow();
+
+    await prisma.fridge.create({
+      data: { profileId, items: { create: [item(0, { seenPriceCents: 0 })] } },
+    });
+  });
+
+  it("recusa a mesma cerveja duas vezes e a mesma posição duas vezes na mesma Geladeira", async () => {
+    await expect(
+      prisma.fridge.create({
+        data: { profileId, items: { create: [item(0), item(0, { position: 1 })] } },
+      }),
+    ).rejects.toThrow();
+    await expect(
+      prisma.fridge.create({
+        data: { profileId, items: { create: [item(0), item(1, { position: 0 })] } },
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("apagar o perfil apaga a Geladeira e os itens; apagar cerveja que está numa Geladeira é recusado", async () => {
+    await prisma.fridge.create({ data: { profileId, items: { create: [item(0)] } } });
+
+    await expect(prisma.beer.delete({ where: { id: beerIds[0] as string } })).rejects.toThrow();
+
+    await prisma.profile.delete({ where: { id: profileId } });
+    expect(await prisma.fridge.count()).toBe(0);
+    expect(await prisma.fridgeItem.count()).toBe(0);
+  });
 });
