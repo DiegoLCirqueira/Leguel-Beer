@@ -21,8 +21,13 @@ export class RevalidateFridge {
     const items: ValidatedItem[] = [];
     const adjustments: FridgeAdjustment[] = [];
     for (const entry of entries) {
-      const beer = found.find((candidate) => candidate.beer.id === entry.beerId)?.beer;
-      if (!beer) continue;
+      const match = found.find((candidate) => candidate.beer.id === entry.beerId);
+      if (!match) continue;
+      const { beer } = match;
+      if (!match.active) {
+        adjustments.push({ type: "unavailable", beerId: beer.id, name: beer.name });
+        continue;
+      }
       if (beer.priceCents !== entry.seenPriceCents) {
         adjustments.push({
           type: "price-changed",
