@@ -51,4 +51,43 @@ describe("destinoDoVoltar", () => {
       destinoDoVoltar({ referrer: "", origem, tamanhoDoHistorico: 1, navegouNoSite: true }),
     ).toBe("/boas-vindas");
   });
+
+  describe("destino de reserva por parâmetro", () => {
+    it("sem página anterior do site o destino é a reserva pedida (ex.: o catálogo no produto)", () => {
+      expect(
+        destinoDoVoltar({ referrer: "", origem, tamanhoDoHistorico: 1, reserva: "/catalogo" }),
+      ).toBe("/catalogo");
+      expect(
+        destinoDoVoltar({
+          referrer: `${origem}/`,
+          origem,
+          tamanhoDoHistorico: 1,
+          reserva: "/catalogo",
+        }),
+      ).toBe("/catalogo");
+    });
+
+    it("aba nova com um só item no histórico cai na reserva, mesmo depois de navegar no site", () => {
+      expect(
+        destinoDoVoltar({
+          referrer: "",
+          origem,
+          tamanhoDoHistorico: 1,
+          navegouNoSite: true,
+          reserva: "/catalogo",
+        }),
+      ).toBe("/catalogo");
+    });
+
+    it("quem veio do site e tem para onde voltar volta na história, qualquer que seja a reserva", () => {
+      expect(
+        destinoDoVoltar({
+          referrer: `${origem}/`,
+          origem,
+          tamanhoDoHistorico: 3,
+          reserva: "/catalogo",
+        }),
+      ).toBe("voltar");
+    });
+  });
 });

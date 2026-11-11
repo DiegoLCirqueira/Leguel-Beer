@@ -26,6 +26,7 @@ export { calcularDesconto } from "./catalogo/desconto.js";
 export { cervejaDetalheSchema } from "./catalogo/detalhe.js";
 export type { CervejaDetalhe } from "./catalogo/detalhe.js";
 export { estoqueBaixo, LIMIAR_ESTOQUE_BAIXO } from "./catalogo/estoque.js";
+export { SLUGS_RESERVADOS, slugReservado } from "./catalogo/slugs-reservados.js";
 export { faixasDeFiltro, pertenceAFaixa } from "./catalogo/faixas.js";
 export type { Faixa } from "./catalogo/faixas.js";
 export { catalogoQuerySchema, ORDENS_DO_CATALOGO } from "./catalogo/query.js";

@@ -91,4 +91,11 @@ describe("buscarCerveja", () => {
       vi.useRealTimers();
     }
   });
+
+  it("destaques é slug reservado da API: vira não encontrada sem nem perguntar à API", async () => {
+    const resultado = await buscarCerveja("destaques");
+
+    expect(resultado).toEqual({ tipo: "nao-encontrada" });
+    expect(fetchFalso).not.toHaveBeenCalled();
+  });
 });

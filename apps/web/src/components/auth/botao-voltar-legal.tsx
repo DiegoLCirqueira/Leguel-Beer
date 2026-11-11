@@ -3,8 +3,9 @@
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useSyncExternalStore, type MouseEvent } from "react";
-import { destinoDoVoltar, type DestinoDoVoltar } from "@/lib/destino-do-voltar";
-import { ESTILO_BOTAO_VOLTAR } from "./botao-voltar";
+import { type DestinoDoVoltar } from "@/lib/destino-do-voltar";
+import { destinoNoNavegador } from "@/lib/destino-no-navegador";
+import { ESTILO_BOTAO_VOLTAR } from "@/components/ui";
 
 /**
  * Botão de voltar das páginas legais (termos, privacidade e entregas), no topo da página. Volta na
@@ -14,20 +15,7 @@ import { ESTILO_BOTAO_VOLTAR } from "./botao-voltar";
  */
 const semAssinatura = () => () => {};
 const noServidor = (): DestinoDoVoltar => "/boas-vindas";
-// O documento aberto de verdade (carga da página) é o da entrada de navegação; se a página atual tem
-// outro caminho, a pessoa chegou por uma navegação dentro do site e o referrer não vale.
-function navegouNoSite(): boolean {
-  const [carga] = performance.getEntriesByType("navigation");
-  return carga ? new URL(carga.name).pathname !== window.location.pathname : false;
-}
-
-const noNavegador = (): DestinoDoVoltar =>
-  destinoDoVoltar({
-    referrer: document.referrer,
-    origem: window.location.origin,
-    tamanhoDoHistorico: window.history.length,
-    navegouNoSite: navegouNoSite(),
-  });
+const noNavegador = (): DestinoDoVoltar => destinoNoNavegador();
 
 export function BotaoVoltarLegal() {
   // O destino depende do navegador (referrer e história): no servidor vale a boas-vindas.
