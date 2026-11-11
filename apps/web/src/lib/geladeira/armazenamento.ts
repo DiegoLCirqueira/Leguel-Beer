@@ -63,6 +63,7 @@ export function gravarGeladeiraLocal(estado: EstadoDaGeladeira): void {
 export function apagarGeladeiraLocal(): void {
   try {
     window.localStorage.removeItem(CHAVE_DA_GELADEIRA);
+    window.localStorage.removeItem(CHAVE_PENDENTE);
   } catch {
     // Armazenamento bloqueado: não há cópia para apagar.
   }
@@ -73,11 +74,18 @@ export const CHAVE_PENDENTE = "lb:geladeira-pendente";
 
 /** Marcas de sincronização (só nesta aba/aparelho): a Geladeira daqui já foi da conta; há envio pendente. */
 export function lerMarca(chave: string): boolean {
-  void chave;
-  return false;
+  try {
+    return window.localStorage.getItem(chave) === "1";
+  } catch {
+    return false;
+  }
 }
 
 export function gravarMarca(chave: string, ligada: boolean): void {
-  void chave;
-  void ligada;
+  try {
+    if (ligada) window.localStorage.setItem(chave, "1");
+    else window.localStorage.removeItem(chave);
+  } catch {
+    // Armazenamento bloqueado: sem a marca, a Geladeira funciona só nesta sessão.
+  }
 }
