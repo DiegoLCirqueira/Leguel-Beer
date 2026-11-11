@@ -1,18 +1,18 @@
 "use client";
 
 import { estoqueBaixo, type CervejaDetalhe } from "@leguele/shared";
-import { Layers, PackageX, Refrigerator, Truck } from "lucide-react";
+import { Layers, Refrigerator, Truck } from "lucide-react";
 import Image from "next/image";
 import { useId, useState } from "react";
-import { BarraFixa, BlocoDePreco, Button, Stepper, StyleBadge } from "@/components/ui";
-
-// Sem imagemUrl a página usa uma imagem padrão (a marca); as imagens por categoria vêm do LB-124.
-const IMAGEM_PADRAO = "/maioridade/logo.webp";
-
-const teor = (valor: number) =>
-  new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(
-    valor,
-  );
+import {
+  BarraFixa,
+  BlocoDePreco,
+  Button,
+  SeloEsgotado,
+  Stepper,
+  StyleBadge,
+} from "@/components/ui";
+import { IMAGEM_PADRAO, formatarTeor } from "@/lib/catalogo/formato";
 
 const avisoDeEstoque = (n: number) =>
   n === 1 ? "Última unidade em estoque!" : `Últimas ${n} unidades em estoque!`;
@@ -47,12 +47,7 @@ export function ProdutoConteudo({ cerveja }: { cerveja: CervejaDetalhe }) {
             priority
             className="h-52 w-auto object-contain"
           />
-          {esgotada ? (
-            <span className="absolute right-0 top-1/3 inline-flex items-center gap-1 rounded-full border-2 border-erro bg-fundo px-3 py-1 text-sm font-semibold text-erro">
-              <PackageX aria-hidden="true" className="size-4" />
-              Esgotado
-            </span>
-          ) : null}
+          {esgotada ? <SeloEsgotado className="absolute right-0 top-1/3" /> : null}
         </div>
         <div className="flex flex-col items-start gap-2">
           <StyleBadge slug={categoria.slug} name={categoria.nome} />
@@ -61,7 +56,7 @@ export function ProdutoConteudo({ cerveja }: { cerveja: CervejaDetalhe }) {
         </div>
         <ul aria-label="Ficha técnica" className="grid grid-cols-3 gap-2 text-center">
           {[
-            ["Teor alcoólico", `${teor(teorAlcoolico)}%`],
+            ["Teor alcoólico", `${formatarTeor(teorAlcoolico)}%`],
             ["IBU", String(ibu)],
             ["Volume", `${volumeMl} ml`],
           ].map(([rotulo, valor]) => (

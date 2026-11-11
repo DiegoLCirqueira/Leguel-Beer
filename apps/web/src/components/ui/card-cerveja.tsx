@@ -1,11 +1,13 @@
 "use client";
 
 import { formatPriceBRL, type CervejaCard } from "@leguele/shared";
-import { PackageX, Plus, Refrigerator } from "lucide-react";
+import { Plus, Refrigerator } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useId } from "react";
+import { IMAGEM_PADRAO, formatarTeor } from "@/lib/catalogo/formato";
 import { cn } from "@/lib/utils";
+import { SeloEsgotado } from "./selo-esgotado";
 import { Button } from "./button";
 import { StyleBadge } from "./style-badge";
 
@@ -14,14 +16,6 @@ export type CardCervejaProps = {
   aoAdicionar?: () => void;
   className?: string;
 };
-
-// Sem imagemUrl o card usa uma imagem padrão (a marca); as imagens por categoria vêm do LB-124.
-const IMAGEM_PADRAO = "/maioridade/logo.webp";
-
-const teor = (valor: number) =>
-  new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(
-    valor,
-  );
 
 /** Card de cerveja da grade do catálogo e da home: imagem, nome, estilo, preço e ação. */
 export function CardCerveja({ cerveja, aoAdicionar, className }: CardCervejaProps) {
@@ -40,12 +34,7 @@ export function CardCerveja({ cerveja, aoAdicionar, className }: CardCervejaProp
         <div className="absolute left-0 top-0">
           <StyleBadge slug={categoria.slug} name={categoria.nome} />
         </div>
-        {esgotada ? (
-          <span className="absolute right-0 top-1/3 inline-flex items-center gap-1 rounded-full border-2 border-erro bg-fundo px-3 py-1 text-sm font-semibold text-erro">
-            <PackageX aria-hidden="true" className="size-4" />
-            Esgotado
-          </span>
-        ) : null}
+        {esgotada ? <SeloEsgotado className="absolute right-0 top-1/3" /> : null}
         <Image
           src={imagemUrl ?? IMAGEM_PADRAO}
           alt={imagemUrl ? `${nome}, ${estilo}` : ""}
@@ -64,7 +53,7 @@ export function CardCerveja({ cerveja, aoAdicionar, className }: CardCervejaProp
           {nome}
         </Link>
       </h3>
-      <p className="text-sm text-texto-suave">{`${estilo} • ${teor(teorAlcoolico)}% • ${volumeMl}ml`}</p>
+      <p className="text-sm text-texto-suave">{`${estilo} • ${formatarTeor(teorAlcoolico)}% • ${volumeMl}ml`}</p>
       <p className="text-xl font-bold text-primaria">{formatPriceBRL(precoCentavos)}</p>
       <Button
         className="relative z-10"

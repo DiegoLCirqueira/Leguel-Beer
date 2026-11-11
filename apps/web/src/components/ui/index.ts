@@ -13,6 +13,7 @@ export { LojaHeader } from "./loja-header";
 export { LojaTabBar } from "./loja-tab-bar";
 export { OlhoDaSenha } from "./olho-da-senha";
 export { ProdutoHeader } from "./produto-header";
+export { SeloEsgotado } from "./selo-esgotado";
 export { Stepper } from "./stepper";
 export { Skeleton } from "./skeleton";
 export { StyleBadge } from "./style-badge";
