@@ -64,7 +64,10 @@ describe("POST /geladeira/validar (banco real)", () => {
       },
     });
 
-  const validar = (body: unknown) => request(app.getHttpServer()).post("/geladeira/validar").send(body as object);
+  const validar = (body: unknown) =>
+    request(app.getHttpServer())
+      .post("/geladeira/validar")
+      .send(body as object);
 
   it("é público: sem token devolve a Geladeira revalidada no contrato, com subtotal", async () => {
     const mareAlta = await addBeer("mare-alta", { name: "Maré Alta", priceCents: 3200 });
@@ -86,5 +89,63 @@ describe("POST /geladeira/validar (banco real)", () => {
     expect(body.ajustes).toEqual([]);
     expect(body.quantidadeTotal).toBe(3);
     expect(body.subtotalCentavos).toBe(9050);
+  });
+
+  it("id que não é UUID ou que não existe vira ajuste indisponível sem nome, nunca erro 500", async () => {
+    const mareAlta = await addBeer("mare-alta", { name: "Maré Alta" });
+
+    const response = await validar({
+      itens: [
+        { cervejaId: "nao-sou-uuid", quantidade: 1, precoVistoCentavos: 3200 },
+        { cervejaId: "00000000-0000-4000-8000-000000000000", quantidade: 1, precoVistoCentavos: 1 },
+        { cervejaId: mareAlta.id, quantidade: 1, precoVistoCentavos: 3200 },
+      ],
+    });
+
+    expect(response.status).toBe(200);
+    const body = geladeiraResponseSchema.parse(response.body);
+    expect(body.ajustes).toEqual([
+      { tipo: "indisponivel", cervejaId: "nao-sou-uuid", nome: null },
+      { tipo: "indisponivel", cervejaId: "00000000-0000-4000-8000-000000000000", nome: null },
+    ]);
+    expect(body.itens.map((item) => item.cerveja.nome)).toEqual(["Maré Alta"]);
+  });
+
+  it("devolve os ajustes de cerveja desativada, esgotada, preço e quantidade", async () => {
+    const desativada = await addBeer("a", { name: "Desativada", active: false });
+    const esgotada = await addBeer("b", { name: "Esgotada", stock: 0 });
+    const barata = await addBeer("c", { name: "Barata", priceCents: 3000 });
+    const poucas = await addBeer("d", { name: "Poucas", stock: 1 });
+
+    const response = await validar({
+      itens: [poucas, barata, esgotada, desativada].map((beer) => ({
+        cervejaId: beer.id,
+        quantidade: 2,
+        precoVistoCentavos: 3200,
+      })),
+    });
+
+    const body = geladeiraResponseSchema.parse(response.body);
+    expect(body.ajustes.map((ajuste) => [ajuste.tipo, ajuste.nome])).toEqual([
+      ["quantidade-reduzida", "Poucas"],
+      ["preco-mudou", "Barata"],
+      ["indisponivel", "Esgotada"],
+      ["indisponivel", "Desativada"],
+    ]);
+    expect(
+      body.itens.map((item) => [item.cerveja.nome, item.quantidade, item.totalCentavos]),
+    ).toEqual([
+      ["Poucas", 1, 3200],
+      ["Barata", 2, 6000],
+    ]);
+  });
+
+  it("recusa com 400 a quantidade fora de 1 a 99 e a cerveja repetida", async () => {
+    const mareAlta = await addBeer("mare-alta");
+    const item = { cervejaId: mareAlta.id, quantidade: 1, precoVistoCentavos: 3200 };
+
+    expect((await validar({ itens: [{ ...item, quantidade: 100 }] })).status).toBe(400);
+    expect((await validar({ itens: [item, item] })).status).toBe(400);
+    expect((await validar({})).status).toBe(400);
   });
 });
