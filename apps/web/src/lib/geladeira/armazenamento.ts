@@ -67,3 +67,17 @@ export function apagarGeladeiraLocal(): void {
     // Armazenamento bloqueado: não há cópia para apagar.
   }
 }
+
+export const CHAVE_DA_CONTA = "lb:geladeira-da-conta";
+export const CHAVE_PENDENTE = "lb:geladeira-pendente";
+
+/** Marcas de sincronização (só nesta aba/aparelho): a Geladeira daqui já foi da conta; há envio pendente. */
+export function lerMarca(chave: string): boolean {
+  void chave;
+  return false;
+}
+
+export function gravarMarca(chave: string, ligada: boolean): void {
+  void chave;
+  void ligada;
+}

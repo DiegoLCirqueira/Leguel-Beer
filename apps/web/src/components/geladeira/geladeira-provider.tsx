@@ -11,6 +11,7 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from "react";
+import type { ContaDaGeladeira } from "@/lib/geladeira/conta";
 import { gravarGeladeiraLocal, lerGeladeiraLocal } from "@/lib/geladeira/armazenamento";
 import {
   adicionar as adicionarOp,
@@ -44,7 +45,15 @@ export function useGeladeira(): GeladeiraContexto {
   return contexto;
 }
 
-export function GeladeiraProvider({ children }: { children: ReactNode }) {
+export function GeladeiraProvider({
+  children,
+  conta,
+}: {
+  children: ReactNode;
+  /** Sem `conta` (testes, telas sem sessão) a Geladeira é só local. */
+  conta?: ContaDaGeladeira;
+}) {
+  void conta;
   // A cópia local só existe no navegador: lida uma vez ao montar (no servidor fica vazia).
   const [estado, setEstado] = useState<EstadoDaGeladeira>(() => lerGeladeiraLocal());
   // `false` no HTML do servidor e na hidratação; `true` depois: o contador só aparece então.
