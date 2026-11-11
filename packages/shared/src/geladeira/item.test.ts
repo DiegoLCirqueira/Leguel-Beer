@@ -12,6 +12,14 @@ describe("itemDaGeladeiraSchema", () => {
     expect(itemDaGeladeiraSchema.safeParse({ ...item, quantidade }).success).toBe(false);
   });
 
+  it.each([-1, 10.5])("recusa o preço visto %s: é inteiro e não negativo", (precoVistoCentavos) => {
+    expect(itemDaGeladeiraSchema.safeParse({ ...item, precoVistoCentavos }).success).toBe(false);
+  });
+
+  it("aceita o preço visto 0", () => {
+    expect(itemDaGeladeiraSchema.safeParse({ ...item, precoVistoCentavos: 0 }).success).toBe(true);
+  });
+
   it.each([1, 99])("aceita a quantidade %i, nos extremos do limite", (quantidade) => {
     expect(itemDaGeladeiraSchema.safeParse({ ...item, quantidade }).success).toBe(true);
   });
