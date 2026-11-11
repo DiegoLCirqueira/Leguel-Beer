@@ -128,4 +128,37 @@ describe("PrismaAccountFridgeRepository (banco real)", () => {
       });
     }
   });
+
+  it("update lê a Geladeira, deixa quem chama decidir e grava o que ele devolver; nulo não grava", async () => {
+    await repository.replace(profileId, [stored(0, 2), stored(1)]);
+
+    const seen = await repository.update(profileId, (current) => ({
+      items: current.filter((item) => item.beerId !== beerIds[0]),
+      result: current.length,
+    }));
+
+    expect(seen).toBe(2);
+    expect(await repository.find(profileId)).toEqual([stored(1)]);
+
+    const kept = await repository.update(profileId, () => ({ items: null, result: "intacta" }));
+
+    expect(kept).toBe("intacta");
+    expect(await repository.find(profileId)).toEqual([stored(1)]);
+  });
+
+  it("update de conta sem perfil ou sem Geladeira chama quem decide com a lista vazia", async () => {
+    const lists: unknown[] = [];
+
+    await repository.update(profileId, (current) => {
+      lists.push(current);
+      return { items: null, result: undefined };
+    });
+    await repository.update(crypto.randomUUID(), (current) => {
+      lists.push(current);
+      return { items: null, result: undefined };
+    });
+
+    expect(lists).toEqual([[], []]);
+    expect(await prisma.fridge.count()).toBe(0);
+  });
 });
