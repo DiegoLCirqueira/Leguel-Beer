@@ -139,4 +139,21 @@ describe("PrismaBeerRepository (banco real)", () => {
     expect(await repository.findActiveBySlug("ipa-velha")).toBeNull();
     expect(await repository.findActiveBySlug("nao-existe")).toBeNull();
   });
+
+  it("findByIds devolve as cervejas pedidas, ativas ou desativadas, com a situação de cada uma", async () => {
+    const ipa = await prisma.category.create({ data: { slug: "ipa", name: "IPAs", order: 1 } });
+    const ativa = await prisma.beer.create({ data: beerData(ipa.id, { slug: "mare-alta" }) });
+    const desativada = await prisma.beer.create({
+      data: beerData(ipa.id, { slug: "ponta-verde", active: false }),
+    });
+    await prisma.beer.create({ data: beerData(ipa.id, { slug: "outra" }) });
+
+    const found = await repository.findByIds([ativa.id, desativada.id]);
+
+    expect(found.map(({ beer, active }) => [beer.slug, active]).sort()).toEqual([
+      ["mare-alta", true],
+      ["ponta-verde", false],
+    ]);
+    expect(found[0]?.beer.category).toEqual({ slug: "ipa", name: "IPAs", order: 1 });
+  });
 });
