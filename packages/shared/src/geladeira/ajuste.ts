@@ -8,6 +8,15 @@ const precoMudouSchema = z.object({
   precoAtualCentavos: z.int().nonnegative(),
 });
 
-export const ajusteDaGeladeiraSchema = z.discriminatedUnion("tipo", [precoMudouSchema]);
+const indisponivelSchema = z.object({
+  tipo: z.literal("indisponivel"),
+  cervejaId: z.string(),
+  nome: z.string().nullable(),
+});
+
+export const ajusteDaGeladeiraSchema = z.discriminatedUnion("tipo", [
+  precoMudouSchema,
+  indisponivelSchema,
+]);
 
 export type AjusteDaGeladeira = z.infer<typeof ajusteDaGeladeiraSchema>;
