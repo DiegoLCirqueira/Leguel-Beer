@@ -81,4 +81,36 @@ describe("GET e PUT /me/geladeira (banco real)", () => {
       subtotalCentavos: 0,
     });
   });
+
+  const put = (token: string | undefined, body: unknown) =>
+    request(app.getHttpServer())
+      .put("/me/geladeira")
+      .set(token ? { Authorization: `Bearer ${token}` } : {})
+      .send(body as object);
+
+  const entry = (beer: { id: string }, quantidade = 1, precoVistoCentavos = 3200) => ({
+    cervejaId: beer.id,
+    quantidade,
+    precoVistoCentavos,
+  });
+
+  it("PUT guarda a Geladeira na ordem de entrada e o GET devolve a mesma, com subtotal", async () => {
+    const mareAlta = await addBeer("mare-alta", { name: "Maré Alta" });
+    const cupuacu = await addBeer("cupuacu-ale", { name: "Cupuaçu Ale", priceCents: 2650 });
+
+    const saved = await put(tokens.customer(), {
+      itens: [entry(cupuacu, 1, 2650), entry(mareAlta, 2)],
+    });
+    const read = await get(tokens.customer());
+
+    expect(saved.status).toBe(200);
+    const body = geladeiraResponseSchema.parse(read.body);
+    expect(body.itens.map((item) => [item.cerveja.nome, item.quantidade])).toEqual([
+      ["Cupuaçu Ale", 1],
+      ["Maré Alta", 2],
+    ]);
+    expect(body.quantidadeTotal).toBe(3);
+    expect(body.subtotalCentavos).toBe(9050);
+    expect(read.body).toEqual(saved.body);
+  });
 });
