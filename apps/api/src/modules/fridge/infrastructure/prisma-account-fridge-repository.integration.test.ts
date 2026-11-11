@@ -87,4 +87,22 @@ describe("PrismaAccountFridgeRepository (banco real)", () => {
       FridgeOwnerNotFoundError,
     );
   });
+
+  it("PUTs simultâneos da mesma conta não falham: vale uma das gravações inteira, a última a entrar", async () => {
+    await repository.replace(profileId, [stored(0)]);
+    const versions = [
+      [stored(0, 2), stored(1), stored(2)],
+      [stored(2, 3), stored(1, 2)],
+      [stored(1, 4), stored(0, 5), stored(2, 6)],
+      [stored(2), stored(0, 7)],
+      [stored(0, 8), stored(2, 2), stored(1, 3)],
+      [stored(1)],
+    ];
+
+    const results = await Promise.allSettled(versions.map((v) => repository.replace(profileId, v)));
+
+    expect(results.filter((r) => r.status === "rejected")).toEqual([]);
+    expect(versions).toContainEqual(await repository.find(profileId));
+    expect(await prisma.fridge.count()).toBe(1);
+  });
 });
