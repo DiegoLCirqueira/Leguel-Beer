@@ -22,4 +22,20 @@ export interface AccountFridgeRepository {
    * Lança `FridgeOwnerNotFoundError` se a conta não tem perfil.
    */
   replace(profileId: string, items: readonly StoredFridgeItem[]): Promise<void>;
+
+  /**
+   * Lê, deixa `decide` calcular e grava, tudo sob a mesma trava da conta: nenhuma gravação de outro
+   * aparelho entra no meio. `items: null` não grava. Sem perfil ou sem Geladeira guardada, `decide`
+   * recebe a lista vazia; gravar sem perfil lança `FridgeOwnerNotFoundError`.
+   */
+  update<T>(
+    profileId: string,
+    decide: (current: StoredFridgeItem[]) => FridgeUpdate<T> | Promise<FridgeUpdate<T>>,
+  ): Promise<T>;
+}
+
+/** O que `update` grava (`null` não grava) e o que devolve a quem chamou. */
+export interface FridgeUpdate<T> {
+  items: readonly StoredFridgeItem[] | null;
+  result: T;
 }
