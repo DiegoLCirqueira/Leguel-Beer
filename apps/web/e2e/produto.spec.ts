@@ -137,7 +137,7 @@ test("Voltar volta à home para quem abriu a cerveja pelos destaques", async ({
 
   await page.getByRole("link", { name: "Voltar" }).click();
 
-  await expect(page).toHaveURL(/localhost:\d+\/$/);
+  await expect(page).toHaveURL((url) => url.pathname === "/");
 });
 
 test("Voltar em link direto (sem página anterior do site) vai ao catálogo", async ({ page }) => {
