@@ -1,3 +1,4 @@
+import { isSoldOut } from "../../catalog/domain/beer.js";
 import type { FridgeBeerLookup } from "../domain/fridge-beer-lookup.js";
 import type {
   FridgeAdjustment,
@@ -27,7 +28,7 @@ export class RevalidateFridge {
         continue;
       }
       const { beer } = match;
-      if (!match.active) {
+      if (!match.active || isSoldOut(beer)) {
         adjustments.push({ type: "unavailable", beerId: beer.id, name: beer.name });
         continue;
       }
