@@ -1,3 +1,4 @@
+import type { Prisma } from "../../../generated/prisma/client.js";
 import type { PrismaService } from "../../../common/prisma/prisma.service.js";
 import {
   FridgeOwnerNotFoundError,
@@ -22,8 +23,7 @@ export class PrismaAccountFridgeRepository implements AccountFridgeRepository {
 
   async replace(profileId: string, items: readonly StoredFridgeItem[]): Promise<void> {
     await this.prisma.$transaction(async (tx) => {
-      const owner = await tx.profile.findUnique({ where: { id: profileId }, select: { id: true } });
-      if (!owner) throw new FridgeOwnerNotFoundError();
+      await lockOwner(tx, profileId);
       const fridge = await tx.fridge.upsert({
         where: { profileId },
         update: {},
@@ -35,4 +35,15 @@ export class PrismaAccountFridgeRepository implements AccountFridgeRepository {
       });
     });
   }
+}
+
+/**
+ * Trava a linha do perfil até o fim da transação: as operações da mesma conta passam uma de cada
+ * vez, então duas gravações simultâneas não se atropelam (vale a última a entrar). Sem perfil, não
+ * há linha para travar e não há onde guardar a Geladeira.
+ */
+async function lockOwner(tx: Prisma.TransactionClient, profileId: string): Promise<void> {
+  const rows = await tx.$queryRaw<{ id: string }[]>`
+    SELECT id FROM profiles WHERE id = ${profileId}::uuid FOR UPDATE`;
+  if (rows.length === 0) throw new FridgeOwnerNotFoundError();
 }
