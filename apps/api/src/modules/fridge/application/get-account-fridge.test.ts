@@ -56,4 +56,21 @@ describe("GetAccountFridge", () => {
     expect(result.items).toEqual([{ beer: mareAlta, quantity: 2 }]);
     expect(repository.replaceCalls).toBe(writesBefore);
   });
+
+  it("lê e grava numa só operação da Geladeira, sem ler e regravar em passos soltos", async () => {
+    const mareAlta = makeBeer({ priceCents: 3000, stock: 10 });
+    const repository = new InMemoryAccountFridgeRepository();
+    await repository.replace("perfil-1", [
+      { beerId: mareAlta.id, quantity: 1, seenPriceCents: 3200 },
+    ]);
+    const writesBefore = repository.replaceCalls;
+
+    await new GetAccountFridge(
+      new RevalidateFridge(new InMemoryFridgeBeerLookup().add(mareAlta)),
+      repository,
+    ).execute("perfil-1");
+
+    expect(repository.updateCalls).toBe(1);
+    expect(repository.replaceCalls).toBe(writesBefore);
+  });
 });
