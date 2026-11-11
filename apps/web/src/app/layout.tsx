@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Figtree, Kaushan_Script } from "next/font/google";
 import type { ReactNode } from "react";
+import { GeladeiraProvider } from "@/components/geladeira/geladeira-provider";
 import "./globals.css";
 
 const figtree = Figtree({
@@ -29,7 +30,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR" className={`${kaushan.variable} ${figtree.variable}`}>
-      <body>{children}</body>
+      <body>
+        <GeladeiraProvider>{children}</GeladeiraProvider>
+      </body>
     </html>
   );
 }
