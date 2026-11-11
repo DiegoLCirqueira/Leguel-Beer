@@ -5,6 +5,7 @@ import { BEER_REPOSITORY } from "../catalog/catalog.tokens.js";
 import type { BeerRepository } from "../catalog/domain/beer-repository.js";
 import { GetAccountFridge } from "./application/get-account-fridge.js";
 import { RevalidateFridge } from "./application/revalidate-fridge.js";
+import { SaveAccountFridge } from "./application/save-account-fridge.js";
 import type { AccountFridgeRepository } from "./domain/account-fridge-repository.js";
 import type { FridgeBeerLookup } from "./domain/fridge-beer-lookup.js";
 import { ACCOUNT_FRIDGE_REPOSITORY, FRIDGE_BEER_LOOKUP } from "./fridge.tokens.js";
@@ -21,6 +22,12 @@ import { FridgeController } from "./presentation/fridge.controller.js";
       provide: ACCOUNT_FRIDGE_REPOSITORY,
       useFactory: (prisma: PrismaService) => new PrismaAccountFridgeRepository(prisma),
       inject: [PrismaService],
+    },
+    {
+      provide: SaveAccountFridge,
+      useFactory: (revalidate: RevalidateFridge, fridges: AccountFridgeRepository) =>
+        new SaveAccountFridge(revalidate, fridges),
+      inject: [RevalidateFridge, ACCOUNT_FRIDGE_REPOSITORY],
     },
     {
       provide: GetAccountFridge,

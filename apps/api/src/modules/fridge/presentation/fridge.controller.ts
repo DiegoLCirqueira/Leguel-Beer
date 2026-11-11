@@ -16,6 +16,7 @@ import { z } from "zod";
 import { zodDto } from "../../../common/validation/zod-dto.js";
 import { Public } from "../../account/presentation/access.decorators.js";
 import { RevalidateFridge } from "../application/revalidate-fridge.js";
+import { toEntries } from "./fridge.entries.js";
 import { toGeladeiraResponse } from "./fridge.mapper.js";
 
 class GeladeiraRequestDto extends zodDto(geladeiraRequestSchema) {}
@@ -40,13 +41,7 @@ export class FridgeController {
   @ApiOkResponse({ schema: jsonSchema(geladeiraResponseSchema, "output") })
   @ApiBadRequestResponse({ description: "Corpo fora do contrato." })
   async validate(@Body() body: GeladeiraRequestDto): Promise<GeladeiraResponse> {
-    const revalidation = await this.revalidateFridge.execute(
-      body.itens.map((item) => ({
-        beerId: item.cervejaId,
-        quantity: item.quantidade,
-        seenPriceCents: item.precoVistoCentavos,
-      })),
-    );
+    const revalidation = await this.revalidateFridge.execute(toEntries(body));
     return toGeladeiraResponse(revalidation);
   }
 }
