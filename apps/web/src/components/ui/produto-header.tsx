@@ -2,7 +2,7 @@
 
 import { ChevronLeft, Refrigerator } from "lucide-react";
 import Link from "next/link";
-import { ESTILO_BOTAO_VOLTAR } from "@/components/auth/botao-voltar";
+import { ESTILO_BOTAO_VOLTAR } from "./estilo-botao-voltar";
 
 type Props = { count: number; voltarHref?: string };
 

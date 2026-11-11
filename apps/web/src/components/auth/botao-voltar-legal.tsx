@@ -4,7 +4,7 @@ import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useSyncExternalStore, type MouseEvent } from "react";
 import { destinoDoVoltar, type DestinoDoVoltar } from "@/lib/destino-do-voltar";
-import { ESTILO_BOTAO_VOLTAR } from "./botao-voltar";
+import { ESTILO_BOTAO_VOLTAR } from "@/components/ui";
 
 /**
  * Botão de voltar das páginas legais (termos, privacidade e entregas), no topo da página. Volta na
