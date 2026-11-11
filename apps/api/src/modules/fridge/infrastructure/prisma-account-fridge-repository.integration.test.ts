@@ -165,15 +165,16 @@ describe("PrismaAccountFridgeRepository (banco real)", () => {
   it("um PUT que chega no meio de um update espera a vez: a gravação mais nova não é sobrescrita pela versão antiga", async () => {
     await repository.replace(profileId, [stored(0)]);
     let releaseDecision: () => void = () => undefined;
-    const decisionStarted = Promise.withResolvers<void>();
+    let markStarted: () => void = () => undefined;
+    const decisionStarted = new Promise<void>((resolve) => (markStarted = resolve));
     const gate = new Promise<void>((resolve) => (releaseDecision = resolve));
 
     const updating = repository.update(profileId, async (current) => {
-      decisionStarted.resolve();
+      markStarted();
       await gate;
       return { items: [...current, stored(1)], result: undefined };
     });
-    await decisionStarted.promise;
+    await decisionStarted;
     const replacing = repository.replace(profileId, [stored(2, 9)]);
     await new Promise((resolve) => setTimeout(resolve, 150));
     releaseDecision();
