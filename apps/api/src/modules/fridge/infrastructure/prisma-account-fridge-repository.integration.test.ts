@@ -55,6 +55,33 @@ describe("PrismaAccountFridgeRepository (banco real)", () => {
     expect(await repository.find(profileId)).toEqual([stored(2), stored(0, 3), stored(1)]);
   });
 
+  it("substituir troca a Geladeira inteira, sem tocar na de outro perfil, e vazio esvazia", async () => {
+    await repository.replace(profileId, [stored(0), stored(1)]);
+    await repository.replace(otherProfileId, [stored(2, 5)]);
+
+    await repository.replace(profileId, [stored(1, 4)]);
+
+    expect(await repository.find(profileId)).toEqual([stored(1, 4)]);
+    expect(await repository.find(otherProfileId)).toEqual([stored(2, 5)]);
+
+    await repository.replace(profileId, []);
+
+    expect(await repository.find(profileId)).toEqual([]);
+    expect(await repository.find(otherProfileId)).toEqual([stored(2, 5)]);
+  });
+
+  it("perfil sem Geladeira guardada devolve vazio", async () => {
+    expect(await repository.find(profileId)).toEqual([]);
+  });
+
+  it("se a gravação falha no meio, a Geladeira anterior continua intacta", async () => {
+    await repository.replace(profileId, [stored(0, 2)]);
+
+    await expect(repository.replace(profileId, [stored(1), stored(2, 0)])).rejects.toThrow();
+
+    expect(await repository.find(profileId)).toEqual([stored(0, 2)]);
+  });
+
   it("conta sem perfil não tem onde guardar a Geladeira", async () => {
     await expect(repository.replace(crypto.randomUUID(), [stored(0)])).rejects.toThrow(
       FridgeOwnerNotFoundError,
