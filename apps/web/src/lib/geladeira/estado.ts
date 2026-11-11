@@ -76,23 +76,32 @@ export function paraRequest(estado: EstadoDaGeladeira): GeladeiraRequest {
 
 export type Desfazer = { item: ItemLocal; posicao: number };
 
+/** Tira a cerveja da Geladeira e devolve o que "Desfazer" precisa: o item e a posição em que estava. */
 export function remover(
   estado: EstadoDaGeladeira,
   cervejaId: string,
 ): { estado: EstadoDaGeladeira; desfazer: Desfazer | null } {
-  void cervejaId;
-  return { estado, desfazer: null };
+  const posicao = estado.itens.findIndex((i) => i.cerveja.id === cervejaId);
+  const item = estado.itens[posicao];
+  if (!item) return { estado, desfazer: null };
+  return {
+    estado: { itens: estado.itens.filter((i) => i.cerveja.id !== cervejaId) },
+    desfazer: { item, posicao },
+  };
 }
 
+/** Devolve a cerveja removida, com a quantidade e na posição de antes (se já voltou, não duplica). */
 export function desfazer(estado: EstadoDaGeladeira, d: Desfazer): EstadoDaGeladeira {
-  void d;
-  return estado;
+  if (estado.itens.some((i) => i.cerveja.id === d.item.cerveja.id)) return estado;
+  const itens = [...estado.itens];
+  itens.splice(Math.min(d.posicao, itens.length), 0, d.item);
+  return { itens };
 }
 
+/** A Geladeira passa a ser a que a API validou: preços e quantidades certos, sem as cervejas removidas. */
 export function aplicarResposta(
-  estado: EstadoDaGeladeira,
+  _estado: EstadoDaGeladeira,
   resposta: GeladeiraResponse,
 ): EstadoDaGeladeira {
-  void resposta;
-  return estado;
+  return { itens: resposta.itens.map((i) => ({ cerveja: i.cerveja, quantidade: i.quantidade })) };
 }
