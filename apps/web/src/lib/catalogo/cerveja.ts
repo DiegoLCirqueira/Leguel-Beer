@@ -1,16 +1,13 @@
-import { cervejaDetalheSchema, type CervejaDetalhe } from "@leguele/shared";
+import { cervejaDetalheSchema, slugReservado, type CervejaDetalhe } from "@leguele/shared";
 import { urlDaApi } from "@/lib/auth/config";
 import { buscarComLimite } from "./fetch-com-limite";
-
-/** Slugs que a API usa para outras rotas de /catalogo: nunca são cerveja. */
-const SLUGS_RESERVADOS = new Set(["destaques"]);
 
 export type ResultadoDaCerveja =
   { tipo: "ok"; cerveja: CervejaDetalhe } | { tipo: "nao-encontrada" } | { tipo: "erro" };
 
 /** GET /catalogo/:slug no servidor: nunca lança; 404 é "não encontrada", o resto que falha é "erro". */
 export async function buscarCerveja(slug: string): Promise<ResultadoDaCerveja> {
-  if (SLUGS_RESERVADOS.has(slug)) return { tipo: "nao-encontrada" };
+  if (slugReservado(slug)) return { tipo: "nao-encontrada" };
   try {
     return await buscarComLimite(
       `${urlDaApi()}/catalogo/${encodeURIComponent(slug)}`,
