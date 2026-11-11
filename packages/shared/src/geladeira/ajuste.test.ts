@@ -42,12 +42,9 @@ describe("ajusteDaGeladeiraSchema", () => {
     expect(ajusteDaGeladeiraSchema.safeParse(reduzida(2)).success).toBe(true);
   });
 
-  it.each(["Maré Alta", null])(
-    "aceita o ajuste de cerveja indisponível com o nome %s",
-    (nome) => {
-      const ajuste = { tipo: "indisponivel", cervejaId: "cerveja-1", nome };
+  it.each(["Maré Alta", null])("aceita o ajuste de cerveja indisponível com o nome %s", (nome) => {
+    const ajuste = { tipo: "indisponivel", cervejaId: "cerveja-1", nome };
 
-      expect(ajusteDaGeladeiraSchema.parse(ajuste)).toEqual(ajuste);
-    },
-  );
+    expect(ajusteDaGeladeiraSchema.parse(ajuste)).toEqual(ajuste);
+  });
 });

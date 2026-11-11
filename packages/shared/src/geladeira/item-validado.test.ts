@@ -25,11 +25,14 @@ describe("itemValidadoSchema", () => {
     expect(itemValidadoSchema.parse(item)).toEqual(item);
   });
 
-  it.each([0, 6])("recusa a quantidade %i: vai de 1 até a quantidade disponível (5)", (quantidade) => {
-    const invalido = { ...item, quantidade, totalCentavos: quantidade * 3200 };
+  it.each([0, 6])(
+    "recusa a quantidade %i: vai de 1 até a quantidade disponível (5)",
+    (quantidade) => {
+      const invalido = { ...item, quantidade, totalCentavos: quantidade * 3200 };
 
-    expect(itemValidadoSchema.safeParse(invalido).success).toBe(false);
-  });
+      expect(itemValidadoSchema.safeParse(invalido).success).toBe(false);
+    },
+  );
 
   it("recusa o total que não é a quantidade vezes o preço da cerveja", () => {
     expect(itemValidadoSchema.safeParse({ ...item, totalCentavos: 6000 }).success).toBe(false);
