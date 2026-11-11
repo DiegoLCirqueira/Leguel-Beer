@@ -13,7 +13,7 @@ const MAX_ACTIVE_BEERS = 200;
 
 type BeerRow = Prisma.BeerGetPayload<{ include: { category: true } }>;
 
-function toBeer(row: BeerRow): Beer {
+export function toBeer(row: BeerRow): Beer {
   return {
     id: row.id,
     slug: row.slug,
