@@ -20,6 +20,13 @@ describe("geladeiraRequestSchema", () => {
     expect(geladeiraRequestSchema.safeParse(corpo).success).toBe(false);
   });
 
+  it("aceita 50 cervejas e recusa 51", () => {
+    const itens = (n: number) => Array.from({ length: n }, (_, i) => item(`cerveja-${i}`));
+
+    expect(geladeiraRequestSchema.safeParse({ itens: itens(50) }).success).toBe(true);
+    expect(geladeiraRequestSchema.safeParse({ itens: itens(51) }).success).toBe(false);
+  });
+
   it("aceita a Geladeira vazia", () => {
     expect(geladeiraRequestSchema.parse({ itens: [] })).toEqual({ itens: [] });
   });
