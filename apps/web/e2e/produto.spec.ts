@@ -107,7 +107,8 @@ test("/catalogo/destaques não é cerveja: mostra Cerveja não encontrada, não 
   await expect(
     page.getByRole("heading", { level: 1, name: "Cerveja não encontrada" }),
   ).toBeVisible();
-  await expect(page.getByRole("alert")).toHaveCount(0);
+  // Não vale contar role=alert: o build de produção do Next injeta o next-route-announcer (alert vazio).
+  await expect(page.getByText("Não foi possível carregar a cerveja agora.")).toHaveCount(0);
 });
 
 test("Voltar da página de produto volta ao catálogo quando veio dele", async ({ page }) => {
