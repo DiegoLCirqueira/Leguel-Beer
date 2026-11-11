@@ -120,6 +120,19 @@ test("Voltar da página de produto volta ao catálogo quando veio dele", async (
   await expect(page).toHaveURL(/\/catalogo$/);
 });
 
+test("Voltar do produto devolve o catálogo com o filtro de categoria que estava na URL", async ({
+  page,
+}) => {
+  await page.goto("/catalogo?categoria=ipa");
+  await page.getByRole("link", { name: "Maré Alta" }).click();
+  await expect(page).toHaveURL(/\/catalogo\/mare-alta$/);
+
+  await page.getByRole("link", { name: "Voltar" }).click();
+
+  await expect(page).toHaveURL(/\/catalogo\?categoria=ipa$/);
+  await expect(page.getByRole("button", { name: /^IPAs/ })).toHaveAttribute("aria-pressed", "true");
+});
+
 test("Voltar volta à home para quem abriu a cerveja pelos destaques", async ({
   page,
   context,
