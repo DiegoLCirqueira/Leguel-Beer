@@ -156,4 +156,21 @@ describe("PrismaBeerRepository (banco real)", () => {
     ]);
     expect(found[0]?.beer.category).toEqual({ slug: "ipa", name: "IPAs", order: 1 });
   });
+
+  it("findByIds ignora o id que não é UUID e o UUID sem cerveja, sem erro, e devolve as demais", async () => {
+    const ipa = await prisma.category.create({ data: { slug: "ipa", name: "IPAs", order: 1 } });
+    const ativa = await prisma.beer.create({ data: beerData(ipa.id, { slug: "mare-alta" }) });
+
+    const found = await repository.findByIds([
+      "nao-sou-uuid",
+      "00000000-0000-4000-8000-000000000000",
+      ativa.id,
+      "",
+      "' OR 1=1 --",
+    ]);
+
+    expect(found.map(({ beer }) => beer.slug)).toEqual(["mare-alta"]);
+    expect(await repository.findByIds(["abc"])).toEqual([]);
+    expect(await repository.findByIds([])).toEqual([]);
+  });
 });
