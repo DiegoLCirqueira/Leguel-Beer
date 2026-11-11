@@ -13,4 +13,12 @@ describe("LinkGeladeira", () => {
 
     expect(screen.getByRole("link", { name: "Geladeira, 1 item" })).toBeInTheDocument();
   });
+
+  it("sem contador (ainda não leu a cópia local) não mostra número nem o diz no nome", () => {
+    render(<LinkGeladeira />);
+
+    const link = screen.getByRole("link", { name: "Geladeira" });
+    expect(link).toHaveAttribute("href", "/geladeira");
+    expect(link).not.toHaveTextContent(/\d/);
+  });
 });
