@@ -32,4 +32,10 @@ describe("geladeiraResponseSchema", () => {
   it("aceita os itens validados, os ajustes e os totais conferidos", () => {
     expect(geladeiraResponseSchema.parse(resposta)).toEqual(resposta);
   });
+
+  it("recusa a quantidade total que não é a soma das unidades", () => {
+    expect(geladeiraResponseSchema.safeParse({ ...resposta, quantidadeTotal: 2 }).success).toBe(
+      false,
+    );
+  });
 });
