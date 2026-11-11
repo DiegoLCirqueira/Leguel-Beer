@@ -1,6 +1,6 @@
 ---
 tipo: produto
-atualizado: 2026-10-29
+atualizado: 2026-11-10
 tags:
   - produto
   - mapa
@@ -33,8 +33,8 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[catalogo]]: listagem, filtros, ordenação, faixa de categorias e esgotadas.
 - [[destaques-home]]: seção "Cervejas em destaque" da home.
 - [[produto]]: página de produto com ficha, desconto, estoque baixo e quantidade (LB-40, LB-41, LB-42).
-- [[adicionar-do-card]]: colocar uma cerveja na Geladeira direto do card.
-- [[geladeira]]: o carrinho em prateleiras por categoria.
+- [[adicionar-do-card]]: colocar uma cerveja na Geladeira direto do card (LB-35).
+- [[geladeira]]: o carrinho em prateleiras por categoria, com resumo, revalidação no servidor e persistência no navegador e na conta (LB-124, LB-47, LB-49, LB-50, LB-51, LB-52).
 - [[checkout]]: Entrega → Pagamento → Revisão, com Pix e cartão.
 
 ## Decisões (ADRs)
