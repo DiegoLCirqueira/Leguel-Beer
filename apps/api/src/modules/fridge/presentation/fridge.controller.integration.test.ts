@@ -148,4 +148,58 @@ describe("POST /geladeira/validar (banco real)", () => {
     expect((await validar({ itens: [item, item] })).status).toBe(400);
     expect((await validar({})).status).toBe(400);
   });
+
+  it("recusa com 400 a quantidade 0, a fracionária e 51 itens, com o corpo do erro e o campo", async () => {
+    const mareAlta = await addBeer("mare-alta");
+    const item = { cervejaId: mareAlta.id, quantidade: 1, precoVistoCentavos: 3200 };
+
+    const zero = await validar({ itens: [{ ...item, quantidade: 0 }] });
+    const fracionaria = await validar({ itens: [{ ...item, quantidade: 1.5 }] });
+    const muitos = await validar({
+      itens: Array.from({ length: 51 }, (_, i) => ({ ...item, cervejaId: `cerveja-${i}` })),
+    });
+
+    for (const response of [zero, fracionaria, muitos]) {
+      expect(response.status).toBe(400);
+      expect(response.body).toMatchObject({ code: "VALIDATION_ERROR" });
+      expect(response.body.details[0].field).toMatch(/^itens/);
+    }
+    expect(zero.body.details[0].field).toBe("itens.0.quantidade");
+    expect(fracionaria.body.details[0].field).toBe("itens.0.quantidade");
+  });
+
+  it("aceita o id em maiúsculas e devolve o id da cerveja em minúsculas", async () => {
+    const mareAlta = await addBeer("mare-alta", { name: "Maré Alta" });
+
+    const response = await validar({
+      itens: [{ cervejaId: mareAlta.id.toUpperCase(), quantidade: 1, precoVistoCentavos: 3200 }],
+    });
+
+    const body = geladeiraResponseSchema.parse(response.body);
+    expect(body.ajustes).toEqual([]);
+    expect(body.itens.map((i) => i.cerveja.id)).toEqual([mareAlta.id]);
+  });
+
+  it("não grava nada: nem Geladeira nova nem mudança na que a conta já tem", async () => {
+    await prisma.profile.create({ data: { id: tokens.customerId, email: "cliente@leguele.test" } });
+    const mareAlta = await addBeer("mare-alta");
+    const antes = await prisma.fridge.create({
+      data: {
+        profileId: tokens.customerId,
+        items: {
+          create: [{ beerId: mareAlta.id, quantity: 2, seenPriceCents: 3200, position: 0 }],
+        },
+      },
+      include: { items: true },
+    });
+
+    await validar({ itens: [{ cervejaId: mareAlta.id, quantidade: 9, precoVistoCentavos: 1 }] });
+
+    expect(await prisma.fridge.count()).toBe(1);
+    const depois = await prisma.fridge.findUniqueOrThrow({
+      where: { id: antes.id },
+      include: { items: true },
+    });
+    expect(depois).toEqual(antes);
+  });
 });
