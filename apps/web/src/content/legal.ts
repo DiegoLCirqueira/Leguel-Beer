@@ -39,7 +39,7 @@ export const PRIVACIDADE: SecaoLegal[] = [
   {
     titulo: "Quais dados coletamos.",
     texto:
-      "Os que você informa ao criar a conta (nome, e-mail, telefone e senha) e, quando usar o checkout, endereço de entrega. A senha é guardada pelo serviço de autenticação apenas como hash; ninguém do projeto tem acesso a ela.",
+      "Os que você informa ao criar a conta (nome, e-mail, telefone e senha) e, quando usar o checkout, endereço de entrega. A senha é guardada pelo serviço de autenticação apenas como hash; ninguém do projeto tem acesso a ela. Também guardamos as cervejas e as quantidades que você coloca na Geladeira: com a conta, elas ficam salvas na conta, para a Geladeira valer em outros aparelhos, e o navegador guarda uma cópia que é apagada quando você sai da conta; sem conta, ficam só no armazenamento do navegador deste aparelho.",
   },
   {
     titulo: "Para que usamos.",
