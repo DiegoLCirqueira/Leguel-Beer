@@ -45,4 +45,18 @@ describe("PrismaFridgeBeerLookup (banco real)", () => {
     ]);
     expect(found[0]?.beer.category).toEqual({ slug: "ipa", name: "IPAs", order: 1 });
   });
+
+  it("ignora o id que não é UUID e o UUID sem cerveja, sem erro, e devolve as demais", async () => {
+    const ativa = await addBeer("mare-alta");
+
+    const found = await lookup.findByIds([
+      "nao-sou-uuid",
+      "00000000-0000-4000-8000-000000000000",
+      ativa.id,
+      "",
+      "' OR 1=1 --",
+    ]);
+
+    expect(found.map(({ beer }) => beer.slug)).toEqual(["mare-alta"]);
+  });
 });
