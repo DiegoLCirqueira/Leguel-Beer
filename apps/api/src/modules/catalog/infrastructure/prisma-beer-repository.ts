@@ -15,7 +15,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 type BeerRow = Prisma.BeerGetPayload<{ include: { category: true } }>;
 
-export function toBeer(row: BeerRow): Beer {
+function toBeer(row: BeerRow): Beer {
   return {
     id: row.id,
     slug: row.slug,

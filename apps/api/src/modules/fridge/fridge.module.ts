@@ -1,18 +1,21 @@
 import { Module } from "@nestjs/common";
-import { PrismaService } from "../../common/prisma/prisma.service.js";
+import { CatalogModule } from "../catalog/catalog.module.js";
+import { BEER_REPOSITORY } from "../catalog/catalog.tokens.js";
+import type { BeerRepository } from "../catalog/domain/beer-repository.js";
 import { RevalidateFridge } from "./application/revalidate-fridge.js";
 import type { FridgeBeerLookup } from "./domain/fridge-beer-lookup.js";
 import { FRIDGE_BEER_LOOKUP } from "./fridge.tokens.js";
-import { PrismaFridgeBeerLookup } from "./infrastructure/prisma-fridge-beer-lookup.js";
+import { CatalogFridgeBeerLookup } from "./infrastructure/catalog-fridge-beer-lookup.js";
 import { FridgeController } from "./presentation/fridge.controller.js";
 
 @Module({
+  imports: [CatalogModule],
   controllers: [FridgeController],
   providers: [
     {
       provide: FRIDGE_BEER_LOOKUP,
-      useFactory: (prisma: PrismaService) => new PrismaFridgeBeerLookup(prisma),
-      inject: [PrismaService],
+      useFactory: (beers: BeerRepository) => new CatalogFridgeBeerLookup(beers),
+      inject: [BEER_REPOSITORY],
     },
     {
       provide: RevalidateFridge,
