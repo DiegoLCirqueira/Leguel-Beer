@@ -19,7 +19,11 @@ export class RevalidateFridge {
 
   async execute(entries: readonly FridgeEntry[]): Promise<FridgeRevalidation> {
     // O UUID vale igual em maiúsculas e minúsculas, mas o banco devolve minúsculas: compara-se assim.
-    const normalized = entries.map((entry) => ({ ...entry, beerId: entry.beerId.toLowerCase() }));
+    const normalized = entries
+      .map((entry) => ({ ...entry, beerId: entry.beerId.toLowerCase() }))
+      .filter(
+        (entry, index, all) => all.findIndex((other) => other.beerId === entry.beerId) === index,
+      );
     const found = await this.lookup.findByIds(normalized.map((entry) => entry.beerId));
     const items: ValidatedItem[] = [];
     const adjustments: FridgeAdjustment[] = [];
