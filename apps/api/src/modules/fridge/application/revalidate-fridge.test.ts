@@ -14,4 +14,24 @@ describe("RevalidateFridge", () => {
 
     expect(result).toEqual({ items: [{ beer: mareAlta, quantity: 2 }], adjustments: [] });
   });
+
+  it("usa o preço atual e avisa quando o preço mudou desde que o cliente viu", async () => {
+    const mareAlta = makeBeer({ name: "Maré Alta", priceCents: 3000, stock: 10 });
+    const lookup = new InMemoryFridgeBeerLookup().add(mareAlta);
+
+    const result = await new RevalidateFridge(lookup).execute([
+      { beerId: mareAlta.id, quantity: 2, seenPriceCents: 3200 },
+    ]);
+
+    expect(result.items).toEqual([{ beer: mareAlta, quantity: 2 }]);
+    expect(result.adjustments).toEqual([
+      {
+        type: "price-changed",
+        beerId: mareAlta.id,
+        name: "Maré Alta",
+        seenPriceCents: 3200,
+        currentPriceCents: 3000,
+      },
+    ]);
+  });
 });
