@@ -22,7 +22,10 @@ export class RevalidateFridge {
     const adjustments: FridgeAdjustment[] = [];
     for (const entry of entries) {
       const match = found.find((candidate) => candidate.beer.id === entry.beerId);
-      if (!match) continue;
+      if (!match) {
+        adjustments.push({ type: "unavailable", beerId: entry.beerId, name: null });
+        continue;
+      }
       const { beer } = match;
       if (!match.active) {
         adjustments.push({ type: "unavailable", beerId: beer.id, name: beer.name });
