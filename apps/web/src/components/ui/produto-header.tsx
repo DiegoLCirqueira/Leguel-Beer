@@ -2,12 +2,14 @@
 
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import { navegouNoSite } from "@/lib/navegacao";
 import { ESTILO_BOTAO_VOLTAR } from "./estilo-botao-voltar";
 import { LinkGeladeira } from "./link-geladeira";
 
 type Props = { count: number; voltarHref?: string };
 
 const veioDoSite = () => {
+  if (navegouNoSite()) return true;
   try {
     return new URL(document.referrer).origin === window.location.origin;
   } catch {
