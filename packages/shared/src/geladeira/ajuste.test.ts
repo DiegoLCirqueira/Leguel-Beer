@@ -13,4 +13,13 @@ describe("ajusteDaGeladeiraSchema", () => {
 
     expect(ajusteDaGeladeiraSchema.parse(ajuste)).toEqual(ajuste);
   });
+
+  it.each(["Maré Alta", null])(
+    "aceita o ajuste de cerveja indisponível com o nome %s",
+    (nome) => {
+      const ajuste = { tipo: "indisponivel", cervejaId: "cerveja-1", nome };
+
+      expect(ajusteDaGeladeiraSchema.parse(ajuste)).toEqual(ajuste);
+    },
+  );
 });
