@@ -1,4 +1,4 @@
-import { isSoldOut } from "../../catalog/domain/beer.js";
+import { availableQuantity, isSoldOut } from "../../catalog/domain/beer.js";
 import type { FridgeBeerLookup } from "../domain/fridge-beer-lookup.js";
 import type {
   FridgeAdjustment,
@@ -41,7 +41,17 @@ export class RevalidateFridge {
           currentPriceCents: beer.priceCents,
         });
       }
-      items.push({ beer, quantity: entry.quantity });
+      const available = availableQuantity(beer);
+      if (entry.quantity > available) {
+        adjustments.push({
+          type: "quantity-reduced",
+          beerId: beer.id,
+          name: beer.name,
+          previousQuantity: entry.quantity,
+          currentQuantity: available,
+        });
+      }
+      items.push({ beer, quantity: Math.min(entry.quantity, available) });
     }
     return { items, adjustments };
   }
