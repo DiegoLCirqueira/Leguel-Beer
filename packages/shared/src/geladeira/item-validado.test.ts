@@ -31,6 +31,10 @@ describe("itemValidadoSchema", () => {
     expect(itemValidadoSchema.safeParse(invalido).success).toBe(false);
   });
 
+  it("recusa o total que não é a quantidade vezes o preço da cerveja", () => {
+    expect(itemValidadoSchema.safeParse({ ...item, totalCentavos: 6000 }).success).toBe(false);
+  });
+
   it("aceita a quantidade igual à disponível", () => {
     const noLimite = { ...item, quantidade: 5, totalCentavos: 16000 };
 
