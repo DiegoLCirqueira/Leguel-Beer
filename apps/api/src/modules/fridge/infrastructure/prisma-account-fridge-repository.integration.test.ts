@@ -161,4 +161,24 @@ describe("PrismaAccountFridgeRepository (banco real)", () => {
     expect(lists).toEqual([[], []]);
     expect(await prisma.fridge.count()).toBe(0);
   });
+
+  it("um PUT que chega no meio de um update espera a vez: a gravação mais nova não é sobrescrita pela versão antiga", async () => {
+    await repository.replace(profileId, [stored(0)]);
+    let releaseDecision: () => void = () => undefined;
+    const decisionStarted = Promise.withResolvers<void>();
+    const gate = new Promise<void>((resolve) => (releaseDecision = resolve));
+
+    const updating = repository.update(profileId, async (current) => {
+      decisionStarted.resolve();
+      await gate;
+      return { items: [...current, stored(1)], result: undefined };
+    });
+    await decisionStarted.promise;
+    const replacing = repository.replace(profileId, [stored(2, 9)]);
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    releaseDecision();
+    await Promise.all([updating, replacing]);
+
+    expect(await repository.find(profileId)).toEqual([stored(2, 9)]);
+  });
 });
