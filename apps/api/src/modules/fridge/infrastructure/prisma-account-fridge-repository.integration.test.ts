@@ -105,4 +105,27 @@ describe("PrismaAccountFridgeRepository (banco real)", () => {
     expect(versions).toContainEqual(await repository.find(profileId));
     expect(await prisma.fridge.count()).toBe(1);
   });
+
+  it("o primeiro PUT da conta, em corrida, também não falha e cria uma só Geladeira", async () => {
+    const versions = [[stored(0, 2), stored(1)], [stored(2, 3)], [stored(1, 4), stored(0)]];
+
+    const results = await Promise.allSettled(versions.map((v) => repository.replace(profileId, v)));
+
+    expect(results.filter((r) => r.status === "rejected")).toEqual([]);
+    expect(versions).toContainEqual(await repository.find(profileId));
+    expect(await prisma.fridge.count()).toBe(1);
+  });
+
+  it("PUTs simultâneos de conta sem perfil recusam todos, sem erro de banco", async () => {
+    const results = await Promise.allSettled(
+      [1, 2, 3].map(() => repository.replace(crypto.randomUUID(), [stored(0)])),
+    );
+
+    for (const result of results) {
+      expect(result).toMatchObject({
+        status: "rejected",
+        reason: expect.any(FridgeOwnerNotFoundError),
+      });
+    }
+  });
 });
