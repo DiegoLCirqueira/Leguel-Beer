@@ -26,6 +26,8 @@ model Profile {
   createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
 
+  fridge Fridge?
+
   @@map("profiles")
 }
 
@@ -42,31 +44,64 @@ model Category {
 
 /// Cerveja do catálogo. O preço é sempre em centavos; `stock` é o estoque físico (as reservas entram com o LB-56).
 model Beer {
-  id                 String   @id @default(uuid()) @db.Uuid
-  slug               String   @unique
+  id                 String       @id @default(uuid()) @db.Uuid
+  slug               String       @unique
   name               String
   style              String
-  categoryId         String   @map("category_id") @db.Uuid
-  category           Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  categoryId         String       @map("category_id") @db.Uuid
+  category           Category     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   /// Teor alcoólico em %, uma casa decimal.
-  abv                Decimal  @db.Decimal(3, 1)
+  abv                Decimal      @db.Decimal(3, 1)
   ibu                Int
-  volumeMl           Int      @map("volume_ml")
-  priceCents         Int      @map("price_cents")
-  featured           Boolean  @default(false)
-  active             Boolean  @default(true)
-  stock              Int      @default(0)
+  volumeMl           Int          @map("volume_ml")
+  priceCents         Int          @map("price_cents")
+  featured           Boolean      @default(false)
+  active             Boolean      @default(true)
+  stock              Int          @default(0)
   /// Texto curto da página de produto; nulo some a seção.
   description        String?
   /// Preço anterior em centavos, opcional: só vale como desconto se for maior que o atual.
-  previousPriceCents Int?     @map("previous_price_cents")
+  previousPriceCents Int?         @map("previous_price_cents")
   /// Nulo usa a imagem padrão da categoria.
-  imageUrl           String?  @map("image_url")
+  imageUrl           String?      @map("image_url")
   /// Data de cadastro: base da ordenação "mais novas".
-  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt          DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdAt          DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+  fridgeItems        FridgeItem[]
 
   @@index([categoryId])
   @@index([active, featured])
   @@map("beers")
+}
+
+/// Geladeira da conta: um registro por perfil. Só o que o cliente escolheu; nome, imagem e preço atual vêm sempre do catálogo.
+model Fridge {
+  id        String       @id @default(uuid()) @db.Uuid
+  profileId String       @unique @map("profile_id") @db.Uuid
+  profile   Profile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  items     FridgeItem[]
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("fridges")
+}
+
+/// Cerveja na Geladeira: quantidade (> 0), preço que o cliente viu (centavos, >= 0) e posição de entrada. Só cervejas avulsas; packs são Pós-MVP.
+model FridgeItem {
+  id             String   @id @default(uuid()) @db.Uuid
+  fridgeId       String   @map("fridge_id") @db.Uuid
+  fridge         Fridge   @relation(fields: [fridgeId], references: [id], onDelete: Cascade)
+  beerId         String   @map("beer_id") @db.Uuid
+  /// Cerveja nunca é apagada (só desativada), então apagar uma que está numa Geladeira é recusado.
+  beer           Beer     @relation(fields: [beerId], references: [id], onDelete: Restrict)
+  quantity       Int
+  seenPriceCents Int      @map("seen_price_cents")
+  /// Ordem em que a cerveja entrou na Geladeira, a partir de 0.
+  position       Int
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@unique([fridgeId, beerId])
+  @@unique([fridgeId, position])
+  @@index([beerId])
+  @@map("fridge_items")
 }
