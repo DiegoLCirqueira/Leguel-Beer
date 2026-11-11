@@ -1,0 +1,1 @@
+export const FRIDGE_BEER_LOOKUP = Symbol("FRIDGE_BEER_LOOKUP");

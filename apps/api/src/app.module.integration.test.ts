@@ -23,4 +23,15 @@ describe("AppModule com banco real", () => {
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("itens");
   });
+
+  it("POST /geladeira/validar está no ar e é público (convidado valida sem token)", async () => {
+    const response = await request(app.getHttpServer())
+      .post("/geladeira/validar")
+      .send({ itens: [{ cervejaId: "nao-sou-uuid", quantidade: 1, precoVistoCentavos: 3200 }] });
+
+    expect(response.status).toBe(200);
+    expect(response.body.ajustes).toEqual([
+      { tipo: "indisponivel", cervejaId: "nao-sou-uuid", nome: null },
+    ]);
+  });
 });
