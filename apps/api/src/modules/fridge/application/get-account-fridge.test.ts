@@ -14,4 +14,29 @@ describe("GetAccountFridge", () => {
 
     expect(await get.execute("perfil-1")).toEqual({ items: [], adjustments: [] });
   });
+
+  it("grava os ajustes: a Geladeira guardada passa a ser a revalidada e o aviso não se repete", async () => {
+    const mareAlta = makeBeer({ name: "Maré Alta", priceCents: 3000, stock: 10 });
+    const velha = makeBeer({ name: "Velha", priceCents: 2800, stock: 10 });
+    const lookup = new InMemoryFridgeBeerLookup().add(mareAlta).add(velha, { active: false });
+    const repository = new InMemoryAccountFridgeRepository();
+    await repository.replace("perfil-1", [
+      { beerId: velha.id, quantity: 1, seenPriceCents: 2800 },
+      { beerId: mareAlta.id, quantity: 2, seenPriceCents: 3200 },
+    ]);
+    const get = new GetAccountFridge(new RevalidateFridge(lookup), repository);
+
+    const first = await get.execute("perfil-1");
+    const second = await get.execute("perfil-1");
+
+    expect(first.adjustments.map((adjustment) => adjustment.type)).toEqual([
+      "unavailable",
+      "price-changed",
+    ]);
+    expect(await repository.find("perfil-1")).toEqual([
+      { beerId: mareAlta.id, quantity: 2, seenPriceCents: 3000 },
+    ]);
+    expect(second.adjustments).toEqual([]);
+    expect(second.items).toEqual(first.items);
+  });
 });
