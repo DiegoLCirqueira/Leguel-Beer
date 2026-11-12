@@ -6,7 +6,7 @@ import Link from "next/link";
  * Sem `count` (ainda não leu a cópia local) não mostra o número.
  */
 export function LinkGeladeira({ count }: { count?: number }) {
-  const itens = count === undefined ? "" : `, ${count} ${count === 1 ? "item" : "itens"}`;
+  const itens = count === undefined ? "" : `, ${count} ${count === 1 ? "unidade" : "unidades"}`;
   return (
     <Link
       href="/geladeira"
