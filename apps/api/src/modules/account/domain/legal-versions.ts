@@ -4,7 +4,7 @@
  */
 export const LEGAL_VERSIONS = {
   termosVersao: "2026-10-31",
-  privacidadeVersao: "2026-10-31",
+  privacidadeVersao: "2026-11-11",
 } as const;
 
 export type LegalVersions = { termosVersao: string; privacidadeVersao: string };
