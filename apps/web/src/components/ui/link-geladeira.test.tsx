@@ -5,12 +5,20 @@ import { LinkGeladeira } from "./link-geladeira";
 describe("LinkGeladeira", () => {
   it("leva à Geladeira com o contador no nome e no texto, no singular com um item", () => {
     const { rerender } = render(<LinkGeladeira count={3} />);
-    const link = screen.getByRole("link", { name: "Geladeira, 3 itens" });
+    const link = screen.getByRole("link", { name: "Geladeira, 3 unidades" });
     expect(link).toHaveAttribute("href", "/geladeira");
     expect(link).toHaveTextContent("3");
 
     rerender(<LinkGeladeira count={1} />);
 
-    expect(screen.getByRole("link", { name: "Geladeira, 1 item" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Geladeira, 1 unidade" })).toBeInTheDocument();
+  });
+
+  it("sem contador (ainda não leu a cópia local) não mostra número nem o diz no nome", () => {
+    render(<LinkGeladeira />);
+
+    const link = screen.getByRole("link", { name: "Geladeira" });
+    expect(link).toHaveAttribute("href", "/geladeira");
+    expect(link).not.toHaveTextContent(/\d/);
   });
 });

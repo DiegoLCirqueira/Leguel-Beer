@@ -3,7 +3,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { LinkGeladeira } from "./link-geladeira";
 
-type Props = { count: number; className?: string };
+type Props = { count?: number; className?: string };
 
 /** Cabeçalho da loja: logo à esquerda e a Geladeira com o contador de itens à direita (alvos de 44 px). */
 export function LojaHeader({ count, className }: Props) {

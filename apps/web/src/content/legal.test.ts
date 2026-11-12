@@ -2,7 +2,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { ATUALIZADO_EM } from "./legal";
+import { ATUALIZADO_EM, PRIVACIDADE } from "./legal";
 
 const arquivoDaApi = resolve(process.cwd(), "../api/src/modules/account/domain/legal-versions.ts");
 
@@ -21,5 +21,13 @@ describe("versão dos textos legais", () => {
   it("a API grava como versão do aceite a mesma data que o site mostra", () => {
     expect(versaoNaApi("termosVersao")).toBe(ATUALIZADO_EM);
     expect(versaoNaApi("privacidadeVersao")).toBe(ATUALIZADO_EM);
+  });
+
+  it("a Política de Privacidade cita a Geladeira em Quais dados coletamos", () => {
+    const secao = PRIVACIDADE.find((s) => s.titulo === "Quais dados coletamos.");
+
+    expect(secao?.texto).toContain(
+      "Também guardamos as cervejas e as quantidades que você coloca na Geladeira: com a conta, elas ficam salvas na conta, para a Geladeira valer em outros aparelhos, e o navegador guarda uma cópia que é apagada quando você sai da conta; sem conta, ficam só no armazenamento do navegador deste aparelho.",
+    );
   });
 });
