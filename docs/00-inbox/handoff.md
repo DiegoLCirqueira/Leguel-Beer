@@ -29,7 +29,7 @@ Sobrescrito pelo Orchestrator ao fim de cada ordem. A próxima conversa começa 
 ## Próximo
 
 1. Rebase e revisão do #248.
-2. Item 3: tela da Geladeira (fatias 6 e 7), depois o item 5 (checkout, spike LB-54).
+2. Item 3: tela da Geladeira (fatias 6 e 7), depois o item 4 (Conta e entrega, ver [[sequencia-telas]]) e o item 5 (checkout, spike LB-54).
 3. Diego: enviar as 7 fotos; em 16/11 o Reviewer volta ao Opus 5.5 (decisão dele de 11/11, cartão de pendências); contas para o LB-8.
 4. Follow-ups: ver a seção "Achados para refino" da [[2026-11-12]] e a seção "Follow-ups" abaixo.
 
