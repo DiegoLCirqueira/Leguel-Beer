@@ -1,8 +1,20 @@
 import { expect, test } from "./support/maior-de-idade";
+import { expectBeerPhoto } from "./support/beer-photo";
 
 // Contra a API real com o seed do catálogo: Maré Alta (R$ 32,00, antes R$ 36,90, 24 em estoque) e
 // Leguelé Comendador (esgotada).
 test.use({ isMobile: false, hasTouch: false, viewport: { width: 390, height: 844 } });
+
+test("a página da Maré Alta exibe a foto da garrafa servida pelo site", async ({ page }) => {
+  await page.goto("/catalogo/mare-alta");
+
+  await expect(page.getByRole("heading", { level: 1, name: "Maré Alta" })).toBeVisible();
+  await expectBeerPhoto(
+    page,
+    page.getByRole("img", { name: "Maré Alta, American IPA" }),
+    "mare-alta",
+  );
+});
 
 test("a ficha da Maré Alta mostra nome, estilo, selo, ficha técnica, preço com desconto e descrição", async ({
   page,

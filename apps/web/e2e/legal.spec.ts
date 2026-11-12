@@ -31,10 +31,10 @@ test("os links do rodapé levam às outras páginas legais", async ({ page }) =>
   ).toBeVisible();
 });
 
-for (const [caminho, titulo] of [
-  ["/termos", "Termos de Uso"],
-  ["/privacidade", "Política de Privacidade"],
-  ["/entregas", "Entregas"],
+for (const [caminho, titulo, updatedAt] of [
+  ["/termos", "Termos de Uso", "31 de outubro de 2026"],
+  ["/privacidade", "Política de Privacidade", "11 de novembro de 2026"],
+  ["/entregas", "Entregas", "31 de outubro de 2026"],
 ] as const) {
   test(`${caminho} mostra a data da última atualização e não tem rolagem horizontal`, async ({
     page,
@@ -42,7 +42,7 @@ for (const [caminho, titulo] of [
     await page.goto(caminho);
 
     await expect(page.getByRole("heading", { level: 1, name: titulo })).toBeVisible();
-    await expect(page.getByText(/^Última atualização: \d{1,2} de \w+ de \d{4}$/)).toBeVisible();
+    await expect(page.getByText(`Última atualização: ${updatedAt}`, { exact: true })).toBeVisible();
     const excesso = await page.evaluate(
       () => document.documentElement.scrollWidth - window.innerWidth,
     );

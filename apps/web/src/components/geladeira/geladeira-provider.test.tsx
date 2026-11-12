@@ -1,4 +1,4 @@
-import type { CervejaCard, GeladeiraResponse } from "@leguele/shared";
+import type { AjusteDaGeladeira, CervejaCard, GeladeiraResponse } from "@leguele/shared";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -29,11 +29,25 @@ const cerveja: CervejaCard = {
 
 let ultimoDesfazer: Desfazer | null = null;
 
+afterEach(() => {
+  localStorage.clear();
+  ultimoDesfazer = null;
+  caminho.atual = "/";
+});
+
 function Painel() {
   const g = useGeladeira();
   return (
     <div>
-      <p data-testid="ajustes">{`ajustes:${g.ajustes.length}`}</p>
+      <output aria-label="Ajustes da Geladeira">
+        {g.ajustes
+          .map((ajuste) =>
+            ajuste.tipo === "preco-mudou"
+              ? `${ajuste.nome}: ${ajuste.precoVistoCentavos} → ${ajuste.precoAtualCentavos}`
+              : ajuste.nome,
+          )
+          .join(", ")}
+      </output>
       <p data-testid="total">{g.pronta ? String(g.quantidadeTotal) : "carregando"}</p>
       <button type="button" onClick={() => g.adicionar(cerveja)}>
         adicionar
@@ -64,11 +78,6 @@ const abrir = () =>
   );
 
 describe("GeladeiraProvider (convidado)", () => {
-  afterEach(() => {
-    localStorage.clear();
-    ultimoDesfazer = null;
-  });
-
   it("só mostra o total depois de ler a cópia local e começa em 0", async () => {
     abrir();
 
@@ -149,11 +158,6 @@ const guardarLocal = (quantidade: number) =>
   );
 
 describe("GeladeiraProvider com a conta", () => {
-  afterEach(() => {
-    localStorage.clear();
-    ultimoDesfazer = null;
-  });
-
   it("convidado (sem sessão): nada vai para a conta, nem a cada mudança", async () => {
     const conta = contaFalsa({ tipo: "sem-sessao" });
     abrirComConta(conta);
@@ -304,12 +308,23 @@ describe("GeladeiraProvider com a conta", () => {
 
   it("guarda os ajustes da resposta da conta no contexto", async () => {
     const resposta = daConta([{ cerveja, quantidade: 1 }]);
-    resposta.ajustes = [{ cervejaId: "a", tipo: "preco", de: 3000, para: 3200 }] as never;
+    const priceChange: AjusteDaGeladeira = {
+      cervejaId: "a",
+      nome: "Maré Alta",
+      tipo: "preco-mudou",
+      precoVistoCentavos: 3000,
+      precoAtualCentavos: 3200,
+    };
+    resposta.ajustes = [priceChange];
     const conta = contaFalsa({ tipo: "ok", resposta });
 
     abrirComConta(conta);
 
-    await vi.waitFor(() => expect(screen.getByTestId("ajustes")).toHaveTextContent("ajustes:1"));
+    await vi.waitFor(() =>
+      expect(screen.getByLabelText("Ajustes da Geladeira")).toHaveTextContent(
+        "Maré Alta: 3000 → 3200",
+      ),
+    );
   });
 
   it("buscar de novo a cada troca de página (entrar e sair sem recarregar)", async () => {
@@ -325,6 +340,42 @@ describe("GeladeiraProvider com a conta", () => {
     );
 
     await vi.waitFor(() => expect(conta.buscar).toHaveBeenCalledTimes(2));
-    caminho.atual = "/";
+  });
+
+  // Falha reproduzida: o buscar sobrescreve 3 unidades por 1 se um envio anterior falhar enquanto
+  // a nova página busca a conta. Requer reler CHAVE_PENDENTE após o await (correção do Front).
+  it.skip("FIXME: envio que falha durante o buscar da próxima página preserva a mudança local pendente", async () => {
+    guardarLocal(1);
+    localStorage.setItem(CHAVE_DA_CONTA, "1");
+    let finishSend!: (result: ResultadoDaConta) => void;
+    let finishFetch!: (result: ResultadoDaConta) => void;
+    const sendRequest = new Promise<ResultadoDaConta>((resolve) => (finishSend = resolve));
+    const fetchRequest = new Promise<ResultadoDaConta>((resolve) => (finishFetch = resolve));
+    const conta = contaFalsa(ok([{ cerveja, quantidade: 1 }]));
+    conta.buscar.mockReturnValueOnce(Promise.resolve(ok([{ cerveja, quantidade: 1 }])));
+    conta.buscar.mockReturnValueOnce(fetchRequest);
+    conta.enviar.mockReturnValueOnce(sendRequest);
+    const { rerender } = abrirComConta(conta);
+    await vi.waitFor(() => expect(conta.buscar).toHaveBeenCalledTimes(1));
+
+    await userEvent.click(screen.getByRole("button", { name: "tres" }));
+    await vi.waitFor(() => expect(conta.enviar).toHaveBeenCalledTimes(1));
+    caminho.atual = "/catalogo";
+    rerender(
+      <GeladeiraProvider conta={conta}>
+        <Painel />
+      </GeladeiraProvider>,
+    );
+    await vi.waitFor(() => expect(conta.buscar).toHaveBeenCalledTimes(2));
+
+    await act(async () => finishSend({ tipo: "erro" }));
+    expect(localStorage.getItem(CHAVE_PENDENTE)).toBe("1");
+    await act(async () => finishFetch(ok([{ cerveja, quantidade: 1 }])));
+
+    expect(screen.getByTestId("total")).toHaveTextContent("3");
+    expect(JSON.parse(localStorage.getItem(CHAVE_DA_GELADEIRA) ?? "{}").itens[0].quantidade).toBe(
+      3,
+    );
+    expect(localStorage.getItem(CHAVE_PENDENTE)).toBe("1");
   });
 });

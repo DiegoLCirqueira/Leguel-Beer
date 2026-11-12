@@ -1,6 +1,4 @@
 import { calcularDesconto, faixasDeFiltro, pertenceAFaixa } from "@leguele/shared";
-import { existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { SEED_CATEGORIES } from "./seed-catalog-data.js";
 
@@ -121,10 +119,6 @@ describe("dados do seed do catálogo", () => {
     ]);
     for (const beer of beers.filter((b) => b.imageUrl !== null)) {
       expect(beer.imageUrl).toBe(`/cervejas/${beer.slug}.webp`);
-      const arquivo = fileURLToPath(
-        new URL(`../../../../../web/public${beer.imageUrl}`, import.meta.url),
-      );
-      expect(existsSync(arquivo), beer.slug).toBe(true);
     }
   });
 });

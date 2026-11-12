@@ -1,9 +1,16 @@
+import type { Page } from "@playwright/test";
 import { expect, test } from "./support/maior-de-idade";
 
 // Contra a API real com o seed do catálogo: 16 cervejas, 4 por categoria, 1 esgotada (Leguelé Comendador).
 test.use({ isMobile: false, hasTouch: false, viewport: { width: 390, height: 844 } });
 
-const cards = (page: import("@playwright/test").Page) => page.getByRole("article");
+const cards = (page: Page) => page.getByRole("article");
+const resultCount = (page: Page, count: number) =>
+  page.getByRole("heading", {
+    level: 2,
+    name: `${count} ${count === 1 ? "cerveja" : "cervejas"}`,
+    exact: true,
+  });
 
 test("os chips mostram o contador de cada categoria e a contagem total", async ({ page }) => {
   await page.goto("/catalogo");
@@ -11,7 +18,7 @@ test("os chips mostram o contador de cada categoria e a contagem total", async (
   for (const nome of ["Todas (16)", "IPAs (4)", "Frutas (4)", "Malt (4)", "Lager (4)"]) {
     await expect(page.getByRole("button", { name: nome })).toBeVisible();
   }
-  await expect(page.getByText("16 cervejas")).toBeVisible();
+  await expect(resultCount(page, 16)).toBeVisible();
   await expect(cards(page)).toHaveCount(16);
 });
 
@@ -23,7 +30,7 @@ test("tocar num chip filtra pela categoria na URL e o contador dos chips não mu
   await page.getByRole("button", { name: "IPAs (4)" }).click();
 
   await expect(page).toHaveURL(/\/catalogo\?categoria=ipa$/);
-  await expect(page.getByText("4 cervejas")).toBeVisible();
+  await expect(resultCount(page, 4)).toBeVisible();
   await expect(cards(page)).toHaveCount(4);
   await expect(page.getByRole("button", { name: "Todas (16)" })).toBeVisible();
   await expect(page.getByRole("button", { name: "IPAs (4)" })).toHaveAttribute(
@@ -35,7 +42,7 @@ test("tocar num chip filtra pela categoria na URL e o contador dos chips não mu
 test("filtros por faixa vêm da URL e Filtrar mostra quantos estão ativos", async ({ page }) => {
   await page.goto("/catalogo?teor=6-ou-mais&ibu=40-ou-mais");
 
-  await expect(page.getByText("3 cervejas")).toBeVisible();
+  await expect(resultCount(page, 3)).toBeVisible();
   await expect(cards(page).filter({ hasText: "Maré Alta" })).toHaveCount(1);
   await expect(cards(page).filter({ hasText: "Leguelé Maceió IPA" })).toHaveCount(1);
   await expect(cards(page).filter({ hasText: "Jaraguá Hazy IPA" })).toHaveCount(1);
@@ -65,8 +72,8 @@ test("a esgotada vai para o fim com o selo e o Adicionar desabilitado; só dispo
 
   await page.goto("/catalogo?disponiveis=true");
 
-  await expect(page.getByText("15 cervejas")).toBeVisible();
-  await expect(page.getByText("Esgotado")).toHaveCount(0);
+  await expect(resultCount(page, 15)).toBeVisible();
+  await expect(cards(page).getByText("Esgotado")).toHaveCount(0);
 });
 
 test("sem resultado mostra a mensagem e Limpar filtros volta ao catálogo inteiro", async ({
@@ -74,12 +81,14 @@ test("sem resultado mostra a mensagem e Limpar filtros volta ao catálogo inteir
 }) => {
   await page.goto("/catalogo?teor=abaixo-de-4-5&ibu=40-ou-mais");
 
-  await expect(page.getByText("Nenhuma cerveja encontrada com esses filtros.")).toBeVisible();
-  await expect(page.getByRole("heading", { level: 2, name: "0 cervejas" })).toBeVisible();
+  await expect(
+    page.getByRole("main").getByText("Nenhuma cerveja encontrada com esses filtros."),
+  ).toBeVisible();
+  await expect(resultCount(page, 0)).toBeVisible();
   await page.getByRole("button", { name: "Limpar filtros" }).click();
 
   await expect(page).toHaveURL(/\/catalogo$/);
-  await expect(page.getByText("16 cervejas")).toBeVisible();
+  await expect(resultCount(page, 16)).toBeVisible();
 });
 
 test("menor preço e maior preço ordenam a lista, com a esgotada sempre no fim", async ({
@@ -120,14 +129,14 @@ test("combinar categoria, faixa e ordem mostra a lista certa e Limpar filtros ao
 }) => {
   await page.goto("/catalogo?categoria=ipa&teor=6-ou-mais&ordem=menor-preco");
 
-  await expect(page.getByRole("heading", { level: 2, name: "3 cervejas" })).toBeVisible();
+  await expect(resultCount(page, 3)).toBeVisible();
   const nomes = await cards(page).getByRole("heading", { level: 3 }).allTextContents();
   expect(nomes).toEqual(["Leguelé Maceió IPA", "Maré Alta", "Jaraguá Hazy IPA"]);
 
   await page.getByRole("button", { name: "Limpar filtros" }).click();
 
   await expect(page).toHaveURL(/\/catalogo$/);
-  await expect(page.getByRole("heading", { level: 2, name: "16 cervejas" })).toBeVisible();
+  await expect(resultCount(page, 16)).toBeVisible();
   await expect(page.getByRole("button", { name: "Limpar filtros" })).toHaveCount(0);
 });
 
