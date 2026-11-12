@@ -124,7 +124,7 @@ Funcionalidade: Geladeira em prateleiras por categoria
 
 ### Imagens das garrafas (LB-124)
 
-- Uma imagem por cerveja: garrafa de frente, fundo transparente, mesmo enquadramento em todas, com a base na borda inferior da imagem (eixo do balanço). Fonte: PNG de 360 × 1000 do estúdio; no site, WebP de 180 × 500 com no máximo 40 KB.
+- Uma imagem por cerveja: foto da garrafa de frente, fundo transparente, recortada em caixa justa (sem margem), com a base na borda inferior da imagem (eixo do balanço). Os tamanhos variam de foto para foto (as 9 atuais vão de 110 a 149 px de largura e de 391 a 452 px de altura); o site alinha todas pela base. No site, WebP com no máximo 40 KB.
 - A mesma imagem serve ao card, à página de produto e à Geladeira (o `imagemUrl` da cerveja). Arquivos em `apps/web/public/cervejas/<slug>.webp`; o seed preenche o `imageUrl` das cervejas que têm imagem. O cadastro de imagem pelo admin é o LB-73 (item 8).
 - **Imagem padrão da categoria**, para cerveja sem imagem: garrafa sem rótulo, com o contorno da garrafa fantasma preenchido na cor do selo da categoria (tokens do `StyleBadge`), uma por categoria, com o mesmo enquadramento.
 - **Fotos do Diego** (decisão do Diego, 2026-11-12, [[catalogo]], "Catálogo do MVP"): o site usa as fotos das garrafas do Diego, mesmo com rótulo que traz marca de terceiros. Entram as 9 que têm foto (PR #249): Maré Alta, Leguelé Carnaval, Leguelé Maceió IPA, Cupuaçu Ale, Cajupá Sour, Avermelhou, Leguelé Kölsch, Leguelé Cream Ale e Leguelé Comendador. As outras 7 (Jaraguá Hazy IPA, Umbu Gose, Graviola Witbier, Rapadura Brown Ale, Barra Nova Porter, Pajuçara Amber Ale e Ponta Verde Pilsen) usam a imagem padrão da categoria até o Diego enviar as fotos.
@@ -272,7 +272,7 @@ Recomendações aplicadas pelo Spec em 10/11, em modo autônomo; qualquer uma po
 - **Frete até o item 4:** só "Informe seu endereço para calcular o frete", com o Total sem frete.
 - **"Finalizar compra"** no lugar de "Ir para pagamento" (design), desabilitado até o checkout existir.
 - **Fora por ora:** "Limpar geladeira", cupom e favoritar da tela 24.
-- **Imagens:** uma imagem por cerveja para card, produto e Geladeira, em `apps/web/public/cervejas/`, WebP 180 × 500 até 40 KB (o card do LB-124 previa um tipo de imagem separado em `BeerImage`, que fica para o cadastro do admin).
+- **Imagens:** uma imagem por cerveja para card, produto e Geladeira, em `apps/web/public/cervejas/`, WebP recortado em caixa justa, de tamanho variável, alinhado pela base, até 40 KB (o card do LB-124 previa um tipo de imagem separado em `BeerImage`, que fica para o cadastro do admin).
 - **Imagem padrão da categoria:** garrafa sem rótulo na cor do selo da categoria.
 - **Garrafas que entram agora:** substituída pela decisão do Diego de 2026-11-12 (fotos dele autorizadas, mesmo com marca de terceiros): as 9 com foto (PR #249); as outras 7 com a imagem padrão até o Diego enviar as fotos.
 - **Tamanho no celular:** sem rolagem da página de 360 × 640 a 430 × 932, com a moldura encolhendo pela altura e a barra inferior da loja mantida.
@@ -284,4 +284,4 @@ Recomendações aplicadas pelo Spec em 10/11, em modo autônomo; qualquer uma po
 
 ## Tickets propostos
 
-Reconciliação das issues #61, #54, #56, #57, #58 e #59, a pedir ao Orchestrator depois do merge desta spec (aprovação permanente para reconciliar issue com spec mergeada): título mantido; descrição com link para esta spec, os cenários e regras de cada card e as decisões vetáveis que tocam nele (#54: persistência e regra ao entrar; #56: prateleiras, com a moldura em imagem já registrada; #57: alterar e remover no resumo; #58: resumo e frete até o item 4; #59: revalidação e textos; #61: imagens, padrão por categoria e as 9 fotos iniciais). Nenhuma issue nova; a arte nova dos rótulos segue no #61.
+Reconciliação das issues #61, #54, #56, #57, #58 e #59, a pedir ao Orchestrator depois do merge desta spec (aprovação permanente para reconciliar issue com spec mergeada): título mantido; descrição com link para esta spec, os cenários e regras de cada card e as decisões vetáveis que tocam nele (#54: persistência e regra ao entrar; #56: prateleiras, com a moldura em imagem já registrada; #57: alterar e remover no resumo; #58: resumo e frete até o item 4; #59: revalidação e textos; #61: imagens, padrão por categoria e as 9 fotos iniciais). Nenhuma issue nova; as fotos que faltam seguem no #61.
