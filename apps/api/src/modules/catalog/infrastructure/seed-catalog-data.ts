@@ -16,6 +16,8 @@ export interface SeedBeer {
   description: string;
   previousPriceCents: number | null;
   createdAt: Date;
+  /** Foto recortada em `apps/web/public/cervejas`; nulo usa a imagem padrão. */
+  imageUrl: string | null;
 }
 
 export interface SeedCategory {
@@ -51,6 +53,7 @@ const beer = (
   stock,
   description,
   createdAt: new Date(createdAt),
+  imageUrl: null,
 });
 
 export const SEED_CATEGORIES: SeedCategory[] = [
