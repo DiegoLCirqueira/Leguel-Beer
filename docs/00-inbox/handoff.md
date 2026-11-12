@@ -1,40 +1,37 @@
 ---
 tags: [handoff]
-atualizado: 2026-11-10
+atualizado: 2026-11-12
 ---
 
 # Handoff
 
-Sobrescrito pelo Orchestrator ao fim de cada ordem. A próxima conversa começa lendo este arquivo, a daily note mais recente em `docs/05-diario/` e [[licoes-aprendidas]].
+Sobrescrito pelo Orchestrator ao fim de cada ordem. A próxima conversa começa lendo este arquivo, a daily mais recente ([[2026-11-12]]) e [[licoes-aprendidas]].
 
-## Última ordem: inspeção do Diego, catálogo de 16 cervejas e API do produto (08/11 a 10/11)
+## Última ordem: Geladeira no site e fotos das garrafas (11/11 a 12/11)
 
-Resumo em [[2026-11-08]] e [[2026-11-10]]. O Diego pediu para terminar o que estava aberto e não iniciar outra tarefa; em 10/11 mandou retomar.
-
-- Reviewer no Claude Fable 5.2 desde 10/11 (decisão do Diego, [[2026-11-10]], [[maestri-banda]]): incluído no plano até 16/11 e consome a cota mais rápido; depois de 16/11, o Diego reavalia (cartão "🗳️ Decisões pendentes do Diego").
-
-- Inspeção aprovada: Home, catálogo, entregas, conta e entrar. Rodapé fora da loja e de /entregas (#231, #234). /criar-conta legível (#235).
-- Catálogo do MVP: 16 cervejas da marca, 4 por categoria (spec #232, seed #237); falta só a arte nova dos rótulos com marca de terceiros (LB-124).
-- Item 1 fechado, com os achados da auditoria corrigidos (#236) e o refino do Codex (#228). Item 2: spec, contrato e API (GET /catalogo/:slug, #233) prontos; falta a tela (fatias 3 e 4, Front).
-- Processo: auditoria final do Codex a cada ordem; ciclo contínuo ([[ADR-016-ciclo-continuo-da-banda]]); PR de código não edita a daily; terminais limpos (/clear) no fim de cada ordem.
+- Mergeados: #243 a #246 (contrato, API e Política), #247 (Geladeira no site com contador e sincronização), #249 (9 fotos), #250 (specs). Aberto: #248 (data da Política; rebase após #247, revisão do Reviewer depois).
+- Item 2 (página de produto) fechado; item 3 (Geladeira): falta a tela (fatias 6 e 7 da [[geladeira]]; E2E de entrar na conta é obrigatório na fatia 7).
+- Fotos: 9 cervejas com foto; **faltam 7** (jaragua-hazy-ipa, umbu-gose, graviola-witbier, rapadura-brown-ale, barra-nova-porter, pajucara-amber-ale, ponta-verde-pilsen). Quando o Diego enviar: `apps/web/public/cervejas/<slug>.webp` e incluir o slug na lista do seed (`seed-catalog-data.ts`). Fontes de ~470 px: pedir maiores.
+- Regras novas do Diego (12/11): Codex revisa tudo (decisões do Orchestrator, testes, commits); decisões dele vão direto ao chat quando ele está acordado; portais sempre na tela em trabalho; Vercel opção A (prefixo `leguele-web`/`leguele-api`, Hobby, no LB-8).
+- Auditoria final do Codex dos itens 1 e 2: em andamento no fim desta ordem (veredito pendente ao gravar este handoff); depois, refino de testes dele em PR próprio com os achados da [[2026-11-12]].
 
 ## Estado
 
-- Ambiente a partir da `main` (8b6d816) com um único `pnpm dev` na raiz (shared em watch, site :3000, API :3333; log `%TEMP%/leguele-dev.log`). Supabase local e Mailpit no Docker. O :3001 serve o worktree da tarefa atual do Front. Para religar: Docker, `pnpm db:start` e os dois comandos.
+- Ambiente na `main` (confira `git log -1`) com um único `pnpm dev` na raiz (site :3000, API :3333; log `%TEMP%/leguele-dev.log`). Supabase local e Mailpit no Docker. Se o Prisma Client ficar velho: `prisma generate` em `apps/api`. Seed sem conta admin: faltam `ADMIN_SEED_PASSWORD` e `SUPABASE_SERVICE_ROLE_KEY` no `.env` da main.
+- Portais "Leguelé iPhone 390" e "Leguelé Android" apontam para :3000; o :3001 serve o worktree da tarefa do Front. Portal "vercel.com" vinculado pelo Diego (conta Hobby; só ler, não alterar sem pedir).
+- O sandbox do Codex grava em `C:/Users/Arthur/Desktop/leguele`; dúvidas operacionais do Codex vão ao Orchestrator (pedidos de leitura: opção 1). No Git Bash use `MSYS_NO_PATHCONV=1` ao mandar `--raw "/clear\n"`, senão o caminho é mal interpretado.
+- O stash `obsidian` é do Diego; nunca adicionar `docs/.obsidian`.
 - O watch da API não reinicia quando muda o `.env`: reiniciar o processo.
-- `apps/api/.env` da working copy principal foi copiado do worktree `leguele-api` (sem as chaves do seed).
-- Portais "Leguelé iPhone 390" e "Leguelé Android" apontam para :3000.
-- O sandbox do Codex grava em `C:/Users/Arthur/Desktop/leguele` (liberado pelo Diego em 08/11) e os worktrees dele ficam lá; escrita fora dessa pasta pede liberação no terminal dele. O Diego orientou que dúvidas operacionais do Codex vão primeiro ao Orchestrator. Commit, push e `gh pr create` já estão liberados.
 - O cadastro de papéis do Maestri (`maestri role show`) está defasado; os arquivos de `.maestri/roles/` são a fonte real. Não usar `maestri role edit` (lição de 04/11).
 - O papel do Orchestrator ainda diz "Merge é sempre do Diego" na seção 5 até o Diego corrigir. Vale o CLAUDE.md.
-- O stash `obsidian` é do Diego: não aplicar nem descartar. Nunca adicionar `docs/.obsidian`.
+- Não limpar o worktree `leguele-g2` (refactor/components-ui-g2, 5 arquivos não commitados) nem o `leguele-fecho2` sem conferir antes.
 
 ## Próximo
 
-1. Aguardar novas ordens do Diego.
-2. Quando retomar: tela da página de produto (item 2, fatias 3 e 4, Front) e, depois, item 3 (Geladeira).
-3. Arte dos rótulos com a marca Leguelé (Diego ou design) para as cervejas que hoje usam a imagem padrão.
-4. LB-8 (nuvem) espera o Diego (contas); "merge = deploy" vira ADR nele. O spike LB-54 abre o checkout (item 5).
+1. Rebase e revisão do #248.
+2. Item 3: tela da Geladeira (fatias 6 e 7), depois o item 4 (Conta e entrega, ver [[sequencia-telas]]) e o item 5 (checkout, spike LB-54).
+3. Diego: enviar as 7 fotos; em 16/11 o Reviewer volta ao Opus 5.5 (decisão dele de 11/11, cartão de pendências); contas para o LB-8.
+4. Follow-ups: ver a seção "Achados para refino" da [[2026-11-12]] e a seção "Follow-ups" abaixo.
 
 ## Follow-ups
 
@@ -66,9 +63,4 @@ Resumo em [[2026-11-08]] e [[2026-11-10]]. O Diego pediu para terminar o que est
 
 ## Skills sugeridas
 
-- Orchestrator: `maestri`, `handoff`.
-- Spec: `grill-with-docs`, `domain-modeling`, `to-spec`, `to-tickets`.
-- Front: `implement`, `tdd`, `web-design-guidelines`, `playwright-cli`.
-- Back: `implement`, `tdd`, `diagnosing-bugs`.
-- Reviewer: `review-spec`, `web-design-guidelines`, `playwright-cli`.
-- Testes (Codex): `playwright-cli`.
+- Orchestrator: `maestri`, `handoff`. Spec: `grill-with-docs`, `domain-modeling`, `to-spec`, `to-tickets`. Front: `implement`, `tdd`, `web-design-guidelines`, `playwright-cli`. Back: `implement`, `tdd`, `diagnosing-bugs`. Reviewer: `review-spec`, `web-design-guidelines`, `playwright-cli`. Testes (Codex): `playwright-cli`.
