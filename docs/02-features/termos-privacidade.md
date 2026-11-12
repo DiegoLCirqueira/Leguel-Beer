@@ -137,6 +137,7 @@ Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adic
 ### Decisões do Diego (2026-11-11)
 
 - **Geladeira na Política de Privacidade (opção A, LGPD):** "Quais dados coletamos" passa a citar as cervejas e as quantidades da Geladeira: salvas na conta do cliente logado, para valer em outros aparelhos, com cópia no navegador apagada ao sair; do convidado, só no armazenamento do navegador. Origem: pendência 1 de [[geladeira]]. O texto espelhado no site e a data de "última atualização" de `/privacidade` são acertados pelo Front no código.
+- **Data da Política sem novo aceite (opção A, LGPD):** a mudança da Geladeira só muda a data de "última atualização" de `/privacidade`; quem já tem conta não precisa aceitar de novo. Cada página legal passa a ter a própria data: Privacidade 2026-11-11; Termos e Entregas continuam em 2026-10-31.
 
 ### Decisões do Diego (2026-11-08)
 
