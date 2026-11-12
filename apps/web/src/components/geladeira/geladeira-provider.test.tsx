@@ -342,9 +342,9 @@ describe("GeladeiraProvider com a conta", () => {
     await vi.waitFor(() => expect(conta.buscar).toHaveBeenCalledTimes(2));
   });
 
-  // Falha reproduzida: o buscar sobrescreve 3 unidades por 1 se um envio anterior falhar enquanto
+  // Corrida: o buscar sobrescrevia 3 unidades por 1 se um envio anterior falhar enquanto
   // a nova página busca a conta. Requer reler CHAVE_PENDENTE após o await (correção do Front).
-  it.skip("FIXME: envio que falha durante o buscar da próxima página preserva a mudança local pendente", async () => {
+  it("envio que falha durante o buscar da próxima página preserva a mudança local pendente", async () => {
     guardarLocal(1);
     localStorage.setItem(CHAVE_DA_CONTA, "1");
     let finishSend!: (result: ResultadoDaConta) => void;
