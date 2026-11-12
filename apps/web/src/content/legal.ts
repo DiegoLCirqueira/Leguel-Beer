@@ -1,7 +1,10 @@
 import type { SecaoLegal } from "@/components/legal/legal-page";
 
-// Data da versão dos textos legais (AAAA-MM-DD). Atualize ao mudar qualquer texto abaixo.
-export const ATUALIZADO_EM = "2026-10-31";
+// Data da versão de cada texto legal (AAAA-MM-DD). Atualize a do texto que mudar, junto com a versão
+// correspondente em apps/api/src/modules/account/domain/legal-versions.ts.
+export const TERMOS_ATUALIZADO_EM = "2026-10-31";
+export const PRIVACIDADE_ATUALIZADA_EM = "2026-11-11";
+export const ENTREGAS_ATUALIZADO_EM = "2026-10-31";
 
 export const TERMOS: SecaoLegal[] = [
   {

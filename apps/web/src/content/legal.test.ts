@@ -2,7 +2,12 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { ATUALIZADO_EM, PRIVACIDADE } from "./legal";
+import {
+  ENTREGAS_ATUALIZADO_EM,
+  PRIVACIDADE,
+  PRIVACIDADE_ATUALIZADA_EM,
+  TERMOS_ATUALIZADO_EM,
+} from "./legal";
 
 const arquivoDaApi = resolve(process.cwd(), "../api/src/modules/account/domain/legal-versions.ts");
 
@@ -14,13 +19,18 @@ function versaoNaApi(campo: string): string | undefined {
 }
 
 describe("versão dos textos legais", () => {
-  it("a data do site vale desde a retirada do aviso de portfólio dos Termos e de Entregas", () => {
-    expect(ATUALIZADO_EM).toBe("2026-10-31");
+  it("a Política de Privacidade vale desde a Geladeira guardada na conta", () => {
+    expect(PRIVACIDADE_ATUALIZADA_EM).toBe("2026-11-11");
   });
 
-  it("a API grava como versão do aceite a mesma data que o site mostra", () => {
-    expect(versaoNaApi("termosVersao")).toBe(ATUALIZADO_EM);
-    expect(versaoNaApi("privacidadeVersao")).toBe(ATUALIZADO_EM);
+  it("os Termos e Entregas seguem na data da retirada do aviso de portfólio", () => {
+    expect(TERMOS_ATUALIZADO_EM).toBe("2026-10-31");
+    expect(ENTREGAS_ATUALIZADO_EM).toBe("2026-10-31");
+  });
+
+  it("a API grava como versão do aceite a mesma data que o site mostra em cada página", () => {
+    expect(versaoNaApi("termosVersao")).toBe(TERMOS_ATUALIZADO_EM);
+    expect(versaoNaApi("privacidadeVersao")).toBe(PRIVACIDADE_ATUALIZADA_EM);
   });
 
   it("a Política de Privacidade cita a Geladeira em Quais dados coletamos", () => {
