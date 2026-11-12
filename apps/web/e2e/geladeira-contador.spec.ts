@@ -61,3 +61,26 @@ test("cópia local inválida começa vazia, sem quebrar a página", async ({ pag
   await expect(page.getByRole("link", { name: "Geladeira, 0 unidades" })).toBeVisible();
   await expect(page.getByRole("heading", { level: 1, name: "Leguelé Beer" })).toBeVisible();
 });
+
+test("sem sessão, a cópia de quem saiu da conta é apagada e o contador volta a 0", async ({
+  page,
+}) => {
+  await page.addInitScript(
+    (geladeira) => {
+      if (window.localStorage.getItem("lb:geladeira-da-conta") !== null) return;
+      window.localStorage.setItem("lb:geladeira", JSON.stringify(geladeira));
+      window.localStorage.setItem("lb:geladeira-da-conta", "1");
+    },
+    { versao: 1, itens: [{ cerveja: cerveja("a", "Maré Alta"), quantidade: 2 }] },
+  );
+
+  await page.goto("/");
+
+  await expect(page.getByRole("link", { name: "Geladeira, 0 unidades" })).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => window.localStorage.getItem("lb:geladeira")))
+    .toBeNull();
+  await expect
+    .poll(() => page.evaluate(() => window.localStorage.getItem("lb:geladeira-da-conta")))
+    .toBeNull();
+});
