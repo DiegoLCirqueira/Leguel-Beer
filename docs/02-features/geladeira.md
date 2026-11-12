@@ -124,10 +124,10 @@ Funcionalidade: Geladeira em prateleiras por categoria
 
 ### Imagens das garrafas (LB-124)
 
-- Uma imagem por cerveja: garrafa de frente, fundo transparente, mesmo enquadramento em todas, com a base na borda inferior da imagem (eixo do balanço). Fonte: PNG de 360 × 1000 do estúdio; no site, WebP de 180 × 500 com no máximo 40 KB.
-- A mesma imagem serve ao card, à página de produto e à Geladeira (o `imagemUrl` da cerveja). Arquivos em `apps/web/public/garrafas/<slug>.webp`; o seed preenche o `imageUrl` das cervejas que têm imagem. O cadastro de imagem pelo admin é o LB-73 (item 8).
+- Uma imagem por cerveja: foto da garrafa de frente, fundo transparente, recortada em caixa justa (sem margem), com a base na borda inferior da imagem (eixo do balanço). Os tamanhos variam de foto para foto (as 9 atuais vão de 110 a 149 px de largura e de 391 a 452 px de altura); o site alinha todas pela base. No site, WebP com no máximo 40 KB.
+- A mesma imagem serve ao card, à página de produto e à Geladeira (o `imagemUrl` da cerveja). Arquivos em `apps/web/public/cervejas/<slug>.webp`; o seed preenche o `imageUrl` das cervejas que têm imagem. O cadastro de imagem pelo admin é o LB-73 (item 8).
 - **Imagem padrão da categoria**, para cerveja sem imagem: garrafa sem rótulo, com o contorno da garrafa fantasma preenchido na cor do selo da categoria (tokens do `StyleBadge`), uma por categoria, com o mesmo enquadramento.
-- **Nenhuma imagem com marca de terceiros** ([[catalogo]], "Catálogo do MVP"). Entram agora só as garrafas cujo rótulo já é da Leguelé e existe no estúdio: Leguelé Maceió IPA, Leguelé Carnaval, Leguelé Kölsch e Leguelé Cream Ale, cada uma conferida a olho antes do commit. As outras 12 usam a imagem padrão da categoria até a arte nova (follow-up de arte, ver "Fora de escopo").
+- **Fotos do Diego** (decisão do Diego, 2026-11-12, [[catalogo]], "Catálogo do MVP"): o site usa as fotos das garrafas do Diego, mesmo com rótulo que traz marca de terceiros. Entram as 9 que têm foto (PR #249): Maré Alta, Leguelé Carnaval, Leguelé Maceió IPA, Cupuaçu Ale, Cajupá Sour, Avermelhou, Leguelé Kölsch, Leguelé Cream Ale e Leguelé Comendador. As outras 7 (Jaraguá Hazy IPA, Umbu Gose, Graviola Witbier, Rapadura Brown Ale, Barra Nova Porter, Pajuçara Amber Ale e Ponta Verde Pilsen) usam a imagem padrão da categoria até o Diego enviar as fotos.
 - **Moldura:** a imagem da geladeira do estúdio (710 × 1573), extraída para `apps/web/public/geladeira/`, com o parapeito de cada prateleira redesenhado por cima das garrafas, como no estúdio.
 
 ### Alterar e remover (LB-50)
@@ -161,7 +161,7 @@ Funcionalidade: Geladeira em prateleiras por categoria
 - Cupom de desconto (LB-53, MVP+), favoritar (Pós-MVP) e "Limpar geladeira" (botão da tela 24 sem card no backlog).
 - Cálculo de frete e endereço padrão (item 4), checkout e exigência de login ao finalizar (item 5, LB-55 e LB-31).
 - Reserva de estoque (LB-56, #32): até ela existir, a quantidade disponível é o estoque.
-- **Arte nova dos rótulos** (follow-up de arte do LB-124): refazer com a marca Leguelé os rótulos de Maré Alta, Cupuaçu Ale, Cajupá Sour e Avermelhou e criar os das outras 8 (as 7 novas e a Leguelé Comendador, que não está no estúdio). Cada garrafa nova entra depois, só com a imagem e o seed, sem mudar esta spec.
+- **Fotos que faltam** (follow-up do LB-124): as 7 cervejas sem foto (Jaraguá Hazy IPA, Umbu Gose, Graviola Witbier, Rapadura Brown Ale, Barra Nova Porter, Pajuçara Amber Ale e Ponta Verde Pilsen), que o Diego vai enviar. Cada foto entra depois, só com a imagem e o seed, sem mudar esta spec. Os rótulos com marca de terceiros não precisam mais ser refeitos (decisão do Diego, 2026-11-12).
 
 ## Referência visual
 
@@ -240,7 +240,7 @@ Os demais já existem: `StyleBadge`, `Stepper`, `Toast`, `BottomSheet` e `Button
 | 2 | LB-52 (#59), API | Back | Caso de uso de revalidação (domínio puro) e `POST /geladeira/validar` |
 | 3 | LB-47 (#54), API | Back | Modelos e migration da Geladeira da conta; `GET` e `PUT /me/geladeira`, reusando a revalidação da fatia 2 |
 | 4 | LB-47 (#54), site | Front | Estado da Geladeira (operações puras, armazenamento local versionado, sincronização com a conta pelo servidor do site, regra ao entrar e ao sair) e contador real no header; destrava [[adicionar-do-card]] e a fatia 4 de [[produto]] |
-| 5 | LB-124 (#61) | Front | Moldura, garrafa fantasma em SVG, imagem padrão por categoria, as 4 garrafas da Leguelé em WebP e o `imageUrl` delas no seed (o seed é ajuste pequeno do Front com revisão do Back) |
+| 5 | LB-124 (#61) | Front | Moldura, garrafa fantasma em SVG, imagem padrão por categoria, as 9 fotos de garrafa em WebP (PR #249) e o `imageUrl` delas no seed (o seed é ajuste pequeno do Front com revisão do Back) |
 | 6 | LB-49 (#56) | Front | `/geladeira` com as prateleiras, arrumação, faixas, fantasmas, animações, acessibilidade e tamanho sem rolagem |
 | 7 | LB-51 (#58), LB-50 (#57) e LB-52 no site | Front | Resumo (barra e sheet no celular, coluna no desktop), alterar e remover com "Desfazer", e a lista de avisos da revalidação |
 
@@ -272,9 +272,9 @@ Recomendações aplicadas pelo Spec em 10/11, em modo autônomo; qualquer uma po
 - **Frete até o item 4:** só "Informe seu endereço para calcular o frete", com o Total sem frete.
 - **"Finalizar compra"** no lugar de "Ir para pagamento" (design), desabilitado até o checkout existir.
 - **Fora por ora:** "Limpar geladeira", cupom e favoritar da tela 24.
-- **Imagens:** uma imagem por cerveja para card, produto e Geladeira, em `apps/web/public/garrafas/`, WebP 180 × 500 até 40 KB (o card do LB-124 previa um tipo de imagem separado em `BeerImage`, que fica para o cadastro do admin).
+- **Imagens:** uma imagem por cerveja para card, produto e Geladeira, em `apps/web/public/cervejas/`, WebP recortado em caixa justa, de tamanho variável, alinhado pela base, até 40 KB (o card do LB-124 previa um tipo de imagem separado em `BeerImage`, que fica para o cadastro do admin).
 - **Imagem padrão da categoria:** garrafa sem rótulo na cor do selo da categoria.
-- **Garrafas que entram agora:** só as 4 com rótulo da Leguelé que existem no estúdio; as outras 12 com a imagem padrão até a arte nova.
+- **Garrafas que entram agora:** substituída pela decisão do Diego de 2026-11-12 (fotos dele autorizadas, mesmo com marca de terceiros): as 9 com foto (PR #249); as outras 7 com a imagem padrão até o Diego enviar as fotos.
 - **Tamanho no celular:** sem rolagem da página de 360 × 640 a 430 × 932, com a moldura encolhendo pela altura e a barra inferior da loja mantida.
 - **Avisos da revalidação** numa lista no topo da Geladeira, que some ao sair da página.
 
@@ -284,4 +284,4 @@ Recomendações aplicadas pelo Spec em 10/11, em modo autônomo; qualquer uma po
 
 ## Tickets propostos
 
-Reconciliação das issues #61, #54, #56, #57, #58 e #59, a pedir ao Orchestrator depois do merge desta spec (aprovação permanente para reconciliar issue com spec mergeada): título mantido; descrição com link para esta spec, os cenários e regras de cada card e as decisões vetáveis que tocam nele (#54: persistência e regra ao entrar; #56: prateleiras, com a moldura em imagem já registrada; #57: alterar e remover no resumo; #58: resumo e frete até o item 4; #59: revalidação e textos; #61: imagens, padrão por categoria e as 4 garrafas iniciais). Nenhuma issue nova; a arte nova dos rótulos segue no #61.
+Reconciliação das issues #61, #54, #56, #57, #58 e #59, a pedir ao Orchestrator depois do merge desta spec (aprovação permanente para reconciliar issue com spec mergeada): título mantido; descrição com link para esta spec, os cenários e regras de cada card e as decisões vetáveis que tocam nele (#54: persistência e regra ao entrar; #56: prateleiras, com a moldura em imagem já registrada; #57: alterar e remover no resumo; #58: resumo e frete até o item 4; #59: revalidação e textos; #61: imagens, padrão por categoria e as 9 fotos iniciais). Nenhuma issue nova; as fotos que faltam seguem no #61.

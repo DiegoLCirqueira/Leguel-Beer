@@ -271,13 +271,13 @@ Depois do contrato (fatia 1), as fatias 2 a 4 (Back) e 5 a 7 (Front) andam em pa
 - **Bottom sheet:** em tela baixa ou com zoom de 200% rola por dentro e fecha com Esc.
 - **Componentes novos** em `apps/web/src/components/ui`, cada um na vitrine `/dev/tokens` ([[identidade-visual]], "Componentes reutilizáveis"): cabeçalho da loja, barra inferior, card de cerveja, stepper, bottom sheet, toast com "Desfazer", skeleton, select, faixa, switch, estado vazio, título de página e selo "Esgotado".
 
-> [!todo] Preencher: imagens das garrafas dos cards. Sem `imagemUrl`, o card usa a imagem padrão da categoria; as imagens recortadas vêm do LB-124 (item 3 da [[sequencia-telas]]).
+> [!todo] Preencher: fotos das 7 cervejas que ainda não têm (Jaraguá Hazy IPA, Umbu Gose, Graviola Witbier, Rapadura Brown Ale, Barra Nova Porter, Pajuçara Amber Ale e Ponta Verde Pilsen); o Diego vai enviar. Sem `imagemUrl`, o card usa a imagem padrão da categoria. As 9 com foto recortada entram no PR #249 (LB-124, item 3 da [[sequencia-telas]]).
 
 ## Catálogo do MVP (16 cervejas da marca)
 
 Decisão do Diego em 08/11: o catálogo do MVP tem **16 cervejas, 4 por categoria, todas da marca Leguelé Beer** ("trocar, tudo deve ser da nossa marca (leguelé beer)"). As 9 dos rótulos em `Imagens/figma/cervejas/` (fora do repo) ficam como base; as outras 7 são novas. Sobre as novas ("Falta criar o resto das cervejas que vão fechar 4 por categoria; quanto ao rótulo ou design faça o que ficar melhor; esses dados vão ser completamente inventados então tem liberdade pra fazê-los, pegue cervejas existentes como base pras pesquisas"), os dados são **inventados, de exemplo**, e serão trocados pelo cadastro (admin, LB-73). Comendador: "Não tenho certeza"; o Spec inventou estilo e dados (Helles, Lager).
 
-Onde rótulo e design divergem, o Diego delegou e vale (decisão do Spec, vetável): o **rótulo** para nome, estilo, teor e volume (Maré Alta 330 ml, Cupuaçu Ale 5,8%); o **design** para preço, preço anterior, IBU e descrição da Maré Alta (R$ 32,00, anterior R$ 36,90, IBU 65). As imagens dos rótulos atuais trazem marcas de terceiros e **precisam ser refeitas com a marca Leguelé** (follow-up de arte, LB-124); até lá, o site usa a imagem padrão da categoria nas cervejas cujo rótulo tenha marca de terceiros.
+Onde rótulo e design divergem, o Diego delegou e vale (decisão do Spec, vetável): o **rótulo** para nome, estilo, teor e volume (Maré Alta 330 ml, Cupuaçu Ale 5,8%); o **design** para preço, preço anterior, IBU e descrição da Maré Alta (R$ 32,00, anterior R$ 36,90, IBU 65). **Fotos das garrafas** (decisão do Diego, 2026-11-12): o site usa as fotos do Diego, mesmo com os rótulos que trazem marca de terceiros (o Diego autorizou). As 9 cervejas com foto (Maré Alta, Leguelé Carnaval, Leguelé Maceió IPA, Cupuaçu Ale, Cajupá Sour, Avermelhou, Leguelé Kölsch, Leguelé Cream Ale e Leguelé Comendador) usam a foto recortada (PR #249); as outras 7 seguem com a imagem padrão da categoria até o Diego enviar as fotos.
 
 | Cerveja (slug) | Estilo | Categoria | Teor | Vol. | Preço | IBU | Destaque | Referência de estilo |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -300,7 +300,7 @@ Onde rótulo e design divergem, o Diego delegou e vale (decisão do Spec, vetáv
 
 Valores inventados para o seed; a coluna "Referência de estilo" mostra só a faixa típica do estilo em cervejas artesanais existentes, sem nome nem marca de terceiros. O preço anterior (Maré Alta, Cajupá Sour) só alimenta o dado; o preço riscado no card não tem spec ainda (na página de produto tem, ver [[produto]]).
 
-**Para todas as cervejas:** descrições abaixo (1 a 2 frases); estoque de exemplo definido pelo Back no seed, com **1 esgotada** (Leguelé Comendador, estoque 0, para exercitar o selo e a ordem) e as outras 15 com estoque; imagem do rótulo da pasta de garrafas quando já for da marca, senão a padrão da categoria.
+**Para todas as cervejas:** descrições abaixo (1 a 2 frases); estoque de exemplo definido pelo Back no seed, com **1 esgotada** (Leguelé Comendador, estoque 0, para exercitar o selo e a ordem) e as outras 15 com estoque; foto recortada da garrafa nas 9 que têm foto, senão a padrão da categoria.
 
 | Cerveja | Descrição |
 | --- | --- |
@@ -331,4 +331,4 @@ Valores inventados para o seed; a coluna "Referência de estilo" mostra só a fa
 
 ### A confirmar
 
-- **Arte dos rótulos** (LB-124): refazer com a marca Leguelé os rótulos de Cupuaçu Ale, Avermelhou, Cajupá Sour e Maré Alta, que trazem outra cervejaria ou origem, e criar os das 7 cervejas novas (Jaraguá Hazy IPA, Umbu Gose, Graviola Witbier, Rapadura Brown Ale, Barra Nova Porter, Pajuçara Amber Ale e Ponta Verde Pilsen). O design dos rótulos novos é livre (o Diego delegou).
+- **Fotos das garrafas** (LB-124): as 9 cervejas com foto do Diego já a usam (PR #249), inclusive as de rótulo com marca de terceiros (Cupuaçu Ale, Avermelhou, Cajupá Sour e Maré Alta), que o Diego autorizou em 2026-11-12 e não precisam mais ser refeitas. Faltam as fotos das 7 cervejas novas (Jaraguá Hazy IPA, Umbu Gose, Graviola Witbier, Rapadura Brown Ale, Barra Nova Porter, Pajuçara Amber Ale e Ponta Verde Pilsen), que o Diego vai enviar; até lá, imagem padrão da categoria.
