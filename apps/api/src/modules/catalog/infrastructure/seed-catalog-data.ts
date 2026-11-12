@@ -16,6 +16,8 @@ export interface SeedBeer {
   description: string;
   previousPriceCents: number | null;
   createdAt: Date;
+  /** Foto recortada em `apps/web/public/cervejas`; nulo usa a imagem padrão. */
+  imageUrl: string | null;
 }
 
 export interface SeedCategory {
@@ -24,6 +26,19 @@ export interface SeedCategory {
   order: number;
   beers: SeedBeer[];
 }
+
+/** Cervejas cuja foto recortada já está em `apps/web/public/cervejas` (as outras usam a imagem padrão). */
+const SLUGS_COM_FOTO = new Set([
+  "mare-alta",
+  "leguele-carnaval",
+  "leguele-maceio-ipa",
+  "cupuacu-ale",
+  "cajupa-sour",
+  "avermelhou",
+  "leguele-kolsch",
+  "leguele-cream-ale",
+  "leguele-comendador",
+]);
 
 const beer = (
   slug: string,
@@ -51,6 +66,7 @@ const beer = (
   stock,
   description,
   createdAt: new Date(createdAt),
+  imageUrl: SLUGS_COM_FOTO.has(slug) ? `/cervejas/${slug}.webp` : null,
 });
 
 export const SEED_CATEGORIES: SeedCategory[] = [

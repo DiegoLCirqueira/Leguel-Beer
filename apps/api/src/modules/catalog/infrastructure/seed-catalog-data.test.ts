@@ -1,4 +1,6 @@
 import { calcularDesconto, faixasDeFiltro, pertenceAFaixa } from "@leguele/shared";
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { SEED_CATEGORIES } from "./seed-catalog-data.js";
 
@@ -101,5 +103,28 @@ describe("dados do seed do catálogo", () => {
     expect(
       beers.filter((beer) => calcularDesconto(beer.previousPriceCents, beer.priceCents) !== null),
     ).toHaveLength(2);
+  });
+
+  it("as cervejas com foto apontam para a imagem recortada do site e as demais ficam sem imagem (imagem padrão)", () => {
+    const comFoto = beers.filter((beer) => beer.imageUrl !== null).map((beer) => beer.slug);
+
+    expect(comFoto.sort()).toEqual([
+      "avermelhou",
+      "cajupa-sour",
+      "cupuacu-ale",
+      "leguele-carnaval",
+      "leguele-comendador",
+      "leguele-cream-ale",
+      "leguele-kolsch",
+      "leguele-maceio-ipa",
+      "mare-alta",
+    ]);
+    for (const beer of beers.filter((b) => b.imageUrl !== null)) {
+      expect(beer.imageUrl).toBe(`/cervejas/${beer.slug}.webp`);
+      const arquivo = fileURLToPath(
+        new URL(`../../../../../web/public${beer.imageUrl}`, import.meta.url),
+      );
+      expect(existsSync(arquivo), beer.slug).toBe(true);
+    }
   });
 });
