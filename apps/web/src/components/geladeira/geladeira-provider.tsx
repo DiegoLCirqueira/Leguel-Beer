@@ -12,6 +12,7 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from "react";
+import { usePathname } from "next/navigation";
 import type { ContaDaGeladeira } from "@/lib/geladeira/conta";
 import {
   CHAVE_DA_CONTA,
@@ -78,6 +79,11 @@ export function GeladeiraProvider({
   );
   // Sempre o estado mais novo, para os resultados síncronos das operações (limite, desfazer).
   const atual = useRef(estado);
+  // Conta as mudanças locais, para descartar a resposta antiga de um buscar que ficou em voo.
+  const versao = useRef(0);
+  const [ajustes, setAjustes] = useState<AjusteDaGeladeira[]>([]);
+  // Entrar e sair redirecionam: a mudança de página é o sinal para olhar a sessão de novo.
+  const pagina = usePathname();
 
   const aplicar = useCallback((proximo: EstadoDaGeladeira) => {
     atual.current = proximo;
@@ -85,51 +91,63 @@ export function GeladeiraProvider({
     gravarGeladeiraLocal(proximo);
   }, []);
 
-  // Manda a Geladeira inteira para a conta; qualquer falha deixa o envio pendente (a cópia local vale).
+  // Sessão acabou (saída da conta, ou outra conta no mesmo navegador): a cópia local é da conta anterior.
+  const sairDaConta = useCallback(() => {
+    apagarGeladeiraLocal();
+    gravarMarca(CHAVE_DA_CONTA, false);
+    atual.current = GELADEIRA_VAZIA;
+    setEstado(GELADEIRA_VAZIA);
+    setAjustes([]);
+  }, []);
+
+  // Manda a Geladeira inteira para a conta. Só falha de envio de mudança local deixa pendente.
   const enviar = useCallback(async () => {
     if (!conta) return;
     const resultado = await conta.enviar(paraRequest(atual.current)).catch(() => undefined);
     if (resultado?.tipo === "ok") {
       gravarMarca(CHAVE_PENDENTE, false);
       gravarMarca(CHAVE_DA_CONTA, true);
+      setAjustes(resultado.resposta.ajustes);
     } else if (resultado?.tipo === "sem-sessao") {
-      // Sessão acabou: o próximo carregamento da página trata a saída da conta.
-      gravarMarca(CHAVE_PENDENTE, false);
-    } else {
+      if (lerMarca(CHAVE_DA_CONTA)) sairDaConta();
+      else gravarMarca(CHAVE_PENDENTE, false);
+    } else if (lerMarca(CHAVE_DA_CONTA)) {
       gravarMarca(CHAVE_PENDENTE, true);
     }
-  }, [conta]);
+  }, [conta, sairDaConta]);
 
   // Depois de uma mudança: com a conta, manda tudo (ou reenvia o que ficou pendente).
   const sincronizar = useCallback(() => {
+    versao.current += 1;
     if (conta && lerMarca(CHAVE_DA_CONTA)) void enviar();
   }, [conta, enviar]);
 
-  // Ao montar: com sessão, aplica a regra ao entrar; sem sessão, apaga a cópia de quem acabou de sair.
+  // A cada página (inclusive depois de entrar ou sair, que redirecionam): com sessão, aplica a regra
+  // ao entrar; sem sessão, apaga a cópia de quem acabou de sair.
   useEffect(() => {
     if (!conta) return;
     let ativo = true;
     (async () => {
-      if (lerMarca(CHAVE_PENDENTE)) return enviar();
+      const sincronizada = lerMarca(CHAVE_DA_CONTA);
+      if (sincronizada && lerMarca(CHAVE_PENDENTE)) return enviar();
+      const antes = versao.current;
       const resultado = await conta.buscar().catch(() => undefined);
       if (!ativo || !resultado) return;
       if (resultado.tipo === "sem-sessao") {
-        if (lerMarca(CHAVE_DA_CONTA)) {
-          apagarGeladeiraLocal();
-          gravarMarca(CHAVE_DA_CONTA, false);
-          atual.current = GELADEIRA_VAZIA;
-          setEstado(GELADEIRA_VAZIA);
-        }
+        if (sincronizada) sairDaConta();
         return;
       }
-      if (resultado.tipo !== "ok") {
-        gravarMarca(CHAVE_PENDENTE, true);
-        return;
-      }
+      // Erro ou conta sem perfil: nada muda e nada fica pendente (a cópia local não vale mais que a conta).
+      if (resultado.tipo !== "ok") return;
+      // Mudança feita enquanto o buscar estava em voo: a resposta é antiga.
+      if (sincronizada && versao.current !== antes) return;
       gravarMarca(CHAVE_DA_CONTA, true);
+      setAjustes(resultado.resposta.ajustes);
+      const daConta = aplicarResposta(GELADEIRA_VAZIA, resultado.resposta);
+      if (sincronizada) return aplicar(daConta);
       const { geladeira, enviarParaConta } = resolverAoEntrar({
         convidado: atual.current,
-        conta: aplicarResposta(GELADEIRA_VAZIA, resultado.resposta),
+        conta: daConta,
       });
       aplicar(geladeira);
       if (enviarParaConta) await enviar();
@@ -137,14 +155,14 @@ export function GeladeiraProvider({
     return () => {
       ativo = false;
     };
-  }, [conta, enviar, aplicar]);
+  }, [conta, enviar, aplicar, sairDaConta, pagina]);
 
   const contexto = useMemo<GeladeiraContexto>(
     () => ({
       pronta,
       estado,
       quantidadeTotal: quantidadeTotal(estado),
-      ajustes: [],
+      ajustes,
       adicionar: (cerveja, quantidade) => {
         const resultado = adicionarOp(atual.current, cerveja, quantidade);
         if (resultado.estado !== atual.current) {
@@ -174,7 +192,7 @@ export function GeladeiraProvider({
         sincronizar();
       },
     }),
-    [pronta, estado, aplicar, sincronizar],
+    [pronta, estado, ajustes, aplicar, sincronizar],
   );
 
   return <Contexto.Provider value={contexto}>{children}</Contexto.Provider>;
