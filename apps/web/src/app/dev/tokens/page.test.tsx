@@ -34,7 +34,7 @@ describe("/dev/tokens", () => {
   it("mostra o cabeçalho e a barra inferior da loja, para conferir o contador e a aba atual", () => {
     render(<DevTokens />);
 
-    expect(screen.getByRole("link", { name: "Geladeira, 2 itens" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Geladeira, 2 unidades" })).toBeInTheDocument();
     const barra = screen.getByRole("navigation", { name: "Menu da loja" });
     expect(within(barra).getByRole("link", { name: "Catálogo" })).toHaveAttribute(
       "aria-current",
@@ -73,7 +73,7 @@ describe("/dev/tokens", () => {
     render(<DevTokens />);
 
     expect(screen.getByText("-13%")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Geladeira, 3 itens" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Geladeira, 3 unidades" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Adicionar à geladeira" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Cerveja não encontrada" })).toBeInTheDocument();
   });

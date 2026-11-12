@@ -42,10 +42,10 @@ describe("cabeçalhos com o contador real da Geladeira", () => {
       </GeladeiraProvider>,
     );
 
-    expect(await screen.findByRole("link", { name: "Geladeira, 0 itens" })).toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: "Geladeira, 0 unidades" })).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "adicionar duas" }));
 
-    expect(screen.getByRole("link", { name: "Geladeira, 2 itens" })).toHaveTextContent("2");
+    expect(screen.getByRole("link", { name: "Geladeira, 2 unidades" })).toHaveTextContent("2");
   });
 
   it("o cabeçalho do produto lê o mesmo contador", async () => {
@@ -58,6 +58,6 @@ describe("cabeçalhos com o contador real da Geladeira", () => {
 
     await userEvent.click(await screen.findByRole("button", { name: "adicionar duas" }));
 
-    expect(screen.getByRole("link", { name: "Geladeira, 2 itens" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Geladeira, 2 unidades" })).toBeInTheDocument();
   });
 });

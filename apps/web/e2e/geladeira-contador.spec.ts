@@ -47,9 +47,9 @@ test("o contador do header soma as unidades da Geladeira guardada no navegador, 
 
   await page.goto("/");
 
-  await expect(page.getByRole("link", { name: "Geladeira, 3 itens" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Geladeira, 3 unidades" })).toBeVisible();
   await page.reload();
-  await expect(page.getByRole("link", { name: "Geladeira, 3 itens" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Geladeira, 3 unidades" })).toBeVisible();
   expect(erros.filter((e) => /hydrat|did not match/i.test(e))).toEqual([]);
 });
 
@@ -58,6 +58,6 @@ test("cópia local inválida começa vazia, sem quebrar a página", async ({ pag
 
   await page.goto("/");
 
-  await expect(page.getByRole("link", { name: "Geladeira, 0 itens" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Geladeira, 0 unidades" })).toBeVisible();
   await expect(page.getByRole("heading", { level: 1, name: "Leguelé Beer" })).toBeVisible();
 });

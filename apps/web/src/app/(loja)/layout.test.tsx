@@ -16,7 +16,7 @@ describe("layout da loja", () => {
       </GeladeiraProvider>,
     );
 
-    expect(screen.getByRole("link", { name: "Geladeira, 0 itens" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Geladeira, 0 unidades" })).toBeInTheDocument();
     expect(screen.getByRole("main")).toHaveTextContent("Conteúdo da página");
     expect(screen.queryByRole("contentinfo")).not.toBeInTheDocument();
     expect(screen.getByRole("navigation", { name: "Menu da loja" })).toBeInTheDocument();

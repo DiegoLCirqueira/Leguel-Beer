@@ -13,7 +13,7 @@ test("a home tem cabeçalho com a Geladeira, barra inferior fixa, sem rodapé, e
 }) => {
   await page.goto("/");
 
-  await expect(page.getByRole("link", { name: "Geladeira, 0 itens" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Geladeira, 0 unidades" })).toBeVisible();
   const barra = page.getByRole("navigation", { name: "Menu da loja" });
   await expect(barra).toBeVisible();
   await expect(barra.getByRole("link", { name: "Início" })).toHaveAttribute("aria-current", "page");
