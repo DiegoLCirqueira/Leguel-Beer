@@ -1,6 +1,6 @@
 "use client";
 
-import type { CervejaCard } from "@leguele/shared";
+import type { AjusteDaGeladeira, CervejaCard } from "@leguele/shared";
 import {
   createContext,
   useCallback,
@@ -42,6 +42,8 @@ export type GeladeiraContexto = {
   pronta: boolean;
   estado: EstadoDaGeladeira;
   quantidadeTotal: number;
+  /** Avisos de preço e quantidade da última resposta da conta (a tela da Geladeira os mostra). */
+  ajustes: AjusteDaGeladeira[];
   adicionar: (cerveja: CervejaCard, quantidade?: number) => Resultado;
   alterarQuantidade: (cervejaId: string, quantidade: number) => Resultado;
   remover: (cervejaId: string) => Desfazer | null;
@@ -142,6 +144,7 @@ export function GeladeiraProvider({
       pronta,
       estado,
       quantidadeTotal: quantidadeTotal(estado),
+      ajustes: [],
       adicionar: (cerveja, quantidade) => {
         const resultado = adicionarOp(atual.current, cerveja, quantidade);
         if (resultado.estado !== atual.current) {

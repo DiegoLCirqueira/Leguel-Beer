@@ -2,6 +2,9 @@ import type { CervejaCard, GeladeiraResponse } from "@leguele/shared";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
+const caminho = vi.hoisted(() => ({ atual: "/" }));
+vi.mock("next/navigation", () => ({ usePathname: () => caminho.atual }));
 import type { ContaDaGeladeira, ResultadoDaConta } from "@/lib/geladeira/conta";
 import { CHAVE_DA_CONTA, CHAVE_DA_GELADEIRA, CHAVE_PENDENTE } from "@/lib/geladeira/armazenamento";
 import type { Desfazer } from "@/lib/geladeira/estado";
@@ -30,6 +33,7 @@ function Painel() {
   const g = useGeladeira();
   return (
     <div>
+      <p data-testid="ajustes">{`ajustes:${g.ajustes.length}`}</p>
       <p data-testid="total">{g.pronta ? String(g.quantidadeTotal) : "carregando"}</p>
       <button type="button" onClick={() => g.adicionar(cerveja)}>
         adicionar
@@ -244,5 +248,83 @@ describe("GeladeiraProvider com a conta", () => {
 
     expect(await screen.findByText("2")).toBeInTheDocument();
     await vi.waitFor(() => expect(localStorage.getItem(CHAVE_PENDENTE)).toBe("1"));
+  });
+
+  it("falha do buscar não marca envio pendente: a carga seguinte não manda a cópia vazia por cima da conta", async () => {
+    const conta = contaFalsa({ tipo: "erro" });
+    const primeira = abrirComConta(conta);
+    await screen.findByText("0");
+    await vi.waitFor(() => expect(conta.buscar).toHaveBeenCalled());
+    primeira.unmount();
+
+    abrirComConta(conta);
+    await screen.findByText("0");
+
+    expect(localStorage.getItem(CHAVE_PENDENTE)).toBeNull();
+    expect(conta.enviar).not.toHaveBeenCalled();
+  });
+
+  it("aparelho já sincronizado: vale sempre a da conta, mesmo vazia (esvaziada em outro aparelho)", async () => {
+    guardarLocal(3);
+    localStorage.setItem(CHAVE_DA_CONTA, "1");
+    const conta = contaFalsa(ok([]));
+
+    abrirComConta(conta);
+
+    await vi.waitFor(() => expect(screen.getByTestId("total")).toHaveTextContent("0"));
+    expect(conta.enviar).not.toHaveBeenCalled();
+  });
+
+  it("troca de conta: envio pendente que recebe sem-sessão apaga a cópia da conta anterior", async () => {
+    guardarLocal(3);
+    localStorage.setItem(CHAVE_DA_CONTA, "1");
+    localStorage.setItem(CHAVE_PENDENTE, "1");
+    const conta = contaFalsa({ tipo: "sem-sessao" }, { tipo: "sem-sessao" });
+
+    abrirComConta(conta);
+
+    await vi.waitFor(() => expect(localStorage.getItem(CHAVE_DA_GELADEIRA)).toBeNull());
+    expect(screen.getByTestId("total")).toHaveTextContent("0");
+    expect(localStorage.getItem(CHAVE_DA_CONTA)).toBeNull();
+    expect(localStorage.getItem(CHAVE_PENDENTE)).toBeNull();
+  });
+
+  it("mudança feita com o buscar em voo não é sobrescrita pela resposta antiga", async () => {
+    localStorage.setItem(CHAVE_DA_CONTA, "1");
+    let responder: (r: ResultadoDaConta) => void = () => {};
+    const conta = contaFalsa(ok([]));
+    conta.buscar.mockReturnValue(new Promise<ResultadoDaConta>((r) => (responder = r)));
+    abrirComConta(conta);
+    await userEvent.click(await screen.findByRole("button", { name: "adicionar" }));
+
+    await act(async () => responder(ok([])));
+
+    expect(screen.getByTestId("total")).toHaveTextContent("1");
+  });
+
+  it("guarda os ajustes da resposta da conta no contexto", async () => {
+    const resposta = daConta([{ cerveja, quantidade: 1 }]);
+    resposta.ajustes = [{ cervejaId: "a", tipo: "preco", de: 3000, para: 3200 }] as never;
+    const conta = contaFalsa({ tipo: "ok", resposta });
+
+    abrirComConta(conta);
+
+    await vi.waitFor(() => expect(screen.getByTestId("ajustes")).toHaveTextContent("ajustes:1"));
+  });
+
+  it("buscar de novo a cada troca de página (entrar e sair sem recarregar)", async () => {
+    const conta = contaFalsa({ tipo: "sem-sessao" });
+    const { rerender } = abrirComConta(conta);
+    await vi.waitFor(() => expect(conta.buscar).toHaveBeenCalledTimes(1));
+
+    caminho.atual = "/catalogo";
+    rerender(
+      <GeladeiraProvider conta={conta}>
+        <Painel />
+      </GeladeiraProvider>,
+    );
+
+    await vi.waitFor(() => expect(conta.buscar).toHaveBeenCalledTimes(2));
+    caminho.atual = "/";
   });
 });
