@@ -11,9 +11,14 @@ export function GarrafaFantasma({ categoria }: GarrafaFantasmaProps) {
     <Link
       href={`/catalogo?categoria=${encodeURIComponent(categoria.slug)}`}
       aria-label={`Adicionar ${categoria.nome}`}
-      className="group absolute inset-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaria"
+      className="group absolute left-1/2 top-1/2 h-[max(100%,44px)] w-[max(100%,44px)] -translate-x-1/2 -translate-y-1/2 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaria"
     >
-      <svg viewBox="0 0 33 92" preserveAspectRatio="none" aria-hidden="true" className="size-full">
+      <svg
+        viewBox="0 0 33 92"
+        preserveAspectRatio="xMidYMid meet"
+        aria-hidden="true"
+        className="size-full"
+      >
         <path
           d={CONTORNO_DA_GARRAFA}
           stroke="var(--color-texto-suave)"
