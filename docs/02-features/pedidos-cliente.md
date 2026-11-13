@@ -48,6 +48,7 @@ Funcionalidade: Pedido confirmado e Meus pedidos
       | que tenho um pedido "Cancelado"                                | sou levado a "Meus pedidos"                                                               |
       | que o pedido é do cliente B e eu entrei como cliente A         | vejo a página "não encontrada" e nada do pedido de B aparece                              |
       | que estou sem sessão                                           | sou levado a "/entrar" e, depois de entrar como dono do pedido, volto à confirmação       |
+      | que meu pedido de Pix venceu há 1 minuto e o cron ainda não rodou | o pedido passa a "Cancelado", sou levado a "Meus pedidos" e a Geladeira não muda          |
 
   Cenário: Meus pedidos do mais recente ao mais antigo
     Dado que fiz 3 pedidos: "#LB111111" em 01/11/2026 (Entregue), "#LB222222" em 05/11/2026 (Cancelado) e "#LB333333" em 10/11/2026 (Em preparo)
@@ -94,7 +95,7 @@ Funcionalidade: Pedido confirmado e Meus pedidos
 
 - **Rota** `/pedido/[id]/confirmado`. Exige conta (sem sessão, vai a `/entrar` e volta depois, como em [[cadastro-login]]).
 - **Só para pedido pago:** a tela aparece quando o pedido está "Pago" ou em qualquer status depois dele (Em preparo, Saiu para entrega, Entregue). Pedido "Aguardando pagamento" leva à tela de pagamento desse pedido (item 6); pedido "Cancelado" leva a "Meus pedidos" (pergunta 2).
-- **Posse:** pedido de outro cliente ou id inexistente mostra a página "não encontrada" (404), sem dizer se o pedido existe.
+- **Posse primeiro:** a posse é conferida antes de qualquer desvio por status. Pedido de outro cliente, em qualquer status (Pago, Aguardando pagamento, Cancelado etc.), e id inexistente dão a mesma página "não encontrada" (404), sem redirecionar para pagamento ou "Meus pedidos" e sem dados do pedido no corpo, na URL de destino ou nos logs.
 - **Conteúdo, de cima para baixo:**
   - título "Pedido confirmado!" e o texto "Pagamento aprovado! Seu pedido já está com a gente. Acompanhe o status em Meus pedidos." (pergunta 3);
   - número do pedido e data e hora;
@@ -102,7 +103,22 @@ Funcionalidade: Pedido confirmado e Meus pedidos
   - resumo: quantidade de itens, cervejas com quantidade (ex.: "3× Maré Alta"), subtotal, frete e total;
   - botões "Meus pedidos" (primário, leva a `/conta/pedidos`) e "Voltar ao catálogo" (secundário, leva a `/catalogo`).
 - **Recarregar** a página mostra a mesma confirmação enquanto o pedido existir; ela não depende de um estado guardado no navegador.
-- **Geladeira depois do pagamento:** quando o pagamento é aprovado (item 6), a API tira da Geladeira da conta as cervejas do pedido, nas quantidades do pedido, **uma única vez por pedido**: a aprovação repetida (webhook reenviado, LB-59) não tira de novo nem apaga o que o cliente repôs depois. Se a Geladeira tiver menos unidades de uma cerveja do que o pedido, ela fica com zero (a cerveja sai), nunca negativa. O que o cliente pôs na Geladeira depois de criar o pedido continua lá. Na confirmação, o site lê a Geladeira de novo, e o contador do cabeçalho da loja ([[geladeira]]) mostra o que sobrou. Enquanto o pedido aguarda pagamento, a Geladeira não muda, para o cliente tentar de novo se o Pix expirar.
+- **Geladeira depois do pagamento:** ao aprovar o pagamento (item 6), a API tira da Geladeira da conta as unidades do pedido que ainda estão lá, **uma única vez por pedido**, e preserva o que o cliente pôs depois de criar o pedido. Semântica:
+  - ao criar o pedido, cada cerveja do pedido ganha uma **baixa pendente** igual à quantidade pedida;
+  - se, antes da aprovação, o cliente diminui a quantidade dessa cerveja na Geladeira (ou a remove), a baixa pendente diminui na mesma medida, sem ficar negativa (com mais de um pedido aguardando, desconta primeiro do mais antigo);
+  - ao aprovar, a API tira de cada cerveja a baixa pendente (sem deixar a quantidade negativa) e zera a baixa; a aprovação repetida (webhook reenviado, LB-59) não tira nada;
+  - pedido cancelado (expirado ou pelo admin) descarta as baixas pendentes sem mexer na Geladeira;
+  - abrir ou recarregar a confirmação nunca tira nada da Geladeira: só a aprovação tira.
+- Exemplos (pedido de 2 Maré Alta):
+
+  | Antes da aprovação | Geladeira depois de aprovar (1 ou 2 vezes) |
+  | --- | --- |
+  | nada muda (2) | 0 |
+  | o cliente adiciona mais 1 (3) | 1 |
+  | o cliente remove as 2 e recoloca 1 (1) | 1 |
+  | o cliente diminui para 1 e depois adiciona 1 (2) | 1 |
+
+- Na confirmação, o site lê a Geladeira de novo, e o contador do cabeçalho da loja ([[geladeira]]) mostra o que sobrou. Enquanto o pedido aguarda pagamento, a Geladeira não muda, para o cliente tentar de novo se o Pix expirar.
 
 ### Meus pedidos (LB-67, tela 13)
 
@@ -124,6 +140,7 @@ Funcionalidade: Pedido confirmado e Meus pedidos
 - **Lista:** rota do cliente que devolve só os pedidos do cliente da sessão, 20 por página, do mais recente ao mais antigo, com número, data, status, quantidade de itens, nomes das cervejas e total. O formato da paginação (cursor ou página) é do Back, desde que a ordem seja estável com pedidos criados no mesmo segundo.
 - **Um pedido:** rota do cliente que devolve um pedido do cliente da sessão, com itens e valores; pedido de outro cliente ou inexistente responde 404.
 - Sem token, 401 ([[guards-api]]). Os dados do pedido de outro cliente nunca aparecem na resposta nem no log.
+- **Sem consulta pelo número:** o número do pedido ("#LB…") não é chave de acesso. Não existe rota, pública ou de cliente, que leia pedido pelo número; o cliente lê só pelo id e só os próprios ([[ADR-009-guard-global-fechado]]).
 
 ### E-mail de confirmação (LB-81, ponto em aberto)
 
@@ -149,9 +166,9 @@ Funcionalidade: Pedido confirmado e Meus pedidos
 > [!info] Proposta do Spec, vetável
 
 - **Contrato** (shared, unitário): a lista de status com os rótulos, o texto da quantidade ("1 item", "5 itens"), o "e mais N" das cervejas e a data no fuso de Maceió (inclusive um pedido às 23:30 de Maceió, que em UTC já é o dia seguinte).
-- **Leitura de pedidos** (API): casos de uso com repositório em memória e relógio fake (ordem do mais recente, paginação de 20 com 21 e 41 pedidos, pedidos no mesmo segundo, pedido aguardando com o Pix vencido volta como "Cancelado" na lista e na leitura); rotas com Supertest e banco real (sem token 401, pedido de outro cliente 404, lista só com os do cliente da sessão). Pedidos criados direto no banco de teste, sem depender do checkout.
-- **Geladeira ao aprovar** (API, entra com o item 6): caso de uso com repositório em memória: tira as cervejas do pedido nas quantidades do pedido e mantém o que entrou depois; a segunda aprovação do mesmo pedido não tira de novo (nem o que o cliente repôs); Geladeira com menos unidades que o pedido fica com zero daquela cerveja.
-- **Telas** (componente): confirmação com frete e com "Grátis"; desvios da confirmação (aguardando, cancelado, sem sessão); lista com os 6 status, vazia, com erro e com "Carregar mais".
+- **Leitura de pedidos** (API): casos de uso com repositório em memória e relógio fake (ordem do mais recente, paginação de 20 com 21 e 41 pedidos, pedidos no mesmo segundo, pedido aguardando com o Pix vencido, com o relógio fixo e o cron sem rodar, volta como "Cancelado" na lista e na leitura e não muda a Geladeira); rotas com Supertest e banco real: sem token 401; matriz de posse (pedido de outro cliente Pago, Aguardando pagamento e Cancelado, e id inexistente) com o mesmo 404 e nada do pedido no corpo nem no log; paginação com pedidos de A e B intercalados no tempo traz só os de A, sem buraco nem repetição; nenhuma rota responde a leitura pelo número. Pedidos criados direto no banco de teste, sem depender do checkout.
+- **Geladeira ao aprovar** (API, entra com o item 6): caso de uso com repositório em memória: tira as cervejas do pedido nas quantidades do pedido e mantém o que entrou depois; as 4 linhas da tabela de exemplos, cada uma aprovando 1 e 2 vezes; diminuir com dois pedidos aguardando desconta do mais antigo; cancelamento descarta a baixa pendente. Os reds desta fatia entram com o webhook (item 6), e a spec do item 6 repete esta regra.
+- **Telas** (componente): confirmação com frete e com "Grátis"; desvios da confirmação (aguardando, cancelado, Pix vencido, sem sessão) e a página "não encontrada" sem dados do pedido; recarregar a confirmação não chama nada que altere a Geladeira; lista com os 6 status, vazia, com erro e com "Carregar mais".
 - **E2E** (celular, 360 × 640): confirmação de um pedido pago criado pela API de teste; pedido aguardando pagamento redireciona ao pagamento; pedido cancelado vai a "Meus pedidos"; sem sessão vai a `/entrar` e volta; pedido de outro cliente dá 404; "Meus pedidos" com 3 pedidos e vazio.
 
 ## Fatias, com dono e ordem
@@ -162,9 +179,9 @@ Funcionalidade: Pedido confirmado e Meus pedidos
 | 2 | LB-67 (#108), API | Back | Lista paginada e leitura de um pedido do cliente da sessão, sobre o modelo de pedido do LB-56 (item 5) |
 | 3 | LB-67 (#108), site | Front | `/conta/pedidos` e o link "Meus pedidos" em `/conta` |
 | 4 | LB-61 (#37), site | Front | `/pedido/[id]/confirmado`, com os desvios para pagamento, "Meus pedidos" e 404 |
-| 5 | LB-61 (#37), API | Back | Tirar da Geladeira as cervejas do pedido ao aprovar o pagamento, uma vez por pedido; entra com o webhook do item 6 (LB-59) |
+| 5 | LB-61 (#37), API | Back | Baixa pendente na Geladeira ao criar o pedido e baixa única ao aprovar o pagamento; entra com o webhook do item 6 (LB-59) |
 
-A fatia 2 depende do modelo de pedido do item 5 (LB-56). A 3 depende da 2; a 4, da 2 e da tela de pagamento do item 6. A 5 entra no PR do webhook (item 6).
+A fatia 2 depende do modelo de pedido do item 5 (LB-56). A 3 depende da 2; a 4, da 2 e da tela de pagamento do item 6. A 5 se divide: a baixa pendente nasce com a criação do pedido (LB-56, item 5) e o desconto ao diminuir a Geladeira mexe na escrita da Geladeira da conta; a baixa única entra no PR do webhook (item 6).
 
 Candidatos a ADR: nenhum.
 
@@ -191,7 +208,7 @@ Recomendações aplicadas pelo Spec em 13/11; qualquer uma pode ser vetada.
 
 - **Número do pedido** "#LB" + 6 dígitos sorteados e únicos, separado do id não adivinhável da URL.
 - **"Acompanhar pedido" da tela 08 vira "Meus pedidos"**, porque a tela 09 está fora.
-- **Geladeira ao aprovar:** a API tira só as cervejas do pedido, nas quantidades do pedido, uma vez por pedido; o que entrou depois fica.
+- **Geladeira ao aprovar, por baixa pendente:** a API tira só as unidades do pedido que continuam na Geladeira, uma vez por pedido; o que entrou depois fica, mesmo que seja a mesma cerveja.
 - **Sem o card "Agora é só esperar!"** da tela 08: sem previsão (pergunta 1), ele ficaria sem conteúdo.
 - **Pedido cancelado** na URL da confirmação leva a "Meus pedidos".
 - **Lista inclui pedidos aguardando pagamento e cancelados.**
