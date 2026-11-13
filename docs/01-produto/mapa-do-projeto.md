@@ -39,6 +39,7 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[enderecos-entrega]]: endereços com busca por CEP, área de entrega e frete por distância com frete grátis (LB-30, LB-62, LB-63, LB-64, LB-66).
 - [[checkout]]: Entrega → Pagamento → Revisão, com Pix e cartão.
 - [[pedidos-cliente]]: pedido confirmado e "Meus pedidos" com o status de cada pedido (LB-61, LB-67; e-mail LB-81 em aberto).
+- [[admin]]: área admin com cervejas e foto, estoque com mínimo, pedidos e status, e regras de entrega (LB-72, LB-73, LB-75, LB-76, LB-77).
 
 ## Decisões (ADRs)
 
