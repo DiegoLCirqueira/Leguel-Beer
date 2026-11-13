@@ -155,7 +155,23 @@ Candidatos a ADR: nenhum.
 
 ## Decisões do Diego
 
-> [!todo] Preencher: respostas do Diego às perguntas de 12/11 (1, 2, 3, 4 e 10 desta spec).
+Perguntas de 12/11, levadas pelo Orchestrator. Resposta do Diego: "todas as recomendadas".
+
+1. **Maioridade no checkout (LB-20): A.** Data de nascimento no perfil e a API recusa o pedido de menor; é declaração, sem validação de documento, dentro do escopo reduzido do [[mvp-corte]].
+2. **CPF (LB-29, LGPD): B.** O CPF não entra no perfil neste item. O spike do Mercado Pago (LB-54) decide se o pagamento exige CPF; se exigir, ele é pedido só na etapa de pagamento ([[checkout]]).
+3. **Política de Privacidade: A.** Texto e data de `/privacidade` atualizados, sem novo aceite de quem já tem conta. Ver "Texto novo de /privacidade" abaixo.
+4. **Campos da tela 19: A.** Sem foto de perfil e sem gênero; e-mail só leitura; ajuda do nascimento "Você precisa ter 18 anos ou mais para comprar." (sem "no app"); sem a ajuda do CPF.
+10. **Convidado em "Finalizar compra" (LB-31): A.** Vai a `/entrar` (com "Criar conta"), volta ao checkout e mantém a Geladeira; sem bottom sheet; favoritos fora.
+
+As perguntas 5 a 9 e 11 estão em [[enderecos-entrega]].
+
+### Texto novo de /privacidade (pergunta 3)
+
+Fonte única em [[termos-privacidade]] ("Decisões do Diego (2026-11-12)"). Nesta spec, a parte da data de nascimento:
+
+- "Quais dados coletamos" ganha: "a data de nascimento, se você a informar em "Dados pessoais"".
+- "Para que usamos" ganha: "conferir a maioridade na compra".
+- Sem novo aceite: muda só a data de "última atualização" de `/privacidade` e a versão da Política no `LEGAL_VERSIONS` da API, no dia em que o texto entrar no site, junto com a primeira tela que coleta dado novo (esta ou [[enderecos-entrega]]).
 
 ## Decisões tomadas sem consulta
 

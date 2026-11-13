@@ -180,7 +180,26 @@ Candidatos a ADR: a escolha do serviço de geocodificação e rota (fatia 1), se
 
 ## Decisões do Diego
 
-> [!todo] Preencher: respostas do Diego às perguntas de 12/11 (3, 5, 6, 7, 8, 9 e 11 desta spec).
+Perguntas de 12/11, levadas pelo Orchestrator. Resposta do Diego: "todas as recomendadas".
+
+3. **Política de Privacidade: A.** Texto e data de `/privacidade` atualizados, sem novo aceite. Ver "Texto novo de /privacidade" abaixo.
+5. **Área de entrega e origem: A.** Raio de 25 km pela distância de rota, a partir de um ponto fictício de Maceió escolhido pelo Back no seed (ex.: Jaraguá). Se o spike LB-62 não achar rota gratuita, vale a opção C: linha reta, com o mesmo raio.
+6. **Valores do frete: sim.** Taxa base de R$ 5,00, R$ 1,50 por km, arredondamento para cima em R$ 0,50 e frete grátis a partir de R$ 150,00, no banco, sem tela de admin no item 4.
+7. **"Usar minha localização": A.** Fora do MVP: só CEP e número, com as coordenadas calculadas pela API ao salvar.
+8. **Regras dos endereços: A.** Apelido livre opcional, até 5 endereços, exclusão permitida, o primeiro vira padrão, excluir o padrão torna padrão o mais recente, só Alagoas.
+9. **Endereço fora da área: A.** Pode salvar, com o selo "Fora da área"; o checkout não avança com ele.
+11. **Conta em serviço de mapas: sim.** O Back pode criar conta e chave só em plano gratuito sem cartão; senão, linha reta (C da pergunta 5). A chave fica só no `.env` da API (fora do git), com a chave sem valor no `.env.example`.
+
+As perguntas 1, 2, 4 e 10 estão em [[dados-pessoais]].
+
+### Texto novo de /privacidade (pergunta 3)
+
+Fonte única em [[termos-privacidade]] ("Decisões do Diego (2026-11-12)"). Nesta spec, a parte dos endereços:
+
+- "Quais dados coletamos" troca "quando usar o checkout, endereço de entrega" por: "os endereços de entrega que você salvar, com a localização (latitude e longitude) e a distância até a cervejaria calculadas a partir deles".
+- "Para que usamos" ganha: "calcular o frete".
+- "Com quem compartilhamos" ganha: "os serviços de CEP e de mapas, que recebem o CEP e o endereço para preencher o endereço e calcular a distância".
+- Sem novo aceite: muda só a data de "última atualização" de `/privacidade` e a versão da Política no `LEGAL_VERSIONS` da API, no dia em que o texto entrar no site.
 
 ## Decisões tomadas sem consulta
 
