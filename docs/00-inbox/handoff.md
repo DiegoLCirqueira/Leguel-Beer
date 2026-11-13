@@ -10,7 +10,7 @@ Sobrescrito pelo Orchestrator ao fim de cada ordem. A próxima conversa começa 
 ## Última ordem: Geladeira no site e fotos das garrafas (11/11 a 12/11)
 
 - Mergeados: #243 a #246 (contrato, API e Política), #247 (Geladeira no site com contador e sincronização), #248 (data da Política 2026-11-11, sem novo aceite), #249 (9 fotos), #250 e #252 e #253 (specs), #251 (fechamento), #254 (refino de testes) e #255 (corrida do provider da Geladeira). Nada aberto ao fim da ordem.
-- Item 2 (página de produto) fechado; item 3 (Geladeira): falta a tela (fatias 6 e 7 da [[geladeira]]; E2E de entrar na conta é obrigatório na fatia 7).
+- Item 2 (página de produto) fechado; item 3 (Geladeira): falta a tela (fatias 6 e 7 da [[geladeira]]).
 - Fotos: 9 cervejas com foto; **faltam 7** (jaragua-hazy-ipa, umbu-gose, graviola-witbier, rapadura-brown-ale, barra-nova-porter, pajucara-amber-ale, ponta-verde-pilsen). Quando o Diego enviar: `apps/web/public/cervejas/<slug>.webp` e incluir o slug na lista do seed (`seed-catalog-data.ts`). Fontes de ~470 px: pedir maiores.
 - Regras novas do Diego (12/11): Codex revisa tudo (decisões do Orchestrator, testes, commits); decisões dele vão direto ao chat quando ele está acordado; portais sempre na tela em trabalho; Vercel opção A (prefixo `leguele-web`/`leguele-api`, Hobby, no LB-8).
 - Auditoria final do Codex dos itens 1 e 2: **Ordem aprovada** (main c249f9c: lint, typecheck, build e 878 testes verdes; E2E 57/57 em build de produção).
@@ -28,10 +28,9 @@ Sobrescrito pelo Orchestrator ao fim de cada ordem. A próxima conversa começa 
 
 ## Próximo
 
-1. Item 3: começar pela fatia 6 da Geladeira (arrumação das prateleiras); a fatia 7 inclui acumular os ajustes do contexto até a tela dispensá-los.
-2. Item 3: tela da Geladeira (fatias 6 e 7), depois o item 4 (Conta e entrega, ver [[sequencia-telas]]) e o item 5 (checkout, spike LB-54).
-3. Diego: enviar as 7 fotos; em 16/11 o Reviewer volta ao Opus 5.5 (decisão dele de 11/11, cartão de pendências); contas para o LB-8.
-4. Follow-ups: ver a seção "Achados para refino" da [[2026-11-12]] e a seção "Follow-ups" abaixo.
+1. Item 3: tela da Geladeira, começando pela fatia 6 (arrumação das prateleiras); a fatia 7 inclui acumular os ajustes do contexto até a tela dispensá-los. Depois o item 4 (Conta e entrega, ver [[sequencia-telas]]) e o item 5 (checkout, spike LB-54).
+2. Diego: enviar as 7 fotos; em 16/11 o Reviewer volta ao Opus 5.5 (decisão dele de 11/11, cartão de pendências); contas para o LB-8.
+3. Follow-ups: ver a seção "Achados para refino" da [[2026-11-12]] e a seção "Follow-ups" abaixo.
 
 ## Follow-ups
 
