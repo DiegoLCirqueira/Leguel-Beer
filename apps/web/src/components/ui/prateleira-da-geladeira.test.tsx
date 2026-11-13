@@ -2,6 +2,7 @@ import type { CervejaCard } from "@leguele/shared";
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { ItemLocal } from "@/lib/geladeira/estado";
+import { posicaoDaGarrafa } from "@/lib/geladeira/geometria";
 import { PrateleiraDaGeladeira } from "./prateleira-da-geladeira";
 
 const IPA = { slug: "ipa", nome: "IPA" };
@@ -45,5 +46,29 @@ describe("PrateleiraDaGeladeira", () => {
     expect(container.querySelectorAll("[data-garrafa]")).toHaveLength(2);
     expect(screen.getAllByRole("link", { name: "Adicionar IPA" })).toHaveLength(2);
     expect(screen.getByText(/^Maré Alta, 2 unidades, R\$\s64,00$/)).toBeInTheDocument();
+  });
+
+  it("6 unidades: 4 garrafas na frente, lado a lado, e 2 na fileira de trás, atrás da 1ª e da 2ª", () => {
+    const indice = 2;
+    const { container } = render(
+      <PrateleiraDaGeladeira indice={indice} categoria={IPA} itens={[mare(6)]} />,
+    );
+
+    const colunaEFileira = [
+      [0, 0],
+      [1, 0],
+      [2, 0],
+      [3, 0],
+      [0, 1],
+      [1, 1],
+    ];
+    const garrafas = Array.from(container.querySelectorAll<HTMLElement>("[data-garrafa]"));
+    expect(garrafas.map((g) => [g.style.left, g.style.bottom, g.style.height])).toEqual(
+      colunaEFileira.map(([coluna, fileira]) => {
+        const p = posicaoDaGarrafa(indice, coluna!, fileira!);
+        return [`${p.left}%`, `${p.bottom}%`, `${p.height}%`];
+      }),
+    );
+    expect(new Set(garrafas.slice(0, 4).map((g) => g.style.left)).size).toBe(4);
   });
 });
