@@ -15,6 +15,10 @@ export function calcularFrete(
   entrada: { readonly distanciaMetros: number; readonly subtotalCentavos: number },
   config: ConfiguracaoDeEntrega,
 ): Frete {
+  if (entrada.distanciaMetros > config.raioMaximoMetros) {
+    return { naArea: false };
+  }
+
   if (entrada.subtotalCentavos >= config.freteGratisMinimoCentavos) {
     return { naArea: true, freteCentavos: 0, gratis: true };
   }
