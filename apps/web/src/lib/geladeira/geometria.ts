@@ -1,4 +1,22 @@
 /** Medidas da moldura do estúdio (710 x 1573) e posição de cada garrafa dela, em percentual. */
+export const MOLDURA = { largura: 710, altura: 1573 } as const;
+
+/** Linha de apoio de cada prateleira: [altura na esquerda, altura na direita], em px da moldura. */
+const LINHAS: readonly (readonly [number, number])[] = [
+  [408, 442],
+  [687, 699],
+  [951, 951],
+  [1240, 1240],
+];
+const INICIO_X = 134;
+const LARGURA_DA_POSICAO = 121;
+const COLUNAS = 4;
+const ALTURA_DA_GARRAFA = 200;
+const PROPORCAO_DA_GARRAFA = 0.36;
+const ESCALA_POR_FILEIRA = 0.1;
+const RECUO_POR_FILEIRA = 30;
+const BRILHO_POR_FILEIRA = 0.3;
+
 export type PosicaoDaGarrafa = {
   left: number;
   bottom: number;
@@ -8,10 +26,33 @@ export type PosicaoDaGarrafa = {
   brilho: number;
 };
 
+const percentual = (valor: number, total: number) => (valor / total) * 100;
+
+/** A linha da prateleira é inclinada: a altura do apoio depende do x. */
+const alturaDaLinha = (prateleira: number, x: number) => {
+  const [esquerda, direita] = LINHAS[prateleira]!;
+  return esquerda + ((direita - esquerda) * (x - INICIO_X)) / (COLUNAS * LARGURA_DA_POSICAO);
+};
+
 export function posicaoDaGarrafa(
-  _prateleira: number,
-  _coluna: number,
-  _fileira: number,
+  prateleira: number,
+  coluna: number,
+  fileira: number,
 ): PosicaoDaGarrafa {
-  return { left: 0, bottom: 0, width: 0, height: 0, brilho: 1 };
+  const escala = 1 - fileira * ESCALA_POR_FILEIRA;
+  const altura = ALTURA_DA_GARRAFA * escala;
+  const largura = altura * PROPORCAO_DA_GARRAFA;
+  const x =
+    INICIO_X +
+    coluna * LARGURA_DA_POSICAO +
+    (LARGURA_DA_POSICAO - largura) / 2 -
+    fileira * RECUO_POR_FILEIRA;
+  const apoio = alturaDaLinha(prateleira, x + largura / 2);
+  return {
+    left: percentual(x, MOLDURA.largura),
+    bottom: percentual(MOLDURA.altura - apoio, MOLDURA.altura),
+    width: percentual(largura, MOLDURA.largura),
+    height: percentual(altura, MOLDURA.altura),
+    brilho: 1 - fileira * BRILHO_POR_FILEIRA,
+  };
 }
