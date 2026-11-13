@@ -11,5 +11,5 @@ export const enderecoFormSchema = z.object({
   complemento: z.string().optional(),
   bairro: obrigatorio("Informe o bairro."),
   cidade: obrigatorio("Informe a cidade."),
-  uf: z.string(),
+  uf: z.literal("AL", "Por enquanto só entregamos em Alagoas."),
 });
