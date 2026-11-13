@@ -36,6 +36,14 @@ describe("enderecoFormSchema", () => {
       expect(result.error?.issues.map((i) => [i.path[0], i.message])).toEqual([[campo, mensagem]]);
     }
   });
+  it.each(["SP", "PE", "", "al"])("recusa a UF %j: só Alagoas", (uf) => {
+    const result = enderecoFormSchema.safeParse({ ...valido, uf });
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues.map((i) => [i.path[0], i.message])).toEqual([
+      ["uf", "Por enquanto só entregamos em Alagoas."],
+    ]);
+  });
 });
 
 function omitir(campo: string): Record<string, string> {
