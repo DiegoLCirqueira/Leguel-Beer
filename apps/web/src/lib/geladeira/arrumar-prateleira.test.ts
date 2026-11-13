@@ -33,4 +33,18 @@ describe("arrumarPrateleira", () => {
     expect(posicoes(p)).toEqual(["mare:0:0", "mare:0:1", "mare:0:2", "carnaval:1:0"]);
     expect(p.fantasmas).toEqual([2, 3]);
   });
+
+  it("desenha no máximo 3 fileiras: a fila de 5 unidades fica com 3 garrafas", () => {
+    const p = arrumarPrateleira([mare(5), carnaval(1)]);
+
+    expect(posicoes(p)).toEqual(["mare:0:0", "mare:0:1", "mare:0:2", "carnaval:1:0"]);
+  });
+
+  it("um rótulo com 13 unidades desenha 12 (3 fileiras de 4) e nenhuma garrafa fantasma", () => {
+    const p = arrumarPrateleira([mare(13)]);
+
+    expect(p.garrafas).toHaveLength(12);
+    expect(Math.max(...p.garrafas.map((g) => g.fileira))).toBe(2);
+    expect(p.fantasmas).toEqual([]);
+  });
 });
