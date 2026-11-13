@@ -26,4 +26,11 @@ describe("arrumarPrateleira", () => {
     expect(posicoes(p)).toEqual(["mare:0:0", "mare:1:0"]);
     expect(p.fantasmas).toEqual([2, 3]);
   });
+
+  it("com 2 rótulos cada um vira uma fila na ordem de entrada, e os fantasmas são 4 menos os rótulos", () => {
+    const p = arrumarPrateleira([mare(3), carnaval(1)]);
+
+    expect(posicoes(p)).toEqual(["mare:0:0", "mare:0:1", "mare:0:2", "carnaval:1:0"]);
+    expect(p.fantasmas).toEqual([2, 3]);
+  });
 });
