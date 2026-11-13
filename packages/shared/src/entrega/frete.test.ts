@@ -32,3 +32,15 @@ describe("calcularFrete: frete grátis", () => {
     });
   });
 });
+
+describe("calcularFrete: área de entrega", () => {
+  it.each([
+    [25_001, 9_050],
+    [26_000, 9_050],
+    [26_000, 40_000],
+  ])("distância de %i m com subtotal %i fica fora da área, até com frete grátis", (d, subtotal) => {
+    expect(calcularFrete({ distanciaMetros: d, subtotalCentavos: subtotal }, config)).toEqual({
+      naArea: false,
+    });
+  });
+});
