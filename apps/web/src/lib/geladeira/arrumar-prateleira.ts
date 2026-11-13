@@ -12,6 +12,13 @@ export type PrateleiraArrumada = {
   rotulos: (RotuloDaPrateleira & { coluna: number })[];
 };
 
-export function arrumarPrateleira(_itens: RotuloDaPrateleira[]): PrateleiraArrumada {
-  return { garrafas: [], fantasmas: [], rotulos: [] };
+export function arrumarPrateleira(itens: RotuloDaPrateleira[]): PrateleiraArrumada {
+  const [unico] = itens;
+  const garrafas = Array.from({ length: unico?.quantidade ?? 0 }, (_, k) => ({
+    chave: `${unico!.cervejaId}#${k}`,
+    cervejaId: unico!.cervejaId,
+    coluna: k % 4,
+    fileira: Math.floor(k / 4),
+  }));
+  return { garrafas, fantasmas: [], rotulos: [] };
 }
