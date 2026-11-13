@@ -103,19 +103,26 @@ describe("dados do seed do catálogo", () => {
     ).toHaveLength(2);
   });
 
-  it("as cervejas com foto apontam para a imagem recortada do site e as demais ficam sem imagem (imagem padrão)", () => {
+  it("as 16 cervejas apontam para a imagem recortada do site", () => {
     const comFoto = beers.filter((beer) => beer.imageUrl !== null).map((beer) => beer.slug);
 
     expect(comFoto.sort()).toEqual([
       "avermelhou",
+      "barra-nova-porter",
       "cajupa-sour",
       "cupuacu-ale",
+      "graviola-witbier",
+      "jaragua-hazy-ipa",
       "leguele-carnaval",
       "leguele-comendador",
       "leguele-cream-ale",
       "leguele-kolsch",
       "leguele-maceio-ipa",
       "mare-alta",
+      "pajucara-amber-ale",
+      "ponta-verde-pilsen",
+      "rapadura-brown-ale",
+      "umbu-gose",
     ]);
     for (const beer of beers.filter((b) => b.imageUrl !== null)) {
       expect(beer.imageUrl).toBe(`/cervejas/${beer.slug}.webp`);
