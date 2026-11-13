@@ -87,7 +87,7 @@ Funcionalidade: Página de produto
 - **Botão fixo:** "Adicionar à geladeira" fica fixo na parte de baixo da tela, sempre visível. A página não tem a barra inferior da loja, para o botão ocupar o lugar dela. O cabeçalho tem o botão de voltar e o contador da Geladeira. A barra fixa publica a própria altura numa variável CSS, para o toast ficar acima dela. A página não tem rodapé, como o resto da loja ([[termos-privacidade]], decisão do Diego, 2026-11-08).
 - **Toast:** o mesmo do card: "<nome> foi para a geladeira" com "Desfazer", por 5 segundos, e o contador do header atualiza. "Desfazer" devolve a Geladeira ao estado de antes daquele toque, inclusive quando foram várias unidades.
 - **Convidado:** adiciona sem conta, como no card.
-- **Frete grátis:** uma linha informativa fixa "Frete grátis em compras acima de R$ 150,00" ([[visao]], [[checkout]]), sem seta e sem cálculo de quanto falta.
+- **Frete grátis:** uma linha informativa fixa "Frete grátis em compras a partir de R$ 150,00" (texto alinhado à regra de [[enderecos-entrega]] em 12/11; o ajuste no site está listado lá) ([[visao]], [[checkout]]), sem seta e sem cálculo de quanto falta.
 - **Enquanto a Geladeira não existe (até o LB-47):** o seletor aparece, mas o botão "Adicionar à geladeira" fica desabilitado; ele passa a funcionar no item 3 da [[sequencia-telas]], como no card.
 
 ## Referência visual

@@ -27,7 +27,7 @@ E-commerce mobile-first (PWA) da cervejaria artesanal **Leguelé Beer**: catálo
 - **Catálogo:** listagem, página de produto, filtros por categoria e atributos, ordenação. Ver [[catalogo]].
 - **Geladeira (carrinho):** prateleiras por categoria, persistida localmente e na conta.
 - **Checkout completo:** Entrega → Pagamento → Revisão; Pix (validade 30 min) e cartão até 12x. Ver [[checkout]].
-- **Entrega:** apenas Maceió e região, frete por distância, frete grátis acima de R$ 150.
+- **Entrega:** apenas Maceió e região, frete por distância, frete grátis a partir de R$ 150 (decisão do Diego, 2026-11-12; ver [[enderecos-entrega]]).
 - **Conta:** e-mail/senha, Google e Facebook. Convidado navega e monta a Geladeira; finalizar a compra exige conta (decisão do Diego, 2026-10-28; ver [[adicionar-do-card]]).
 
 > [!info] Tamanho do catálogo
