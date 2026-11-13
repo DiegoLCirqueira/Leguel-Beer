@@ -8,6 +8,8 @@ const LINHAS: readonly (readonly [number, number])[] = [
   [951, 951],
   [1240, 1240],
 ];
+/** Quanto cada fileira de trás sobe, em px da moldura: só nas prateleiras abaixo da linha dos olhos. */
+const SUBIDA_POR_FILEIRA = [0, 0, 6, 17] as const;
 const INICIO_X = 134;
 const LARGURA_DA_POSICAO = 121;
 const COLUNAS = 4;
@@ -47,7 +49,7 @@ export function posicaoDaGarrafa(
     coluna * LARGURA_DA_POSICAO +
     (LARGURA_DA_POSICAO - largura) / 2 -
     fileira * RECUO_POR_FILEIRA;
-  const apoio = alturaDaLinha(prateleira, x + largura / 2);
+  const apoio = alturaDaLinha(prateleira, x + largura / 2) - fileira * SUBIDA_POR_FILEIRA[prateleira]!;
   return {
     left: percentual(x, MOLDURA.largura),
     bottom: percentual(MOLDURA.altura - apoio, MOLDURA.altura),
