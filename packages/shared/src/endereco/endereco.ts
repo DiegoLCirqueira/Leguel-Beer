@@ -4,7 +4,13 @@ import { cepSchema } from "./cep.js";
 const ate = (limite: number) => `Use até ${limite} caracteres.`;
 const obrigatorio = (mensagem: string, limite: number) =>
   z.string(mensagem).trim().min(1, mensagem).max(limite, ate(limite));
-const opcional = (limite: number) => z.string().max(limite, ate(limite)).optional();
+const opcional = (limite: number) =>
+  z
+    .string()
+    .trim()
+    .max(limite, ate(limite))
+    .transform((valor) => (valor === "" ? undefined : valor))
+    .optional();
 
 export const enderecoFormSchema = z.object({
   apelido: opcional(30),
