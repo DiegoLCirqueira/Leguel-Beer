@@ -40,6 +40,23 @@ describe("arrumarPrateleira", () => {
     expect(posicoes(p)).toEqual(["mare:0:0", "mare:0:1", "mare:0:2", "carnaval:1:0"]);
   });
 
+  it("lista os rótulos na ordem de entrada, cada um na coluna da sua fila e com o total de unidades", () => {
+    const p = arrumarPrateleira([mare(5), carnaval(1)]);
+
+    expect(p.rotulos).toEqual([
+      { cervejaId: "mare", nome: "Maré Alta", quantidade: 5, coluna: 0 },
+      { cervejaId: "carnaval", nome: "Leguelé Carnaval", quantidade: 1, coluna: 1 },
+    ]);
+  });
+
+  it("prateleira sem cerveja: nenhum rótulo e 4 garrafas fantasma", () => {
+    const p = arrumarPrateleira([]);
+
+    expect(p.rotulos).toEqual([]);
+    expect(p.garrafas).toEqual([]);
+    expect(p.fantasmas).toEqual([0, 1, 2, 3]);
+  });
+
   it("um rótulo com 13 unidades desenha 12 (3 fileiras de 4) e nenhuma garrafa fantasma", () => {
     const p = arrumarPrateleira([mare(13)]);
 
