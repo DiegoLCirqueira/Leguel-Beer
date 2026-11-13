@@ -12,15 +12,20 @@ export type PrateleiraArrumada = {
   rotulos: (RotuloDaPrateleira & { coluna: number })[];
 };
 
+const COLUNAS = 4;
+
+/** Posição de cada garrafa: um rótulo só se espalha pelas colunas e depois para trás; vários viram filas. */
 export function arrumarPrateleira(itens: RotuloDaPrateleira[]): PrateleiraArrumada {
-  const [unico] = itens;
-  const garrafas = Array.from({ length: unico?.quantidade ?? 0 }, (_, k) => ({
-    chave: `${unico!.cervejaId}#${k}`,
-    cervejaId: unico!.cervejaId,
-    coluna: k % 4,
-    fileira: Math.floor(k / 4),
-  }));
-  const livres = Math.max(0, 4 - garrafas.length);
-  const fantasmas = Array.from({ length: livres }, (_, i) => 4 - livres + i);
+  const unico = itens.length === 1;
+  const garrafas = itens.slice(0, COLUNAS).flatMap((item, indice) =>
+    Array.from({ length: item.quantidade }, (_, k) => ({
+      chave: `${item.cervejaId}#${k}`,
+      cervejaId: item.cervejaId,
+      coluna: unico ? k % COLUNAS : indice,
+      fileira: unico ? Math.floor(k / COLUNAS) : k,
+    })),
+  );
+  const ocupadas = unico ? Math.min(itens[0]!.quantidade, COLUNAS) : Math.min(itens.length, COLUNAS);
+  const fantasmas = Array.from({ length: COLUNAS - ocupadas }, (_, i) => ocupadas + i);
   return { garrafas, fantasmas, rotulos: [] };
 }
