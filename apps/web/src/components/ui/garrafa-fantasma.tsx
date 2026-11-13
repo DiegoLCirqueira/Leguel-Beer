@@ -16,11 +16,10 @@ export function GarrafaFantasma({ categoria }: GarrafaFantasmaProps) {
       <svg viewBox="0 0 33 92" preserveAspectRatio="none" aria-hidden="true" className="size-full">
         <path
           d={CONTORNO_DA_GARRAFA}
-          fill="rgba(5,13,7,.35)"
           stroke="var(--color-texto-suave)"
           strokeWidth="1.2"
           strokeDasharray="4 3"
-          className="group-hover:stroke-primaria"
+          className="fill-fantasma group-hover:stroke-primaria"
         />
         <circle cx="16.5" cy="62" r="8" fill="var(--color-superficie-elevada)" />
         <path
