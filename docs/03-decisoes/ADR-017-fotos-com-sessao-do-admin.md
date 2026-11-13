@@ -16,13 +16,13 @@ O admin envia uma foto por cerveja ao armazenamento de arquivos do Supabase ([[A
 
 ## Decisão
 
-- O navegador converte a foto para WebP e a manda ao **servidor do site**, que a envia ao armazenamento com o token da sessão do admin. O navegador nunca vê o token nem a chave.
-- Uma política do armazenamento só deixa gravar no bucket das cervejas quem tem o papel admin no banco; o bucket aceita só `image/webp` até 40 KB (o original escolhido no navegador pode ter até 5 MB) e não sobrescreve arquivos; a escrita pública é negada.
-- A API gera o caminho (aleatório, válido por 10 minutos) e, antes de gravar o endereço na cerveja, confere que o arquivo existe nesse caminho, é WebP de fato (pelos bytes) e tem até 40 KB.
+- O navegador converte a foto para WebP e a manda ao **servidor do site**, que a grava num bucket **privado** de envio com o token da sessão do admin. O token e a chave ficam no servidor do site; o JavaScript do navegador nunca os lê.
+- A API gera o caminho de envio (aleatório, válido por 10 minutos). Para publicar, ela lê o arquivo no bucket privado com a sessão do admin, confere os bytes (WebP de fato) e o tamanho (até 40 KB; o original escolhido no navegador pode ter até 5 MB), copia para o bucket **público** com um nome novo, apaga o envio e só então grava o endereço na cerveja. Recusado, o envio é apagado e nunca é servido.
+- Uma política do armazenamento só deixa gravar nos dois buckets quem tem o papel admin no banco; nenhum sobrescreve arquivos e a escrita pública é negada.
 
 ## Por quê
 
-Nenhum processo em execução guarda uma chave com poder total sobre o Supabase; a permissão de gravar fica no papel admin, a mesma regra do resto do admin. O custo é a regra de acesso existir em dois lugares (guard da API e política do armazenamento) e o arquivo, de até 40 KB, atravessar a função do servidor do site.
+Nenhum processo em execução guarda uma chave com poder total sobre o Supabase; a permissão de gravar fica no papel admin, a mesma regra do resto do admin. A etapa privada garante que nada inválido seja servido, mesmo com tipo ou extensão falsos. O custo é a regra de acesso existir em dois lugares (guard da API e política do armazenamento), o arquivo de até 40 KB atravessar a função do servidor do site e a API, e haver uma cópia a mais na publicação.
 
 ## Alternativas consideradas
 
