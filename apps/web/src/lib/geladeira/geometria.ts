@@ -59,13 +59,36 @@ export function posicaoDaGarrafa(
   };
 }
 
+/** Parapeito de cada prateleira: [topo na esquerda, topo na direita, espessura], em px da moldura. */
+const PARAPEITOS: readonly (readonly [number, number, number])[] = [
+  [398, 432, 14],
+  [677, 689, 12],
+  [944, 944, 9],
+  [1244, 1244, 11],
+];
+const PARAPEITO_X = [118, 632] as const;
+const FOLGA_DA_FAIXA = 8;
+
 export type PosicaoDaFaixa = {
   /** Distância da borda de baixo da moldura, em %. */
   bottom: number;
   /** Inclinação do parapeito, em radianos (a faixa gira com ele). */
   giro: number;
+  /** Recorte (clip-path) do parapeito, para redesenhá-lo por cima das garrafas. */
+  recorte: string;
 };
 
-export function posicaoDaFaixa(_prateleira: number): PosicaoDaFaixa {
-  return { bottom: 0, giro: 0 };
+export function posicaoDaFaixa(prateleira: number): PosicaoDaFaixa {
+  const [esquerda, direita, espessura] = PARAPEITOS[prateleira]!;
+  const inclinacao = (direita - esquerda) / (COLUNAS * LARGURA_DA_POSICAO);
+  const [x0, x1] = PARAPEITO_X;
+  const y0 = esquerda + inclinacao * (x0 - INICIO_X);
+  const y1 = esquerda + inclinacao * (x1 - INICIO_X);
+  const ponto = (x: number, y: number) =>
+    `${percentual(x, MOLDURA.largura)}% ${percentual(y, MOLDURA.altura)}%`;
+  return {
+    bottom: percentual(MOLDURA.altura - esquerda - espessura - FOLGA_DA_FAIXA, MOLDURA.altura),
+    giro: Math.atan2(direita - esquerda, COLUNAS * LARGURA_DA_POSICAO),
+    recorte: `polygon(${ponto(x0, y0)},${ponto(x1, y1)},${ponto(x1, y1 + espessura)},${ponto(x0, y0 + espessura)})`,
+  };
 }
