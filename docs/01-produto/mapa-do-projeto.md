@@ -38,6 +38,7 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[dados-pessoais]]: editar o perfil com data de nascimento, maioridade no pedido e login ao finalizar (LB-29, LB-20, LB-31).
 - [[enderecos-entrega]]: endereços com busca por CEP, área de entrega e frete por distância com frete grátis (LB-30, LB-62, LB-63, LB-64, LB-66).
 - [[checkout]]: Entrega → Pagamento → Revisão, com Pix e cartão.
+- [[pedidos-cliente]]: pedido confirmado e "Meus pedidos" com o status de cada pedido (LB-61, LB-67; e-mail LB-81 em aberto).
 
 ## Decisões (ADRs)
 
