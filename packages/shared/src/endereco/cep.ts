@@ -1,3 +1,8 @@
 import { z } from "zod";
 
-export const cepSchema = z.string().transform((valor) => valor.replace(/\D/g, ""));
+const MENSAGEM = "Informe o CEP.";
+
+export const cepSchema = z
+  .string(MENSAGEM)
+  .transform((valor) => valor.replace(/\D/g, ""))
+  .pipe(z.string().regex(/^\d{8}$/, MENSAGEM));
