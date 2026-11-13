@@ -61,6 +61,20 @@ describe("enderecoFormSchema", () => {
       [campo, `Use até ${limite} caracteres.`],
     ]);
   });
+  it.each(["apelido", "complemento"])("trata %s vazio ou só com espaços como ausente", (campo) => {
+    for (const vazio of ["", "   "]) {
+      const parsed = enderecoFormSchema.parse({ ...valido, [campo]: vazio });
+
+      expect(parsed[campo as "apelido" | "complemento"]).toBeUndefined();
+    }
+  });
+
+  it("tira os espaços das pontas dos textos", () => {
+    const parsed = enderecoFormSchema.parse({ ...valido, rua: "  Rua A ", apelido: " Casa " });
+
+    expect(parsed.rua).toBe("Rua A");
+    expect(parsed.apelido).toBe("Casa");
+  });
 });
 
 function omitir(campo: string): Record<string, string> {
