@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { posicaoDaGarrafa } from "./geometria";
+import { posicaoDaFaixa, posicaoDaGarrafa } from "./geometria";
 
 describe("posicaoDaGarrafa", () => {
   it("garrafa da frente: caixa de 72 x 200 px da moldura, centrada na posição e apoiada na linha da prateleira", () => {
@@ -30,5 +30,15 @@ describe("posicaoDaGarrafa", () => {
       (12 / 1573) * 100,
       3,
     );
+  });
+});
+
+describe("posicaoDaFaixa", () => {
+  it("a faixa fica sobre o parapeito e gira com a inclinação dele (a 1ª prateleira desce 34 px em 484)", () => {
+    const f = posicaoDaFaixa(0);
+
+    expect(f.bottom).toBeCloseTo(((1573 - 398 - 14 - 8) / 1573) * 100, 3);
+    expect(f.giro).toBeCloseTo(Math.atan2(34, 484), 5);
+    expect(posicaoDaFaixa(2).giro).toBe(0);
   });
 });
