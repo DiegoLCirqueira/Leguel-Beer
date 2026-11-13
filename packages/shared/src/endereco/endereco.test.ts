@@ -44,6 +44,23 @@ describe("enderecoFormSchema", () => {
       ["uf", "Por enquanto só entregamos em Alagoas."],
     ]);
   });
+  it.each([
+    ["apelido", 30],
+    ["rua", 120],
+    ["numero", 10],
+    ["complemento", 60],
+    ["bairro", 80],
+    ["cidade", 80],
+  ])("aceita %s com %i caracteres e recusa com um a mais", (campo, limite) => {
+    const noLimite = enderecoFormSchema.safeParse({ ...valido, [campo]: "a".repeat(limite) });
+    const acima = enderecoFormSchema.safeParse({ ...valido, [campo]: "a".repeat(limite + 1) });
+
+    expect(noLimite.success).toBe(true);
+    expect(acima.success).toBe(false);
+    expect(acima.error?.issues.map((i) => [i.path[0], i.message])).toEqual([
+      [campo, `Use até ${limite} caracteres.`],
+    ]);
+  });
 });
 
 function omitir(campo: string): Record<string, string> {
