@@ -59,7 +59,7 @@ Funcionalidade: Checkout em etapas
 - Geladeira vazia em `/checkout` leva de volta à Geladeira.
 - A criação do pedido usa `POST /orders` com `Idempotency-Key`.
 
-> [!todo] Preencher: taxa de juros do cartão a partir da 3ª parcela.
+- Juros do cartão a partir da 3ª parcela: os da tabela de parcelas do gateway; se o spike LB-54 mostrar que não dá para configurar 1x e 2x sem juros, taxa fixa da loja de 2,99% a.m. (decisão do Diego, 13/11). Ver [[pagamento]].
 
 ## Fora de escopo
 
