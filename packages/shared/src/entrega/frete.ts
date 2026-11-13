@@ -31,7 +31,8 @@ export function calcularFrete(
   }
 
   // Em milésimos de centavo, para não depender de ponto flutuante.
-  const exato = config.taxaBaseCentavos * 1000 + config.valorPorKmCentavos * entrada.distanciaMetros;
+  const exato =
+    config.taxaBaseCentavos * 1000 + config.valorPorKmCentavos * entrada.distanciaMetros;
   const passo = PASSO_DO_ARREDONDAMENTO_CENTAVOS * 1000;
   const freteCentavos = Math.ceil(exato / passo) * PASSO_DO_ARREDONDAMENTO_CENTAVOS;
 

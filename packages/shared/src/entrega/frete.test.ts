@@ -24,13 +24,18 @@ describe("calcularFrete: valor cobrado", () => {
 });
 
 describe("calcularFrete: frete grátis", () => {
-  it.each([15_000, 15_001, 40_000])("subtotal de %i centavos ou mais não paga frete", (subtotal) => {
-    expect(calcularFrete({ distanciaMetros: 5_200, subtotalCentavos: subtotal }, config)).toEqual({
-      naArea: true,
-      freteCentavos: 0,
-      gratis: true,
-    });
-  });
+  it.each([15_000, 15_001, 40_000])(
+    "subtotal de %i centavos ou mais não paga frete",
+    (subtotal) => {
+      expect(calcularFrete({ distanciaMetros: 5_200, subtotalCentavos: subtotal }, config)).toEqual(
+        {
+          naArea: true,
+          freteCentavos: 0,
+          gratis: true,
+        },
+      );
+    },
+  );
 });
 
 describe("calcularFrete: área de entrega", () => {
@@ -54,11 +59,14 @@ describe("calcularFrete: arredondamento e configuração", () => {
     [7_990, 1_300],
     [8_500, 1_350],
     [8_510, 1_400],
-  ])("com R$ 1,00 por km, %i m dá %i centavos (sempre para cima, de R$ 0,50 em R$ 0,50)", (d, frete) => {
-    expect(calcularFrete({ distanciaMetros: d, subtotalCentavos: 1_000 }, porCem)).toMatchObject({
-      freteCentavos: frete,
-    });
-  });
+  ])(
+    "com R$ 1,00 por km, %i m dá %i centavos (sempre para cima, de R$ 0,50 em R$ 0,50)",
+    (d, frete) => {
+      expect(calcularFrete({ distanciaMetros: d, subtotalCentavos: 1_000 }, porCem)).toMatchObject({
+        freteCentavos: frete,
+      });
+    },
+  );
 
   it("usa a configuração recebida: mudar o valor por km muda a cotação", () => {
     const entrada = { distanciaMetros: 5_200, subtotalCentavos: 9_050 };
@@ -71,10 +79,16 @@ describe("calcularFrete: arredondamento e configuração", () => {
 
   it("usa o raio e o mínimo de frete grátis da configuração", () => {
     expect(
-      calcularFrete({ distanciaMetros: 30_000, subtotalCentavos: 1_000 }, { ...config, raioMaximoMetros: 30_000 }),
+      calcularFrete(
+        { distanciaMetros: 30_000, subtotalCentavos: 1_000 },
+        { ...config, raioMaximoMetros: 30_000 },
+      ),
     ).toMatchObject({ naArea: true });
     expect(
-      calcularFrete({ distanciaMetros: 5_000, subtotalCentavos: 10_000 }, { ...config, freteGratisMinimoCentavos: 10_000 }),
+      calcularFrete(
+        { distanciaMetros: 5_000, subtotalCentavos: 10_000 },
+        { ...config, freteGratisMinimoCentavos: 10_000 },
+      ),
     ).toMatchObject({ gratis: true });
   });
 });

@@ -18,7 +18,7 @@ describe("enderecoFormSchema", () => {
   });
 
   it("aceita sem apelido e sem complemento", () => {
-    const { apelido: _apelido, complemento: _complemento, ...semOpcionais } = valido;
+    const semOpcionais = omitir("apelido", "complemento");
 
     expect(enderecoFormSchema.parse(semOpcionais)).toEqual({ ...semOpcionais, cep: "57035000" });
   });
@@ -29,7 +29,11 @@ describe("enderecoFormSchema", () => {
     ["bairro", "Informe o bairro."],
     ["cidade", "Informe a cidade."],
   ])("recusa %s vazio, só com espaços ou ausente com a mensagem do campo", (campo, mensagem) => {
-    for (const entrada of [{ ...valido, [campo]: "" }, { ...valido, [campo]: "   " }, omitir(campo)]) {
+    for (const entrada of [
+      { ...valido, [campo]: "" },
+      { ...valido, [campo]: "   " },
+      omitir(campo),
+    ]) {
       const result = enderecoFormSchema.safeParse(entrada);
 
       expect(result.success).toBe(false);
@@ -85,8 +89,8 @@ describe("enderecoFormSchema", () => {
   });
 });
 
-function omitir(campo: string): Record<string, string> {
+function omitir(...campos: string[]): Record<string, string> {
   const copia: Record<string, string> = { ...valido };
-  delete copia[campo];
+  for (const campo of campos) delete copia[campo];
   return copia;
 }
