@@ -124,7 +124,7 @@ Unidades de uma cerveja que estão na cervejaria, inclusive as reservadas. Muda 
 _Evite_: estoque total, saldo
 
 **Reservado**:
-Unidades de uma cerveja presas em pedidos "Aguardando pagamento". Viram baixa no estoque físico quando o pagamento é aprovado e voltam a ficar disponíveis quando o pedido é cancelado. Ver [[pagamento]].
+Unidades de uma cerveja presas em pedidos "Aguardando pagamento". Viram baixa no estoque físico quando o pagamento é aprovado e voltam a ficar disponíveis quando o pedido é cancelado. Ver [[checkout]].
 _Evite_: bloqueado, separado
 
 **Estoque mínimo**:
