@@ -23,3 +23,15 @@ describe("cepSchema (formato)", () => {
     },
   );
 });
+
+describe("cepSchema (faixa de Alagoas)", () => {
+  it.each(["01432-000", "56999-999", "58000-000", "01432000"])(
+    "recusa o CEP %s, fora da faixa 57, com a mensagem de Alagoas",
+    (entrada) => {
+      const result = cepSchema.safeParse(entrada);
+
+      expect(result.success).toBe(false);
+      expect(result.error?.issues[0]?.message).toBe("Por enquanto só entregamos em Alagoas.");
+    },
+  );
+});
