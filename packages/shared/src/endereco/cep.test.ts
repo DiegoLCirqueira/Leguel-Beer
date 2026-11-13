@@ -11,3 +11,15 @@ describe("cepSchema", () => {
     expect(cepSchema.parse(entrada)).toBe(esperado);
   });
 });
+
+describe("cepSchema (formato)", () => {
+  it.each(["", "5703", "57035-00", "570350000", "abcdefgh"])(
+    "recusa %j com a mensagem do campo",
+    (entrada) => {
+      const result = cepSchema.safeParse(entrada);
+
+      expect(result.success).toBe(false);
+      expect(result.error?.issues[0]?.message).toBe("Informe o CEP.");
+    },
+  );
+});
