@@ -49,7 +49,8 @@ export function posicaoDaGarrafa(
     coluna * LARGURA_DA_POSICAO +
     (LARGURA_DA_POSICAO - largura) / 2 -
     fileira * RECUO_POR_FILEIRA;
-  const apoio = alturaDaLinha(prateleira, x + largura / 2) - fileira * SUBIDA_POR_FILEIRA[prateleira]!;
+  const apoio =
+    alturaDaLinha(prateleira, x + largura / 2) - fileira * SUBIDA_POR_FILEIRA[prateleira]!;
   return {
     left: percentual(x, MOLDURA.largura),
     bottom: percentual(MOLDURA.altura - apoio, MOLDURA.altura),

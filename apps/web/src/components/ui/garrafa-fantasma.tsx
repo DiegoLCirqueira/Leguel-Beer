@@ -13,12 +13,7 @@ export function GarrafaFantasma({ categoria }: GarrafaFantasmaProps) {
       aria-label={`Adicionar ${categoria.nome}`}
       className="group absolute inset-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaria"
     >
-      <svg
-        viewBox="0 0 33 92"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-        className="size-full"
-      >
+      <svg viewBox="0 0 33 92" preserveAspectRatio="none" aria-hidden="true" className="size-full">
         <path
           d={CONTORNO_DA_GARRAFA}
           fill="rgba(5,13,7,.35)"

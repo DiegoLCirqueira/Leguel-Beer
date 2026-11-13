@@ -15,7 +15,13 @@ describe("FaixaDaPrateleira", () => {
         categoriaNome="IPA"
         rotulos={[
           { cervejaId: "a", nome: "Maré Alta", quantidade: 2, totalCentavos: 6400, coluna: 0 },
-          { cervejaId: "b", nome: "Leguelé Carnaval", quantidade: 1, totalCentavos: 3200, coluna: 1 },
+          {
+            cervejaId: "b",
+            nome: "Leguelé Carnaval",
+            quantidade: 1,
+            totalCentavos: 3200,
+            coluna: 1,
+          },
         ]}
       />,
     );

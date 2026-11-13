@@ -80,7 +80,8 @@ export function PrateleiraDaGeladeira({ indice, categoria, itens }: PrateleiraDa
           categoriaNome={categoria.nome}
           rotulos={arrumacao.rotulos.map((rotulo) => ({
             ...rotulo,
-            totalCentavos: rotulo.quantidade * (porId.get(rotulo.cervejaId)?.cerveja.precoCentavos ?? 0),
+            totalCentavos:
+              rotulo.quantidade * (porId.get(rotulo.cervejaId)?.cerveja.precoCentavos ?? 0),
           }))}
         />
       </div>
