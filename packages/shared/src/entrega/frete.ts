@@ -15,6 +15,13 @@ export function calcularFrete(
   entrada: { readonly distanciaMetros: number; readonly subtotalCentavos: number },
   config: ConfiguracaoDeEntrega,
 ): Frete {
+  if (!Number.isInteger(entrada.distanciaMetros) || entrada.distanciaMetros < 0) {
+    throw new RangeError("A distância deve ser um número inteiro de metros, sem negativos.");
+  }
+  if (!Number.isInteger(entrada.subtotalCentavos) || entrada.subtotalCentavos < 0) {
+    throw new RangeError("O subtotal deve ser um número inteiro de centavos, sem negativos.");
+  }
+
   if (entrada.distanciaMetros > config.raioMaximoMetros) {
     return { naArea: false };
   }
