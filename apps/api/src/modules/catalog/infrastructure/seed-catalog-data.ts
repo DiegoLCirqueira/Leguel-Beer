@@ -27,7 +27,7 @@ export interface SeedCategory {
   beers: SeedBeer[];
 }
 
-/** Cervejas cuja foto recortada já está em `apps/web/public/cervejas` (as outras usam a imagem padrão). */
+/** Cervejas cuja foto recortada já está em `apps/web/public/cervejas` (todas as 16 têm). */
 const SLUGS_COM_FOTO = new Set([
   "mare-alta",
   "leguele-carnaval",
@@ -38,6 +38,13 @@ const SLUGS_COM_FOTO = new Set([
   "leguele-kolsch",
   "leguele-cream-ale",
   "leguele-comendador",
+  "jaragua-hazy-ipa",
+  "umbu-gose",
+  "graviola-witbier",
+  "rapadura-brown-ale",
+  "barra-nova-porter",
+  "pajucara-amber-ale",
+  "ponta-verde-pilsen",
 ]);
 
 const beer = (
