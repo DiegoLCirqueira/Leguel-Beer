@@ -137,6 +137,7 @@ Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adic
 ### Decisões do Diego (2026-11-12)
 
 - **Dados pessoais e endereços na Política (opção A, LGPD, sem novo aceite):** "Quais dados coletamos" passa a citar a data de nascimento e os endereços com localização e distância; "Para que usamos", a maioridade e o frete; "Com quem compartilhamos", os serviços de CEP e de mapas. Quem já tem conta não aceita de novo; muda só a data de "última atualização" de `/privacidade`, para o dia em que o texto entrar no site. O Front acerta o texto espelhado e a data junto com a primeira tela que coletar esses dados ([[dados-pessoais]] ou [[enderecos-entrega]]), e o Back atualiza a versão da Política no `LEGAL_VERSIONS` no mesmo dia. CPF não entra (fica para o spike do pagamento). Origem: perguntas 2 e 3 de 12/11.
+- **Entregas "a partir de R$ 150":** o item 3 de `/entregas` passa a dizer "a partir de" (regra inclusiva de [[enderecos-entrega]]); a data de `/entregas` muda quando o Front aplicar o texto.
 
 ### Decisões do Diego (2026-11-11)
 

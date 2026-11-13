@@ -98,7 +98,7 @@ Funcionalidade: Endereços e entrega
   - Mensagens por campo: "Informe o CEP.", "Informe a rua.", "Informe o número.", "Informe o bairro.", "Informe a cidade.".
 - **Busca por CEP:** um serviço público de CEP (o card cita o ViaCEP) preenche rua, bairro, cidade e UF. CEP inexistente ou serviço fora do ar (ou mais de 5 s sem resposta) não impedem o preenchimento à mão. CEP fora da faixa de Alagoas (ou busca que devolve outra UF): "Por enquanto só entregamos em Alagoas.".
 - **Coordenadas:** ao salvar (e ao editar rua, número, bairro, cidade ou CEP), a API calcula a latitude e a longitude do endereço pelo serviço escolhido no spike (LB-62) e as grava. Se o serviço não achar o endereço, nada é salvo e aparece "Não encontramos este endereço. Confira a rua, o número e o CEP.". O site nunca manda coordenadas: elas vêm da API.
-- **Serviço de mapas fora do ar:** a API espera no máximo 8 s pela geocodificação e pela rota. Erro ou tempo esgotado: nada é salvo, a API responde 503 `MAPS_UNAVAILABLE` e o site mostra a mensagem pendente do Diego (proposta: "Não conseguimos calcular o frete agora. Tente de novo em instantes."). Na edição, o endereço anterior continua salvo como estava (coordenadas e distância inclusive) até uma edição dar certo.
+- **Serviço de mapas fora do ar:** a API espera no máximo 8 s pela geocodificação e pela rota. Erro ou tempo esgotado: nada é salvo, a API responde 503 `MAPS_UNAVAILABLE` e o site mostra "Não conseguimos calcular o frete agora. Tente de novo em instantes." (texto confirmado pelo Diego, segunda rodada de 12/11). Na edição, o endereço anterior continua salvo como estava (coordenadas e distância inclusive) até uma edição dar certo.
 - **Sem rota até a cervejaria** (o serviço acha o endereço, mas não há caminho de carro): o endereço é salvo com o selo "Fora da área".
 - **Linha reta só por decisão do spike:** se o spike LB-62 concluir que não há rota gratuita, a distância passa a ser em linha reta para todos os endereços, por configuração. Nunca há troca silenciosa para linha reta numa requisição em que o serviço de rota falhou.
 - **Padrão:** cada cliente tem exatamente um endereço padrão quando tem algum. O primeiro endereço vira padrão; "Tornar padrão" troca; excluir o padrão torna padrão o endereço salvo mais recentemente; excluir o último deixa a lista vazia.
@@ -122,6 +122,7 @@ Funcionalidade: Endereços e entrega
 - **Uma regra só:** o cálculo é uma função pura compartilhada, usada pela cotação e pela criação do pedido. O frete gravado no pedido é recalculado pela API na hora, com as configurações em vigor e o subtotal revalidado por ela.
 - **Cotação:** a API recebe só o id de um endereço do cliente da sessão; o subtotal vem da Geladeira da conta ([[geladeira]], LB-47), revalidada pela API. Devolve o frete, se é grátis e se está na área. Para o convidado, a Geladeira continua com "Informe seu endereço para calcular o frete" ([[geladeira]]).
 - **No resumo da Geladeira** (cliente com endereço padrão): a linha do frete mostra o valor ou "Grátis", e o Total passa a somar o frete. Sem endereço salvo: "Cadastre um endereço para calcular o frete", com link para "Meus endereços".
+- **Recálculo que falha no resumo:** se a origem mudou e o recálculo da distância responde 503 `MAPS_UNAVAILABLE`, a linha do frete mostra "Não conseguimos calcular o frete agora. Tente de novo em instantes.", o Total fica sem frete e o checkout não avança com esse endereço até uma cotação dar certo. A distância antiga (da origem anterior) não é usada. A próxima abertura do resumo tenta de novo.
 - **Distância de rota:** calculada pela API ao salvar o endereço e guardada com ele, junto com a origem usada no cálculo. Se a origem das configurações mudar, a próxima cotação (ou criação de pedido) desse endereço recalcula e guarda a distância nova, na própria requisição, sem processo em segundo plano ([[ADR-002-hospedagem-api]]). Mudar o endereço também recalcula. Prazo de entrega fica fora (LB-65, adiável).
 
 ### Spike de geocodificação e rota (LB-62)
@@ -211,12 +212,28 @@ Fonte única em [[termos-privacidade]] ("Decisões do Diego (2026-11-12)"). Nest
 - "Com quem compartilhamos" ganha: "os serviços de CEP e de mapas, que recebem o CEP e o endereço para preencher o endereço e calcular a distância".
 - Sem novo aceite: muda só a data de "última atualização" de `/privacidade` e a versão da Política no `LEGAL_VERSIONS` da API, no dia em que o texto entrar no site.
 
+### Segunda rodada (12/11)
+
+Achados do Reviewer no #257, levados pelo Orchestrator. Resposta do Diego: "recomendados".
+
+1. **Texto de erro com mapas fora do ar: A.** "Não conseguimos calcular o frete agora. Tente de novo em instantes.", ao salvar ou editar endereço (nada é salvo) e na linha do frete quando o recálculo falha.
+2. **Data de nascimento de menor (LGPD, art. 14): A.** Ver [[dados-pessoais]].
+3. **Frete grátis na visão: A.** [[visao]] passa a dizer "a partir de R$ 150".
+
+### Texto "a partir de R$ 150" no site (para o Front)
+
+O site ainda diz "acima de R$ 150". Ajuste de texto numa fatia do Front deste item (a fatia 6, que já mexe no frete da Geladeira), com os testes junto:
+
+- `apps/web/src/content/legal.ts:87` (/entregas): "com frete grátis para pedidos a partir de R$ 150.", e `ENTREGAS_ATUALIZADO_EM` com a data em que o texto mudar.
+- `apps/web/src/app/entregas/page.test.tsx:21`: o mesmo texto.
+- `apps/web/src/components/produto/produto-conteudo.tsx:96` e `produto-conteudo.test.tsx:76`: "Frete grátis em compras a partir de R$ 150,00" ([[produto]]).
+
 ## Decisões tomadas sem consulta
 
 Recomendações aplicadas pelo Spec em 12/11; qualquer uma pode ser vetada.
 
 - **Geocodificação falhou, nada é salvo:** assim todo endereço salvo tem coordenadas e frete calculável.
-- **Mapas fora do ar:** espera máxima de 8 s; na edição, o endereço anterior é mantido.
+- **Mapas fora do ar:** espera máxima de 8 s; na edição, o endereço anterior é mantido; no resumo, sem frete e sem checkout até a cotação dar certo.
 - **Sem rota:** o endereço é salvo como "Fora da área".
 - **Distância guardada com o endereço e a origem usada**, recalculada na próxima cotação quando a origem muda ou quando o endereço muda (evita chamar o serviço de mapas a cada abertura da Geladeira).
 - **Frete no resumo da Geladeira pelo endereço padrão**, como a [[geladeira]] já previa para o item 4; sem endereço, "Cadastre um endereço para calcular o frete".

@@ -113,6 +113,7 @@ Funcionalidade: Dados pessoais
 
 - A data de nascimento é dado pessoal novo: a Política de Privacidade passa a citá-la. Ver "Decisões do Diego", pergunta 3, e [[termos-privacidade]].
 - A data de nascimento não aparece em listas do admin.
+- **Data de nascimento de menor de 18 anos (LGPD, art. 14):** é guardada como as demais, porque é o dado mínimo para a API aplicar a trava de maioridade; não se pede nenhum outro dado por isso, e a Política de Privacidade informa a coleta ("Texto novo de /privacidade"). Decisão do Diego, segunda rodada de 12/11.
 
 ### Fora de escopo
 
@@ -174,6 +175,14 @@ Fonte única em [[termos-privacidade]] ("Decisões do Diego (2026-11-12)"). Nest
 - "Para que usamos" ganha: "conferir a maioridade na compra".
 - Sem novo aceite: muda só a data de "última atualização" de `/privacidade` e a versão da Política no `LEGAL_VERSIONS` da API, no dia em que o texto entrar no site, junto com a primeira tela que coleta dado novo (esta ou [[enderecos-entrega]]).
 
+### Segunda rodada (12/11)
+
+Achados do Reviewer no #257, levados pelo Orchestrator. Resposta do Diego: "recomendados".
+
+1. **Texto de erro com mapas fora do ar: A.** "Não conseguimos calcular o frete agora. Tente de novo em instantes.", e o endereço não é salvo. Detalhes em [[enderecos-entrega]].
+2. **Data de nascimento de menor (LGPD, art. 14): A.** Mantida no perfil, como dado mínimo para a trava de maioridade, com a coleta informada na Política. Ver "LGPD" acima.
+3. **Frete grátis na visão: A.** [[visao]] passa a dizer "frete grátis a partir de R$ 150", como [[enderecos-entrega]].
+
 ## Decisões tomadas sem consulta
 
 Recomendações aplicadas pelo Spec em 12/11; qualquer uma pode ser vetada.
@@ -181,7 +190,7 @@ Recomendações aplicadas pelo Spec em 12/11; qualquer uma pode ser vetada.
 - **Duas specs para o item 4**, pelo limite de 6 cenários: esta e [[enderecos-entrega]].
 - **Data de nascimento opcional no perfil e obrigatória no pedido:** o cliente pode salvar o resto sem ela; o pedido não sai sem ela.
 - **Data a partir de 01/01/1900** e não futura.
-- **Menor de idade pode salvar a data:** o bloqueio é no pedido, com a mensagem do card. (LGPD, art. 14: guardar a data de menor aguarda o Diego, levada pelo Orchestrator em 12/11.)
+- **Menor de idade pode salvar a data:** o bloqueio é no pedido, com a mensagem do card. Guardar a data de menor foi confirmado pelo Diego (segunda rodada de 12/11, pergunta 2).
 - **Nascido em 29/02** completa 18 anos em 01/03 nos anos não bissextos (regra conservadora).
 - **Textos novos:** "Informe uma data válida.", "Informe sua data de nascimento para finalizar a compra." e "Perfil atualizado" (este do card).
 
