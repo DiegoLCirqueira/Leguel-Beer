@@ -71,11 +71,12 @@ Funcionalidade: Pagamento com Pix e cartão
       | Aguardando pagamento | de aprovação, com assinatura válida  | o pedido fica "Pago", a reserva vira baixa no estoque físico e sai a baixa da Geladeira                              |
       | Pago                 | igual ao anterior, repetido           | a API responde 200 e nada se repete: nem estoque, nem Geladeira, nem histórico                                      |
       | Aguardando pagamento | com assinatura falsa                 | a API responde 401 e nada muda                                                                                      |
-      | Cancelado (expirado) | de aprovação tardia                  | o pedido continua "Cancelado" e o admin vê "Pagamento recebido após o cancelamento: faça o reembolso no painel do Mercado Pago." |
+      | Cancelado (expirado) | de aprovação feita depois da validade | o pedido continua "Cancelado" e o admin vê "Pagamento recebido após o cancelamento: faça o reembolso no painel do Mercado Pago." |
 
   Cenário: Pix vencido antes do cron
     Dado um pedido de Pix vencido há 1 minuto e o cron diário ainda não rodou
     Quando o pedido é lido, um aviso de pagamento dele chega ou outro pedido tenta reservar a mesma cerveja
+    E o gateway confirma que a cobrança não foi paga
     Então o pedido passa a "Cancelado" e a reserva é liberada nessa mesma requisição
 ```
 
@@ -87,7 +88,8 @@ Funcionalidade: Pagamento com Pix e cartão
 - **Pix:** a etapa Pagamento só registra a escolha. Ao tocar "Confirmar pedido" na Revisão, a API cria o pedido (LB-56) e a cobrança Pix, e o site abre a tela de pagamento do pedido, com o QR. O QR nunca aparece antes de confirmar ([[sequencia-telas]], divergência 18 e 30).
 - **Cartão:** os dados são digitados na etapa Pagamento, no formulário seguro do gateway, que devolve um token; ao tocar "Confirmar pedido", a API cria o pedido e cobra o token com as parcelas escolhidas. Aprovado: vai à confirmação ([[pedidos-cliente]]). Recusado: vai à tela de pagamento do pedido com a mensagem.
 - **Tela de pagamento do pedido** `/pedido/[id]/pagamento`: exige conta; posse antes de qualquer desvio (pedido de outro cliente ou inexistente dá "não encontrada", como em [[pedidos-cliente]]). Pedido pago leva à confirmação; cancelado mostra o estado "Pix expirado" ou "Pedido cancelado" com "Refazer pedido". Enquanto o pedido aguarda e está na validade, o cliente pode trocar a forma de pagamento (gerar o Pix ou tentar outro cartão) sem criar outro pedido.
-- **Validade do pedido:** 30 minutos desde a criação, para Pix e cartão ([[checkout]]). A cobrança Pix vence junto com o pedido.
+- **Troca de forma de pagamento:** antes de gerar a nova cobrança, a API cancela no gateway a cobrança anterior ainda aberta do mesmo pedido (o Pix gerado ou o pagamento de cartão pendente). Se, mesmo assim, chegar a aprovação de outro pagamento para um pedido já "Pago", o pedido não muda, e o pagamento a mais ganha a marca "Pagamento em duplicidade", que o admin vê no detalhe com "Faça o reembolso no painel do Mercado Pago." (reembolso manual).
+- **Validade do pedido:** 30 minutos desde a criação, para Pix e cartão ([[checkout]]). A partir de 30:00 o pedido está vencido (criado às 10:00:00, às 10:29:59 ainda vale e às 10:30:00 já venceu). A cobrança Pix vence no mesmo instante.
 - **Retomar o pagamento** (pergunta 3): em "Meus pedidos", o pedido "Aguardando pagamento" fica tocável e leva a esta tela; os outros status seguem não tocáveis ([[pedidos-cliente]]).
 
 ### Pix (LB-57, telas 18 e 30)
@@ -96,11 +98,12 @@ Funcionalidade: Pagamento com Pix e cartão
 - **Copiar código:** leva o código à área de transferência e mostra o toast "Código copiado". Se o navegador recusar, o código fica selecionado para o cliente copiar à mão.
 - **Aprovação sem recarregar:** sem WebSocket ([[ADR-002-hospedagem-api]]), a tela consulta o status do pedido a cada 5 s enquanto está aberta e visível, e também no botão "Já paguei". Pago: vai à confirmação.
 - **Expirado** (pergunta 2): ao zerar a contagem (ou ao abrir depois), a tela mostra "Pix expirado", "O tempo para pagamento se esgotou." e o botão "Refazer pedido", que leva ao checkout com a Geladeira como estava (novo pedido, nova reserva, novo Pix).
-- **Simular pagamento:** só com o gateway em modo de testes, a tela mostra "Simular pagamento", que pede ao gateway de testes a aprovação, para a demonstração do portfólio. Nunca aparece com credenciais de produção.
+- **Simular pagamento:** só com o gateway em modo de testes, a tela mostra "Simular pagamento", que pede ao gateway de testes a aprovação, para a demonstração do portfólio. A rota da API que faz isso exige a posse do pedido e é recusada pelo próprio servidor fora do modo de testes (não basta esconder o botão). O mesmo vale para o relógio adiantado usado nos testes: só existe no modo de testes.
 
 ### Cartão (LB-58, tela 17)
 
-- **Formulário seguro do gateway:** número, nome, validade e CVV são digitados em campos do SDK do gateway; os dados do cartão nunca passam pela API nem ficam em log. A API recebe só o token, as parcelas e o meio (bandeira).
+- **Formulário seguro do gateway:** número, nome, validade e CVV são digitados em campos do SDK do gateway; os dados do cartão nunca passam pela API nem ficam em log. A API recebe só o token, as parcelas e o meio (bandeira). O token fica só na memória da página: nunca em armazenamento local, URL ou log. Voltar etapas ou recarregar pede o cartão de novo.
+- **Dados enviados ao gateway** (mínimo, Pix e cartão): valor, descrição "Pedido #LB…", e-mail e nome do cliente e, só se o gateway exigir, o CPF. Nunca telefone, endereço, data de nascimento nem itens. Um teste captura a requisição enviada e falha se aparecer outro campo.
 - **CPF do titular** (pergunta 4): só se o spike LB-54 mostrar que o gateway exige; pedido na etapa Pagamento, enviado ao gateway e não gravado na loja (perfil, pedido ou log). Se entrar, a Política ganha "o CPF vai ao processador de pagamento" ([[termos-privacidade]]).
 - **Parcelas** (pergunta 1; se o spike LB-54 mostrar que o modo de testes não deixa configurar 1x e 2x sem juros, vale a taxa fixa da loja de 2,99% a.m., tabela Price, calculada no `@leguele/shared` e usada pelo site e pela API): de 1x a 12x, conforme a tabela que o gateway devolve para o total do pedido. 1x e 2x sem juros ("sem juros"); de 3x a 12x com os juros do gateway, mostrando o valor da parcela e o total final antes de confirmar. Se o gateway oferecer menos parcelas para um total baixo, o site mostra só as oferecidas. Valores em centavos, sem arredondamento do site.
 - **Recusa:** "Pagamento recusado. Tente outro cartão ou Pix." (texto do card). Erro ou tempo esgotado no gateway: "Não foi possível processar o pagamento agora. Tente de novo em instantes." e nada é cobrado em dobro (a nova tentativa usa a mesma chave de idempotência da tentativa anterior).
@@ -110,10 +113,11 @@ Funcionalidade: Pagamento com Pix e cartão
 
 - **Endpoint público** de avisos do gateway na API, processado de forma síncrona na própria requisição ([[ADR-002-hospedagem-api]], [[mvp-corte]]: sem fila).
 - **Assinatura:** confere a assinatura do aviso com o segredo do gateway; inválida ou ausente, 401 e nada muda.
-- **Status real:** não confia no corpo do aviso: consulta o pagamento no gateway antes de mudar o pedido.
+- **Status real:** não confia no corpo do aviso: consulta o pagamento no gateway antes de mudar o pedido, e só aplica se o pagamento for um dos registrados para aquele pedido e o valor bater com o total do pedido. Pagamento de outro pedido ou com valor diferente não muda nada, responde 200 e ganha a marca "Pagamento divergente" para o admin.
+- **Vale a hora da aprovação:** o que decide é a hora em que o gateway aprovou, não a hora em que o aviso chega. Aprovado dentro da validade, o pedido fica "Pago" mesmo que o aviso chegue depois dos 30 minutos.
 - **Um registro por evento:** o id do evento do gateway é único; evento repetido responde 200 sem repetir nada. Fora de ordem: um pedido "Pago" nunca volta a "Aguardando pagamento".
 - **Ao aprovar** (uma vez por pedido): o pedido fica "Pago"; a reserva vira baixa no estoque físico (e entra no histórico do estoque, [[admin]]); sai a baixa da Geladeira ([[pedidos-cliente]], "baixa pendente"); o status anterior fica no histórico do pedido.
-- **Aprovação tardia** (pergunta 5): pedido já "Cancelado" continua cancelado, sem baixa de estoque nem da Geladeira, e ganha a marca "Pagamento recebido após o cancelamento", que o admin vê no detalhe com "Faça o reembolso no painel do Mercado Pago." ([[admin]]).
+- **Aprovação depois da validade** (pergunta 5): pedido já "Cancelado" continua cancelado, sem baixa de estoque nem da Geladeira, e ganha a marca "Pagamento recebido após o cancelamento", que o admin vê no detalhe com "Faça o reembolso no painel do Mercado Pago." ([[admin]]).
 - **Recusa** do cartão por aviso: o pedido continua "Aguardando pagamento".
 - Os logs registram o id do evento, o id do pedido e o status; nunca dados do cartão, CPF nem dados pessoais.
 
@@ -121,12 +125,21 @@ Funcionalidade: Pagamento com Pix e cartão
 
 - Já definida no [[checkout]]: checagem **no momento do uso** (ao ler o pedido, ao receber o aviso de pagamento e antes de reservar estoque) e um **cron diário** da plataforma que cancela os expirados que restarem. Sem processo em segundo plano.
 - Expirar = status "Cancelado" com motivo "pagamento não concluído", reserva liberada, baixas pendentes da Geladeira descartadas e o status anterior no histórico. O cron e a checagem usam o mesmo caso de uso, com relógio injetado, e são seguros se rodarem juntos (um pedido só é cancelado uma vez).
+- **Antes de cancelar, consulta o gateway:** a expiração (no uso ou no cron) pergunta ao gateway se a cobrança do pedido foi aprovada dentro da validade; se foi, aplica a aprovação em vez de cancelar. Se o gateway não responder, o pedido não é cancelado nessa vez (segue aguardando, com a reserva) e a próxima checagem tenta de novo. Uma aprovação dentro da validade que chegue a um pedido já cancelado (atraso do gateway) é tratada como aprovação depois da validade: segue "Cancelado" com reembolso manual.
 
 ### Gateway e spike (LB-54)
 
 - A API fala com o gateway só por uma porta (cobrar Pix, cobrar cartão, consultar pagamento, tabela de parcelas, conferir assinatura) ([[ADR-004-mercado-pago]], [[ADR-005-monorepo-camadas]]).
 - O spike LB-54 (timebox de 3 h) confirma no modo de testes: Pix com vencimento de 30 minutos, cartão com 1x e 2x sem juros e a tabela de parcelas, cartões de teste de aprovação e recusa, assinatura do aviso, se o CPF é exigido, e os termos de uso (retenção e transferência de dados). O resultado vai na descrição do PR do spike; o Back muda o [[ADR-004-mercado-pago]] para aceito por um ADR novo, ou propõe outro provedor.
 - **Conta e segredos** (pergunta 6): conta de desenvolvedor gratuita, só credenciais de teste; chaves e segredo do aviso só no `.env` da API, fora do git, com as chaves sem valor no `.env.example`. No local, o aviso chega por um túnel sem conta ou é substituído pela consulta ao gateway.
+
+### Política de Privacidade
+
+- "Com quem compartilhamos" ganha: "o processador de pagamento (Mercado Pago), que recebe seu nome, seu e-mail e, quando exigido, seu CPF, para processar o pagamento". Sem novo aceite, como em 12/11 ([[termos-privacidade]]): muda a data de "última atualização" de `/privacidade` e a versão no `LEGAL_VERSIONS` no dia em que o pagamento entrar no site. Recomendação aplicada, vetável.
+
+### Ajuste previsto no admin
+
+- O detalhe do pedido no admin ([[admin]]) passa a mostrar as marcas "Pagamento recebido após o cancelamento", "Pagamento em duplicidade" e "Pagamento divergente", cada uma com "Faça o reembolso no painel do Mercado Pago." quando couber. Entra num PR seguinte da spec do Admin.
 
 ## Fora de escopo
 
@@ -147,10 +160,12 @@ Funcionalidade: Pagamento com Pix e cartão
 > [!info] Proposta do Spec, vetável
 
 - **Porta do gateway** (API): adaptador testado com respostas gravadas do modo de testes (Pix criado, aprovado, vencido; cartão aprovado e recusado; tabela de parcelas; erro e tempo esgotado), sem rede no CI; fake da porta para os casos de uso.
-- **Casos de uso** (API, repositório em memória e relógio fake): cobrar Pix e cartão (posse, pedido vencido recusado, troca de forma de pagamento); confirmar pagamento (aprovação, repetida 3 vezes, fora de ordem, tardia após cancelamento, recusa); expirar (31 min cancela, 10 min não muda, cron e leitura juntos cancelam uma vez).
+- **Casos de uso** (API, repositório em memória e relógio fake): cobrar Pix e cartão (posse, pedido vencido recusado, troca de forma de pagamento); confirmar pagamento (aprovação, repetida 3 vezes, fora de ordem, aprovada dentro da validade com aviso depois dos 30 min, depois da validade, recusa, pagamento de outro pedido ou com valor diferente, segundo pagamento aprovado para pedido já pago marcado como duplicidade); troca de forma de pagamento cancela a cobrança anterior no gateway fake; expiração consulta o gateway antes de cancelar (aprovado aplica, gateway fora do ar não cancela); borda da validade (29:59 vale, 30:00 venceu); expirar (31 min cancela, 10 min não muda, cron e leitura juntos cancelam uma vez).
 - **Aviso de pagamento** (HTTP, Supertest e banco real): assinatura válida, falsa e ausente; o mesmo evento 3 vezes; logs sem dados de cartão nem pessoais.
+- **Modo de testes** (HTTP): a rota de simular pagamento e o relógio adiantado respondem recusa fora do modo de testes; dentro dele, exigem a posse do pedido (outro cliente, 404).
+- **Dados ao gateway** (API): a requisição capturada no gateway fake só tem valor, descrição, e-mail, nome e, quando exigido, CPF; o CPF não aparece no banco nem nos logs.
 - **Estoque e Geladeira** (integração com banco real): aprovação converte a reserva em baixa uma vez; expiração libera a reserva; baixa pendente da Geladeira ([[pedidos-cliente]]).
-- **Telas** (componente, relógio controlado): contagem a partir do vencimento da API, "Código copiado", consulta a cada 5 s e no "Já paguei", estado expirado, parcelas (1x, 2x, 3x) e recusa.
+- **Telas** (componente, relógio controlado): contagem a partir do vencimento da API, token do cartão fora do armazenamento local e da URL, "Código copiado", consulta a cada 5 s e no "Já paguei", estado expirado, parcelas (1x, 2x, 3x) e recusa.
 - **E2E** (celular, 360 × 640): Pix aprovado pelo "Simular pagamento" com o gateway fake; Pix expirado com o relógio da API de teste adiantado; cartão aprovado e recusado com os cartões de teste do gateway fake.
 
 ## Fatias, com dono e ordem
@@ -184,14 +199,19 @@ Perguntas levadas pelo Orchestrator. Resposta do Diego: "todas as recomendadas".
 5. **Aprovação depois da expiração: A.** O pedido continua "Cancelado" e o admin vê o aviso de reembolso manual.
 6. **Conta de teste no Mercado Pago: A.** O Back cria a conta de desenvolvedor gratuita e as credenciais de teste; chaves só no `.env` da API, com os nomes sem valor no `.env.example`.
 
-As decisões abaixo, tomadas sem consulta, ficam valendo e continuam vetáveis pelo Diego.
+As 6 respostas acima são do Diego. As escolhas abaixo, tomadas sem consulta, ficam valendo e continuam vetáveis por ele.
 
 ## Decisões tomadas sem consulta
 
 Recomendações aplicadas pelo Spec em 13/11; qualquer uma pode ser vetada.
 
+- **Vale a hora da aprovação no gateway** e a expiração consulta o gateway antes de cancelar. Refina a resposta 5: só o pagamento aprovado depois da validade segue "Cancelado" com reembolso manual.
+- **Troca de forma de pagamento cancela a cobrança anterior;** pagamento a mais para pedido pago vira "Pagamento em duplicidade" com reembolso manual; pagamento de outro pedido ou com valor diferente vira "Pagamento divergente".
+- **Vencido a partir de 30:00.**
+- **Mínimo ao gateway** (valor, descrição, e-mail, nome e CPF só se exigido) e o texto novo da Política, sem novo aceite.
+- **Token do cartão só em memória.**
 - **Consulta a cada 5 s e no "Já paguei"** no lugar do tempo real.
-- **"Simular pagamento" só no modo de testes.**
+- **"Simular pagamento" e relógio adiantado só no modo de testes**, recusados pelo servidor fora dele.
 - **Recusa mantém o pedido aguardando**, com troca de forma de pagamento dentro da validade.
 - **Validade de 30 minutos também para o cartão** (a do pedido, LB-56).
 - **Contagem pelo vencimento dado pela API.**
