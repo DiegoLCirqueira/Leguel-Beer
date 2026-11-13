@@ -58,3 +58,14 @@ export function posicaoDaGarrafa(
     brilho: 1 - fileira * BRILHO_POR_FILEIRA,
   };
 }
+
+export type PosicaoDaFaixa = {
+  /** Distância da borda de baixo da moldura, em %. */
+  bottom: number;
+  /** Inclinação do parapeito, em radianos (a faixa gira com ele). */
+  giro: number;
+};
+
+export function posicaoDaFaixa(_prateleira: number): PosicaoDaFaixa {
+  return { bottom: 0, giro: 0 };
+}
