@@ -98,6 +98,7 @@ Funcionalidade: Dados pessoais
 ### Maioridade no pedido (LB-20)
 
 - Regra única "tem 18 anos ou mais na data de hoje", com hoje no fuso de Maceió (`America/Maceio`): quem faz 18 anos hoje pode comprar.
+- **Nascido em 29/02:** em ano não bissexto, completa 18 anos em 01/03 (regra conservadora). Ex.: nascido em 29/02/2008 pode comprar a partir de 01/03/2026, não em 28/02/2026.
 - A API confere ao criar o pedido (item 5, LB-55) e recusa com 422 `UNDERAGE` e a mensagem "Venda proibida para menores de 18 anos."; sem data de nascimento, recusa com 422 `BIRTH_DATE_REQUIRED`. O site também mostra o aviso antes, mas quem decide é a API.
 - É uma declaração do cliente, sem validação de documento ([[mvp-corte]]). Complementa a [[maioridade-entrada]], que é só uma confirmação na entrada do site.
 - A regra e os testes entram neste item; a chamada na criação do pedido entra com o pedido (item 5). A assinatura do Clube (citada no card) é Pós-MVP.
@@ -131,7 +132,7 @@ Tela 19 (Dados pessoais), normalizada ao padrão aprovado (regra da revisão em 
 > [!info] Proposta do Spec, aplicada como recomendação (12/11), vetável pelo Diego
 
 - **Schema do perfil** (shared, unitário): nome, telefone e data de nascimento, incluindo 29/02 em ano bissexto e não bissexto, data futura e antes de 1900.
-- **Maioridade** (shared, unitário): tabela com véspera, dia e dia seguinte dos 18 anos, 29/02, e a virada do dia em UTC contra o horário de Maceió (ex.: 23h30 de Maceió já é o dia seguinte em UTC).
+- **Maioridade** (shared, unitário): tabela com véspera, dia e dia seguinte dos 18 anos, 29/02 (nascido em 29/02/2008: não em 28/02/2026, sim em 01/03/2026), e a virada do dia em UTC contra o horário de Maceió (ex.: 23h30 de Maceió já é o dia seguinte em UTC).
 - **Editar perfil** (API): caso de uso com repositório em memória; rota com Supertest e banco real: sem token 401, dado inválido 400, corpo com e-mail ou id de outro cliente não muda nada além do perfil da sessão.
 - **Tela** (componente): máscaras, mensagens por campo, toast, botão desabilitado ao salvar e e-mail só leitura.
 - **E2E** (celular, 360 × 640): salvar e recarregar; convidado em `/conta/dados-pessoais`. O fluxo convidado → entrar → checkout entra no E2E do item 5.
@@ -180,7 +181,8 @@ Recomendações aplicadas pelo Spec em 12/11; qualquer uma pode ser vetada.
 - **Duas specs para o item 4**, pelo limite de 6 cenários: esta e [[enderecos-entrega]].
 - **Data de nascimento opcional no perfil e obrigatória no pedido:** o cliente pode salvar o resto sem ela; o pedido não sai sem ela.
 - **Data a partir de 01/01/1900** e não futura.
-- **Menor de idade pode salvar a data:** o bloqueio é no pedido, com a mensagem do card.
+- **Menor de idade pode salvar a data:** o bloqueio é no pedido, com a mensagem do card. (LGPD, art. 14: guardar a data de menor aguarda o Diego, levada pelo Orchestrator em 12/11.)
+- **Nascido em 29/02** completa 18 anos em 01/03 nos anos não bissextos (regra conservadora).
 - **Textos novos:** "Informe uma data válida.", "Informe sua data de nascimento para finalizar a compra." e "Perfil atualizado" (este do card).
 
 ## Tickets propostos

@@ -101,7 +101,7 @@ Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adic
 
 1. **Como funciona.** Os pedidos feitos neste site não são entregues; esta página descreve como a entrega funcionaria.
 2. **Área de entrega.** Só Maceió e região.
-3. **Frete.** Calculado pela distância até a cervejaria, com frete grátis para pedidos acima de R$ 150.
+3. **Frete.** Calculado pela distância até a cervejaria, com frete grátis para pedidos a partir de R$ 150.
 4. **Retirada.** Não há retirada no local.
 
 ## Seams de teste

@@ -98,6 +98,9 @@ Funcionalidade: Endereços e entrega
   - Mensagens por campo: "Informe o CEP.", "Informe a rua.", "Informe o número.", "Informe o bairro.", "Informe a cidade.".
 - **Busca por CEP:** um serviço público de CEP (o card cita o ViaCEP) preenche rua, bairro, cidade e UF. CEP inexistente ou serviço fora do ar (ou mais de 5 s sem resposta) não impedem o preenchimento à mão. CEP fora da faixa de Alagoas (ou busca que devolve outra UF): "Por enquanto só entregamos em Alagoas.".
 - **Coordenadas:** ao salvar (e ao editar rua, número, bairro, cidade ou CEP), a API calcula a latitude e a longitude do endereço pelo serviço escolhido no spike (LB-62) e as grava. Se o serviço não achar o endereço, nada é salvo e aparece "Não encontramos este endereço. Confira a rua, o número e o CEP.". O site nunca manda coordenadas: elas vêm da API.
+- **Serviço de mapas fora do ar:** a API espera no máximo 8 s pela geocodificação e pela rota. Erro ou tempo esgotado: nada é salvo, a API responde 503 `MAPS_UNAVAILABLE` e o site mostra a mensagem pendente do Diego (proposta: "Não conseguimos calcular o frete agora. Tente de novo em instantes."). Na edição, o endereço anterior continua salvo como estava (coordenadas e distância inclusive) até uma edição dar certo.
+- **Sem rota até a cervejaria** (o serviço acha o endereço, mas não há caminho de carro): o endereço é salvo com o selo "Fora da área".
+- **Linha reta só por decisão do spike:** se o spike LB-62 concluir que não há rota gratuita, a distância passa a ser em linha reta para todos os endereços, por configuração. Nunca há troca silenciosa para linha reta numa requisição em que o serviço de rota falhou.
 - **Padrão:** cada cliente tem exatamente um endereço padrão quando tem algum. O primeiro endereço vira padrão; "Tornar padrão" troca; excluir o padrão torna padrão o endereço salvo mais recentemente; excluir o último deixa a lista vazia.
 - **Limite:** até 5 endereços por cliente. Com 5, "Adicionar novo endereço" fica desabilitado com a dica "Você pode guardar até 5 endereços.".
 - **Posse:** a API só lê, altera e exclui endereços do cliente da sessão; endereço de outro cliente responde 404, como se não existisse.
@@ -126,6 +129,12 @@ Funcionalidade: Endereços e entrega
 - Pergunta: qual serviço gratuito transforma endereços de Maceió em coordenadas e dá a distância de rota de carro, dentro do plano gratuito e sem cartão.
 - Timebox de 3 h, com 10 endereços de bairros de Maceió e 3 de cidades vizinhas; compara rota com linha reta.
 - Se nenhum serviço gratuito der rota, a distância passa a ser em linha reta, com o mesmo raio (ver "Decisões do Diego", perguntas 5 e 11).
+- **Minimização dos dados (LGPD), critério de aceite do spike e dos adaptadores:**
+  - O serviço de CEP recebe só o CEP.
+  - O serviço de mapas recebe só o necessário: rua, número, bairro, cidade, UF e CEP para a geocodificação, e só as coordenadas de origem e destino para a rota. Nunca nome, e-mail, telefone, data de nascimento, id do cliente, token de sessão, apelido nem complemento.
+  - Os logs da API não registram endereço completo nem coordenadas do cliente.
+  - Os testes (red primeiro) capturam a requisição enviada a cada serviço e os logs, e falham se aparecer qualquer campo fora dessa lista.
+  - Antes de usar dados reais, o spike registra os termos de uso, a retenção dos dados e se há transferência internacional de cada serviço candidato. A decisão de não pedir novo aceite (pergunta 3) continua valendo; se o spike achar algo que a Política não cobre, volta ao Diego.
 - O resultado vai na descrição do PR do spike; se a escolha atender aos três critérios de ADR, o Back escreve o ADR no mesmo PR.
 
 ### LGPD
@@ -153,7 +162,7 @@ Funcionalidade: Endereços e entrega
 
 - **Frete** (shared, unitário): tabela da função de frete, com arredondamento (12,80 → 13,00; 13,00 → 13,00; 13,01 → 13,50), R$ 149,99 e R$ 150,00, raio de 25 km e 25,01 km, configurações diferentes (cenário 2 do LB-63: o valor por km mudou e a cotação muda).
 - **Endereço** (shared, unitário): schema com CEP, UF só AL, CEP fora da faixa 57 recusado mesmo com UF AL (ex.: 01432-000 com AL) e limites de tamanho.
-- **CEP e mapas** (API): portas para o serviço de CEP e o de geocodificação e rota; adaptadores testados com respostas gravadas (sucesso, não encontrado, erro e tempo esgotado), sem rede no CI.
+- **CEP e mapas** (API): portas para o serviço de CEP e o de geocodificação e rota; adaptadores testados com respostas gravadas (sucesso, não encontrado, sem rota, erro e tempo esgotado), sem rede no CI; captura da requisição enviada e dos logs contra a lista de campos permitidos (minimização); edição com o serviço fora do ar mantém o endereço anterior.
 - **Endereços** (API): casos de uso com repositório em memória (um padrão por cliente, primeiro vira padrão, excluir o padrão, limite de 5); rotas com Supertest e banco real (sem token 401, endereço de outro cliente 404, coordenadas vindas do serviço fake).
 - **Cotação** (API): caso de uso com configurações e distância fakes; subtotal tirado da Geladeira da conta revalidada (um subtotal mandado no corpo é ignorado); origem mudada recalcula e guarda a distância nova; HTTP com endereço de outro cliente (404).
 - **Telas** (componente): busca por CEP nos quatro casos, selos, lista vazia e limite.
@@ -207,6 +216,8 @@ Fonte única em [[termos-privacidade]] ("Decisões do Diego (2026-11-12)"). Nest
 Recomendações aplicadas pelo Spec em 12/11; qualquer uma pode ser vetada.
 
 - **Geocodificação falhou, nada é salvo:** assim todo endereço salvo tem coordenadas e frete calculável.
+- **Mapas fora do ar:** espera máxima de 8 s; na edição, o endereço anterior é mantido.
+- **Sem rota:** o endereço é salvo como "Fora da área".
 - **Distância guardada com o endereço e a origem usada**, recalculada na próxima cotação quando a origem muda ou quando o endereço muda (evita chamar o serviço de mapas a cada abertura da Geladeira).
 - **Frete no resumo da Geladeira pelo endereço padrão**, como a [[geladeira]] já previa para o item 4; sem endereço, "Cadastre um endereço para calcular o frete".
 - **Busca de CEP com tempo máximo de 5 s** antes de liberar o preenchimento à mão.
