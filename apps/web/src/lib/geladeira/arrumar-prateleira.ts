@@ -29,5 +29,6 @@ export function arrumarPrateleira(itens: RotuloDaPrateleira[]): PrateleiraArruma
   );
   const ocupadas = unico ? Math.min(itens[0]!.quantidade, COLUNAS) : Math.min(itens.length, COLUNAS);
   const fantasmas = Array.from({ length: COLUNAS - ocupadas }, (_, i) => ocupadas + i);
-  return { garrafas, fantasmas, rotulos: [] };
+  const rotulos = itens.slice(0, COLUNAS).map((item, indice) => ({ ...item, coluna: unico ? 0 : indice }));
+  return { garrafas, fantasmas, rotulos };
 }
