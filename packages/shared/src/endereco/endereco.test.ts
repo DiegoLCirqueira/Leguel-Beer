@@ -22,4 +22,24 @@ describe("enderecoFormSchema", () => {
 
     expect(enderecoFormSchema.parse(semOpcionais)).toEqual({ ...semOpcionais, cep: "57035000" });
   });
+
+  it.each([
+    ["rua", "Informe a rua."],
+    ["numero", "Informe o número."],
+    ["bairro", "Informe o bairro."],
+    ["cidade", "Informe a cidade."],
+  ])("recusa %s vazio, só com espaços ou ausente com a mensagem do campo", (campo, mensagem) => {
+    for (const entrada of [{ ...valido, [campo]: "" }, { ...valido, [campo]: "   " }, omitir(campo)]) {
+      const result = enderecoFormSchema.safeParse(entrada);
+
+      expect(result.success).toBe(false);
+      expect(result.error?.issues.map((i) => [i.path[0], i.message])).toEqual([[campo, mensagem]]);
+    }
+  });
 });
+
+function omitir(campo: string): Record<string, string> {
+  const copia: Record<string, string> = { ...valido };
+  delete copia[campo];
+  return copia;
+}
