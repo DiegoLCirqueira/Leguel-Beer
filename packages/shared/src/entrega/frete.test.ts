@@ -44,3 +44,37 @@ describe("calcularFrete: área de entrega", () => {
     });
   });
 });
+
+describe("calcularFrete: arredondamento e configuração", () => {
+  const porCem = { ...config, valorPorKmCentavos: 100 };
+
+  it.each([
+    [8_000, 1_300],
+    [8_010, 1_350],
+    [7_990, 1_300],
+    [8_500, 1_350],
+    [8_510, 1_400],
+  ])("com R$ 1,00 por km, %i m dá %i centavos (sempre para cima, de R$ 0,50 em R$ 0,50)", (d, frete) => {
+    expect(calcularFrete({ distanciaMetros: d, subtotalCentavos: 1_000 }, porCem)).toMatchObject({
+      freteCentavos: frete,
+    });
+  });
+
+  it("usa a configuração recebida: mudar o valor por km muda a cotação", () => {
+    const entrada = { distanciaMetros: 5_200, subtotalCentavos: 9_050 };
+
+    expect(calcularFrete(entrada, config)).toMatchObject({ freteCentavos: 1_300 });
+    expect(calcularFrete(entrada, { ...config, valorPorKmCentavos: 200 })).toMatchObject({
+      freteCentavos: 1_550,
+    });
+  });
+
+  it("usa o raio e o mínimo de frete grátis da configuração", () => {
+    expect(
+      calcularFrete({ distanciaMetros: 30_000, subtotalCentavos: 1_000 }, { ...config, raioMaximoMetros: 30_000 }),
+    ).toMatchObject({ naArea: true });
+    expect(
+      calcularFrete({ distanciaMetros: 5_000, subtotalCentavos: 10_000 }, { ...config, freteGratisMinimoCentavos: 10_000 }),
+    ).toMatchObject({ gratis: true });
+  });
+});
