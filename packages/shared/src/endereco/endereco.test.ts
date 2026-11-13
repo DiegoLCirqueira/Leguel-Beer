@@ -75,6 +75,14 @@ describe("enderecoFormSchema", () => {
     expect(parsed.rua).toBe("Rua A");
     expect(parsed.apelido).toBe("Casa");
   });
+  it("recusa CEP fora da faixa 57 mesmo com a UF AL", () => {
+    const result = enderecoFormSchema.safeParse({ ...valido, cep: "01432-000", uf: "AL" });
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues.map((i) => [i.path[0], i.message])).toEqual([
+      ["cep", "Por enquanto só entregamos em Alagoas."],
+    ]);
+  });
 });
 
 function omitir(campo: string): Record<string, string> {
