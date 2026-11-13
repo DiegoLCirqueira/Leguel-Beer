@@ -19,4 +19,11 @@ describe("arrumarPrateleira", () => {
     expect(posicoes(p)).toEqual(["mare:0:0", "mare:1:0", "mare:2:0", "mare:3:0"]);
     expect(p.fantasmas).toEqual([]);
   });
+
+  it("2 unidades de um rótulo deixam 2 garrafas fantasma nas colunas livres", () => {
+    const p = arrumarPrateleira([mare(2)]);
+
+    expect(posicoes(p)).toEqual(["mare:0:0", "mare:1:0"]);
+    expect(p.fantasmas).toEqual([2, 3]);
+  });
 });
