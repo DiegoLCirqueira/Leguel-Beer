@@ -22,3 +22,5 @@ export const enderecoFormSchema = z.object({
   cidade: obrigatorio("Informe a cidade.", 80),
   uf: z.literal("AL", "Por enquanto só entregamos em Alagoas."),
 });
+
+export type EnderecoForm = z.output<typeof enderecoFormSchema>;
