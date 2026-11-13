@@ -78,3 +78,17 @@ describe("calcularFrete: arredondamento e configuração", () => {
     ).toMatchObject({ gratis: true });
   });
 });
+
+describe("calcularFrete: entradas inválidas", () => {
+  it.each([
+    [-1, 1_000],
+    [5_200.5, 1_000],
+    [Number.NaN, 1_000],
+    [5_200, -1],
+    [5_200, 10.5],
+  ])("recusa distância %s m e subtotal %s centavos (inteiros, sem negativos)", (d, subtotal) => {
+    expect(() => calcularFrete({ distanciaMetros: d, subtotalCentavos: subtotal }, config)).toThrow(
+      RangeError,
+    );
+  });
+});
