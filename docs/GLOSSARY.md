@@ -1,6 +1,6 @@
 ---
 tipo: glossario
-atualizado: 2026-11-10
+atualizado: 2026-11-13
 tags:
   - glossario
 ---
@@ -102,3 +102,17 @@ _Evite_: região atendida, cobertura
 **Frete**:
 Valor da entrega: taxa base mais o valor por km da distância de rota, arredondado para cima em R$ 0,50; grátis com subtotal a partir de R$ 150,00. Ver [[enderecos-entrega]].
 _Evite_: taxa de entrega, envio
+
+## Pedidos
+
+**Pedido**:
+A compra criada no checkout, com as cervejas, os preços e o endereço gravados no momento da compra. Ver [[checkout]] e [[pedidos-cliente]].
+_Evite_: compra (quando se quer dizer o registro), ordem
+
+**Número do pedido**:
+Código mostrado ao cliente e ao admin, "#LB" seguido de 6 dígitos (ex.: "#LB482731"). Não é o id do pedido na URL. Ver [[pedidos-cliente]].
+_Evite_: código, protocolo
+
+**Status do pedido**:
+Etapa em que o pedido está: Aguardando pagamento, Pago, Em preparo, Saiu para entrega, Entregue ou Cancelado. Ver [[pedidos-cliente]].
+_Evite_: situação, estado
