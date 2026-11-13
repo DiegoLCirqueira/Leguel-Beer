@@ -1,15 +1,18 @@
 import { z } from "zod";
 import { cepSchema } from "./cep.js";
 
-const obrigatorio = (mensagem: string) => z.string(mensagem).trim().min(1, mensagem);
+const ate = (limite: number) => `Use até ${limite} caracteres.`;
+const obrigatorio = (mensagem: string, limite: number) =>
+  z.string(mensagem).trim().min(1, mensagem).max(limite, ate(limite));
+const opcional = (limite: number) => z.string().max(limite, ate(limite)).optional();
 
 export const enderecoFormSchema = z.object({
-  apelido: z.string().optional(),
+  apelido: opcional(30),
   cep: cepSchema,
-  rua: obrigatorio("Informe a rua."),
-  numero: obrigatorio("Informe o número."),
-  complemento: z.string().optional(),
-  bairro: obrigatorio("Informe o bairro."),
-  cidade: obrigatorio("Informe a cidade."),
+  rua: obrigatorio("Informe a rua.", 120),
+  numero: obrigatorio("Informe o número.", 10),
+  complemento: opcional(60),
+  bairro: obrigatorio("Informe o bairro.", 80),
+  cidade: obrigatorio("Informe a cidade.", 80),
   uf: z.literal("AL", "Por enquanto só entregamos em Alagoas."),
 });
