@@ -24,7 +24,7 @@ Pessoa que opera a loja (cervejas, estoque e pedidos). É uma conta com o papel 
 _Evite_: administrador do sistema, superusuário
 
 **Perfil**:
-Dados do cliente guardados pela loja (nome e telefone, no cadastro), criados no primeiro acesso à conta. Ver [[cadastro-login]].
+Dados do cliente guardados pela loja (nome e telefone, no cadastro; data de nascimento, em "Dados pessoais"), criados no primeiro acesso à conta. Ver [[cadastro-login]] e [[dados-pessoais]].
 _Evite_: usuário, cadastro (quando se quer dizer os dados)
 
 ## Acesso
@@ -88,3 +88,17 @@ _Evite_: placeholder, slot vazio
 **Revalidação**:
 Conferência da Geladeira pela API (preço, cerveja ativa e quantidade disponível) ao abrir a Geladeira e ao iniciar o checkout; o que muda vira um aviso para o cliente. Ver [[geladeira]].
 _Evite_: sincronização (quando se quer dizer a conferência de preço e estoque)
+
+## Entrega
+
+**Endereço padrão**:
+O endereço do cliente usado primeiro no frete do resumo da Geladeira e no checkout. Cada cliente com endereço tem exatamente um. Ver [[enderecos-entrega]].
+_Evite_: endereço principal, endereço favorito
+
+**Área de entrega**:
+Os endereços até o raio máximo de distância de rota da cervejaria (25 km de início). Fora dela, o endereço pode ser salvo, mas não serve para comprar. Ver [[enderecos-entrega]].
+_Evite_: região atendida, cobertura
+
+**Frete**:
+Valor da entrega: taxa base mais o valor por km da distância de rota, arredondado para cima em R$ 0,50; grátis com subtotal a partir de R$ 150,00. Ver [[enderecos-entrega]].
+_Evite_: taxa de entrega, envio

@@ -35,6 +35,8 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[produto]]: página de produto com ficha, desconto, estoque baixo e quantidade (LB-40, LB-41, LB-42).
 - [[adicionar-do-card]]: colocar uma cerveja na Geladeira direto do card (LB-35).
 - [[geladeira]]: o carrinho em prateleiras por categoria, com resumo, revalidação no servidor e persistência no navegador e na conta (LB-124, LB-47, LB-49, LB-50, LB-51, LB-52).
+- [[dados-pessoais]]: editar o perfil com data de nascimento, maioridade no pedido e login ao finalizar (LB-29, LB-20, LB-31).
+- [[enderecos-entrega]]: endereços com busca por CEP, área de entrega e frete por distância com frete grátis (LB-30, LB-62, LB-63, LB-64, LB-66).
 - [[checkout]]: Entrega → Pagamento → Revisão, com Pix e cartão.
 
 ## Decisões (ADRs)

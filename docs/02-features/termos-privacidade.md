@@ -89,9 +89,9 @@ Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adic
 
 ### Política de Privacidade (`/privacidade`)
 
-1. **Quais dados coletamos.** Os que você informa ao criar a conta (nome, e-mail, telefone e senha) e, quando usar o checkout, endereço de entrega. A senha é guardada pelo serviço de autenticação apenas como hash; ninguém do projeto tem acesso a ela. Também guardamos as cervejas e as quantidades que você coloca na Geladeira: com a conta, elas ficam salvas na conta, para a Geladeira valer em outros aparelhos, e o navegador guarda uma cópia que é apagada quando você sai da conta; sem conta, ficam só no armazenamento do navegador deste aparelho.
-2. **Para que usamos.** Só para o funcionamento do site: entrar na conta, simular pedidos e enviar e-mails da conta (confirmação de cadastro e recuperação de senha).
-3. **Com quem compartilhamos.** Com os serviços que hospedam o site, o banco de dados, a autenticação e o envio de e-mails, só na medida necessária para o site funcionar. Não vendemos nem cedemos dados a terceiros.
+1. **Quais dados coletamos.** Os que você informa ao criar a conta (nome, e-mail, telefone e senha), a data de nascimento, se você a informar em "Dados pessoais", e os endereços de entrega que você salvar, com a localização (latitude e longitude) e a distância até a cervejaria calculadas a partir deles. A senha é guardada pelo serviço de autenticação apenas como hash; ninguém do projeto tem acesso a ela. Também guardamos as cervejas e as quantidades que você coloca na Geladeira: com a conta, elas ficam salvas na conta, para a Geladeira valer em outros aparelhos, e o navegador guarda uma cópia que é apagada quando você sai da conta; sem conta, ficam só no armazenamento do navegador deste aparelho.
+2. **Para que usamos.** Só para o funcionamento do site: entrar na conta, simular pedidos, conferir a maioridade na compra, calcular o frete e enviar e-mails da conta (confirmação de cadastro e recuperação de senha).
+3. **Com quem compartilhamos.** Com os serviços que hospedam o site, o banco de dados, a autenticação e o envio de e-mails, e com os serviços de CEP e de mapas, que recebem o CEP e o endereço para preencher o endereço e calcular a distância, só na medida necessária para o site funcionar. Não vendemos nem cedemos dados a terceiros.
 4. **Cookies.** Usamos cookies necessários: a confirmação de maioridade (30 dias) e a sessão da conta.
 5. **Seus direitos.** Pela Lei Geral de Proteção de Dados (LGPD), você pode pedir acesso, correção ou exclusão dos seus dados pelo contato do responsável, abaixo.
 6. **Responsável e contato.** O responsável pelos dados (controlador) é Diego Lins Cirqueira, autor do projeto. Pedidos sobre os seus dados vão para diegopantanalstudio@gmail.com.
@@ -101,7 +101,7 @@ Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adic
 
 1. **Como funciona.** Os pedidos feitos neste site não são entregues; esta página descreve como a entrega funcionaria.
 2. **Área de entrega.** Só Maceió e região.
-3. **Frete.** Calculado pela distância até a cervejaria, com frete grátis para pedidos acima de R$ 150.
+3. **Frete.** Calculado pela distância até a cervejaria, com frete grátis para pedidos a partir de R$ 150.
 4. **Retirada.** Não há retirada no local.
 
 ## Seams de teste
@@ -133,6 +133,10 @@ Escritos pelo Spec com a autorização do Diego de 2026-10-29 (pergunta 4: "adic
 ### Decisões do Diego (2026-10-30)
 
 - **Sem aviso de portfólio:** "quero que retire o 'Projeto de portfóio pagamentos em modo de teste', isso não deve aparecer em lugar algum já que é desnecessário". Saem a faixa do topo, a nota do rodapé e o item "Projeto de portfólio." de Entregas. O rodapé e as páginas legais continuam, e a empresa segue marcada como fictícia.
+
+### Decisões do Diego (2026-11-12)
+
+- **Dados pessoais e endereços na Política (opção A, LGPD, sem novo aceite):** "Quais dados coletamos" passa a citar a data de nascimento e os endereços com localização e distância; "Para que usamos", a maioridade e o frete; "Com quem compartilhamos", os serviços de CEP e de mapas. Quem já tem conta não aceita de novo; muda só a data de "última atualização" de `/privacidade`, para o dia em que o texto entrar no site. O Front acerta o texto espelhado e a data junto com a primeira tela que coletar esses dados ([[dados-pessoais]] ou [[enderecos-entrega]]), e o Back atualiza a versão da Política no `LEGAL_VERSIONS` no mesmo dia. CPF não entra (fica para o spike do pagamento). Origem: perguntas 2 e 3 de 12/11.
 
 ### Decisões do Diego (2026-11-11)
 

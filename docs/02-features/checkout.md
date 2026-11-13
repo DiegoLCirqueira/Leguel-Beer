@@ -55,7 +55,7 @@ Funcionalidade: Checkout em etapas
   - Não há fila nem processo em segundo plano (ver [[ADR-002-hospedagem-api]]).
 - Cartão em até 12x: sem juros até 2x, com juros a partir da 3ª parcela.
 - Entrega apenas em Maceió e região; fora da área, mostrar "Ainda não entregamos neste endereço" e não avançar.
-- Frete calculado por distância; frete grátis acima de R$ 150.
+- Frete calculado por distância; frete grátis a partir de R$ 150 (inclusive, ver [[enderecos-entrega]]).
 - Geladeira vazia em `/checkout` leva de volta à Geladeira.
 - A criação do pedido usa `POST /orders` com `Idempotency-Key`.
 
