@@ -20,5 +20,7 @@ export function arrumarPrateleira(itens: RotuloDaPrateleira[]): PrateleiraArruma
     coluna: k % 4,
     fileira: Math.floor(k / 4),
   }));
-  return { garrafas, fantasmas: [], rotulos: [] };
+  const livres = Math.max(0, 4 - garrafas.length);
+  const fantasmas = Array.from({ length: livres }, (_, i) => 4 - livres + i);
+  return { garrafas, fantasmas, rotulos: [] };
 }
