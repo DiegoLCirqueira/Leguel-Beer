@@ -141,6 +141,8 @@ export function GeladeiraProvider({
       if (resultado.tipo !== "ok") return;
       // Mudança feita enquanto o buscar estava em voo: a resposta é antiga.
       if (sincronizada && versao.current !== antes) return;
+      // Um envio em voo pode ter falhado enquanto o buscar rodava: a mudança local pendente vale mais.
+      if (sincronizada && lerMarca(CHAVE_PENDENTE)) return;
       gravarMarca(CHAVE_DA_CONTA, true);
       setAjustes(resultado.resposta.ajustes);
       const daConta = aplicarResposta(GELADEIRA_VAZIA, resultado.resposta);
