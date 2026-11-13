@@ -1,1 +1,1 @@
-export const LIMITE_DE_ENDERECOS = 0;
+export const LIMITE_DE_ENDERECOS = 5;
