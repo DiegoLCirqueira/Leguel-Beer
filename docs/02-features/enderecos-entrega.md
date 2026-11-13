@@ -94,8 +94,9 @@ Funcionalidade: Endereços e entrega
   - **CEP**, obrigatório, 8 dígitos, máscara "00000-000"; a busca roda ao completar os 8 dígitos e pelo botão de busca.
   - **Rua**, **número** e **bairro**, obrigatórios, até 120, 10 e 80 caracteres; **complemento** opcional, até 60.
   - **Cidade** e **UF**: preenchidas pelo CEP ou à mão; a UF só pode ser AL.
+  - **Alagoas pelo CEP também:** o schema compartilhado (site e API) só aceita CEP da faixa de Alagoas, que começa com 57 (57000-000 a 57999-999), além da UF AL. Digitar AL com CEP de outra UF não passa.
   - Mensagens por campo: "Informe o CEP.", "Informe a rua.", "Informe o número.", "Informe o bairro.", "Informe a cidade.".
-- **Busca por CEP:** um serviço público de CEP (o card cita o ViaCEP) preenche rua, bairro, cidade e UF. CEP inexistente ou serviço fora do ar (ou mais de 5 s sem resposta) não impedem o preenchimento à mão. CEP de outra UF: "Por enquanto só entregamos em Alagoas.".
+- **Busca por CEP:** um serviço público de CEP (o card cita o ViaCEP) preenche rua, bairro, cidade e UF. CEP inexistente ou serviço fora do ar (ou mais de 5 s sem resposta) não impedem o preenchimento à mão. CEP fora da faixa de Alagoas (ou busca que devolve outra UF): "Por enquanto só entregamos em Alagoas.".
 - **Coordenadas:** ao salvar (e ao editar rua, número, bairro, cidade ou CEP), a API calcula a latitude e a longitude do endereço pelo serviço escolhido no spike (LB-62) e as grava. Se o serviço não achar o endereço, nada é salvo e aparece "Não encontramos este endereço. Confira a rua, o número e o CEP.". O site nunca manda coordenadas: elas vêm da API.
 - **Padrão:** cada cliente tem exatamente um endereço padrão quando tem algum. O primeiro endereço vira padrão; "Tornar padrão" troca; excluir o padrão torna padrão o endereço salvo mais recentemente; excluir o último deixa a lista vazia.
 - **Limite:** até 5 endereços por cliente. Com 5, "Adicionar novo endereço" fica desabilitado com a dica "Você pode guardar até 5 endereços.".
@@ -113,12 +114,12 @@ Funcionalidade: Endereços e entrega
 
 - **Origem:** a cervejaria, um ponto fixo e fictício em Maceió guardado nas configurações de entrega.
 - **Valor:** taxa base + valor por km × distância de rota em km, arredondado para cima ao próximo múltiplo de R$ 0,50. Com os valores iniciais: R$ 5,00 + R$ 1,50 por km (5,2 km dá R$ 12,80, que vira R$ 13,00).
-- **Frete grátis:** subtotal de R$ 150,00 ou mais (inclusive). O subtotal é o da Geladeira depois da revalidação; cupom e desconto de assinante são MVP+ e Pós-MVP.
+- **Frete grátis:** subtotal de R$ 150,00 ou mais (inclusive). O subtotal é sempre calculado pela API a partir da Geladeira revalidada (preços atuais e quantidades disponíveis), nunca recebido no corpo do pedido nem da cotação; cupom e desconto de assinante são MVP+ e Pós-MVP.
 - **Configurações de entrega** no banco, uma só linha: origem (latitude e longitude), taxa base, valor por km, raio máximo e mínimo para frete grátis, com os valores iniciais acima pelo seed. Mudam sem novo deploy; a tela de admin para elas fica para o item 8.
-- **Uma regra só:** o cálculo é uma função pura compartilhada, usada pela cotação e pela criação do pedido. O frete gravado no pedido é recalculado pela API na hora, com as configurações em vigor.
-- **Cotação:** a API recebe o id de um endereço do cliente e o subtotal e devolve frete, se é grátis e se está na área. Para o convidado, a Geladeira continua com "Informe seu endereço para calcular o frete" ([[geladeira]]).
+- **Uma regra só:** o cálculo é uma função pura compartilhada, usada pela cotação e pela criação do pedido. O frete gravado no pedido é recalculado pela API na hora, com as configurações em vigor e o subtotal revalidado por ela.
+- **Cotação:** a API recebe só o id de um endereço do cliente da sessão; o subtotal vem da Geladeira da conta ([[geladeira]], LB-47), revalidada pela API. Devolve o frete, se é grátis e se está na área. Para o convidado, a Geladeira continua com "Informe seu endereço para calcular o frete" ([[geladeira]]).
 - **No resumo da Geladeira** (cliente com endereço padrão): a linha do frete mostra o valor ou "Grátis", e o Total passa a somar o frete. Sem endereço salvo: "Cadastre um endereço para calcular o frete", com link para "Meus endereços".
-- **Distância de rota:** calculada pela API ao salvar o endereço e guardada com ele; só é recalculada quando o endereço ou a origem mudam. Prazo de entrega fica fora (LB-65, adiável).
+- **Distância de rota:** calculada pela API ao salvar o endereço e guardada com ele, junto com a origem usada no cálculo. Se a origem das configurações mudar, a próxima cotação (ou criação de pedido) desse endereço recalcula e guarda a distância nova, na própria requisição, sem processo em segundo plano ([[ADR-002-hospedagem-api]]). Mudar o endereço também recalcula. Prazo de entrega fica fora (LB-65, adiável).
 
 ### Spike de geocodificação e rota (LB-62)
 
@@ -151,10 +152,10 @@ Funcionalidade: Endereços e entrega
 > [!info] Proposta do Spec, aplicada como recomendação (12/11), vetável pelo Diego
 
 - **Frete** (shared, unitário): tabela da função de frete, com arredondamento (12,80 → 13,00; 13,00 → 13,00; 13,01 → 13,50), R$ 149,99 e R$ 150,00, raio de 25 km e 25,01 km, configurações diferentes (cenário 2 do LB-63: o valor por km mudou e a cotação muda).
-- **Endereço** (shared, unitário): schema com CEP, UF só AL e limites de tamanho.
+- **Endereço** (shared, unitário): schema com CEP, UF só AL, CEP fora da faixa 57 recusado mesmo com UF AL (ex.: 01432-000 com AL) e limites de tamanho.
 - **CEP e mapas** (API): portas para o serviço de CEP e o de geocodificação e rota; adaptadores testados com respostas gravadas (sucesso, não encontrado, erro e tempo esgotado), sem rede no CI.
 - **Endereços** (API): casos de uso com repositório em memória (um padrão por cliente, primeiro vira padrão, excluir o padrão, limite de 5); rotas com Supertest e banco real (sem token 401, endereço de outro cliente 404, coordenadas vindas do serviço fake).
-- **Cotação** (API): caso de uso com configurações e distância fakes; HTTP com endereço de outro cliente (404).
+- **Cotação** (API): caso de uso com configurações e distância fakes; subtotal tirado da Geladeira da conta revalidada (um subtotal mandado no corpo é ignorado); origem mudada recalcula e guarda a distância nova; HTTP com endereço de outro cliente (404).
 - **Telas** (componente): busca por CEP nos quatro casos, selos, lista vazia e limite.
 - **E2E** (celular, 360 × 640): salvar o primeiro endereço com o CEP e os mapas simulados pela API de teste; frete no resumo da Geladeira; endereço fora da área.
 
@@ -206,7 +207,7 @@ Fonte única em [[termos-privacidade]] ("Decisões do Diego (2026-11-12)"). Nest
 Recomendações aplicadas pelo Spec em 12/11; qualquer uma pode ser vetada.
 
 - **Geocodificação falhou, nada é salvo:** assim todo endereço salvo tem coordenadas e frete calculável.
-- **Distância guardada com o endereço**, recalculada só quando o endereço ou a origem mudam (evita chamar o serviço de mapas a cada abertura da Geladeira).
+- **Distância guardada com o endereço e a origem usada**, recalculada na próxima cotação quando a origem muda ou quando o endereço muda (evita chamar o serviço de mapas a cada abertura da Geladeira).
 - **Frete no resumo da Geladeira pelo endereço padrão**, como a [[geladeira]] já previa para o item 4; sem endereço, "Cadastre um endereço para calcular o frete".
 - **Busca de CEP com tempo máximo de 5 s** antes de liberar o preenchimento à mão.
 - **Limites de tamanho dos campos** (apelido 30, rua 120, número 10, bairro 80, complemento 60).
@@ -214,4 +215,4 @@ Recomendações aplicadas pelo Spec em 12/11; qualquer uma pode ser vetada.
 
 ## Tickets propostos
 
-Reconciliação das issues #45, #48, #49, #50 e #52, a pedir ao Orchestrator depois do merge desta spec (aprovação permanente para reconciliar issue com spec mergeada): link para esta spec, os cenários e as regras de cada card, "Usar minha localização" fora do #45 e a tela 29 e a checagem no pedido (#50) dependentes do item 5. Nenhuma issue nova.
+Reconciliação das issues #45, #48, #49, #50 e #52, a pedir ao Orchestrator depois do merge desta spec (aprovação permanente para reconciliar issue com spec mergeada): link para esta spec, os cenários e as regras de cada card, "Usar minha localização" fora do #45 e a tela 29 e a checagem no pedido (#50) dependentes do item 5. No #52, usar "a partir de R$ 150,00" (inclusive), não "acima de". Nenhuma issue nova.
