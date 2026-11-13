@@ -22,3 +22,13 @@ describe("calcularFrete: valor cobrado", () => {
     });
   });
 });
+
+describe("calcularFrete: frete grátis", () => {
+  it.each([15_000, 15_001, 40_000])("subtotal de %i centavos ou mais não paga frete", (subtotal) => {
+    expect(calcularFrete({ distanciaMetros: 5_200, subtotalCentavos: subtotal }, config)).toEqual({
+      naArea: true,
+      freteCentavos: 0,
+      gratis: true,
+    });
+  });
+});
