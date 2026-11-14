@@ -35,3 +35,19 @@ describe("cepSchema (faixa de Alagoas)", () => {
     },
   );
 });
+
+describe("cepSchema (caracteres)", () => {
+  it.each(["57.035-000", "57035/000", "5703a5000", "57035_000", "57035+000"])(
+    "recusa %j: só dígitos, hífen e espaço são aceitos",
+    (entrada) => {
+      const result = cepSchema.safeParse(entrada);
+
+      expect(result.success).toBe(false);
+      expect(result.error?.issues[0]?.message).toBe("Informe o CEP.");
+    },
+  );
+
+  it("aceita espaço em volta e no meio, e guarda só os dígitos", () => {
+    expect(cepSchema.parse(" 57035 000 ")).toBe("57035000");
+  });
+});
