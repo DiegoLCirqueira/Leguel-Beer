@@ -8,6 +8,8 @@ export type GarrafaAnimada<T extends GarrafaBase> = T & {
   animacao?: Animacao;
   /** Atraso em ms do balanço escalonado. */
   atraso: number;
+  /** Muda a cada mudança que anima a garrafa: quem usa como `key` reinicia a animação CSS. */
+  rodada: number;
 };
 
 type Efeito = { animacao: Animacao; atraso: number };
@@ -15,6 +17,8 @@ type Estado<T> = {
   assinatura: string;
   garrafas: T[];
   efeitos: Map<string, Efeito>;
+  /** Quantas mudanças já animaram. */
+  rodada: number;
   /** Garrafas que saíram e ainda estão na tela, saindo. */
   saindo: T[];
 };
@@ -56,6 +60,7 @@ export function useAnimacaoDasGarrafas<T extends GarrafaBase>(garrafas: T[]): Ga
     assinatura,
     garrafas,
     efeitos: new Map(),
+    rodada: 0,
     saindo: [],
   });
   let atual = anterior;
@@ -67,6 +72,7 @@ export function useAnimacaoDasGarrafas<T extends GarrafaBase>(garrafas: T[]): Ga
       assinatura,
       garrafas,
       efeitos: semMovimento ? new Map() : efeitosDaMudanca(anterior.garrafas, garrafas),
+      rodada: anterior.rodada + 1,
       saindo: semMovimento ? [] : [...new Map(saindo.map((g) => [g.chave, g])).values()],
     };
     setAnterior(atual);
@@ -85,7 +91,8 @@ export function useAnimacaoDasGarrafas<T extends GarrafaBase>(garrafas: T[]): Ga
       ...g,
       animacao: atual.efeitos.get(g.chave)?.animacao,
       atraso: atual.efeitos.get(g.chave)?.atraso ?? 0,
+      rodada: atual.efeitos.has(g.chave) ? atual.rodada : 0,
     })),
-    ...saindo.map((g) => ({ ...g, animacao: "saida" as const, atraso: 0 })),
+    ...saindo.map((g) => ({ ...g, animacao: "saida" as const, atraso: 0, rodada: atual.rodada })),
   ];
 }

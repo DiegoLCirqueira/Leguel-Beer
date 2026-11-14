@@ -56,6 +56,7 @@ export function PrateleiraDaGeladeira({ indice, categoria, itens }: PrateleiraDa
             }}
           >
             <div
+              key={garrafa.rodada}
               className="relative size-full origin-bottom"
               style={{ animationDelay: `${garrafa.atraso}ms` }}
             >
