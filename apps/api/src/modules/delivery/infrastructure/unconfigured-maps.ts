@@ -11,10 +11,7 @@ export class UnconfiguredMaps implements Geocoder, RouteCalculator {
     throw new MapsUnavailableError();
   }
 
-  async routeDistanceMeters(
-    _origin: Coordinates,
-    _destination: Coordinates,
-  ): Promise<number | null> {
+  async routeDistanceMeters(): Promise<number | null> {
     throw new MapsUnavailableError();
   }
 }
