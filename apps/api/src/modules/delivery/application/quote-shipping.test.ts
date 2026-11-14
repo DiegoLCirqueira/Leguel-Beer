@@ -55,4 +55,32 @@ describe("QuoteShipping", () => {
       gratis: false,
     });
   });
+
+  it.each([
+    [
+      "5,2 km, R$ 149,99: ainda paga",
+      5_200,
+      14_999,
+      { naArea: true, freteCentavos: 1_300, gratis: false },
+    ],
+    [
+      "5,2 km, R$ 150,00: grátis (inclusive)",
+      5_200,
+      15_000,
+      { naArea: true, freteCentavos: 0, gratis: true },
+    ],
+    [
+      "25 km, R$ 90,50: R$ 42,50 (raio inclusive)",
+      25_000,
+      9_050,
+      { naArea: true, freteCentavos: 4_250, gratis: false },
+    ],
+    ["25,001 km: fora da área", 25_001, 9_050, { naArea: false }],
+    ["25,001 km mesmo com frete grátis: fora da área", 25_001, 20_000, { naArea: false }],
+    ["sem rota até a cervejaria: fora da área", null, 9_050, { naArea: false }],
+  ])("%s", async (_nome, distanceMeters, subtotalCents, expected) => {
+    const { quote } = await setup({ distanceMeters, subtotalCents });
+
+    expect(await quote.execute("owner-1", "casa")).toEqual(expected);
+  });
 });
