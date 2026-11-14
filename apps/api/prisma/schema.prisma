@@ -29,6 +29,7 @@ model Profile {
   fridge          Fridge?
   orders          Order[]
   idempotencyKeys IdempotencyKey[]
+  statusChanges   OrderStatusHistory[] @relation("OrderStatusChangedBy")
 
   @@map("profiles")
 }
@@ -193,9 +194,13 @@ model OrderStatusHistory {
   fromStatus OrderStatus? @map("from_status")
   toStatus   OrderStatus  @map("to_status")
   reason     String?
+  /// Quem mudou o status (admin); nulo quando foi o sistema (pagamento, expiração).
+  actorId    String?      @map("actor_id") @db.Uuid
+  actor      Profile?     @relation("OrderStatusChangedBy", fields: [actorId], references: [id], onDelete: SetNull)
   createdAt  DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
 
   @@index([orderId, createdAt])
+  @@index([actorId])
   @@map("order_status_history")
 }
 
