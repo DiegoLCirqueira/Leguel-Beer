@@ -7,10 +7,10 @@ import { useGeladeira } from "./geladeira-provider";
 export function GeladeiraTela() {
   const { pronta, estado } = useGeladeira();
   return (
-    <main className="flex flex-1 flex-col items-center px-4 pb-2 pt-2">
+    <main className="flex h-[calc(100dvh-var(--altura-header-loja)-var(--altura-barra-loja)-env(safe-area-inset-bottom,0px))] flex-col items-center px-4 py-2">
       <h1 className="sr-only">Geladeira</h1>
       {pronta ? (
-        <MolduraDaGeladeira itens={estado.itens} />
+        <MolduraDaGeladeira itens={estado.itens} className="min-h-0 flex-1" />
       ) : (
         <>
           <p role="status" className="sr-only">
