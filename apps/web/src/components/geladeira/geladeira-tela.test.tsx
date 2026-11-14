@@ -1,5 +1,6 @@
 import type { CervejaCard } from "@leguele/shared";
 import { render, screen, within } from "@testing-library/react";
+import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/geladeira" }));
@@ -56,5 +57,16 @@ describe("GeladeiraTela", () => {
     const ipa = screen.getByRole("region", { name: "IPA" });
     expect(within(ipa).getByText("Maré Alta, 2 unidades, R$ 64,00")).toBeInTheDocument();
     expect(within(ipa).getAllByRole("link", { name: "Adicionar IPA" })).toHaveLength(2);
+  });
+
+  it("antes de ler a cópia local (HTML do servidor), mostra o carregamento e não as prateleiras", () => {
+    const html = renderToString(
+      <GeladeiraProvider>
+        <GeladeiraTela />
+      </GeladeiraProvider>,
+    );
+
+    expect(html).toContain("Carregando a Geladeira");
+    expect(html).not.toContain("Adicionar IPA");
   });
 });
