@@ -1,6 +1,7 @@
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { PrismaService } from "../../../common/prisma/prisma.service.js";
 import { resetDatabase } from "../../../common/testing/database.js";
+import { DeliverySettingsNotConfiguredError } from "../domain/delivery-settings-repository.js";
 import { PrismaDeliverySettingsRepository } from "./prisma-delivery-settings-repository.js";
 
 describe("PrismaDeliverySettingsRepository (banco real)", () => {
@@ -29,5 +30,9 @@ describe("PrismaDeliverySettingsRepository (banco real)", () => {
       freteGratisMinimoCentavos: 15_000,
       origem: { latitude: -9.6649, longitude: -35.7313 },
     });
+  });
+
+  it("falha com erro claro quando as configurações não foram criadas", async () => {
+    await expect(settings.get()).rejects.toBeInstanceOf(DeliverySettingsNotConfiguredError);
   });
 });
