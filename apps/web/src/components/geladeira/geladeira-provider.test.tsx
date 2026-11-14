@@ -561,5 +561,25 @@ describe("GeladeiraProvider com a conta", () => {
 
       expect(screen.getByTestId("total")).toHaveTextContent("5");
     });
+
+    it("login e logout com a validação pendente: a resposta antiga não ressuscita a Geladeira esvaziada", async () => {
+      const { conta, irPara, responder } = comValidacaoPendente([
+        { tipo: "sem-sessao" },
+        { tipo: "sem-sessao" },
+        ok([{ cerveja, quantidade: 5 }]),
+        { tipo: "sem-sessao" },
+        { tipo: "sem-sessao" },
+      ]);
+      await vi.waitFor(() => expect(conta.validar).toHaveBeenCalledTimes(1));
+      await irPara("/entrar", 2);
+      await irPara("/geladeira", 3);
+      await irPara("/", 4);
+      await irPara("/geladeira", 5);
+      expect(screen.getByTestId("total")).toHaveTextContent("0");
+
+      await responder(reduzida);
+
+      expect(screen.getByTestId("total")).toHaveTextContent("0");
+    });
   });
 });
