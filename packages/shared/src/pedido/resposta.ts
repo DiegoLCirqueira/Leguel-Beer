@@ -1,16 +1,13 @@
 import { z } from "zod";
+import { cartaoSchema, pixSchema } from "../pagamento/forma.js";
 import { numeroDoPedidoSchema } from "./numero.js";
 import { statusDoPedidoSchema } from "./status.js";
 import { VALIDADE_DO_PEDIDO_MINUTOS } from "./validade.js";
 
-/** Forma de pagamento registrada no pedido. Nunca inclui o token do cartão. */
+/** Forma de pagamento registrada no pedido: a do cartão, sem o token, que nunca é guardado nem devolvido. */
 const pagamentoRegistradoSchema = z.discriminatedUnion("tipo", [
-  z.object({ tipo: z.literal("pix") }),
-  z.object({
-    tipo: z.literal("cartao"),
-    parcelas: z.int().min(1).max(12),
-    bandeira: z.string().min(1),
-  }),
+  pixSchema,
+  cartaoSchema.omit({ token: true }),
 ]);
 
 const itemDoPedidoSchema = z.object({
