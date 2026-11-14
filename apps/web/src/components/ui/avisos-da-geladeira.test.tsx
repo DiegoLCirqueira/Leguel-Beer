@@ -24,7 +24,11 @@ describe("AvisosDaGeladeira", () => {
     render(<AvisosDaGeladeira ajustes={[precoMudou, indisponivel, reduzida]} />);
 
     const regiao = screen.getByRole("status");
-    expect(within(regiao).getAllByRole("listitem").map((i) => i.textContent)).toEqual([
+    expect(
+      within(regiao)
+        .getAllByRole("listitem")
+        .map((i) => i.textContent),
+    ).toEqual([
       "O preço de Maré Alta mudou",
       "Umbu não está mais disponível",
       "A quantidade de Cupuaçu Ale foi ajustada para 2",
@@ -32,9 +36,7 @@ describe("AvisosDaGeladeira", () => {
   });
 
   it("chama a cerveja sem nome de 'Uma cerveja'", () => {
-    render(
-      <AvisosDaGeladeira ajustes={[{ tipo: "indisponivel", cervejaId: "x", nome: null }]} />,
-    );
+    render(<AvisosDaGeladeira ajustes={[{ tipo: "indisponivel", cervejaId: "x", nome: null }]} />);
 
     expect(screen.getByRole("listitem")).toHaveTextContent("Uma cerveja não está mais disponível");
   });
