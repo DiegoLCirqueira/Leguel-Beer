@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
 import {
   enderecoFormSchema,
@@ -10,6 +10,7 @@ import type { AuthorizedUser } from "../../account/application/authorize-request
 import { Authenticated, CurrentUser } from "../../account/presentation/access.decorators.js";
 import { zodDto } from "../../../common/validation/zod-dto.js";
 import { AddAddress } from "../application/add-address.js";
+import { UpdateAddress } from "../application/update-address.js";
 import { ListAddresses } from "../application/list-addresses.js";
 import { withAddressErrors } from "./address-http-errors.js";
 import { toAddressInput, toEnderecoResposta } from "./address.mapper.js";
@@ -24,6 +25,7 @@ export class AddressController {
   constructor(
     private readonly listAddresses: ListAddresses,
     private readonly addAddress: AddAddress,
+    private readonly updateAddress: UpdateAddress,
   ) {}
 
   @Get()
@@ -53,5 +55,23 @@ export class AddressController {
       this.addAddress.execute(user.id, toAddressInput(body)),
     );
     return enderecoRespostaSchema.parse(toEnderecoResposta(created));
+  }
+
+  @Put(":id")
+  @ApiOperation({
+    summary: "Edita um endereço",
+    description:
+      "Troca os dados do endereço do cliente. Mudar rua, número, bairro, cidade ou CEP recalcula coordenadas e distância; só apelido ou complemento não chama os mapas. Endereço de outro cliente responde 404.",
+  })
+  @ApiOkResponse({ description: "Endereço editado (formato `enderecoRespostaSchema`)." })
+  async update(
+    @CurrentUser() user: AuthorizedUser,
+    @Param("id") id: string,
+    @Body() body: EnderecoFormDto,
+  ): Promise<EnderecoResposta> {
+    const updated = await withAddressErrors(() =>
+      this.updateAddress.execute(user.id, id, toAddressInput(body)),
+    );
+    return enderecoRespostaSchema.parse(toEnderecoResposta(updated));
   }
 }

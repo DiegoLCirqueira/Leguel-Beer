@@ -3,7 +3,9 @@ import type { Address, AddressInput, Coordinates } from "../domain/address.js";
 import { AddressNotLocatedError } from "../domain/address-errors.js";
 import type { AddressRepository } from "../domain/address-repository.js";
 import type { DeliverySettingsRepository } from "../domain/delivery-settings-repository.js";
+import { isOutsideDeliveryArea } from "../domain/delivery-area.js";
 import type { Geocoder, RouteCalculator } from "../domain/maps.js";
+import type { AddressListItem } from "./list-addresses.js";
 
 /** Mudar qualquer um destes muda o lugar: recalcula coordenadas e distância. Apelido e complemento não. */
 function locationChanged(address: Address, input: AddressInput): boolean {
@@ -31,18 +33,21 @@ export class UpdateAddress {
     private readonly settings: DeliverySettingsRepository,
   ) {}
 
-  async execute(ownerId: string, addressId: string, input: AddressInput): Promise<Address> {
+  async execute(ownerId: string, addressId: string, input: AddressInput): Promise<AddressListItem> {
     const existing = (await this.addresses.list(ownerId)).find(({ id }) => id === addressId);
     if (!existing) throw new NotFoundError();
+    const { origem, raioMaximoMetros } = await this.settings.get();
 
     // Os mapas ficam fora da trava da conta: nenhuma chamada externa dentro da gravação.
-    const recalculated = locationChanged(existing, input) ? await this.recalculate(input) : null;
+    const recalculated = locationChanged(existing, input)
+      ? await this.recalculate(input, origem)
+      : null;
 
-    return this.addresses.update(ownerId, (current) => {
+    const updated = await this.addresses.update(ownerId, (current) => {
       const target = current.find((address) => address.id === addressId);
       if (!target) throw new NotFoundError();
       // Campos opcionais ausentes no formulário são apagados, não herdados do endereço antigo.
-      const updated: Address = {
+      const next: Address = {
         ...target,
         ...input,
         nickname: input.nickname,
@@ -50,14 +55,17 @@ export class UpdateAddress {
         ...recalculated,
       };
       return {
-        addresses: current.map((address) => (address.id === addressId ? updated : address)),
-        result: updated,
+        addresses: current.map((address) => (address.id === addressId ? next : address)),
+        result: next,
       };
     });
+    return {
+      ...updated,
+      outsideArea: isOutsideDeliveryArea(updated.distanceMeters, raioMaximoMetros),
+    };
   }
 
-  private async recalculate(input: AddressInput): Promise<Recalculated> {
-    const { origem } = await this.settings.get();
+  private async recalculate(input: AddressInput, origem: Coordinates): Promise<Recalculated> {
     const coordinates = await this.geocoder.geocode({
       street: input.street,
       number: input.number,

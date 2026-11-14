@@ -3,6 +3,7 @@ import { PrismaService } from "../../common/prisma/prisma.service.js";
 import { randomUUID } from "node:crypto";
 import { AddAddress } from "./application/add-address.js";
 import { ListAddresses } from "./application/list-addresses.js";
+import { UpdateAddress } from "./application/update-address.js";
 import { ADDRESS_REPOSITORY, DELIVERY_SETTINGS_REPOSITORY } from "./delivery.tokens.js";
 import { GEOCODER, ROUTE_CALCULATOR } from "./delivery.tokens.js";
 import type { AddressRepository } from "./domain/address-repository.js";
@@ -37,6 +38,16 @@ import { AddressController } from "./presentation/address.controller.js";
         router: RouteCalculator,
         settings: DeliverySettingsRepository,
       ) => new AddAddress(addresses, geocoder, router, settings, randomUUID, () => new Date()),
+      inject: [ADDRESS_REPOSITORY, GEOCODER, ROUTE_CALCULATOR, DELIVERY_SETTINGS_REPOSITORY],
+    },
+    {
+      provide: UpdateAddress,
+      useFactory: (
+        addresses: AddressRepository,
+        geocoder: Geocoder,
+        router: RouteCalculator,
+        settings: DeliverySettingsRepository,
+      ) => new UpdateAddress(addresses, geocoder, router, settings),
       inject: [ADDRESS_REPOSITORY, GEOCODER, ROUTE_CALCULATOR, DELIVERY_SETTINGS_REPOSITORY],
     },
     {
