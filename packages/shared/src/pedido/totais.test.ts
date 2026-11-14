@@ -36,8 +36,8 @@ describe("calcularTotais", () => {
   });
 
   it("repassa a recusa de entrada inválida", () => {
-    expect(() =>
-      calcularTotais({ distanciaMetros: 1_000, subtotalCentavos: -1 }, config),
-    ).toThrow(RangeError);
+    expect(() => calcularTotais({ distanciaMetros: 1_000, subtotalCentavos: -1 }, config)).toThrow(
+      RangeError,
+    );
   });
 });
