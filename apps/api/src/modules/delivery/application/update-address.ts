@@ -4,7 +4,12 @@ import { AddressConcurrentEditError, AddressNotLocatedError } from "../domain/ad
 import type { AddressRepository } from "../domain/address-repository.js";
 import type { DeliverySettingsRepository } from "../domain/delivery-settings-repository.js";
 import { isOutsideDeliveryArea } from "../domain/delivery-area.js";
-import type { Geocoder, RouteCalculator } from "../domain/maps.js";
+import {
+  validCoordinates,
+  validDistanceMeters,
+  type Geocoder,
+  type RouteCalculator,
+} from "../domain/maps.js";
 import type { AddressListItem } from "./list-addresses.js";
 
 /** Mudar qualquer um destes muda o lugar: recalcula coordenadas e distância. Apelido e complemento não. */
@@ -97,7 +102,10 @@ export class UpdateAddress {
       zip: input.zip,
     });
     if (!coordinates) throw new AddressNotLocatedError();
-    const distanceMeters = await this.router.routeDistanceMeters(origem, coordinates);
+    validCoordinates(coordinates);
+    const distanceMeters = validDistanceMeters(
+      await this.router.routeDistanceMeters(origem, coordinates),
+    );
     return { coordinates, distanceMeters, routeOrigin: origem };
   }
 }

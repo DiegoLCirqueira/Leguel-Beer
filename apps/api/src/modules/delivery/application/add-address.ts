@@ -4,7 +4,12 @@ import { AddressLimitReachedError, AddressNotLocatedError } from "../domain/addr
 import { isOutsideDeliveryArea } from "../domain/delivery-area.js";
 import type { AddressRepository } from "../domain/address-repository.js";
 import type { DeliverySettingsRepository } from "../domain/delivery-settings-repository.js";
-import type { Geocoder, RouteCalculator } from "../domain/maps.js";
+import {
+  validCoordinates,
+  validDistanceMeters,
+  type Geocoder,
+  type RouteCalculator,
+} from "../domain/maps.js";
 import type { AddressListItem } from "./list-addresses.js";
 
 export class AddAddress {
@@ -33,7 +38,10 @@ export class AddAddress {
       zip: input.zip,
     });
     if (!coordinates) throw new AddressNotLocatedError();
-    const distanceMeters = await this.router.routeDistanceMeters(origem, coordinates);
+    validCoordinates(coordinates);
+    const distanceMeters = validDistanceMeters(
+      await this.router.routeDistanceMeters(origem, coordinates),
+    );
 
     const created = await this.addresses.update(ownerId, (current) => {
       // Reconfere sob a trava: outra requisição pode ter ocupado a última vaga enquanto os mapas respondiam.
