@@ -4,6 +4,15 @@ export interface OrderExpirer {
   execute(orderId: string): Promise<void>;
 }
 
+export interface ExpirationFailure {
+  orderId: string;
+  error: unknown;
+}
+
+export interface ExpireDueOrdersResult {
+  failures: ExpirationFailure[];
+}
+
 /** Cron diário: expira os pedidos vencidos que a checagem no uso não pegou. */
 export class ExpireDueOrders {
   constructor(
@@ -12,9 +21,16 @@ export class ExpireDueOrders {
     private readonly now: () => Date,
   ) {}
 
-  async execute(): Promise<void> {
+  /** Um pedido que falha não interrompe a varredura: a falha volta no resultado e o resto segue. */
+  async execute(): Promise<ExpireDueOrdersResult> {
+    const failures: ExpirationFailure[] = [];
     for (const orderId of await this.orders.findDueOrderIds(this.now())) {
-      await this.expireOrder.execute(orderId);
+      try {
+        await this.expireOrder.execute(orderId);
+      } catch (error) {
+        failures.push({ orderId, error });
+      }
     }
+    return { failures };
   }
 }
