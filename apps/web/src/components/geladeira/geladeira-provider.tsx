@@ -149,7 +149,8 @@ export function GeladeiraProvider({
       if (!ativo || !resultado) return;
       if (resultado.tipo === "sem-sessao") {
         if (sincronizada) return sairDaConta();
-        return validarConvidado();
+        // A API só é chamada ao abrir a Geladeira, não a cada página.
+        return pagina === "/geladeira" ? validarConvidado() : undefined;
       }
       // Erro ou conta sem perfil: nada muda e nada fica pendente (a cópia local não vale mais que a conta).
       if (resultado.tipo !== "ok") return;
