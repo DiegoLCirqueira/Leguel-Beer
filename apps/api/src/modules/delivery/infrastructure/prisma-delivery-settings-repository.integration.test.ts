@@ -35,4 +35,22 @@ describe("PrismaDeliverySettingsRepository (banco real)", () => {
   it("falha com erro claro quando as configurações não foram criadas", async () => {
     await expect(settings.get()).rejects.toBeInstanceOf(DeliverySettingsNotConfiguredError);
   });
+
+  it("reflete a mudança feita no banco, sem novo deploy", async () => {
+    await prisma.deliverySettings.create({
+      data: {
+        originLatitude: -9.6649,
+        originLongitude: -35.7313,
+        baseFeeCents: 500,
+        perKmFeeCents: 150,
+        maxRadiusMeters: 25_000,
+        freeShippingMinimumCents: 15_000,
+      },
+    });
+    expect((await settings.get()).valorPorKmCentavos).toBe(150);
+
+    await prisma.deliverySettings.update({ where: { id: 1 }, data: { perKmFeeCents: 200 } });
+
+    expect((await settings.get()).valorPorKmCentavos).toBe(200);
+  });
 });
