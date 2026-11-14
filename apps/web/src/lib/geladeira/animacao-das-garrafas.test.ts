@@ -26,4 +26,20 @@ describe("useAnimacaoDasGarrafas", () => {
 
     expect(animacoes(result.current)).toEqual({ "a#0": null, "b#0": "queda" });
   });
+
+  it("ao aumentar a quantidade, as garrafas do rótulo balançam escalonadas e a nova cai", () => {
+    const { result, rerender } = renderHook(({ lista }) => useAnimacaoDasGarrafas(lista), {
+      initialProps: { lista: [garrafa("a", 0), garrafa("a", 1), garrafa("b", 0)] },
+    });
+
+    rerender({ lista: [garrafa("a", 0), garrafa("a", 1), garrafa("a", 2), garrafa("b", 0)] });
+
+    expect(animacoes(result.current)).toEqual({
+      "a#0": "balanco",
+      "a#1": "balanco",
+      "a#2": "queda",
+      "b#0": null,
+    });
+    expect(result.current.map((g) => g.atraso)).toEqual([0, 60, 0, 0]);
+  });
 });
