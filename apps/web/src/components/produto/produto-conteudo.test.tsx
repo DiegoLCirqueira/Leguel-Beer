@@ -73,7 +73,7 @@ describe("ProdutoConteudo", () => {
   it("mostra a linha informativa de frete grátis", () => {
     render(<ProdutoConteudo cerveja={cerveja()} />);
 
-    expect(screen.getByText("Frete grátis em compras acima de R$ 150,00")).toBeInTheDocument();
+    expect(screen.getByText("Frete grátis em compras a partir de R$ 150,00")).toBeInTheDocument();
   });
 
   it("o seletor vai de 1 até a quantidade disponível e o botão fixo fica desabilitado até a Geladeira existir", async () => {
