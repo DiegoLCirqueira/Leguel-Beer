@@ -60,4 +60,20 @@ describe("UpdateAddress", () => {
       },
     ]);
   });
+
+  it("mudar só o apelido ou o complemento não chama os mapas e mantém as coordenadas e a distância", async () => {
+    const { addresses, geocoder, router, update } = await setup();
+
+    await update.execute("owner-1", "casa", {
+      ...sameFields,
+      nickname: "Casa da praia",
+      complement: "Apto 12",
+    });
+
+    expect(geocoder.received).toEqual([]);
+    expect(router.received).toEqual([]);
+    expect(await addresses.list("owner-1")).toEqual([
+      { ...stored, nickname: "Casa da praia", complement: "Apto 12" },
+    ]);
+  });
 });
