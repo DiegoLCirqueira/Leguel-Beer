@@ -21,7 +21,9 @@ describe("enderecoRespostaSchema", () => {
   });
 
   it("aceita sem apelido e sem complemento", () => {
-    const { apelido: _a, complemento: _c, ...semOpcionais } = endereco;
+    const semOpcionais: Record<string, unknown> = { ...endereco };
+    delete semOpcionais["apelido"];
+    delete semOpcionais["complemento"];
 
     expect(enderecoRespostaSchema.parse(semOpcionais)).toEqual(semOpcionais);
   });
