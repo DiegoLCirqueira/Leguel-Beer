@@ -2,23 +2,36 @@
 
 import { resumirGeladeira } from "@leguele/shared";
 import { useState } from "react";
-import { BarraDoResumo, BottomSheet, MolduraDaGeladeira, Skeleton } from "@/components/ui";
+import { BarraDoResumo, BottomSheet, MolduraDaGeladeira, Skeleton, Toast } from "@/components/ui";
+import type { Desfazer } from "@/lib/geladeira/estado";
 import { useTelaLarga } from "@/lib/use-tela-larga";
 import { useGeladeira } from "./geladeira-provider";
 import { FechamentoDoResumo, LinhasDoResumo } from "./resumo-da-geladeira";
 
+const mensagemDoLimite = (limite: number) =>
+  `Só temos ${limite} ${limite === 1 ? "unidade" : "unidades"}`;
+
 /** A Geladeira em prateleiras, uma por categoria, com o resumo: barra e sheet no celular, coluna no desktop. */
 export function GeladeiraTela() {
-  const { pronta, estado, alterarQuantidade, remover } = useGeladeira();
+  const { pronta, estado, alterarQuantidade, remover, desfazer } = useGeladeira();
   const larga = useTelaLarga();
   const [sheetAberto, setSheetAberto] = useState(false);
+  // Só o toque mais recente tem toast (e pode ser desfeito): um toast novo substitui o anterior.
+  const [toast, setToast] = useState<{ mensagem: string; desfazer?: Desfazer } | null>(null);
   const { quantidadeTotal, subtotalCentavos } = resumirGeladeira(estado.itens);
   const comResumo = pronta && estado.itens.length > 0;
   const linhas = (
     <LinhasDoResumo
       itens={estado.itens}
-      aoAlterar={(id, quantidade) => void alterarQuantidade(id, quantidade)}
-      aoRemover={(id) => void remover(id)}
+      aoAlterar={(id, quantidade) => {
+        const { limite } = alterarQuantidade(id, quantidade);
+        if (limite !== undefined) setToast({ mensagem: mensagemDoLimite(limite) });
+      }}
+      aoRemover={(id) => {
+        const nome = estado.itens.find((i) => i.cerveja.id === id)?.cerveja.nome;
+        const d = remover(id);
+        if (d) setToast({ mensagem: `${nome} saiu da geladeira`, desfazer: d });
+      }}
     />
   );
   return (
@@ -61,6 +74,18 @@ export function GeladeiraTela() {
             {linhas}
           </BottomSheet>
         </>
+      ) : null}
+      {toast ? (
+        <Toast
+          mensagem={toast.mensagem}
+          acao={
+            toast.desfazer
+              ? { rotulo: "Desfazer", aoAcionar: () => desfazer(toast.desfazer!) }
+              : undefined
+          }
+          aoFechar={() => setToast(null)}
+          className="z-[60]"
+        />
       ) : null}
     </main>
   );
