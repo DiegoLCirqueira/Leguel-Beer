@@ -349,4 +349,54 @@ describe("endereços do cliente (HTTP, banco real)", () => {
       [trabalho.id, true],
     ]);
   });
+
+  it.each([
+    ["excluir", (id: string) => remove(id)],
+    ["tornar padrão", (id: string) => makeDefault(id)],
+  ])(
+    "%s o endereço de outro cliente ou inexistente responde 404 e não muda nada",
+    async (_nome, act) => {
+      const otherId = crypto.randomUUID();
+      await prisma.profile.create({
+        data: { id: otherId, email: `outro-${otherId}@leguele.test` },
+      });
+      const theirs = await prisma.address.create({
+        data: {
+          profileId: otherId,
+          zip: "57035000",
+          street: "Rua do Outro",
+          number: "1",
+          district: "Farol",
+          city: "Maceió",
+          state: "AL",
+          isDefault: true,
+          latitude: -9.6,
+          longitude: -35.7,
+          distanceMeters: 1_000,
+          routeOriginLatitude: -9.6649,
+          routeOriginLongitude: -35.7313,
+        },
+      });
+      await create(form);
+
+      const others = await act(theirs.id);
+      const missing = await act(crypto.randomUUID());
+
+      expect([others.status, missing.status]).toEqual([404, 404]);
+      expect(await prisma.address.count({ where: { profileId: otherId, isDefault: true } })).toBe(
+        1,
+      );
+      expect(await prisma.address.count({ where: { profileId: tokens.customerId } })).toBe(1);
+    },
+  );
+
+  it.each([
+    ["excluir", () => request(app.getHttpServer()).delete(`/me/enderecos/${crypto.randomUUID()}`)],
+    [
+      "tornar padrão",
+      () => request(app.getHttpServer()).post(`/me/enderecos/${crypto.randomUUID()}/padrao`),
+    ],
+  ])("%s sem token responde 401", async (_nome, act) => {
+    expect((await act()).status).toBe(401);
+  });
 });
