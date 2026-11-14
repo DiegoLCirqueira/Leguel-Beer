@@ -231,4 +231,56 @@ describe("endereços do cliente (HTTP, banco real)", () => {
       distanceMeters: 8_000,
     });
   });
+
+  it("editar o endereço de outro cliente ou inexistente responde 404 e não altera nada", async () => {
+    const otherId = crypto.randomUUID();
+    await prisma.profile.create({ data: { id: otherId, email: "outro@leguele.test" } });
+    const theirs = await prisma.address.create({
+      data: {
+        profileId: otherId,
+        zip: "57035000",
+        street: "Rua do Outro",
+        number: "1",
+        district: "Farol",
+        city: "Maceió",
+        state: "AL",
+        isDefault: true,
+        latitude: -9.6,
+        longitude: -35.7,
+        distanceMeters: 1_000,
+        routeOriginLatitude: -9.6649,
+        routeOriginLongitude: -35.7313,
+      },
+    });
+
+    const mine = await edit(theirs.id, { ...form, rua: "Invadida" });
+    const missing = await edit(crypto.randomUUID(), form);
+    const notAnId = await edit("nao-e-um-id", form);
+
+    expect([mine.status, missing.status, notAnId.status]).toEqual([404, 404, 404]);
+    expect(mine.body).toEqual({ code: "NOT_FOUND", message: "Recurso não encontrado." });
+    expect((await prisma.address.findUniqueOrThrow({ where: { id: theirs.id } })).street).toBe(
+      "Rua do Outro",
+    );
+  });
+
+  it("com os mapas fora do ar a edição responde 503 e o endereço anterior continua como estava", async () => {
+    const { body: created } = await create(form);
+    const before = await prisma.address.findUniqueOrThrow({ where: { id: created.id } });
+    geocoder.respondWith("unavailable");
+
+    const response = await edit(created.id, { ...form, rua: "Rua da Praia" });
+
+    expect(response.status).toBe(503);
+    expect(response.body.code).toBe("MAPS_UNAVAILABLE");
+    expect(await prisma.address.findUniqueOrThrow({ where: { id: created.id } })).toEqual(before);
+  });
+
+  it("sem token a edição responde 401", async () => {
+    const response = await request(app.getHttpServer())
+      .put(`/me/enderecos/${crypto.randomUUID()}`)
+      .send(form);
+
+    expect(response.status).toBe(401);
+  });
 });
