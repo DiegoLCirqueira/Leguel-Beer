@@ -16,16 +16,16 @@ export type LinhaDoResumoProps = {
 export function LinhaDoResumo({ item, aoAlterar, aoRemover }: LinhaDoResumoProps) {
   const { cerveja, quantidade } = item;
   return (
-    <li className="flex gap-3 border-b border-borda py-3 text-texto">
+    <li className="flex flex-wrap gap-x-2 gap-y-2 border-b border-borda py-3 text-texto">
       <Image
         src={cerveja.imagemUrl ?? IMAGEM_PADRAO}
         alt=""
-        width={56}
-        height={80}
-        sizes="56px"
-        className="h-20 w-14 shrink-0 object-contain"
+        width={48}
+        height={64}
+        sizes="48px"
+        className="h-16 w-12 shrink-0 object-contain"
       />
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
+      <div className="flex min-w-0 flex-[1_1_10.75rem] flex-col gap-1">
         <div>
           <StyleBadge slug={cerveja.categoria.slug} name={cerveja.categoria.nome} />
         </div>
@@ -33,7 +33,7 @@ export function LinhaDoResumo({ item, aoAlterar, aoRemover }: LinhaDoResumoProps
         <p className="text-sm text-texto-suave">
           {`${cerveja.estilo} • ${formatarTeor(cerveja.teorAlcoolico)}% • ${cerveja.volumeMl}ml`}
         </p>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1">
           <Stepper
             valor={quantidade}
             min={0}
