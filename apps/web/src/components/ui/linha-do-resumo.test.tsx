@@ -56,7 +56,9 @@ describe("LinhaDoResumo", () => {
 
     expect(aoAlterar).toHaveBeenCalledWith(3);
     expect(aoRemover).toHaveBeenCalledTimes(1);
-    expect(screen.getByRole("button", { name: "Remover Maré Alta" }).className).toContain("size-11");
+    expect(screen.getByRole("button", { name: "Remover Maré Alta" }).className).toContain(
+      "size-11",
+    );
   });
 
   it("o '+' fica ativo no limite: quem usa o Stepper decide o aviso", async () => {

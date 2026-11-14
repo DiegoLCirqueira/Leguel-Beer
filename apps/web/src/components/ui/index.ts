@@ -13,6 +13,7 @@ export { ESTILO_BOTAO_VOLTAR } from "./estilo-botao-voltar";
 export { FaixaDaPrateleira } from "./faixa-da-prateleira";
 export { GarrafaFantasma } from "./garrafa-fantasma";
 export { ImagemDaGarrafa } from "./imagem-da-garrafa";
+export { LinhaDoResumo } from "./linha-do-resumo";
 export { LinkGeladeira } from "./link-geladeira";
 export { LojaHeader } from "./loja-header";
 export { LojaTabBar } from "./loja-tab-bar";
