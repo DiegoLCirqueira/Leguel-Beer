@@ -53,6 +53,7 @@ Funcionalidade: Checkout
       | que entrei na conta com a Geladeira vazia           | sou levado à Geladeira                                                            |
       | que estou sem sessão, com 2 Maré Alta na Geladeira  | sou levado a "/entrar" e, depois de entrar, volto ao checkout com as 2 Maré Alta  |
       | que a revalidação tira a única cerveja da Geladeira | sou levado à Geladeira com o aviso da revalidação                                 |
+      | que tenho um pedido de Pix aguardando, na validade  | sou levado à tela de pagamento desse pedido                                       |
 
   Cenário: Disputa pela última unidade
     Dado que a "Graviola Witbier" tem 1 unidade disponível
@@ -81,6 +82,7 @@ Funcionalidade: Checkout
 
 - **Rotas:** `/checkout` leva à primeira etapa pendente; as etapas são `/checkout/entrega`, `/checkout/pagamento` e `/checkout/revisao`, com o indicador "1 Entrega — 2 Pagamento — 3 Revisão" e voltar no cabeçalho. Sem a barra inferior da loja.
 - **Conta:** exigida; sem sessão, vai a `/entrar` e volta ao checkout com a Geladeira ([[dados-pessoais]], LB-31). Não há etapa de identificação.
+- **Pedido pendente ao entrar:** se o cliente já tem um pedido "Aguardando pagamento" dentro da validade, abrir o checkout leva direto à tela de pagamento dele ([[pagamento]]); a criação do pedido confere de novo (`PENDING_ORDER`).
 - **Revalidação ao entrar:** ao abrir o checkout, o site revalida a Geladeira na API ([[geladeira]], LB-52). Os ajustes viram avisos no topo da etapa; se a Geladeira ficar vazia (ou já estiver), o cliente vai à Geladeira.
 - **Ordem:** não dá para pular etapas pela URL: abrir `/checkout/revisao` sem endereço e forma de pagamento escolhidos leva à primeira etapa que falta.
 - **Estado preservado:** endereço, forma de pagamento e parcelas ficam guardados na aba enquanto o cliente anda pelas etapas e ao recarregar. Os dados e o token do cartão não: voltar ao Pagamento ou recarregar pede o cartão de novo ([[pagamento]]).
@@ -115,12 +117,12 @@ Funcionalidade: Checkout
 - **Rota** de criar pedido do cliente, com o cabeçalho `Idempotency-Key`. O corpo traz só o id do endereço, a forma de pagamento (com as parcelas e o token, no cartão) e o **total que o cliente viu** (sem juros). Itens e preços vêm da Geladeira da conta, revalidada pela API; preço, frete ou itens mandados pelo site são ignorados.
 - **Numa transação**, nesta ordem (a reserva de pedido vencido já não conta no disponível, então a criação não expira pedidos nem consulta o gateway: isso fica com a leitura e o cron, [[pagamento]]):
   1. confere a maioridade (422 `UNDERAGE` ou `BIRTH_DATE_REQUIRED`, [[dados-pessoais]]);
-  2. confere que o cliente não tem outro pedido "Aguardando pagamento" dentro da validade; se tiver, responde 409 `PENDING_ORDER` com o id dele, e o site leva à tela de pagamento desse pedido;
+  2. confere que o cliente não tem outro pedido "Aguardando pagamento" dentro da validade; se tiver, responde 409 `PENDING_ORDER` com o id dele, e o site leva à tela de pagamento desse pedido. Esta conferência e a criação são serializadas por cliente (trava por cliente ou restrição única no banco, a escolha é do Back): duas criações simultâneas do mesmo cliente, mesmo com chaves de idempotência diferentes (duas abas), criam exatamente um pedido; a outra recebe 409 `PENDING_ORDER` com o id desse pedido, sem segunda reserva nem segunda cobrança;
   3. confere que o endereço é do cliente (404) e está na área (422 `OUT_OF_DELIVERY_AREA`, [[enderecos-entrega]]);
   4. revalida a Geladeira; vazia, responde 422 `EMPTY_FRIDGE`;
   5. calcula subtotal, frete e total com a regra compartilhada; total diferente do total visto responde 409 `TOTAL_CHANGED` com os avisos da revalidação e o total novo, e nada é criado;
   6. trava as cervejas do pedido em ordem fixa (pelo id da cerveja) e confere a quantidade disponível de cada uma; faltando alguma, responde 409 `OUT_OF_STOCK` com as cervejas que faltam, e nada é criado;
-  7. cria o pedido "Aguardando pagamento" com o número "#LB" ([[pedidos-cliente]]), a validade de 30 minutos ([[pagamento]]), a forma de pagamento, a cópia dos itens (nome, preço e quantidade), a cópia do endereço (os campos naquele momento; editar ou excluir o endereço depois não muda o pedido), a cópia do nome e do telefone do perfil (para a entrega e o histórico), subtotal, frete e total;
+  7. cria o pedido "Aguardando pagamento" com o número "#LB" ([[pedidos-cliente]]), a validade de 30 minutos ([[pagamento]]), a forma de pagamento, a cópia dos itens (nome, preço e quantidade), a cópia do endereço (os campos naquele momento; editar ou excluir o endereço depois não muda o pedido), a cópia do nome e do telefone do perfil (para a entrega e o histórico; a cópia de dados pessoais está pendente, ver "Dados pessoais no pedido"), subtotal, frete e total;
   8. cria as reservas (uma por cerveja) e as baixas pendentes da Geladeira ([[pedidos-cliente]]).
 - **Depois de criado,** a API gera a cobrança ([[pagamento]]); a falha do gateway não desfaz o pedido: ele fica "Aguardando pagamento" e o cliente tenta de novo na tela de pagamento.
 - **Ajuste gravado mesmo sem pedido:** em `TOTAL_CHANGED` e `OUT_OF_STOCK`, os ajustes da revalidação (preço novo, cerveja que saiu, quantidade reduzida) são gravados na Geladeira da conta, como a revalidação já faz ([[geladeira]]), mesmo com o pedido não criado.
@@ -142,8 +144,10 @@ Funcionalidade: Checkout
 
 ### Dados pessoais no pedido (LGPD)
 
+> [!warning] **Pendente de confirmação do Diego** (dado pessoal, LGPD): não vale como aplicada e não vai ao site antes da resposta (cartão "Decisões pendentes").
+
 - O pedido guarda a cópia do endereço, do nome e do telefone do cliente no momento da compra, e ela continua no pedido mesmo se o cliente editar ou excluir o endereço ou mudar o perfil depois (histórico e entrega).
-- A Política de Privacidade ([[termos-privacidade]]) ganha, em "Quais dados coletamos": "os pedidos que você faz, com as cervejas, os valores e uma cópia do nome, do telefone e do endereço de entrega usados na compra, que continuam no pedido mesmo se você mudar o perfil ou excluir o endereço". Sem novo aceite, como em 12/11: muda a data de "última atualização" de `/privacidade` e a versão no `LEGAL_VERSIONS` no dia em que o checkout entrar no site. Recomendação aplicada, vetável.
+- A Política de Privacidade ([[termos-privacidade]]) ganha, em "Quais dados coletamos": "os pedidos que você faz, com as cervejas, os valores e uma cópia do nome, do telefone e do endereço de entrega usados na compra, que continuam no pedido mesmo se você mudar o perfil ou excluir o endereço". Sem novo aceite, como em 12/11: muda a data de "última atualização" de `/privacidade` e a versão no `LEGAL_VERSIONS` no dia em que o checkout entrar no site. Recomendação do Spec, pendente de confirmação do Diego.
 
 ### Juros do cartão
 
@@ -171,7 +175,7 @@ Funcionalidade: Checkout
 - **Etapas** (site, unitário): máquina de estados do checkout (ordem das etapas, pular pela URL leva à primeira pendente, estado guardado na aba sem dados nem token do cartão, chave de idempotência nova a cada mudança).
 - **Pedido** (domínio da API, unitário): totais, validade (vence a partir de 30:00), cópia dos itens e do endereço, número "#LB", baixas pendentes.
 - **Criar o pedido** (API, caso de uso com repositórios em memória e relógio fake): maioridade, pedido pendente válido do mesmo cliente (409 `PENDING_ORDER`; pendente vencido não bloqueia), endereço de outro cliente, fora da área, Geladeira vazia, total diferente (409 sem criar, com o ajuste da revalidação gravado na Geladeira), cópia do nome e do telefone, preço e itens mandados pelo site ignorados, reserva vencida não conta, gateway fora do ar não desfaz o pedido, logs sem endereço, data de nascimento nem token.
-- **Concorrência** (integração com banco real): N pedidos simultâneos para M unidades criam no máximo M pedidos; dois pedidos com as mesmas duas cervejas em ordens diferentes não travam (ordem fixa); duas requisições simultâneas com a mesma chave criam um pedido.
+- **Concorrência** (integração com banco real): N pedidos simultâneos para M unidades criam no máximo M pedidos; duas requisições simultâneas com a mesma chave criam um pedido; duas criações simultâneas do mesmo cliente com chaves diferentes (duas abas), soltas juntas por uma barreira no teste e com estoque suficiente, criam exatamente um pedido "Aguardando pagamento"; a outra responde 409 `PENDING_ORDER` com o mesmo id, sem segunda reserva nem cobrança no gateway fake. Pedidos de clientes diferentes com as mesmas duas cervejas em ordens inversas, com estoque suficiente, concluem os dois: os dois ficam "Aguardando pagamento", com uma reserva por cerveja cada, e o disponível final de cada cerveja é o estoque menos as duas reservas.
 - **Idempotência** (HTTP, Supertest e banco real): mesma chave e mesmo corpo repetem status e corpo da criação; outro corpo com a mesma chave 422; a chave de A não vale para B; sem token 401; um `TOTAL_CHANGED` não guarda a chave, e a nova tentativa com chave nova e o total novo cria o pedido; o registro guardado tem o hash do corpo e nunca o token do cartão. No site: chave nova depois de 409 ou 422 e quando o total visto muda; mesma chave só na falha de rede.
 - **Disponível** (integração): reservas válidas descontam, vencidas não; o catálogo mostra esgotada com tudo reservado.
 - **Telas** (componente): fora da área com "Continuar" desabilitado, sem endereço, avisos da revalidação, Revisão sem data de nascimento, "Confirmar pedido" desabilitado enquanto envia, respostas 409 voltando à Revisão.
@@ -210,8 +214,8 @@ Recomendações aplicadas pelo Spec em 13/11, pela regra do Diego ("sempre vá p
 - **Itens vindos da Geladeira da conta**, não do corpo.
 - **Cópia do endereço no pedido.**
 - **Chave de idempotência** gerada ao abrir a Revisão, trocada a cada mudança e depois de toda resposta que não criou pedido; a API guarda só a do pedido criado, por 24 horas, com o hash do corpo e sem o token; outro corpo com a mesma chave, 422.
-- **Um pedido "Aguardando pagamento" por cliente:** novo checkout com um pendente válido leva à tela de pagamento dele.
-- **Nome e telefone copiados no pedido**, junto com o endereço; texto novo da Política sobre os dados dos pedidos, sem novo aceite.
+- **Um pedido "Aguardando pagamento" por cliente:** abrir o checkout ou confirmar com um pendente válido leva à tela de pagamento dele; duas abas não criam dois.
+- **Nome e telefone copiados no pedido**, junto com o endereço; texto novo da Política sobre os dados dos pedidos, sem novo aceite. **Pendente de confirmação do Diego** (LGPD, item 7): não está aplicada.
 - **Criação do pedido sem expirar pedidos nem consultar o gateway** (a reserva vencida já não conta).
 - **Avisos com os textos da revalidação da Geladeira**, sem textos novos para preço e esgotada.
 - **Reserva vencida não conta** na quantidade disponível, mesmo antes do cancelamento.

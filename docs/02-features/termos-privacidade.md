@@ -166,8 +166,8 @@ Decisões pequenas e fáceis de reverter, pela política de autonomia. Qualquer 
 - **Links do cadastro em nova aba,** para não perder o formulário.
 - **Termos e Entregas sem citar o portfólio (2026-10-30):** o item 1 dos Termos perde só a frase do portfólio e continua dizendo que a empresa e os produtos são fictícios, que nada é entregue e que os pagamentos são de teste, para o texto seguir verdadeiro. Em Entregas, o item 1 vira "Como funciona.", com o mesmo aviso de que os pedidos não são entregues.
 
-> [!todo] Texto pendente para a Política (13/11, recomendação vetável)
-> "Quais dados coletamos" ganha os dados guardados nos pedidos (cópia do nome, do telefone e do endereço usados na compra), conforme [[checkout]], "Dados pessoais no pedido". Entra no site com o checkout, sem novo aceite.
+> [!todo] Texto pendente para a Política (13/11, pendente de confirmação do Diego, LGPD)
+> "Quais dados coletamos" ganha os dados guardados nos pedidos (cópia do nome, do telefone e do endereço usados na compra), conforme [[checkout]], "Dados pessoais no pedido". Só entra no site depois da confirmação do Diego, junto com o checkout, sem novo aceite.
 
 ## Tickets propostos
 
