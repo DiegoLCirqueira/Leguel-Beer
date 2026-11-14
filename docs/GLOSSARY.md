@@ -52,7 +52,7 @@ Cerveja que aparece para os clientes. Uma cerveja inativa continua cadastrada, m
 _Evite_: publicada, visível
 
 **Quantidade disponível**:
-Estoque da cerveja menos as unidades reservadas em pedidos pendentes.
+Estoque físico da cerveja menos as unidades reservadas em pedidos "Aguardando pagamento" ainda dentro da validade; a reserva de pedido vencido não conta. Ver [[checkout]].
 _Evite_: estoque (quando se quer dizer o que ainda pode ser vendido)
 
 **Esgotada**:
