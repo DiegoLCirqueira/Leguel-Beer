@@ -4,7 +4,7 @@ import type { SecaoLegal } from "@/components/legal/legal-page";
 // correspondente em apps/api/src/modules/account/domain/legal-versions.ts.
 export const TERMOS_ATUALIZADO_EM = "2026-10-31";
 export const PRIVACIDADE_ATUALIZADA_EM = "2026-11-11";
-export const ENTREGAS_ATUALIZADO_EM = "2026-10-31";
+export const ENTREGAS_ATUALIZADO_EM = "2026-11-12";
 
 export const TERMOS: SecaoLegal[] = [
   {
@@ -84,7 +84,7 @@ export const ENTREGAS: SecaoLegal[] = [
   {
     titulo: "Frete.",
     texto:
-      "Calculado pela distância até a cervejaria, com frete grátis para pedidos acima de R$ 150.",
+      "Calculado pela distância até a cervejaria, com frete grátis para pedidos a partir de R$ 150.",
   },
   { titulo: "Retirada.", texto: "Não há retirada no local." },
 ];
