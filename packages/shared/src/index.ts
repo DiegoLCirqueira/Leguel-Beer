@@ -50,6 +50,8 @@ export { cepSchema } from "./endereco/cep.js";
 export { enderecoFormSchema } from "./endereco/endereco.js";
 export type { EnderecoForm } from "./endereco/endereco.js";
 export { LIMITE_DE_ENDERECOS } from "./endereco/limite.js";
+export { enderecoRespostaSchema, listaDeEnderecosSchema } from "./endereco/resposta.js";
+export type { EnderecoResposta } from "./endereco/resposta.js";
 export { calcularFrete } from "./entrega/frete.js";
 export type { ConfiguracaoDeEntrega, Frete } from "./entrega/frete.js";
 export { STATUS_DO_PEDIDO, statusDoPedidoSchema } from "./pedido/status.js";
