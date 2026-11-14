@@ -1,7 +1,11 @@
 import type { PrismaService } from "../../../common/prisma/prisma.service.js";
 import type { Address as AddressRow } from "../../../generated/prisma/client.js";
 import type { Address } from "../domain/address.js";
-import type { AddressRepository, AddressUpdate } from "../domain/address-repository.js";
+import {
+  AddressOwnerNotFoundError,
+  type AddressRepository,
+  type AddressUpdate,
+} from "../domain/address-repository.js";
 
 function toAddress(row: AddressRow): Address {
   return {
@@ -62,13 +66,16 @@ export class PrismaAddressRepository implements AddressRepository {
   ): Promise<T> {
     return this.prisma.$transaction(async (tx) => {
       // Trava a linha do perfil até o fim da transação: as operações da mesma conta passam uma de cada vez.
-      await tx.$queryRaw`SELECT id FROM profiles WHERE id = ${ownerId}::uuid FOR UPDATE`;
+      const locked = await tx.$queryRaw<
+        { id: string }[]
+      >`SELECT id FROM profiles WHERE id = ${ownerId}::uuid FOR UPDATE`;
       const rows = await tx.address.findMany({
         where: { profileId: ownerId },
         orderBy: [{ createdAt: "asc" }, { id: "asc" }],
       });
       const outcome = await decide(rows.map(toAddress));
       if (outcome.addresses) {
+        if (locked.length === 0) throw new AddressOwnerNotFoundError();
         const ids = outcome.addresses.map(({ id }) => id);
         await tx.address.deleteMany({ where: { profileId: ownerId, id: { notIn: ids } } });
         // Tira o padrão de todos antes de gravar: o índice único aceita um padrão só por cliente.
