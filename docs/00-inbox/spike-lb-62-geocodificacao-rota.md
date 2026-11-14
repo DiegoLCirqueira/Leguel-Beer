@@ -23,7 +23,7 @@ Spec: [[enderecos-entrega]] (fatia 1). Pergunta: qual serviço gratuito, sem car
 
 ## Precisão: rota × linha reta
 
-Medido com dados do OpenStreetMap (a mesma base do Geoapify): geocodificação do Nominatim e rota do OSRM público, só com bairros e cidades (sem endereço de cliente), a partir de Jaraguá (origem fictícia sugerida pela spec). O Geoapify em si não foi medido, por falta de chave (ver "Pendências"); a estimativa vale para a rota de carro sobre OSM.
+Medido com dados do OpenStreetMap (a mesma base do Geoapify): geocodificação do Nominatim e rota do OSRM público, só com 10 bairros e 3 cidades (sem endereço de cliente), a partir de Jaraguá (origem fictícia sugerida pela spec). O Geoapify em si não foi medido, por falta de chave (ver "Pendências"); a estimativa vale para a rota de carro sobre OSM.
 
 | Destino | Reta | Rota | Rota ÷ reta |
 | --- | --- | --- | --- |
@@ -32,6 +32,7 @@ Medido com dados do OpenStreetMap (a mesma base do Geoapify): geocodificação d
 | Ponta Verde | 2,5 km | 3,2 km | 1,27 |
 | Mangabeiras | 2,8 km | 3,4 km | 1,22 |
 | Jatiúca | 3,0 km | 4,2 km | 1,43 |
+| Ponta Grossa | 3,5 km | 4,4 km | 1,26 |
 | Cruz das Almas | 4,9 km | 6,7 km | 1,38 |
 | Gruta de Lourdes | 5,6 km | 6,9 km | 1,23 |
 | Tabuleiro do Martins | 8,9 km | 10,0 km | 1,11 |
@@ -70,4 +71,3 @@ Leitura: a rota é de 1,1 a 2,1 vezes a reta. Em linha reta, **Rio Largo (24,9 k
 1. **Conta e chave Geoapify (plano Free, sem cartão)**: autorizada pela pergunta 11, mas o cadastro pede um e-mail e não usei o do Diego sem perguntar. Quem for criar usa um e-mail do projeto; a chave vai só no `.env` da API (`GEOAPIFY_API_KEY`, sem valor no `.env.example`). Com a chave, rodar os 13 endereços no Geoapify antes do green dos adaptadores (a chave segue só no `.env`, free tier já autorizado; sem conta nova além dele). Sem a chave, o green dos adaptadores fica bloqueado e o Back segue com as fatias que não dependem dela.
 2. Atribuição "Powered by Geoapify" e OSM no site (Diego e Front).
 3. **Transferência internacional na Política** (Diego): ver "Termos, retenção e transferência".
-4. **Amostra incompleta:** a spec pede 10 bairros de Maceió e 3 cidades vizinhas (13); a tabela tem 9 bairros e 3 cidades (12). Completar com mais 1 bairro na rodada com o Geoapify.
