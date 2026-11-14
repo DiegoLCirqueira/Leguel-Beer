@@ -46,7 +46,7 @@ export function GeladeiraTela() {
   );
   return (
     <main className="flex h-[calc(100dvh-var(--altura-header-loja)-var(--altura-barra-loja)-env(safe-area-inset-bottom,0px))] flex-col lg:flex-row lg:justify-center lg:gap-8">
-      <div className="flex min-h-0 flex-1 flex-col items-center px-4 py-2 lg:flex-none">
+      <div className="flex min-h-0 flex-1 flex-col items-center px-4 py-2 lg:aspect-[710/1573] lg:flex-none lg:px-0">
         <h1 className="sr-only">Geladeira</h1>
         <AvisosDaGeladeira ajustes={ajustes} />
         {pronta ? (

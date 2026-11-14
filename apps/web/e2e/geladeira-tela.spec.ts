@@ -143,7 +143,9 @@ test.describe("esqueleto de carregamento (HTML do servidor, sem JavaScript)", ()
       await page.setViewportSize(tamanho);
       await page.goto("/geladeira");
 
-      await expect(page.getByRole("status")).toHaveText("Carregando a Geladeira");
+      await expect(
+        page.getByRole("status").filter({ hasText: "Carregando a Geladeira" }),
+      ).toBeVisible();
       const esqueleto = page.getByTestId("esqueleto-da-geladeira");
       const caixa = (await esqueleto.boundingBox())!;
       const barra = (await page.getByRole("navigation").last().boundingBox())!;
