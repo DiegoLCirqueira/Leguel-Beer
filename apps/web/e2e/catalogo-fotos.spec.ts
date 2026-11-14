@@ -1,4 +1,4 @@
-import { expect, test } from "./support/maior-de-idade";
+import { test } from "./support/maior-de-idade";
 import { expectBeerPhoto } from "./support/beer-photo";
 
 test("os cards do catálogo mostram a foto da garrafa, com o arquivo no ar, nas 16 cervejas", async ({
