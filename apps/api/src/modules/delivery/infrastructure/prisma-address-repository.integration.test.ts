@@ -1,6 +1,7 @@
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { PrismaService } from "../../../common/prisma/prisma.service.js";
 import { resetDatabase } from "../../../common/testing/database.js";
+import { AddressOwnerNotFoundError } from "../domain/address-repository.js";
 import { anAddress } from "../testing/factories.js";
 import { PrismaAddressRepository } from "./prisma-address-repository.js";
 
@@ -82,5 +83,15 @@ describe("PrismaAddressRepository (banco real)", () => {
 
     expect(await addresses.list(ownerId)).toEqual([]);
     expect(await addresses.list(otherOwnerId)).toEqual([theirs]);
+  });
+
+  it("recusa gravar para a conta que ainda não tem perfil, sem erro de banco", async () => {
+    const noProfile = crypto.randomUUID();
+
+    await expect(
+      save(noProfile, anAddress({ id: crypto.randomUUID(), ownerId: noProfile })),
+    ).rejects.toBeInstanceOf(AddressOwnerNotFoundError);
+
+    expect(await addresses.list(noProfile)).toEqual([]);
   });
 });
