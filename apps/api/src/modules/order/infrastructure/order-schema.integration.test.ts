@@ -149,4 +149,37 @@ describe("regras do schema do pedido (banco real)", () => {
     await prisma.order.delete({ where: { id: criado.id } });
     expect(await prisma.orderStatusHistory.count()).toBe(0);
   });
+
+  it("guarda quem mudou o status (nulo quando foi o sistema) e mantém o histórico se o autor for apagado", async () => {
+    const admin = await prisma.profile.create({
+      data: { id: crypto.randomUUID(), email: "admin@x.test", role: "ADMIN" },
+    });
+    const criado = await prisma.order.create({ data: pedido() });
+    await prisma.orderStatusHistory.create({
+      data: { orderId: criado.id, toStatus: "AWAITING_PAYMENT" },
+    });
+    await prisma.orderStatusHistory.create({
+      data: {
+        orderId: criado.id,
+        fromStatus: "AWAITING_PAYMENT",
+        toStatus: "PAID",
+        actorId: admin.id,
+      },
+    });
+
+    const [sistema, manual] = await prisma.orderStatusHistory.findMany({
+      where: { orderId: criado.id },
+      orderBy: { createdAt: "asc" },
+    });
+    expect(sistema?.actorId).toBeNull();
+    expect(manual?.actorId).toBe(admin.id);
+
+    await prisma.profile.delete({ where: { id: admin.id } });
+    expect(await prisma.orderStatusHistory.count({ where: { orderId: criado.id } })).toBe(2);
+    expect(
+      (await prisma.orderStatusHistory.findMany({ where: { orderId: criado.id } })).map(
+        (h) => h.actorId,
+      ),
+    ).toEqual([null, null]);
+  });
 });
