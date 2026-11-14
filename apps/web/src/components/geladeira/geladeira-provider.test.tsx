@@ -520,5 +520,46 @@ describe("GeladeiraProvider com a conta", () => {
 
       expect(screen.getByTestId("total")).toHaveTextContent("1");
     });
+
+    // Toda mudança de identidade invalida a validação em voo: a resposta é de quem já saiu.
+    const comValidacaoPendente = (buscas: ResultadoDaConta[]) => {
+      guardarLocal(3);
+      let responder: (r: ResultadoDaConta) => void = () => {};
+      const conta = contaFalsa({ tipo: "sem-sessao" });
+      conta.buscar.mockReset();
+      for (const busca of buscas) conta.buscar.mockResolvedValueOnce(busca);
+      conta.buscar.mockResolvedValue({ tipo: "sem-sessao" });
+      conta.validar.mockReturnValue(new Promise<ResultadoDaConta>((r) => (responder = r)));
+      const { rerender } = abrirComConta(conta);
+      const irPara = async (rota: string, chamadas: number) => {
+        caminho.atual = rota;
+        rerender(
+          <GeladeiraProvider conta={conta}>
+            <Painel />
+          </GeladeiraProvider>,
+        );
+        await vi.waitFor(() => expect(conta.buscar).toHaveBeenCalledTimes(chamadas));
+        await act(async () => {
+          await new Promise((resolver) => setTimeout(resolver, 0));
+        });
+      };
+      return { conta, irPara, responder: (r: ResultadoDaConta) => act(async () => responder(r)) };
+    };
+
+    it("login com a validação pendente: a resposta antiga não sobrescreve a Geladeira da conta", async () => {
+      const { conta, irPara, responder } = comValidacaoPendente([
+        { tipo: "sem-sessao" },
+        { tipo: "sem-sessao" },
+        ok([{ cerveja, quantidade: 5 }]),
+      ]);
+      await vi.waitFor(() => expect(conta.validar).toHaveBeenCalledTimes(1));
+      await irPara("/entrar", 2);
+      await irPara("/geladeira", 3);
+      expect(screen.getByTestId("total")).toHaveTextContent("5");
+
+      await responder(reduzida);
+
+      expect(screen.getByTestId("total")).toHaveTextContent("5");
+    });
   });
 });
