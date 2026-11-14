@@ -21,4 +21,16 @@ describe("seedDeliverySettings (banco real)", () => {
       freteGratisMinimoCentavos: 15_000,
     });
   });
+
+  it("rodar de novo mantém uma linha só e não sobrescreve valores já alterados", async () => {
+    await seedDeliverySettings(prisma);
+    await prisma.deliverySettings.update({ where: { id: 1 }, data: { perKmFeeCents: 200 } });
+
+    await seedDeliverySettings(prisma);
+
+    expect(await prisma.deliverySettings.count()).toBe(1);
+    expect(
+      (await prisma.deliverySettings.findUniqueOrThrow({ where: { id: 1 } })).perKmFeeCents,
+    ).toBe(200);
+  });
 });
