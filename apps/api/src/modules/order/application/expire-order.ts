@@ -15,7 +15,8 @@ export class ExpireOrder {
 
   async execute(orderId: string): Promise<void> {
     const order = await this.orders.findForExpiration(orderId);
-    if (!order) return;
+    // Só quem ainda aguarda pagamento expira; pago ou cancelado não consulta o gateway nem aplica nada.
+    if (!order || order.status !== "aguardando-pagamento") return;
 
     const at = this.now();
     if (!pedidoVencido(order.expiresAt, at)) return;
