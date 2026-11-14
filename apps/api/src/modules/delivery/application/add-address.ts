@@ -1,6 +1,6 @@
 import { LIMITE_DE_ENDERECOS } from "@leguele/shared";
 import type { Address, AddressInput } from "../domain/address.js";
-import { AddressLimitReachedError } from "../domain/address-errors.js";
+import { AddressLimitReachedError, AddressNotLocatedError } from "../domain/address-errors.js";
 import type { AddressRepository } from "../domain/address-repository.js";
 import type { DeliverySettingsRepository } from "../domain/delivery-settings-repository.js";
 import type { Geocoder, RouteCalculator } from "../domain/maps.js";
@@ -30,7 +30,8 @@ export class AddAddress {
       state: input.state,
       zip: input.zip,
     });
-    const distanceMeters = await this.router.routeDistanceMeters(origem, coordinates!);
+    if (!coordinates) throw new AddressNotLocatedError();
+    const distanceMeters = await this.router.routeDistanceMeters(origem, coordinates);
 
     return this.addresses.update(ownerId, (current) => {
       const address: Address = {
@@ -38,7 +39,7 @@ export class AddAddress {
         id: this.newId(),
         ownerId,
         isDefault: current.length === 0,
-        coordinates: coordinates!,
+        coordinates,
         distanceMeters,
         routeOrigin: origem,
         createdAt: this.now(),
