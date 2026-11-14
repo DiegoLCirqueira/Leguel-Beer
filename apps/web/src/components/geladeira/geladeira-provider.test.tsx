@@ -472,5 +472,25 @@ describe("GeladeiraProvider com a conta", () => {
 
       expect(screen.getByTestId("total")).toHaveTextContent("4");
     });
+
+    it("se a pessoa sai da /geladeira antes da resposta, ela é descartada: nem preço nem aviso", async () => {
+      guardarLocal(3);
+      let responder: (r: ResultadoDaConta) => void = () => {};
+      const conta = contaFalsa({ tipo: "sem-sessao" });
+      conta.validar.mockReturnValue(new Promise<ResultadoDaConta>((r) => (responder = r)));
+      const { rerender } = abrirComConta(conta);
+      await vi.waitFor(() => expect(conta.validar).toHaveBeenCalled());
+
+      caminho.atual = "/catalogo";
+      rerender(
+        <GeladeiraProvider conta={conta}>
+          <Painel />
+        </GeladeiraProvider>,
+      );
+      await act(async () => responder(reduzida));
+
+      expect(screen.getByTestId("total")).toHaveTextContent("3");
+      expect(screen.getByLabelText("Ajustes da Geladeira")).toBeEmptyDOMElement();
+    });
   });
 });
