@@ -65,4 +65,16 @@ describe("useAnimacaoDasGarrafas", () => {
     });
     expect(result.current.map((g) => g.chave)).toEqual(["a#0"]);
   });
+
+  it("com movimento reduzido nada anima: a garrafa nova só aparece e a que sai some na hora", () => {
+    window.matchMedia = (consulta: string) =>
+      ({ matches: consulta === "(prefers-reduced-motion: reduce)" }) as MediaQueryList;
+    const { result, rerender } = renderHook(({ lista }) => useAnimacaoDasGarrafas(lista), {
+      initialProps: { lista: [garrafa("a", 0), garrafa("b", 0)] },
+    });
+
+    rerender({ lista: [garrafa("a", 0), garrafa("a", 1)] });
+
+    expect(animacoes(result.current)).toEqual({ "a#0": null, "a#1": null });
+  });
 });
