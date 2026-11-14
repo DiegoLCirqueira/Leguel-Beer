@@ -109,7 +109,7 @@ describe("GeladeiraTela", () => {
           media: consulta,
           addEventListener: () => {},
           removeEventListener: () => {},
-        }) as MediaQueryList;
+        }) as unknown as MediaQueryList;
       guardar([{ cerveja: mare, quantidade: 2 }]);
       abrir();
 
