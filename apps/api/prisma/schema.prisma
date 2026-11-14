@@ -318,3 +318,20 @@ model PaymentMark {
   @@index([orderId])
   @@map("payment_marks")
 }
+
+/// Configurações de entrega: uma linha só (o CHECK `id = 1` na migration garante). Mudam sem novo deploy; a tela de admin vem no item 8. Dinheiro em centavos, distância em metros.
+model DeliverySettings {
+  id                       Int      @id @default(1)
+  /// Origem do frete e da área: a cervejaria.
+  originLatitude           Float    @map("origin_latitude")
+  originLongitude          Float    @map("origin_longitude")
+  baseFeeCents             Int      @map("base_fee_cents")
+  perKmFeeCents            Int      @map("per_km_fee_cents")
+  /// Área de entrega: distância de rota máxima, inclusive.
+  maxRadiusMeters          Int      @map("max_radius_meters")
+  /// Subtotal a partir do qual o frete é grátis, inclusive.
+  freeShippingMinimumCents Int      @map("free_shipping_minimum_cents")
+  updatedAt                DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("delivery_settings")
+}
