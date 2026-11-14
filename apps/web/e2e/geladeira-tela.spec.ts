@@ -144,7 +144,7 @@ test.describe("esqueleto de carregamento (HTML do servidor, sem JavaScript)", ()
       await page.goto("/geladeira");
 
       await expect(page.getByRole("status")).toHaveText("Carregando a Geladeira");
-      const esqueleto = page.locator("main .animate-pulse");
+      const esqueleto = page.getByTestId("esqueleto-da-geladeira");
       const caixa = (await esqueleto.boundingBox())!;
       const barra = (await page.getByRole("navigation").last().boundingBox())!;
       expect(caixa.y + caixa.height).toBeLessThanOrEqual(barra.y + 1);
