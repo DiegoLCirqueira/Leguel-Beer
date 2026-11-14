@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { DeliverySettingsRepository } from "../domain/delivery-settings-repository.js";
-import { AddressLimitReachedError } from "../domain/address-errors.js";
+import { AddressLimitReachedError, AddressNotLocatedError } from "../domain/address-errors.js";
 import { InMemoryAddressRepository } from "../testing/in-memory-addresses.js";
 import { FakeGeocoder, FakeRouteCalculator } from "../testing/fake-maps.js";
 import { AddAddress } from "./add-address.js";
@@ -86,5 +86,15 @@ describe("AddAddress", () => {
     expect(await addresses.list("owner-1")).toHaveLength(5);
     expect(geocoder.received).toHaveLength(callsBefore);
     expect(router.received).toHaveLength(callsBefore);
+  });
+
+  it("não salva nem calcula a rota quando o serviço de mapas não acha o endereço", async () => {
+    const { addresses, geocoder, router, add } = setup();
+    geocoder.respondWith(null);
+
+    await expect(add.execute("owner-1", input)).rejects.toBeInstanceOf(AddressNotLocatedError);
+
+    expect(await addresses.list("owner-1")).toEqual([]);
+    expect(router.received).toEqual([]);
   });
 });
