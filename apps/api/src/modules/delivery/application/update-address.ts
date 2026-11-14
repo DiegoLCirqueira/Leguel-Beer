@@ -1,6 +1,6 @@
 import { NotFoundError } from "../../../common/errors/not-found-error.js";
 import type { Address, AddressInput, Coordinates } from "../domain/address.js";
-import { AddressNotLocatedError } from "../domain/address-errors.js";
+import { AddressConcurrentEditError, AddressNotLocatedError } from "../domain/address-errors.js";
 import type { AddressRepository } from "../domain/address-repository.js";
 import type { DeliverySettingsRepository } from "../domain/delivery-settings-repository.js";
 import { isOutsideDeliveryArea } from "../domain/delivery-area.js";
@@ -19,6 +19,12 @@ function locationChanged(address: Address, input: AddressInput): boolean {
   );
 }
 
+const MAX_ATTEMPTS = 3;
+
+function sameLocation(a: Address, b: Address): boolean {
+  return !locationChanged(a, b);
+}
+
 interface Recalculated {
   coordinates: Coordinates;
   distanceMeters: number | null;
@@ -34,6 +40,19 @@ export class UpdateAddress {
   ) {}
 
   async execute(ownerId: string, addressId: string, input: AddressInput): Promise<AddressListItem> {
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      const updated = await this.attempt(ownerId, addressId, input);
+      if (updated) return updated;
+    }
+    throw new AddressConcurrentEditError();
+  }
+
+  /** Uma tentativa; `null` quando o lugar gravado mudou entre a leitura e a trava e é preciso reler. */
+  private async attempt(
+    ownerId: string,
+    addressId: string,
+    input: AddressInput,
+  ): Promise<AddressListItem | null> {
     const existing = (await this.addresses.list(ownerId)).find(({ id }) => id === addressId);
     if (!existing) throw new NotFoundError();
     const { origem, raioMaximoMetros } = await this.settings.get();
@@ -46,6 +65,8 @@ export class UpdateAddress {
     const updated = await this.addresses.update(ownerId, (current) => {
       const target = current.find((address) => address.id === addressId);
       if (!target) throw new NotFoundError();
+      // Outra edição mudou o lugar depois da leitura: a decisão de recalcular ou não ficou velha.
+      if (sameLocation(target, existing) === false) return { addresses: null, result: null };
       // Campos opcionais ausentes no formulário são apagados, não herdados do endereço antigo.
       const next: Address = {
         ...target,
@@ -59,6 +80,7 @@ export class UpdateAddress {
         result: next,
       };
     });
+    if (!updated) return null;
     return {
       ...updated,
       outsideArea: isOutsideDeliveryArea(updated.distanceMeters, raioMaximoMetros),

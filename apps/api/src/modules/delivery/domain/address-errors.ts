@@ -15,3 +15,11 @@ export class AddressNotLocatedError extends Error {
     this.name = "AddressNotLocatedError";
   }
 }
+
+/** O endereço mudou de lugar enquanto era editado e as tentativas de reler acabaram. */
+export class AddressConcurrentEditError extends Error {
+  constructor() {
+    super("O endereço foi alterado por outra requisição. Tente de novo.");
+    this.name = "AddressConcurrentEditError";
+  }
+}
