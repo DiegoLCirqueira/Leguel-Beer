@@ -97,6 +97,17 @@ describe("regras do schema do pedido (banco real)", () => {
       prisma.order.create({ data: pedido({ paymentMethod: "CARD" }) }),
     ).rejects.toThrow();
 
+    await expect(
+      prisma.order.create({ data: pedido({ paymentMethod: "CARD", cardBrand: "visa" }) }),
+    ).rejects.toThrow();
+    await expect(
+      prisma.order.create({ data: pedido({ paymentMethod: "CARD", installments: 3 }) }),
+    ).rejects.toThrow();
+    await expect(
+      prisma.order.create({
+        data: pedido({ paymentMethod: "CARD", installments: 13, cardBrand: "visa" }),
+      }),
+    ).rejects.toThrow();
     await prisma.order.create({
       data: pedido({ paymentMethod: "CARD", installments: 3, cardBrand: "visa" }),
     });
