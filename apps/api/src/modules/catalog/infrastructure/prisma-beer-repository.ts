@@ -28,6 +28,7 @@ function toBeer(row: BeerRow): Beer {
     priceCents: row.priceCents,
     featured: row.featured,
     stock: row.stock,
+    reserved: 0,
     description: row.description,
     previousPriceCents: row.previousPriceCents,
     imageUrl: row.imageUrl,
