@@ -83,4 +83,37 @@ describe("PrismaOrderRepository (banco real)", () => {
       },
     ]);
   });
+
+  it("cancela uma vez só quando várias expirações chegam juntas (cron e leitura)", async () => {
+    const results = await Promise.all(
+      Array.from({ length: 5 }, () =>
+        orders.cancelIfAwaitingPayment(orderId, "pagamento não concluído", NOW),
+      ),
+    );
+
+    expect(results.filter(Boolean)).toHaveLength(1);
+    expect(await prisma.orderStatusHistory.count({ where: { orderId } })).toBe(1);
+  });
+
+  it("não mexe no pedido que já foi pago", async () => {
+    await prisma.order.update({ where: { id: orderId }, data: { status: "PAID" } });
+
+    const cancelled = await orders.cancelIfAwaitingPayment(orderId, "pagamento não concluído", NOW);
+
+    expect(cancelled).toBe(false);
+    const order = await prisma.order.findUniqueOrThrow({ where: { id: orderId } });
+    expect(order).toMatchObject({ status: "PAID", cancelReason: null });
+    expect(await prisma.stockReservation.count({ where: { orderId, releasedAt: null } })).toBe(1);
+    expect(await prisma.fridgePendingDeduction.count({ where: { orderId } })).toBe(1);
+    expect(await prisma.orderStatusHistory.count({ where: { orderId } })).toBe(0);
+  });
+
+  it("lê o pedido para a expiração com o status do contrato e a validade", async () => {
+    expect(await orders.findForExpiration(orderId)).toEqual({
+      id: orderId,
+      status: "aguardando-pagamento",
+      expiresAt: EXPIRES_AT,
+    });
+    expect(await orders.findForExpiration(crypto.randomUUID())).toBeNull();
+  });
 });
