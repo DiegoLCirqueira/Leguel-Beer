@@ -330,4 +330,23 @@ describe("endereços do cliente (HTTP, banco real)", () => {
       [sitio.id, true],
     ]);
   });
+
+  const makeDefault = (id: string, token = tokens.customer()) =>
+    request(app.getHttpServer())
+      .post(`/me/enderecos/${id}/padrao`)
+      .set({ Authorization: `Bearer ${token}` });
+
+  it("troca o endereço padrão: só o escolhido fica com o selo", async () => {
+    const { body: casa } = await create(form);
+    const { body: trabalho } = await create({ ...form, rua: "Rua da Praia" });
+
+    const response = await makeDefault(trabalho.id);
+
+    expect(response.status).toBe(204);
+    const after = await list(tokens.customer());
+    expect(after.body.map((a: { id: string; padrao: boolean }) => [a.id, a.padrao])).toEqual([
+      [casa.id, false],
+      [trabalho.id, true],
+    ]);
+  });
 });
