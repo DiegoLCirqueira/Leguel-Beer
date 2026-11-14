@@ -14,7 +14,7 @@ function toHttpError(error: unknown): unknown {
     return new CodedHttpError(
       503,
       "DELIVERY_SETTINGS_MISSING",
-      "A entrega está indisponível no momento. Tente de novo em instantes.",
+      "Não conseguimos calcular o frete agora. Tente de novo em instantes.",
     );
   }
   if (error instanceof MapsUnavailableError) {
