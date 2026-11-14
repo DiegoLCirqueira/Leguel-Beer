@@ -117,6 +117,18 @@ _Evite_: código, protocolo
 Etapa em que o pedido está: Aguardando pagamento, Pago, Em preparo, Saiu para entrega, Entregue ou Cancelado. Ver [[pedidos-cliente]].
 _Evite_: situação, estado
 
+**Validade do pedido**:
+Os 30 minutos, desde a criação, em que um pedido "Aguardando pagamento" pode ser pago; a partir de 30:00 ele está vencido e é cancelado no próximo uso ou pelo cron. Ver [[pagamento]].
+_Evite_: prazo, timeout
+
+**Reserva**:
+Unidades de uma cerveja presas a um pedido "Aguardando pagamento" dentro da validade; só a reserva válida conta na quantidade disponível. Ver [[checkout]] e [[pagamento]].
+_Evite_: bloqueio, separação
+
+**Aviso de pagamento**:
+Mensagem que o gateway manda à API quando um pagamento muda; a API confere a assinatura, consulta o pagamento no gateway e aplica a mudança uma vez só. Ver [[pagamento]].
+_Evite_: webhook (fora do código), notificação, callback
+
 ## Estoque
 
 **Estoque físico**:
@@ -124,7 +136,7 @@ Unidades de uma cerveja que estão na cervejaria, inclusive as reservadas. Muda 
 _Evite_: estoque total, saldo
 
 **Reservado**:
-Unidades de uma cerveja presas em pedidos "Aguardando pagamento". Viram baixa no estoque físico quando o pagamento é aprovado e voltam a ficar disponíveis quando o pedido é cancelado. Ver [[checkout]].
+Unidades de uma cerveja presas em pedidos "Aguardando pagamento". Viram baixa no estoque físico quando o pagamento é aprovado e voltam a ficar disponíveis quando o pedido é cancelado. Ver [[pagamento]].
 _Evite_: bloqueado, separado
 
 **Estoque mínimo**:
