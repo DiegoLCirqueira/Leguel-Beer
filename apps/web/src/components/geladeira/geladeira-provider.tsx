@@ -86,11 +86,12 @@ export function GeladeiraProvider({
   const [ajustes, setAjustes] = useState<AjusteDaGeladeira[]>([]);
   // Entrar e sair redirecionam: a mudança de página é o sinal para olhar a sessão de novo.
   const pagina = usePathname();
-  // A página de agora, para a resposta de uma chamada em voo saber se ainda é a dela.
-  const paginaAtual = useRef(pagina);
-  useEffect(() => {
-    paginaAtual.current = pagina;
-  }, [pagina]);
+  // Geração da identidade/modo (convidado ou conta, página, sessão): sobe a cada mudança que torna
+  // antiga uma resposta em voo. A chamada guarda a geração em que saiu e só vale se ainda for a atual.
+  const geracao = useRef(0);
+  const novaGeracao = useCallback(() => {
+    geracao.current += 1;
+  }, []);
 
   const aplicar = useCallback((proximo: EstadoDaGeladeira) => {
     atual.current = proximo;
@@ -100,12 +101,13 @@ export function GeladeiraProvider({
 
   // Sessão acabou (saída da conta, ou outra conta no mesmo navegador): a cópia local é da conta anterior.
   const sairDaConta = useCallback(() => {
+    novaGeracao();
     apagarGeladeiraLocal();
     gravarMarca(CHAVE_DA_CONTA, false);
     atual.current = GELADEIRA_VAZIA;
     setEstado(GELADEIRA_VAZIA);
     setAjustes([]);
-  }, []);
+  }, [novaGeracao]);
 
   // Manda a Geladeira inteira para a conta. Só falha de envio de mudança local deixa pendente.
   const enviar = useCallback(async () => {
@@ -126,22 +128,19 @@ export function GeladeiraProvider({
   // Depois de uma mudança: com a conta, manda tudo (ou reenvia o que ficou pendente).
   const sincronizar = useCallback(() => {
     versao.current += 1;
+    novaGeracao();
     if (conta && lerMarca(CHAVE_DA_CONTA)) void enviar();
-  }, [conta, enviar]);
+  }, [conta, enviar, novaGeracao]);
 
   // Convidado: ao abrir, a API confere preço e estoque da Geladeira local (não grava nada) e o que ela
   // devolve vira a Geladeira, com os avisos. Falha da validação deixa tudo como estava.
-  const geracaoDaValidacao = useRef(0);
   const validarConvidado = useCallback(async () => {
     if (!conta || atual.current.itens.length === 0) return;
-    const antes = versao.current;
-    // Cada visita à Geladeira abre uma geração nova: só a resposta da última chamada vale.
-    const geracao = ++geracaoDaValidacao.current;
+    const dela = geracao.current;
     const resultado = await conta.validar(paraRequest(atual.current)).catch(() => undefined);
-    // Mudança feita enquanto a validação estava em voo, ou saída da Geladeira antes da resposta
-    // (os avisos não seriam vistos): a resposta é descartada, nem preço nem aviso.
-    if (resultado?.tipo !== "ok" || versao.current !== antes) return;
-    if (paginaAtual.current !== "/geladeira" || geracao !== geracaoDaValidacao.current) return;
+    // Mudança de identidade, de página ou local enquanto a chamada estava em voo: a resposta é de
+    // outro momento e é descartada, nem preço nem aviso.
+    if (resultado?.tipo !== "ok" || dela !== geracao.current) return;
     setAjustes(resultado.resposta.ajustes);
     aplicar(aplicarResposta(atual.current, resultado.resposta));
   }, [conta, aplicar]);
@@ -150,6 +149,7 @@ export function GeladeiraProvider({
   // ao entrar; sem sessão, apaga a cópia de quem acabou de sair.
   useEffect(() => {
     if (!conta) return;
+    novaGeracao();
     let ativo = true;
     (async () => {
       const sincronizada = lerMarca(CHAVE_DA_CONTA);
@@ -169,6 +169,8 @@ export function GeladeiraProvider({
       // Um envio em voo pode ter falhado enquanto o buscar rodava: a mudança local pendente vale mais.
       if (sincronizada && lerMarca(CHAVE_PENDENTE)) return;
       gravarMarca(CHAVE_DA_CONTA, true);
+      // A conta passa a mandar: qualquer validação do convidado em voo ficou para trás.
+      novaGeracao();
       setAjustes(resultado.resposta.ajustes);
       const daConta = aplicarResposta(GELADEIRA_VAZIA, resultado.resposta);
       if (sincronizada) return aplicar(daConta);
@@ -182,7 +184,7 @@ export function GeladeiraProvider({
     return () => {
       ativo = false;
     };
-  }, [conta, enviar, aplicar, sairDaConta, validarConvidado, pagina]);
+  }, [conta, enviar, aplicar, sairDaConta, validarConvidado, novaGeracao, pagina]);
 
   // Estável: a tela o usa na limpeza de um efeito.
   const limparAjustes = useCallback(() => setAjustes([]), []);
