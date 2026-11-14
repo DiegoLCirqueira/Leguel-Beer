@@ -3,7 +3,7 @@ import type { INestApplication } from "@nestjs/common";
 import { APP_FILTER, APP_PIPE } from "@nestjs/core";
 import { Test } from "@nestjs/testing";
 import request from "supertest";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { CommonModule } from "../../../common/common.module.js";
 import { AllExceptionsFilter } from "../../../common/http/all-exceptions.filter.js";
 import { PrismaModule } from "../../../common/prisma/prisma.module.js";
@@ -410,5 +410,51 @@ describe("endereços do cliente (HTTP, banco real)", () => {
 
     expect(response.status).toBe(400);
     expect(geocoder.received).toEqual([]);
+  });
+
+  describe("log de erro inesperado", () => {
+    afterEach(() => vi.restoreAllMocks());
+
+    const logged = (spy: ReturnType<typeof vi.spyOn>) =>
+      spy.mock.calls.map(([chunk]: unknown[]) => String(chunk)).join("");
+
+    it.each([
+      [
+        "erro do geocodificador com o endereço na mensagem",
+        async () => {
+          geocoder.geocode = async () => {
+            throw new Error("falha ao geocodificar Rua do Sol 100, Farol, Maceió, 57035000");
+          };
+        },
+      ],
+      [
+        "falha real na gravação do banco",
+        async () => {
+          await prisma.$executeRawUnsafe(
+            "CREATE OR REPLACE FUNCTION fail_address_insert() RETURNS trigger LANGUAGE plpgsql AS 'BEGIN RAISE EXCEPTION ''falha forçada''; END;'",
+          );
+          await prisma.$executeRawUnsafe(
+            "CREATE TRIGGER fail_address_insert BEFORE INSERT ON addresses FOR EACH ROW EXECUTE FUNCTION fail_address_insert()",
+          );
+        },
+      ],
+    ])("%s não copia rua, número nem CEP para o log do servidor", async (_nome, arrange) => {
+      const originalGeocode = geocoder.geocode.bind(geocoder);
+      await arrange();
+      const spy = vi.spyOn(process.stderr, "write");
+
+      try {
+        const response = await create(form);
+
+        expect(response.status).toBe(500);
+        expect(JSON.stringify(response.body)).not.toMatch(/Rua do Sol|57035/);
+        expect(logged(spy)).toContain("Erro não tratado");
+        expect(logged(spy)).not.toMatch(/Rua do Sol|57035|Farol|Maceió/);
+      } finally {
+        geocoder.geocode = originalGeocode;
+        await prisma.$executeRawUnsafe("DROP TRIGGER IF EXISTS fail_address_insert ON addresses");
+        await prisma.$executeRawUnsafe("DROP FUNCTION IF EXISTS fail_address_insert()");
+      }
+    });
   });
 });
