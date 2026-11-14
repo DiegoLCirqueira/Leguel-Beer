@@ -22,6 +22,8 @@ type Estado<T> = {
 const ATRASO_DO_BALANCO_MS = 60;
 const DURACAO_DA_SAIDA_MS = 300;
 
+const movimentoReduzido = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 /** O que mudou da lista anterior para a atual: o que entra cai e o rótulo que cresceu balança. */
 function efeitosDaMudanca<T extends GarrafaBase>(anterior: T[], atual: T[]) {
   const conhecidas = new Set(anterior.map((g) => g.chave));
@@ -45,6 +47,7 @@ function efeitosDaMudanca<T extends GarrafaBase>(anterior: T[], atual: T[]) {
 /**
  * Anima só a mudança: a garrafa que entra cai e as do rótulo que cresceu balançam. A primeira
  * leitura não anima, para a Geladeira abrir arrumada. A garrafa que sai fica 300 ms, saindo.
+ * Com movimento reduzido nada anima: a garrafa só aparece e some.
  */
 export function useAnimacaoDasGarrafas<T extends GarrafaBase>(garrafas: T[]): GarrafaAnimada<T>[] {
   // Quem chama monta a lista a cada render: o que conta é o conteúdo, não a identidade do array.
@@ -59,11 +62,12 @@ export function useAnimacaoDasGarrafas<T extends GarrafaBase>(garrafas: T[]): Ga
   if (assinatura !== anterior.assinatura) {
     const chaves = new Set(garrafas.map((g) => g.chave));
     const saindo = [...anterior.saindo, ...anterior.garrafas].filter((g) => !chaves.has(g.chave));
+    const semMovimento = movimentoReduzido();
     atual = {
       assinatura,
       garrafas,
-      efeitos: efeitosDaMudanca(anterior.garrafas, garrafas),
-      saindo: [...new Map(saindo.map((g) => [g.chave, g])).values()],
+      efeitos: semMovimento ? new Map() : efeitosDaMudanca(anterior.garrafas, garrafas),
+      saindo: semMovimento ? [] : [...new Map(saindo.map((g) => [g.chave, g])).values()],
     };
     setAnterior(atual);
   }
