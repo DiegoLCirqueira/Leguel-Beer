@@ -16,7 +16,8 @@ test("aguardarRevelacao espera o div oculto do Suspense sumir, deixando um só '
 
   await aguardarRevelacao(page);
 
-  await expect(page.getByText("Esgotado", { exact: true })).toHaveCount(1);
+  // Leitura única (não `toHaveCount`, que espera sozinho e passaria mesmo com o helper vazio).
+  expect(await page.getByText("Esgotado", { exact: true }).count()).toBe(1);
 });
 
 test("aguardarRevelacao passa direto quando não há conteúdo oculto do Suspense", async ({
