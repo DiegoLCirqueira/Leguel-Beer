@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { NotFoundError } from "../../../common/errors/not-found-error.js";
 import type { AddressInput } from "../domain/address.js";
 import type { DeliverySettingsRepository } from "../domain/delivery-settings-repository.js";
+import { AddressNotLocatedError } from "../domain/address-errors.js";
+import { MapsUnavailableError } from "../domain/maps.js";
 import { anAddress, ORIGIN } from "../testing/factories.js";
 import { FakeGeocoder, FakeRouteCalculator } from "../testing/fake-maps.js";
 import { InMemoryAddressRepository } from "../testing/in-memory-addresses.js";
@@ -89,5 +92,41 @@ describe("UpdateAddress", () => {
     const [saved] = await addresses.list("owner-1");
     expect(saved?.nickname).toBeUndefined();
     expect(saved?.complement).toBeUndefined();
+  });
+
+  it.each([
+    ["mapas fora do ar na geocodificação", "geocoder", "unavailable", MapsUnavailableError],
+    ["mapas fora do ar na rota", "router", "unavailable", MapsUnavailableError],
+    ["endereço que o serviço não acha", "geocoder", null, AddressNotLocatedError],
+  ] as const)(
+    "com %s, o endereço anterior continua salvo como estava",
+    async (_name, which, outcome, errorClass) => {
+      const { addresses, geocoder, router, update } = await setup();
+      (which === "geocoder" ? geocoder : router).respondWith(outcome as never);
+
+      await expect(
+        update.execute("owner-1", "casa", { ...sameFields, street: "Rua da Praia" }),
+      ).rejects.toBeInstanceOf(errorClass);
+
+      expect(await addresses.list("owner-1")).toEqual([stored]);
+    },
+  );
+
+  it("responde não encontrado, sem chamar os mapas, para o endereço de outro cliente ou inexistente", async () => {
+    const { addresses, geocoder, update } = await setup();
+    await addresses.update("owner-2", () => ({
+      addresses: [anAddress({ id: "do-outro", ownerId: "owner-2" })],
+      result: undefined,
+    }));
+
+    await expect(update.execute("owner-1", "do-outro", sameFields)).rejects.toBeInstanceOf(
+      NotFoundError,
+    );
+    await expect(update.execute("owner-1", "nao-existe", sameFields)).rejects.toBeInstanceOf(
+      NotFoundError,
+    );
+
+    expect(geocoder.received).toEqual([]);
+    expect((await addresses.list("owner-2"))[0]?.street).toBe("Rua do Sol");
   });
 });
