@@ -34,12 +34,14 @@ class InMemoryOrderRepository implements OrderRepository {
 
 class FakePaymentGateway implements PaymentGateway {
   constructor(
-    private readonly outcome: "not-approved" | "unavailable" | "approved-in-time" = "not-approved",
+    private readonly outcome:
+      "not-approved" | "unavailable" | "approved-in-time" | "approved-late" = "not-approved",
   ) {}
 
   async findApprovedPayment(): Promise<{ approvedAt: Date } | null> {
     if (this.outcome === "unavailable") throw new PaymentGatewayUnavailableError();
     if (this.outcome === "approved-in-time") return { approvedAt: minutesAfter(CREATED_AT, 29) };
+    if (this.outcome === "approved-late") return { approvedAt: minutesAfter(CREATED_AT, 31) };
     return null;
   }
 }
@@ -143,4 +145,17 @@ describe("ExpireOrder", () => {
       expect(orders.cancellations).toEqual([]);
     },
   );
+
+  it("cancela sem aplicar a aprovação quando o gateway aprovou só depois da validade", async () => {
+    const orders = new InMemoryOrderRepository([awaitingOrder()]);
+    const approvals = new FakeApprovalApplier();
+    const expire = new ExpireOrder(orders, new FakePaymentGateway("approved-late"), approvals, () =>
+      minutesAfter(CREATED_AT, 32),
+    );
+
+    await expire.execute("order-1");
+
+    expect(approvals.applied).toEqual([]);
+    expect(orders.cancellations).toHaveLength(1);
+  });
 });
