@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { ExpirableOrder, OrderRepository } from "../domain/order-repository.js";
 import { PaymentGatewayUnavailableError, type PaymentGateway } from "../domain/payment-gateway.js";
+import type { ApprovalApplier } from "../domain/approval-applier.js";
 import { ExpireOrder } from "./expire-order.js";
 
 const CREATED_AT = new Date("2026-11-14T10:00:00.000Z");
@@ -28,11 +29,22 @@ class InMemoryOrderRepository implements OrderRepository {
 }
 
 class FakePaymentGateway implements PaymentGateway {
-  constructor(private readonly outcome: "not-approved" | "unavailable" = "not-approved") {}
+  constructor(
+    private readonly outcome: "not-approved" | "unavailable" | "approved-in-time" = "not-approved",
+  ) {}
 
   async findApprovedPayment(): Promise<{ approvedAt: Date } | null> {
     if (this.outcome === "unavailable") throw new PaymentGatewayUnavailableError();
+    if (this.outcome === "approved-in-time") return { approvedAt: minutesAfter(CREATED_AT, 29) };
     return null;
+  }
+}
+
+class FakeApprovalApplier implements ApprovalApplier {
+  applied: { orderId: string; approvedAt: Date }[] = [];
+
+  async apply(orderId: string, approvedAt: Date): Promise<void> {
+    this.applied.push({ orderId, approvedAt });
   }
 }
 
@@ -49,7 +61,12 @@ describe("ExpireOrder", () => {
   it("cancela o pedido aguardando pagamento vencido há 31 minutos com o motivo 'pagamento não concluído'", async () => {
     const now = minutesAfter(CREATED_AT, 31);
     const orders = new InMemoryOrderRepository([awaitingOrder()]);
-    const expire = new ExpireOrder(orders, new FakePaymentGateway(), () => now);
+    const expire = new ExpireOrder(
+      orders,
+      new FakePaymentGateway(),
+      new FakeApprovalApplier(),
+      () => now,
+    );
 
     await expire.execute("order-1");
 
@@ -60,8 +77,11 @@ describe("ExpireOrder", () => {
 
   it("não muda o pedido ainda dentro da validade, 10 minutos depois de criado", async () => {
     const orders = new InMemoryOrderRepository([awaitingOrder()]);
-    const expire = new ExpireOrder(orders, new FakePaymentGateway(), () =>
-      minutesAfter(CREATED_AT, 10),
+    const expire = new ExpireOrder(
+      orders,
+      new FakePaymentGateway(),
+      new FakeApprovalApplier(),
+      () => minutesAfter(CREATED_AT, 10),
     );
 
     await expire.execute("order-1");
@@ -71,12 +91,33 @@ describe("ExpireOrder", () => {
 
   it("não cancela o pedido vencido se o gateway não responde, para tentar de novo na próxima checagem", async () => {
     const orders = new InMemoryOrderRepository([awaitingOrder()]);
-    const expire = new ExpireOrder(orders, new FakePaymentGateway("unavailable"), () =>
-      minutesAfter(CREATED_AT, 31),
+    const expire = new ExpireOrder(
+      orders,
+      new FakePaymentGateway("unavailable"),
+      new FakeApprovalApplier(),
+      () => minutesAfter(CREATED_AT, 31),
     );
 
     await expire.execute("order-1");
 
+    expect(orders.cancellations).toEqual([]);
+  });
+
+  it("aplica a aprovação em vez de cancelar quando o gateway aprovou dentro da validade", async () => {
+    const orders = new InMemoryOrderRepository([awaitingOrder()]);
+    const approvals = new FakeApprovalApplier();
+    const expire = new ExpireOrder(
+      orders,
+      new FakePaymentGateway("approved-in-time"),
+      approvals,
+      () => minutesAfter(CREATED_AT, 31),
+    );
+
+    await expire.execute("order-1");
+
+    expect(approvals.applied).toEqual([
+      { orderId: "order-1", approvedAt: minutesAfter(CREATED_AT, 29) },
+    ]);
     expect(orders.cancellations).toEqual([]);
   });
 });
