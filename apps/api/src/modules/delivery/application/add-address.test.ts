@@ -144,4 +144,24 @@ describe("AddAddress", () => {
     expect(geocoder.received).toEqual([]);
     expect(await addresses.list("owner-1")).toEqual([]);
   });
+
+  it("envia aos mapas só os campos permitidos: nunca apelido nem complemento, e a rota só com coordenadas", async () => {
+    const { geocoder, router, add } = setup();
+
+    await add.execute("owner-1", { ...input, nickname: "Casa da Ana", complement: "Apto 12" });
+
+    expect(geocoder.received).toEqual([
+      {
+        street: "Rua do Sol",
+        number: "100",
+        district: "Farol",
+        city: "Maceió",
+        state: "AL",
+        zip: "57035000",
+      },
+    ]);
+    expect(router.received).toEqual([
+      { origin: ORIGIN, destination: { latitude: -9.66, longitude: -35.74 } },
+    ]);
+  });
 });
