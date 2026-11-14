@@ -61,4 +61,17 @@ describe("AddAddress", () => {
       },
     ]);
   });
+
+  it("o segundo endereço não vira padrão e o primeiro continua padrão", async () => {
+    const { addresses, add } = setup();
+    await add.execute("owner-1", input);
+
+    await add.execute("owner-1", { ...input, nickname: "Trabalho", street: "Rua da Praia" });
+
+    const saved = await addresses.list("owner-1");
+    expect(saved.map(({ id, isDefault }) => ({ id, isDefault }))).toEqual([
+      { id: "address-1", isDefault: true },
+      { id: "address-2", isDefault: false },
+    ]);
+  });
 });
