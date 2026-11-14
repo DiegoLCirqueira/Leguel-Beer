@@ -39,6 +39,8 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[enderecos-entrega]]: endereços com busca por CEP, área de entrega e frete por distância com frete grátis (LB-30, LB-62, LB-63, LB-64, LB-66).
 - [[checkout]]: Entrega → Pagamento → Revisão, com Pix e cartão.
 - [[pedidos-cliente]]: pedido confirmado e "Meus pedidos" com o status de cada pedido (LB-61, LB-67; e-mail LB-81 em aberto).
+- [[admin]]: área admin com cervejas e foto, estoque com mínimo, pedidos e status, e regras de entrega (LB-72, LB-73, LB-75, LB-76, LB-77).
+- [[pagamento]]: Pix com QR e validade de 30 min, cartão em até 12x, avisos do gateway idempotentes e expiração (LB-57, LB-58, LB-59, LB-60).
 
 ## Decisões (ADRs)
 
@@ -58,6 +60,7 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[ADR-014-admin-so-com-email-confirmado]]: admin só com e-mail confirmado, lido pela API no banco.
 - [[ADR-015-ferramentas-monorepo]]: pnpm + Turborepo, `@leguele/shared` compilado com `tsc`, Vitest em todos os pacotes e dependency-cruiser no CI.
 - [[ADR-016-ciclo-continuo-da-banda]]: a ordem vira ciclo contínuo; decisão do Diego vai ao cartão de pendências e a banda segue; recomendada é aplicada e vetável.
+- [[ADR-017-fotos-com-sessao-do-admin]] (aceito pelo Diego em 13/11): fotos das cervejas enviadas pelo servidor do site com a sessão do admin e política do armazenamento pelo papel admin, sem chave de serviço.
 
 ## Arquitetura
 

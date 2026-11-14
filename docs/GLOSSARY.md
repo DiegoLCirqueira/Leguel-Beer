@@ -52,7 +52,7 @@ Cerveja que aparece para os clientes. Uma cerveja inativa continua cadastrada, m
 _Evite_: publicada, visível
 
 **Quantidade disponível**:
-Estoque da cerveja menos as unidades reservadas em pedidos pendentes.
+Estoque físico da cerveja menos as unidades reservadas em pedidos "Aguardando pagamento" ainda dentro da validade; a reserva de pedido vencido não conta. Ver [[checkout]].
 _Evite_: estoque (quando se quer dizer o que ainda pode ser vendido)
 
 **Esgotada**:
@@ -116,3 +116,33 @@ _Evite_: código, protocolo
 **Status do pedido**:
 Etapa em que o pedido está: Aguardando pagamento, Pago, Em preparo, Saiu para entrega, Entregue ou Cancelado. Ver [[pedidos-cliente]].
 _Evite_: situação, estado
+
+**Validade do pedido**:
+Os 30 minutos, desde a criação, em que um pedido "Aguardando pagamento" pode ser pago; a partir de 30:00 ele está vencido e é cancelado no próximo uso ou pelo cron. Ver [[pagamento]].
+_Evite_: prazo, timeout
+
+**Reserva**:
+Unidades de uma cerveja presas a um pedido "Aguardando pagamento" dentro da validade; só a reserva válida conta na quantidade disponível. Ver [[checkout]] e [[pagamento]].
+_Evite_: bloqueio, separação
+
+**Aviso de pagamento**:
+Mensagem que o gateway manda à API quando um pagamento muda; a API confere a assinatura, consulta o pagamento no gateway e aplica a mudança uma vez só. Ver [[pagamento]].
+_Evite_: webhook (fora do código), notificação, callback
+
+## Estoque
+
+**Estoque físico**:
+Unidades de uma cerveja que estão na cervejaria, inclusive as reservadas. Muda só por movimento de estoque. Ver [[admin]].
+_Evite_: estoque total, saldo
+
+**Reservado**:
+Unidades de uma cerveja presas em pedidos "Aguardando pagamento". Viram baixa no estoque físico quando o pagamento é aprovado e voltam a ficar disponíveis quando o pedido é cancelado. Ver [[pagamento]].
+_Evite_: bloqueado, separado
+
+**Estoque mínimo**:
+Quantidade de uma cerveja a partir da qual o admin vê o selo "Baixo" (disponível igual ou abaixo dele); 6 por padrão. Não é o aviso de estoque baixo ao cliente da [[produto]]. Ver [[admin]].
+_Evite_: estoque de segurança, alerta
+
+**Movimento de estoque**:
+Registro de uma mudança no estoque físico: entrada, perda, correção, venda ou cancelamento, com data, quantidade, motivo e saldo depois. Ver [[admin]].
+_Evite_: lançamento, ajuste (quando se quer dizer o registro)
