@@ -35,3 +35,20 @@ for (const tamanho of TAMANHOS) {
     expect(rolagem).toBeLessThanOrEqual(0);
   });
 }
+
+test("em 360x640, com a moldura encolhida, cada garrafa fantasma da Geladeira tem alvo de toque de pelo menos 44 px", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 360, height: 640 });
+  await page.goto("/geladeira");
+
+  for (const categoria of ["IPA", "Frutas", "Malt", "Lager"]) {
+    const fantasmas = page.getByRole("link", { name: `Adicionar ${categoria}` });
+    await expect(fantasmas).toHaveCount(4);
+    for (const fantasma of await fantasmas.all()) {
+      const caixa = (await fantasma.boundingBox())!;
+      expect(caixa.width).toBeGreaterThanOrEqual(44);
+      expect(caixa.height).toBeGreaterThanOrEqual(44);
+    }
+  }
+});
