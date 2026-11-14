@@ -8,6 +8,7 @@ import { requestIdMiddleware } from "./common/http/request-id.middleware.js";
 import { ZodValidationPipe } from "./common/validation/zod-validation.pipe.js";
 import { AccountModule } from "./modules/account/account.module.js";
 import { CatalogModule } from "./modules/catalog/catalog.module.js";
+import { DeliveryModule } from "./modules/delivery/delivery.module.js";
 import { FridgeModule } from "./modules/fridge/fridge.module.js";
 import { HealthModule } from "./modules/health/health.module.js";
 
@@ -18,6 +19,7 @@ import { HealthModule } from "./modules/health/health.module.js";
     AccountModule,
     CatalogModule,
     FridgeModule,
+    DeliveryModule,
     HealthModule,
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
   ],

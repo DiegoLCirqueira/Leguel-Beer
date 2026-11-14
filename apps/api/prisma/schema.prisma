@@ -30,6 +30,7 @@ model Profile {
   orders          Order[]
   idempotencyKeys IdempotencyKey[]
   statusChanges   OrderStatusHistory[] @relation("OrderStatusChangedBy")
+  addresses       Address[]
 
   @@map("profiles")
 }
@@ -334,4 +335,32 @@ model DeliverySettings {
   updatedAt                DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@map("delivery_settings")
+}
+
+/// Endereço de entrega do cliente (dado pessoal): até 5 por perfil, um padrão. Apagar o perfil apaga os endereços; o pedido guarda uma cópia própria. Latitude, longitude e distância vêm da API (serviço de mapas), nunca do site.
+model Address {
+  id                   String   @id @default(uuid()) @db.Uuid
+  profileId            String   @map("profile_id") @db.Uuid
+  profile              Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  nickname             String?
+  zip                  String
+  street               String
+  number               String
+  complement           String?
+  district             String
+  city                 String
+  state                String
+  isDefault            Boolean  @default(false) @map("is_default")
+  latitude             Float
+  longitude            Float
+  /// Distância de rota até a origem usada, em metros; nulo quando não há rota (fora da área).
+  distanceMeters       Int?     @map("distance_meters")
+  /// Origem (cervejaria) usada no cálculo, para recalcular se ela mudar.
+  routeOriginLatitude  Float    @map("route_origin_latitude")
+  routeOriginLongitude Float    @map("route_origin_longitude")
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt            DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([profileId, createdAt])
+  @@map("addresses")
 }
