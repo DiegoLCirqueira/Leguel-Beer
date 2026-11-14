@@ -15,6 +15,10 @@ class InMemoryOrderRepository implements OrderRepository {
 
   constructor(private readonly orders: ExpirableOrder[]) {}
 
+  async findDueOrderIds(): Promise<string[]> {
+    return [];
+  }
+
   async findForExpiration(orderId: string): Promise<ExpirableOrder | null> {
     return this.orders.find((order) => order.id === orderId) ?? null;
   }

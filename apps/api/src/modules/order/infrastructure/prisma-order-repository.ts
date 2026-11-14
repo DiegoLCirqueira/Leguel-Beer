@@ -15,6 +15,15 @@ const STATUS_BY_ROW: Record<OrderStatus, StatusDoPedido> = {
 export class PrismaOrderRepository implements OrderRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findDueOrderIds(at: Date): Promise<string[]> {
+    const rows = await this.prisma.order.findMany({
+      where: { status: "AWAITING_PAYMENT", expiresAt: { lte: at } },
+      select: { id: true },
+      orderBy: { expiresAt: "asc" },
+    });
+    return rows.map((row) => row.id);
+  }
+
   async findForExpiration(orderId: string): Promise<ExpirableOrder | null> {
     const row = await this.prisma.order.findUnique({
       where: { id: orderId },

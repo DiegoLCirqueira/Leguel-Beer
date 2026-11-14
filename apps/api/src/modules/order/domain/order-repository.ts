@@ -9,6 +9,9 @@ export interface ExpirableOrder {
 }
 
 export interface OrderRepository {
+  /** Ids dos pedidos ainda aguardando pagamento cuja validade já passou em `at`. */
+  findDueOrderIds(at: Date): Promise<string[]>;
+
   findForExpiration(orderId: string): Promise<ExpirableOrder | null>;
 
   /**
