@@ -41,7 +41,14 @@ export class UpdateAddress {
     return this.addresses.update(ownerId, (current) => {
       const target = current.find((address) => address.id === addressId);
       if (!target) throw new NotFoundError();
-      const updated: Address = { ...target, ...input, ...recalculated };
+      // Campos opcionais ausentes no formulário são apagados, não herdados do endereço antigo.
+      const updated: Address = {
+        ...target,
+        ...input,
+        nickname: input.nickname,
+        complement: input.complement,
+        ...recalculated,
+      };
       return {
         addresses: current.map((address) => (address.id === addressId ? updated : address)),
         result: updated,
