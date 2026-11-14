@@ -3,6 +3,7 @@
 import type { CervejaCard } from "@leguele/shared";
 import { ArrowRight, Link2, Lock, UserRound } from "lucide-react";
 import { useState } from "react";
+import type { ItemLocal } from "@/lib/geladeira/estado";
 import {
   BarraFixa,
   BlocoDePreco,
@@ -15,6 +16,7 @@ import {
   DivisorOu,
   LojaHeader,
   LojaTabBar,
+  MolduraDaGeladeira,
   ProdutoHeader,
   Stepper,
   Skeleton,
@@ -27,6 +29,8 @@ const swatches = [
   { name: "superficie", className: "bg-superficie" },
   { name: "superficie-elevada", className: "bg-superficie-elevada" },
   { name: "veu", className: "bg-veu" },
+  { name: "fantasma", className: "bg-fantasma" },
+  { name: "sombra", className: "bg-sombra" },
   { name: "borda", className: "bg-borda" },
   { name: "borda-campo", className: "bg-borda-campo" },
   { name: "texto", className: "bg-texto" },
@@ -66,6 +70,11 @@ const cervejaEsgotada: CervejaCard = {
   quantidadeDisponivel: 0,
   esgotada: true,
 };
+
+const itensDaMoldura: ItemLocal[] = [
+  { cerveja: cervejaExemplo, quantidade: 6 },
+  { cerveja: cervejaEsgotada, quantidade: 1 },
+];
 
 const categories = [
   { id: "todas", label: "Todas", count: 16 },
@@ -162,6 +171,9 @@ export function ComponentShowcase() {
           max={12}
           rotulo="Quantidade de exemplo"
         />
+      </Section>
+      <Section title="Geladeira: moldura, prateleiras, garrafas e fantasmas">
+        <MolduraDaGeladeira itens={itensDaMoldura} />
       </Section>
       <Section title="Bottom sheet, toast e skeleton">
         <div className="flex flex-wrap gap-3">
