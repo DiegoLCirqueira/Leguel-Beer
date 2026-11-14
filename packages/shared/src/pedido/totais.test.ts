@@ -11,8 +11,8 @@ const config: ConfiguracaoDeEntrega = {
 
 describe("calcularTotais", () => {
   it("soma o subtotal e o frete (R$ 149,00 + R$ 13,00 = R$ 162,00)", () => {
-    // 5 km: 5,00 + 7,50 = 12,50, arredondado para R$ 13,00.
-    expect(calcularTotais({ distanciaMetros: 5_000, subtotalCentavos: 14_900 }, config)).toEqual({
+    // 5,2 km: 5,00 + 7,80 = 12,80, arredondado para R$ 13,00.
+    expect(calcularTotais({ distanciaMetros: 5_200, subtotalCentavos: 14_900 }, config)).toEqual({
       naArea: true,
       subtotalCentavos: 14_900,
       freteCentavos: 1_300,
