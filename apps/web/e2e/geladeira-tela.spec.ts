@@ -52,3 +52,23 @@ test("em 360x640, com a moldura encolhida, cada garrafa fantasma da Geladeira te
     }
   }
 });
+
+test("a fonte da faixa acompanha a largura da moldura, não a da janela", async ({ page }) => {
+  const medir = async (tamanho: { width: number; height: number }) => {
+    await page.setViewportSize(tamanho);
+    await page.goto("/geladeira");
+    const faixa = page.getByText("Toque no + para escolher uma IPA");
+    await expect(faixa).toBeVisible();
+    const moldura = (await page
+      .getByRole("region", { name: "IPA" })
+      .locator("xpath=..")
+      .boundingBox())!;
+    const fonte = await faixa.evaluate((e) => parseFloat(getComputedStyle(e).fontSize));
+    return { largura: moldura.width, fonte };
+  };
+
+  const pequena = await medir({ width: 360, height: 640 });
+  const grande = await medir({ width: 430, height: 932 });
+
+  expect(grande.fonte / pequena.fonte).toBeCloseTo(grande.largura / pequena.largura, 1);
+});
