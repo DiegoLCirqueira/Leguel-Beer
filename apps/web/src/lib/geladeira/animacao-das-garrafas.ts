@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export type Animacao = "queda" | "balanco" | "saida";
 
@@ -11,9 +11,16 @@ export type GarrafaAnimada<T extends GarrafaBase> = T & {
 };
 
 type Efeito = { animacao: Animacao; atraso: number };
-type Estado<T> = { assinatura: string; garrafas: T[]; efeitos: Map<string, Efeito> };
+type Estado<T> = {
+  assinatura: string;
+  garrafas: T[];
+  efeitos: Map<string, Efeito>;
+  /** Garrafas que saíram e ainda estão na tela, saindo. */
+  saindo: T[];
+};
 
 const ATRASO_DO_BALANCO_MS = 60;
+const DURACAO_DA_SAIDA_MS = 300;
 
 /** O que mudou da lista anterior para a atual: o que entra cai e o rótulo que cresceu balança. */
 function efeitosDaMudanca<T extends GarrafaBase>(anterior: T[], atual: T[]) {
@@ -37,7 +44,7 @@ function efeitosDaMudanca<T extends GarrafaBase>(anterior: T[], atual: T[]) {
 
 /**
  * Anima só a mudança: a garrafa que entra cai e as do rótulo que cresceu balançam. A primeira
- * leitura não anima, para a Geladeira abrir arrumada.
+ * leitura não anima, para a Geladeira abrir arrumada. A garrafa que sai fica 300 ms, saindo.
  */
 export function useAnimacaoDasGarrafas<T extends GarrafaBase>(garrafas: T[]): GarrafaAnimada<T>[] {
   // Quem chama monta a lista a cada render: o que conta é o conteúdo, não a identidade do array.
@@ -46,15 +53,35 @@ export function useAnimacaoDasGarrafas<T extends GarrafaBase>(garrafas: T[]): Ga
     assinatura,
     garrafas,
     efeitos: new Map(),
+    saindo: [],
   });
   let atual = anterior;
   if (assinatura !== anterior.assinatura) {
-    atual = { assinatura, garrafas, efeitos: efeitosDaMudanca(anterior.garrafas, garrafas) };
+    const chaves = new Set(garrafas.map((g) => g.chave));
+    const saindo = [...anterior.saindo, ...anterior.garrafas].filter((g) => !chaves.has(g.chave));
+    atual = {
+      assinatura,
+      garrafas,
+      efeitos: efeitosDaMudanca(anterior.garrafas, garrafas),
+      saindo: [...new Map(saindo.map((g) => [g.chave, g])).values()],
+    };
     setAnterior(atual);
   }
-  return garrafas.map((g) => ({
-    ...g,
-    animacao: atual.efeitos.get(g.chave)?.animacao,
-    atraso: atual.efeitos.get(g.chave)?.atraso ?? 0,
-  }));
+  const saindo = atual.saindo;
+  useEffect(() => {
+    if (saindo.length === 0) return;
+    const timer = setTimeout(
+      () => setAnterior((s) => (s.saindo === saindo ? { ...s, saindo: [] } : s)),
+      DURACAO_DA_SAIDA_MS,
+    );
+    return () => clearTimeout(timer);
+  }, [saindo]);
+  return [
+    ...garrafas.map((g) => ({
+      ...g,
+      animacao: atual.efeitos.get(g.chave)?.animacao,
+      atraso: atual.efeitos.get(g.chave)?.atraso ?? 0,
+    })),
+    ...saindo.map((g) => ({ ...g, animacao: "saida" as const, atraso: 0 })),
+  ];
 }
