@@ -19,9 +19,9 @@ export class QuoteShipping {
     const config = await this.settings.get();
     const subtotalCentavos = await this.fridgeSubtotal.subtotalCents(ownerId);
 
-    return calcularFrete(
-      { distanciaMetros: address.distanceMeters ?? 0, subtotalCentavos },
-      config,
-    );
+    // Sem rota até a cervejaria o endereço está fora da área, e a distância nunca é inventada.
+    if (address.distanceMeters === null) return { naArea: false };
+
+    return calcularFrete({ distanciaMetros: address.distanceMeters, subtotalCentavos }, config);
   }
 }
