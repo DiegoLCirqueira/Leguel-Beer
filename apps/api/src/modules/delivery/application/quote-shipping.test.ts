@@ -83,4 +83,24 @@ describe("QuoteShipping", () => {
 
     expect(await quote.execute("owner-1", "casa")).toEqual(expected);
   });
+
+  it("origem mudada: recalcula a distância na própria cotação, usa a nova e a guarda com a origem usada", async () => {
+    const newOrigin = { latitude: -9.7, longitude: -35.8 };
+    const { addresses, router, quote } = await setup({
+      distanceMeters: 5_200,
+      subtotalCents: 9_050,
+      settings: { ...SETTINGS, origem: newOrigin },
+    });
+
+    const result = await quote.execute("owner-1", "casa");
+
+    expect(router.received).toEqual([
+      { origin: newOrigin, destination: { latitude: -9.66, longitude: -35.74 } },
+    ]);
+    expect(result).toEqual({ naArea: true, freteCentavos: 1_700, gratis: false });
+    expect((await addresses.list("owner-1"))[0]).toMatchObject({
+      distanceMeters: 8_000,
+      routeOrigin: newOrigin,
+    });
+  });
 });
