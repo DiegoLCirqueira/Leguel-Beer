@@ -1,4 +1,4 @@
-import { listaDeEnderecosSchema } from "@leguele/shared";
+import { enderecoRespostaSchema, listaDeEnderecosSchema } from "@leguele/shared";
 import type { INestApplication } from "@nestjs/common";
 import { APP_FILTER, APP_PIPE } from "@nestjs/core";
 import { Test } from "@nestjs/testing";
@@ -85,5 +85,40 @@ describe("endereços do cliente (HTTP, banco real)", () => {
       message: "A entrega está indisponível no momento. Tente de novo em instantes.",
     });
     expect(JSON.stringify(response.body)).not.toMatch(/stack|DeliverySettingsNotConfigured|at \w/);
+  });
+
+  const form = {
+    cep: "57035-000",
+    rua: "Rua do Sol",
+    numero: "100",
+    bairro: "Farol",
+    cidade: "Maceió",
+    uf: "AL",
+  };
+
+  const create = (body: object, token = tokens.customer()) =>
+    request(app.getHttpServer())
+      .post("/me/enderecos")
+      .set({ Authorization: `Bearer ${token}` })
+      .send(body);
+
+  it("salva o primeiro endereço como padrão e grava as coordenadas calculadas pela API, ignorando as do corpo", async () => {
+    const response = await create({ ...form, latitude: 10, longitude: 20, distanciaMetros: 1 });
+
+    expect(response.status).toBe(201);
+    expect(enderecoRespostaSchema.parse(response.body)).toMatchObject({
+      cep: "57035000",
+      rua: "Rua do Sol",
+      padrao: true,
+      foraDaArea: false,
+    });
+    const [saved] = await prisma.address.findMany();
+    expect(saved).toMatchObject({
+      profileId: tokens.customerId,
+      latitude: -9.66,
+      longitude: -35.74,
+      distanceMeters: 5_200,
+      isDefault: true,
+    });
   });
 });
