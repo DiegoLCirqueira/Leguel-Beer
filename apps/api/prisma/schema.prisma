@@ -160,6 +160,9 @@ model Order {
   reservations      StockReservation[]
   pendingDeductions FridgePendingDeduction[]
   idempotencyKey    IdempotencyKey?
+  payments          Payment[]
+  paymentEvents     PaymentEvent[]
+  paymentMarks      PaymentMark[]
 
   @@index([profileId, createdAt(sort: Desc)])
   @@index([status, expiresAt])
@@ -248,4 +251,65 @@ model IdempotencyKey {
   @@unique([profileId, key])
   @@index([expiresAt])
   @@map("idempotency_keys")
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REFUSED
+  CANCELLED
+}
+
+enum PaymentMarkKind {
+  /// Aprovado depois do cancelamento: reembolso manual.
+  AFTER_CANCELLATION
+  /// Outro pagamento aprovado para pedido já pago: reembolso manual.
+  DUPLICATE
+  /// Pagamento de outro pedido ou com principal diferente do total.
+  DIVERGENT
+}
+
+/// Cobrança do pedido no gateway. Um pedido pode ter várias (troca de forma de pagamento); o efeito da aprovação é aplicado uma vez por pagamento. Nunca guarda token nem dados do cartão.
+model Payment {
+  id               String        @id @default(uuid()) @db.Uuid
+  orderId          String        @map("order_id") @db.Uuid
+  order            Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  gatewayPaymentId String        @unique @map("gateway_payment_id")
+  method           PaymentMethod
+  status           PaymentStatus @default(PENDING)
+  /// Hora da aprovação no gateway (vale para decidir a validade), não a do aviso.
+  approvedAt       DateTime?     @map("approved_at") @db.Timestamptz(3)
+  createdAt        DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([orderId])
+  @@map("payments")
+}
+
+/// Aviso do gateway já processado: o id do evento é único, e o evento repetido não repete nada. Fica mesmo sem pedido.
+model PaymentEvent {
+  id               String   @id @default(uuid()) @db.Uuid
+  gatewayEventId   String   @unique @map("gateway_event_id")
+  gatewayPaymentId String   @map("gateway_payment_id")
+  orderId          String?  @map("order_id") @db.Uuid
+  order            Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([orderId])
+  @@index([gatewayPaymentId])
+  @@map("payment_events")
+}
+
+/// Marca que o admin vê no detalhe do pedido.
+model PaymentMark {
+  id               String          @id @default(uuid()) @db.Uuid
+  orderId          String          @map("order_id") @db.Uuid
+  order            Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  gatewayPaymentId String          @map("gateway_payment_id")
+  kind             PaymentMarkKind
+  createdAt        DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@unique([gatewayPaymentId, kind])
+  @@index([orderId])
+  @@map("payment_marks")
 }

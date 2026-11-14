@@ -66,7 +66,9 @@ describe("regras do schema de pagamentos, eventos e marcas (banco real)", () => 
     await expect(
       prisma.payment.create({ data: pagamento({ status: "PENDING", approvedAt: agora }) }),
     ).rejects.toThrow();
-    await expect(prisma.payment.create({ data: pagamento({ status: "APPROVED" }) })).rejects.toThrow();
+    await expect(
+      prisma.payment.create({ data: pagamento({ status: "APPROVED" }) }),
+    ).rejects.toThrow();
     await prisma.payment.create({ data: pagamento({ status: "APPROVED", approvedAt: agora }) });
   });
 

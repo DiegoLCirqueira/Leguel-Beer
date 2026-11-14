@@ -154,6 +154,8 @@ describe("regras do schema de reservas, baixas pendentes e idempotência (banco 
   it("um pedido nasce de uma única chave", async () => {
     await prisma.idempotencyKey.create({ data: chave() });
 
-    await expect(prisma.idempotencyKey.create({ data: chave({ key: "outra-chave-1234567" }) })).rejects.toThrow();
+    await expect(
+      prisma.idempotencyKey.create({ data: chave({ key: "outra-chave-1234567" }) }),
+    ).rejects.toThrow();
   });
 });
