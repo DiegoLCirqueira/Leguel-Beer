@@ -86,6 +86,11 @@ export function GeladeiraProvider({
   const [ajustes, setAjustes] = useState<AjusteDaGeladeira[]>([]);
   // Entrar e sair redirecionam: a mudança de página é o sinal para olhar a sessão de novo.
   const pagina = usePathname();
+  // A página de agora, para a resposta de uma chamada em voo saber se ainda é a dela.
+  const paginaAtual = useRef(pagina);
+  useEffect(() => {
+    paginaAtual.current = pagina;
+  }, [pagina]);
 
   const aplicar = useCallback((proximo: EstadoDaGeladeira) => {
     atual.current = proximo;
@@ -130,8 +135,10 @@ export function GeladeiraProvider({
     if (!conta || atual.current.itens.length === 0) return;
     const antes = versao.current;
     const resultado = await conta.validar(paraRequest(atual.current)).catch(() => undefined);
-    // Mudança feita enquanto a validação estava em voo: a resposta é antiga.
+    // Mudança feita enquanto a validação estava em voo, ou saída da Geladeira antes da resposta
+    // (os avisos não seriam vistos): a resposta é descartada, nem preço nem aviso.
     if (resultado?.tipo !== "ok" || versao.current !== antes) return;
+    if (paginaAtual.current !== "/geladeira") return;
     setAjustes(resultado.resposta.ajustes);
     aplicar(aplicarResposta(atual.current, resultado.resposta));
   }, [conta, aplicar]);
