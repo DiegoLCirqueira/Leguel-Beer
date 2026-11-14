@@ -132,3 +132,27 @@ for (const [movimento, esperado] of [
     for (const a of animacoes) expect(a.propriedades).toEqual(["opacity", "transform"]);
   });
 }
+
+test.describe("esqueleto de carregamento (HTML do servidor, sem JavaScript)", () => {
+  test.use({ javaScriptEnabled: false });
+
+  for (const tamanho of TAMANHOS) {
+    test(`em ${tamanho.width}x${tamanho.height} o esqueleto cabe entre o header e a barra, sem rolagem`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(tamanho);
+      await page.goto("/geladeira");
+
+      await expect(page.getByRole("status")).toHaveText("Carregando a Geladeira");
+      const esqueleto = page.locator("main .animate-pulse");
+      const caixa = (await esqueleto.boundingBox())!;
+      const barra = (await page.getByRole("navigation").last().boundingBox())!;
+      expect(caixa.y + caixa.height).toBeLessThanOrEqual(barra.y + 1);
+      expect(caixa.width / caixa.height).toBeCloseTo(710 / 1573, 2);
+      const rolagem = await page.evaluate(
+        () => document.documentElement.scrollHeight - document.documentElement.clientHeight,
+      );
+      expect(rolagem).toBeLessThanOrEqual(0);
+    });
+  }
+});
