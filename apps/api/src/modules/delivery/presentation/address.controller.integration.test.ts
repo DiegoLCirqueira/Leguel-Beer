@@ -283,4 +283,31 @@ describe("endereços do cliente (HTTP, banco real)", () => {
 
     expect(response.status).toBe(401);
   });
+
+  it("a lista traz só os endereços do cliente do token, nunca os de outro", async () => {
+    const otherId = crypto.randomUUID();
+    await prisma.profile.create({ data: { id: otherId, email: "outro2@leguele.test" } });
+    await prisma.address.create({
+      data: {
+        profileId: otherId,
+        zip: "57035000",
+        street: "Rua do Outro",
+        number: "1",
+        district: "Farol",
+        city: "Maceió",
+        state: "AL",
+        isDefault: true,
+        latitude: -9.6,
+        longitude: -35.7,
+        distanceMeters: 1_000,
+        routeOriginLatitude: -9.6649,
+        routeOriginLongitude: -35.7313,
+      },
+    });
+    await create(form);
+
+    const response = await list(tokens.customer());
+
+    expect(response.body.map((item: { rua: string }) => item.rua)).toEqual(["Rua do Sol"]);
+  });
 });
