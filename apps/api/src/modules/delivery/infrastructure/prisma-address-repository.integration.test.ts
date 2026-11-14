@@ -40,4 +40,47 @@ describe("PrismaAddressRepository (banco real)", () => {
 
     expect(await addresses.list(ownerId)).toEqual([address]);
   });
+
+  it("troca o endereço padrão numa gravação só, sem ferir o índice de padrão único", async () => {
+    const casa = anAddress({ id: crypto.randomUUID(), ownerId, isDefault: true, createdAt: at(8) });
+    const trabalho = anAddress({ id: crypto.randomUUID(), ownerId, createdAt: at(9) });
+    await save(ownerId, casa, trabalho);
+
+    // O novo padrão vem primeiro na gravação: sem limpar o padrão antigo antes, o índice único recusaria.
+    await save(ownerId, { ...trabalho, isDefault: true }, { ...casa, isDefault: false });
+
+    expect((await addresses.list(ownerId)).map(({ id, isDefault }) => ({ id, isDefault }))).toEqual(
+      [
+        { id: casa.id, isDefault: false },
+        { id: trabalho.id, isDefault: true },
+      ],
+    );
+  });
+
+  it("remove do banco os endereços que saíram da lista gravada", async () => {
+    const casa = anAddress({ id: crypto.randomUUID(), ownerId, isDefault: true, createdAt: at(8) });
+    const trabalho = anAddress({ id: crypto.randomUUID(), ownerId, createdAt: at(9) });
+    await save(ownerId, casa, trabalho);
+
+    await save(ownerId, { ...trabalho, isDefault: true });
+
+    expect((await addresses.list(ownerId)).map(({ id }) => id)).toEqual([trabalho.id]);
+  });
+
+  it("nunca lê nem altera os endereços de outro cliente", async () => {
+    const mine = anAddress({ id: crypto.randomUUID(), ownerId, isDefault: true });
+    const theirs = anAddress({
+      id: crypto.randomUUID(),
+      ownerId: otherOwnerId,
+      isDefault: true,
+      street: "Rua do Outro",
+    });
+    await save(otherOwnerId, theirs);
+
+    await save(ownerId, mine);
+    await save(ownerId);
+
+    expect(await addresses.list(ownerId)).toEqual([]);
+    expect(await addresses.list(otherOwnerId)).toEqual([theirs]);
+  });
 });
