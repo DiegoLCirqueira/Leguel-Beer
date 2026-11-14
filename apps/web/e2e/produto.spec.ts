@@ -32,7 +32,7 @@ test("a ficha da Maré Alta mostra nome, estilo, selo, ficha técnica, preço co
   await expect(page.locator("s")).toContainText(/R\$\s*36,90/);
   await expect(page.getByText("-13%")).toBeVisible();
   await expect(page.getByRole("heading", { level: 2, name: "Sobre a cerveja" })).toBeVisible();
-  await expect(page.getByText("Frete grátis em compras acima de R$ 150,00")).toBeVisible();
+  await expect(page.getByText("Frete grátis em compras a partir de R$ 150,00")).toBeVisible();
   await expect(page.getByText(/em estoque!/)).toHaveCount(0);
 });
 
@@ -81,7 +81,7 @@ test("o seletor sobe de 1 até a quantidade e o botão fixo fica no pé da tela,
   expect(botao?.y ?? 0).toBeGreaterThan(844 - 100);
 
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-  const frete = await page.getByText("Frete grátis em compras acima de R$ 150,00").boundingBox();
+  const frete = await page.getByText("Frete grátis em compras a partir de R$ 150,00").boundingBox();
   expect((frete?.y ?? 0) + (frete?.height ?? 0)).toBeLessThanOrEqual(botao?.y ?? 0);
 });
 
