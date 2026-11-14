@@ -74,6 +74,36 @@ describe("GET /catalogo (banco real)", () => {
       },
     });
 
+  /** Reserva `quantity` unidades de um pedido aguardando pagamento ainda dentro da validade. */
+  async function reserveUnits(beerId: string, quantity: number, number: string) {
+    const profile = await prisma.profile.create({
+      data: { id: crypto.randomUUID(), email: `${number}@x.test` },
+    });
+    const expiresAt = new Date(Date.now() + 20 * 60_000);
+    const order = await prisma.order.create({
+      data: {
+        number,
+        profileId: profile.id,
+        paymentMethod: "PIX",
+        subtotalCents: 100,
+        shippingCents: 0,
+        totalCents: 100,
+        expiresAt,
+        customerName: "Ana",
+        customerPhone: "82999990000",
+        shipZip: "57035000",
+        shipStreet: "Rua do Sol",
+        shipNumber: "1",
+        shipDistrict: "Farol",
+        shipCity: "Maceió",
+        shipState: "AL",
+      },
+    });
+    await prisma.stockReservation.create({
+      data: { orderId: order.id, beerId, quantity, expiresAt },
+    });
+  }
+
   const get = (query = "") => request(app.getHttpServer()).get(`/catalogo${query}`);
   const getDestaques = () => request(app.getHttpServer()).get("/catalogo/destaques");
   const getDetalhe = (slug: string) => request(app.getHttpServer()).get(`/catalogo/${slug}`);
@@ -181,6 +211,22 @@ describe("GET /catalogo (banco real)", () => {
     expect(soDisponiveis.body.itens.map((item: { slug: string }) => item.slug)).toEqual([
       "disponivel-cara",
     ]);
+  });
+
+  it("cerveja com todo o estoque reservado aparece esgotada no catálogo e no produto", async () => {
+    const reservada = await addBeer("ipa", "toda-reservada", { stock: 3 });
+    await addBeer("ipa", "livre", { stock: 3 });
+    await reserveUnits(reservada.id, 3, "#LB200001");
+
+    const lista = await get("?ordem=menor-preco");
+    const detalhe = await getDetalhe("toda-reservada");
+
+    const porSlug = Object.fromEntries(
+      lista.body.itens.map((item: { slug: string }) => [item.slug, item]),
+    );
+    expect(porSlug["toda-reservada"]).toMatchObject({ quantidadeDisponivel: 0, esgotada: true });
+    expect(porSlug["livre"]).toMatchObject({ quantidadeDisponivel: 3, esgotada: false });
+    expect(detalhe.body).toMatchObject({ quantidadeDisponivel: 0, esgotada: true });
   });
 
   it("parâmetro repetido na URL é inválido e ignorado: ?categoria=ipa&categoria=frutas não filtra", async () => {

@@ -47,6 +47,7 @@ describe("PrismaBeerRepository (banco real)", () => {
         priceCents: 3200,
         featured: true,
         stock: 12,
+        reserved: 0,
         description: "Uma IPA cítrica e resinosa.",
         previousPriceCents: 3690,
         imageUrl: null,
