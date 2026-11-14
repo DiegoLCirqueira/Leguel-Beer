@@ -73,4 +73,17 @@ describe("endereços do cliente (HTTP, banco real)", () => {
     expect(response.status).toBe(200);
     expect(listaDeEnderecosSchema.parse(response.body)).toEqual([]);
   });
+
+  it("sem a configuração de entrega responde 503 DELIVERY_SETTINGS_MISSING, sem stack nem detalhe interno", async () => {
+    await prisma.deliverySettings.deleteMany();
+
+    const response = await list(tokens.customer());
+
+    expect(response.status).toBe(503);
+    expect(response.body).toEqual({
+      code: "DELIVERY_SETTINGS_MISSING",
+      message: "A entrega está indisponível no momento. Tente de novo em instantes.",
+    });
+    expect(JSON.stringify(response.body)).not.toMatch(/stack|DeliverySettingsNotConfigured|at \w/);
+  });
 });
