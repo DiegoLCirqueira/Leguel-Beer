@@ -84,7 +84,7 @@ describe("endereços do cliente (HTTP, banco real)", () => {
     expect(response.status).toBe(503);
     expect(response.body).toEqual({
       code: "DELIVERY_SETTINGS_MISSING",
-      message: "A entrega está indisponível no momento. Tente de novo em instantes.",
+      message: "Não conseguimos calcular o frete agora. Tente de novo em instantes.",
     });
     expect(JSON.stringify(response.body)).not.toMatch(/stack|DeliverySettingsNotConfigured|at \w/);
   });
