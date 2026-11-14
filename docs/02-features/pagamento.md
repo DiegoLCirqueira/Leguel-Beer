@@ -99,13 +99,13 @@ Funcionalidade: Pagamento com Pix e cartão
 - **Copiar código:** leva o código à área de transferência e mostra o toast "Código copiado". Se o navegador recusar, o código fica selecionado para o cliente copiar à mão.
 - **Aprovação sem recarregar:** sem WebSocket ([[ADR-002-hospedagem-api]]), a tela consulta o status do pedido a cada 5 s enquanto está aberta e visível, e também no botão "Já paguei". Pago: vai à confirmação.
 - **Expirado** (pergunta 2): ao zerar a contagem (ou ao abrir depois), a tela mostra "Pix expirado", "O tempo para pagamento se esgotou." e o botão "Refazer pedido", que leva ao checkout com a Geladeira como estava (novo pedido, nova reserva, novo Pix).
-- **Simular pagamento:** só com o gateway em modo de testes, a tela mostra "Simular pagamento", que pede ao gateway de testes a aprovação, para a demonstração do portfólio. A rota da API que faz isso exige a posse do pedido e é recusada pelo próprio servidor fora do modo de testes (não basta esconder o botão). O mesmo vale para o relógio adiantado usado nos testes: só existe no modo de testes.
+- **Simular pagamento:** só com o gateway em modo de testes, a tela mostra "Simular pagamento", que pede ao gateway de testes a aprovação, para a demonstração do portfólio. A rota da API que faz isso exige a posse do pedido, age só sobre aquele pedido do dono e é recusada pelo próprio servidor fora do modo de testes (não basta esconder o botão). O mesmo vale para o relógio adiantado usado nos testes: só existe no modo de testes, exige a posse e adianta o tempo só daquele pedido do dono; nunca muda o relógio da API para os outros pedidos nem para os outros clientes.
 
 ### Cartão (LB-58, tela 17)
 
 - **Formulário seguro do gateway:** número, nome, validade e CVV são digitados em campos do SDK do gateway; os dados do cartão nunca passam pela API nem ficam em log. Número do cartão e CVV nunca chegam à API. A API recebe só o token, as parcelas e o meio (bandeira), e não grava o token (nem no pedido, nem no registro de idempotência, nem em log). Na página, o token fica só na memória: nunca em armazenamento local, URL ou log. Voltar etapas ou recarregar pede o cartão de novo.
 - **Dados enviados ao gateway** (mínimo, Pix e cartão), em duas listas fechadas:
-  - **Dados pessoais permitidos:** e-mail e nome do cliente e, só se o gateway exigir (spike LB-54), o CPF. Nunca telefone, endereço, data de nascimento nem itens.
+  - **Dados pessoais permitidos** (nome e e-mail pendentes de confirmação do Diego, ver "Política de Privacidade"): e-mail e nome do cliente e, só se o gateway exigir (spike LB-54), o CPF. Nunca telefone, endereço, data de nascimento nem itens.
   - **Campos técnicos necessários:** valor, descrição "Pedido #LB…", a referência do pedido, a chave de idempotência e o meio de pagamento; no cartão, também o token, as parcelas e a bandeira; no Pix, o vencimento. A lista final de nomes de campo sai do spike LB-54.
   - Um teste captura a requisição enviada e falha se aparecer campo fora das duas listas. O token e o CPF não são gravados no banco nem aparecem em log.
 - **CPF do titular** (pergunta 4): só se o spike LB-54 mostrar que o gateway exige; pedido na etapa Pagamento, enviado ao gateway e não gravado na loja (perfil, pedido ou log). Se entrar, a Política ganha "o CPF vai ao processador de pagamento" ([[termos-privacidade]]).
@@ -144,7 +144,9 @@ Funcionalidade: Pagamento com Pix e cartão
 
 ### Política de Privacidade
 
-- "Com quem compartilhamos" ganha: "o processador de pagamento (Mercado Pago), que recebe seu nome, seu e-mail e, quando exigido, seu CPF, para processar o pagamento". Sem novo aceite, como em 12/11 ([[termos-privacidade]]): muda a data de "última atualização" de `/privacidade` e a versão no `LEGAL_VERSIONS` no dia em que o pagamento entrar no site. Recomendação aplicada, vetável.
+> [!warning] **Pendente de confirmação do Diego** (dado pessoal, LGPD, item 7): o envio do nome e do e-mail ao Mercado Pago e a mudança da Política sem novo aceite não valem como aplicados e não vão ao site antes da resposta (cartão "Decisões pendentes"). O CPF já tem a resposta 4 do Diego.
+
+- "Com quem compartilhamos" ganha: "o processador de pagamento (Mercado Pago), que recebe seu nome, seu e-mail e, quando exigido, seu CPF, para processar o pagamento". Sem novo aceite, como em 12/11 ([[termos-privacidade]]): muda a data de "última atualização" de `/privacidade` e a versão no `LEGAL_VERSIONS` no dia em que o pagamento entrar no site. Recomendação do Spec, pendente de confirmação do Diego.
 
 ### Ajuste previsto no admin
 
@@ -171,7 +173,7 @@ Funcionalidade: Pagamento com Pix e cartão
 - **Porta do gateway** (API): adaptador testado com respostas gravadas do modo de testes (Pix criado, aprovado, vencido; cartão aprovado e recusado; tabela de parcelas; erro e tempo esgotado), sem rede no CI; fake da porta para os casos de uso.
 - **Casos de uso** (API, repositório em memória e relógio fake): cobrar Pix e cartão (posse, pedido vencido recusado, troca de forma de pagamento); confirmar pagamento (aprovação, repetida 3 vezes, fora de ordem, aprovada dentro da validade com aviso depois dos 30 min, depois da validade, aprovada dentro da validade com as unidades já reservadas por outro pedido (cancela com a marca, sem baixa), recusa, pagamento de outro pedido ou com principal diferente, cartão de 3x com juros aprovado sem marca de divergência, segundo pagamento aprovado para pedido já pago marcado como duplicidade, dois eventos do mesmo pagamento sem marca de duplicidade); troca de forma de pagamento cancela a cobrança anterior no gateway fake; expiração consulta o gateway antes de cancelar (aprovado aplica, gateway fora do ar não cancela); borda da validade (29:59 vale, 30:00 venceu); expirar (31 min cancela, 10 min não muda, cron e leitura juntos cancelam uma vez).
 - **Aviso de pagamento** (HTTP, Supertest e banco real): assinatura válida, falsa e ausente; o mesmo evento 3 vezes; dois avisos simultâneos do mesmo evento e dois eventos diferentes do mesmo pagamento ao mesmo tempo (um pedido "Pago", uma baixa de estoque, uma da Geladeira, uma linha de histórico, nenhuma marca de duplicidade); falha forçada entre registrar o evento e dar baixa (nada gravado; o reenvio aplica tudo uma vez); logs sem dados de cartão nem pessoais.
-- **Modo de testes** (HTTP): a rota de simular pagamento e o relógio adiantado respondem recusa fora do modo de testes; dentro dele, exigem a posse do pedido (outro cliente, 404).
+- **Modo de testes** (HTTP): a rota de simular pagamento e o relógio adiantado respondem recusa fora do modo de testes; dentro dele, exigem a posse do pedido (outro cliente, 404) e só afetam aquele pedido: adiantar o relógio de um pedido não vence o pedido de outro cliente nem muda o disponível dos outros.
 - **Dados ao gateway** (API): a requisição capturada no gateway fake só tem campos das duas listas (dados pessoais permitidos e campos técnicos necessários); número do cartão e CVV nunca chegam à API; o token e o CPF não aparecem no banco nem nos logs.
 - **Estoque e Geladeira** (integração com banco real): aprovação converte a reserva em baixa uma vez; aprovação tardia com a última unidade já reservada por outro pedido não dá baixa e cancela; expiração libera a reserva; baixa pendente da Geladeira ([[pedidos-cliente]]).
 - **Telas** (componente, relógio controlado): contagem a partir do vencimento da API, token do cartão fora do armazenamento local e da URL, "Código copiado", consulta a cada 5 s e no "Já paguei", estado expirado, parcelas (1x, 2x, 3x) e recusa.
@@ -220,10 +222,10 @@ Recomendações aplicadas pelo Spec em 13/11; qualquer uma pode ser vetada.
 - **Aprovação tardia confere o estoque:** aprovada dentro da validade, mas com as unidades já reservadas por outro pedido depois do vencimento, cancela com reembolso manual em vez de vender além do estoque.
 - **Um efeito por pagamento, tudo numa transação,** nos avisos do gateway.
 - **Juros do parcelamento fora do total do pedido:** compara-se o principal.
-- **Mínimo ao gateway** (valor, descrição, e-mail, nome e CPF só se exigido) e o texto novo da Política, sem novo aceite.
+- **Mínimo ao gateway** (valor, descrição, e-mail, nome e CPF só se exigido) e o texto novo da Política, sem novo aceite. **Pendente de confirmação do Diego** (LGPD, item 7) quanto ao nome, ao e-mail e ao "sem novo aceite": não está aplicada.
 - **Token do cartão só em memória.**
 - **Consulta a cada 5 s e no "Já paguei"** no lugar do tempo real.
-- **"Simular pagamento" e relógio adiantado só no modo de testes**, recusados pelo servidor fora dele.
+- **"Simular pagamento" e relógio adiantado só no modo de testes**, recusados pelo servidor fora dele, e só no pedido do dono (o relógio nunca é global).
 - **Recusa mantém o pedido aguardando**, com troca de forma de pagamento dentro da validade.
 - **Validade de 30 minutos também para o cartão** (a do pedido, LB-56).
 - **Contagem pelo vencimento dado pela API.**
