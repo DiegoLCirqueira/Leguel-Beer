@@ -1,6 +1,10 @@
 import { ConflictException } from "@nestjs/common";
 import { CodedHttpError } from "../../../common/errors/coded-http-error.js";
-import { AddressLimitReachedError, AddressNotLocatedError } from "../domain/address-errors.js";
+import {
+  AddressConcurrentEditError,
+  AddressLimitReachedError,
+  AddressNotLocatedError,
+} from "../domain/address-errors.js";
 import { AddressOwnerNotFoundError } from "../domain/address-repository.js";
 import { DeliverySettingsNotConfiguredError } from "../domain/delivery-settings-repository.js";
 import { MapsUnavailableError } from "../domain/maps.js";
@@ -29,6 +33,9 @@ function toHttpError(error: unknown): unknown {
   }
   if (error instanceof AddressNotLocatedError) {
     return new CodedHttpError(422, "ADDRESS_NOT_LOCATED", error.message);
+  }
+  if (error instanceof AddressConcurrentEditError) {
+    return new CodedHttpError(409, "ADDRESS_CONCURRENT_EDIT", error.message);
   }
   if (error instanceof AddressOwnerNotFoundError) return new ConflictException();
   return error;
