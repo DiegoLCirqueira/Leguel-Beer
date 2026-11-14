@@ -25,7 +25,7 @@ describe("versão dos textos legais", () => {
 
   it("os Termos seguem na data da retirada do aviso de portfólio e as Entregas na do frete grátis a partir de R$ 150", () => {
     expect(TERMOS_ATUALIZADO_EM).toBe("2026-10-31");
-    expect(ENTREGAS_ATUALIZADO_EM).toBe("2026-11-12");
+    expect(ENTREGAS_ATUALIZADO_EM).toBe("2026-11-14");
   });
 
   it("a API grava como versão do aceite a mesma data que o site mostra em cada página", () => {
