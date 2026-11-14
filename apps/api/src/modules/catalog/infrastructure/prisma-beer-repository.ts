@@ -46,6 +46,13 @@ export class PrismaBeerRepository implements BeerRepository {
   /**
    * Unidades reservadas por cerveja: reservas ainda não liberadas nem consumidas e dentro da validade.
    * A reserva de um pedido vencido não conta, mesmo antes de o pedido ser cancelado.
+   *
+   * O estoque e as reservas são lidos em duas consultas, sem transação: o resultado serve só para
+   * exibir (catálogo, produto e Geladeira) e pode estar um instante defasado. Quem decide de verdade
+   * é a criação do pedido, que confere o disponível dentro da transação, com trava por cerveja.
+   *
+   * A validade é comparada com o relógio desta instância da API (`now`); no MVP há uma instância só,
+   * então não há diferença de relógio entre instâncias.
    */
   private async reservedByBeer(beerIds: readonly string[]): Promise<Map<string, number>> {
     if (beerIds.length === 0) return new Map();
