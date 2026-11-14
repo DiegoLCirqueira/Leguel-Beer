@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Put,
+} from "@nestjs/common";
 import {
   ApiCreatedResponse,
   ApiNoContentResponse,
@@ -76,7 +86,7 @@ export class AddressController {
   @ApiOkResponse({ description: "Endereço editado (formato `enderecoRespostaSchema`)." })
   async update(
     @CurrentUser() user: AuthorizedUser,
-    @Param("id") id: string,
+    @Param("id", ParseUUIDPipe) id: string,
     @Body() body: EnderecoFormDto,
   ): Promise<EnderecoResposta> {
     const updated = await withAddressErrors(() =>
@@ -93,7 +103,10 @@ export class AddressController {
       "Só o escolhido fica com o selo de padrão. Endereço de outro cliente responde 404.",
   })
   @ApiNoContentResponse({ description: "Endereço padrão trocado." })
-  async makeDefault(@CurrentUser() user: AuthorizedUser, @Param("id") id: string): Promise<void> {
+  async makeDefault(
+    @CurrentUser() user: AuthorizedUser,
+    @Param("id", ParseUUIDPipe) id: string,
+  ): Promise<void> {
     await withAddressErrors(() => this.setDefaultAddress.execute(user.id, id));
   }
 
@@ -105,7 +118,10 @@ export class AddressController {
       "Excluir o padrão torna padrão o endereço salvo mais recentemente. Endereço de outro cliente responde 404.",
   })
   @ApiNoContentResponse({ description: "Endereço excluído." })
-  async remove(@CurrentUser() user: AuthorizedUser, @Param("id") id: string): Promise<void> {
+  async remove(
+    @CurrentUser() user: AuthorizedUser,
+    @Param("id", ParseUUIDPipe) id: string,
+  ): Promise<void> {
     await withAddressErrors(() => this.deleteAddress.execute(user.id, id));
   }
 }
