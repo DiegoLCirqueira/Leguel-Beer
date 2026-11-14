@@ -164,4 +164,23 @@ describe("AddAddress", () => {
       { origin: ORIGIN, destination: { latitude: -9.66, longitude: -35.74 } },
     ]);
   });
+
+  it.each([
+    ["latitude fora da faixa", "geocoder", { latitude: 91, longitude: -35.74 }],
+    ["longitude fora da faixa", "geocoder", { latitude: -9.66, longitude: 181 }],
+    ["coordenada que não é número", "geocoder", { latitude: Number.NaN, longitude: -35.74 }],
+    ["distância negativa", "router", -1],
+    ["distância fracionária", "router", 12.5],
+    ["distância infinita", "router", Number.POSITIVE_INFINITY],
+  ] as const)(
+    "trata %s devolvida pelos mapas como serviço indisponível e não salva nada",
+    async (_nome, which, value) => {
+      const { addresses, geocoder, router, add } = setup();
+      (which === "geocoder" ? geocoder : router).respondWith(value as never);
+
+      await expect(add.execute("owner-1", input)).rejects.toBeInstanceOf(MapsUnavailableError);
+
+      expect(await addresses.list("owner-1")).toEqual([]);
+    },
+  );
 });
