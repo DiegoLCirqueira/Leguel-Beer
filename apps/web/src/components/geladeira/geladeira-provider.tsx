@@ -124,6 +124,18 @@ export function GeladeiraProvider({
     if (conta && lerMarca(CHAVE_DA_CONTA)) void enviar();
   }, [conta, enviar]);
 
+  // Convidado: ao abrir, a API confere preço e estoque da Geladeira local (não grava nada) e o que ela
+  // devolve vira a Geladeira, com os avisos. Falha da validação deixa tudo como estava.
+  const validarConvidado = useCallback(async () => {
+    if (!conta || atual.current.itens.length === 0) return;
+    const antes = versao.current;
+    const resultado = await conta.validar(paraRequest(atual.current)).catch(() => undefined);
+    // Mudança feita enquanto a validação estava em voo: a resposta é antiga.
+    if (resultado?.tipo !== "ok" || versao.current !== antes) return;
+    setAjustes(resultado.resposta.ajustes);
+    aplicar(aplicarResposta(atual.current, resultado.resposta));
+  }, [conta, aplicar]);
+
   // A cada página (inclusive depois de entrar ou sair, que redirecionam): com sessão, aplica a regra
   // ao entrar; sem sessão, apaga a cópia de quem acabou de sair.
   useEffect(() => {
@@ -136,8 +148,8 @@ export function GeladeiraProvider({
       const resultado = await conta.buscar().catch(() => undefined);
       if (!ativo || !resultado) return;
       if (resultado.tipo === "sem-sessao") {
-        if (sincronizada) sairDaConta();
-        return;
+        if (sincronizada) return sairDaConta();
+        return validarConvidado();
       }
       // Erro ou conta sem perfil: nada muda e nada fica pendente (a cópia local não vale mais que a conta).
       if (resultado.tipo !== "ok") return;
@@ -159,7 +171,7 @@ export function GeladeiraProvider({
     return () => {
       ativo = false;
     };
-  }, [conta, enviar, aplicar, sairDaConta, pagina]);
+  }, [conta, enviar, aplicar, sairDaConta, validarConvidado, pagina]);
 
   // Estável: a tela o usa na limpeza de um efeito.
   const limparAjustes = useCallback(() => setAjustes([]), []);

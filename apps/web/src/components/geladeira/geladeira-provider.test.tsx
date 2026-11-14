@@ -1,7 +1,7 @@
 import type { AjusteDaGeladeira, CervejaCard, GeladeiraResponse } from "@leguele/shared";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const caminho = vi.hoisted(() => ({ atual: "/" }));
 vi.mock("next/navigation", () => ({ usePathname: () => caminho.atual }));
@@ -385,6 +385,10 @@ describe("GeladeiraProvider com a conta", () => {
   });
 
   describe("convidado: revalidação ao abrir (7b)", () => {
+    beforeEach(() => {
+      caminho.atual = "/geladeira";
+    });
+
     const reduzida: ResultadoDaConta = {
       tipo: "ok",
       resposta: {
@@ -418,6 +422,21 @@ describe("GeladeiraProvider com a conta", () => {
       });
       expect(conta.enviar).not.toHaveBeenCalled();
       expect(localStorage.getItem(CHAVE_DA_GELADEIRA)).toContain('"quantidade":2');
+    });
+
+    it("fora da /geladeira o convidado não revalida (a API é chamada ao abrir a Geladeira)", async () => {
+      caminho.atual = "/catalogo";
+      guardarLocal(3);
+      const conta = contaFalsa({ tipo: "sem-sessao" }, ok([]), reduzida);
+
+      abrirComConta(conta);
+      await vi.waitFor(() => expect(conta.buscar).toHaveBeenCalled());
+      await act(async () => {
+        await new Promise((resolver) => setTimeout(resolver, 0));
+      });
+
+      expect(conta.validar).not.toHaveBeenCalled();
+      expect(screen.getByTestId("total")).toHaveTextContent("3");
     });
 
     it("Geladeira vazia não chama a validação", async () => {
