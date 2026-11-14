@@ -310,4 +310,24 @@ describe("endereços do cliente (HTTP, banco real)", () => {
 
     expect(response.body.map((item: { rua: string }) => item.rua)).toEqual(["Rua do Sol"]);
   });
+
+  const remove = (id: string, token = tokens.customer()) =>
+    request(app.getHttpServer())
+      .delete(`/me/enderecos/${id}`)
+      .set({ Authorization: `Bearer ${token}` });
+
+  it("exclui o endereço padrão e torna padrão o mais recente", async () => {
+    const { body: casa } = await create(form);
+    const { body: trabalho } = await create({ ...form, rua: "Rua da Praia" });
+    const { body: sitio } = await create({ ...form, rua: "Rua do Sítio" });
+
+    const response = await remove(casa.id);
+
+    expect(response.status).toBe(204);
+    const remaining = await list(tokens.customer());
+    expect(remaining.body.map((a: { id: string; padrao: boolean }) => [a.id, a.padrao])).toEqual([
+      [trabalho.id, false],
+      [sitio.id, true],
+    ]);
+  });
 });
