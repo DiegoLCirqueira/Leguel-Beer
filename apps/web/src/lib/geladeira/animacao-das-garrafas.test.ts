@@ -66,6 +66,21 @@ describe("useAnimacaoDasGarrafas", () => {
     expect(result.current.map((g) => g.chave)).toEqual(["a#0"]);
   });
 
+  it("dois cortes rápidos: a garrafa que já está saindo mantém a rodada em que saiu", () => {
+    const { result, rerender } = renderHook(({ lista }) => useAnimacaoDasGarrafas(lista), {
+      initialProps: { lista: [garrafa("a", 0), garrafa("a", 1), garrafa("a", 2)] },
+    });
+    rerender({ lista: [garrafa("a", 0), garrafa("a", 1)] });
+    const rodadaDaPrimeira = result.current.find((g) => g.chave === "a#2")!.rodada;
+
+    rerender({ lista: [garrafa("a", 0)] });
+
+    const saindo = result.current.filter((g) => g.animacao === "saida");
+    expect(saindo.map((g) => g.chave)).toEqual(["a#2", "a#1"]);
+    expect(saindo.find((g) => g.chave === "a#2")!.rodada).toBe(rodadaDaPrimeira);
+    expect(saindo.find((g) => g.chave === "a#1")!.rodada).toBeGreaterThan(rodadaDaPrimeira);
+  });
+
   it("com movimento reduzido nada anima: a garrafa nova só aparece e a que sai some na hora", () => {
     window.matchMedia = (consulta: string) =>
       ({ matches: consulta === "(prefers-reduced-motion: reduce)" }) as MediaQueryList;
