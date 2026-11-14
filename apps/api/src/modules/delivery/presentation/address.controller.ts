@@ -1,5 +1,11 @@
-import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
-import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put } from "@nestjs/common";
+import {
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from "@nestjs/swagger";
 import {
   enderecoFormSchema,
   enderecoRespostaSchema,
@@ -10,6 +16,7 @@ import type { AuthorizedUser } from "../../account/application/authorize-request
 import { Authenticated, CurrentUser } from "../../account/presentation/access.decorators.js";
 import { zodDto } from "../../../common/validation/zod-dto.js";
 import { AddAddress } from "../application/add-address.js";
+import { DeleteAddress } from "../application/delete-address.js";
 import { UpdateAddress } from "../application/update-address.js";
 import { ListAddresses } from "../application/list-addresses.js";
 import { withAddressErrors } from "./address-http-errors.js";
@@ -26,6 +33,7 @@ export class AddressController {
     private readonly listAddresses: ListAddresses,
     private readonly addAddress: AddAddress,
     private readonly updateAddress: UpdateAddress,
+    private readonly deleteAddress: DeleteAddress,
   ) {}
 
   @Get()
@@ -73,5 +81,17 @@ export class AddressController {
       this.updateAddress.execute(user.id, id, toAddressInput(body)),
     );
     return enderecoRespostaSchema.parse(toEnderecoResposta(updated));
+  }
+
+  @Delete(":id")
+  @HttpCode(204)
+  @ApiOperation({
+    summary: "Exclui um endereço",
+    description:
+      "Excluir o padrão torna padrão o endereço salvo mais recentemente. Endereço de outro cliente responde 404.",
+  })
+  @ApiNoContentResponse({ description: "Endereço excluído." })
+  async remove(@CurrentUser() user: AuthorizedUser, @Param("id") id: string): Promise<void> {
+    await withAddressErrors(() => this.deleteAddress.execute(user.id, id));
   }
 }

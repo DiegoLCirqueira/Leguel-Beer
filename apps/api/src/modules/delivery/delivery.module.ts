@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { PrismaService } from "../../common/prisma/prisma.service.js";
 import { randomUUID } from "node:crypto";
 import { AddAddress } from "./application/add-address.js";
+import { DeleteAddress } from "./application/delete-address.js";
 import { ListAddresses } from "./application/list-addresses.js";
 import { UpdateAddress } from "./application/update-address.js";
 import { ADDRESS_REPOSITORY, DELIVERY_SETTINGS_REPOSITORY } from "./delivery.tokens.js";
@@ -49,6 +50,11 @@ import { AddressController } from "./presentation/address.controller.js";
         settings: DeliverySettingsRepository,
       ) => new UpdateAddress(addresses, geocoder, router, settings),
       inject: [ADDRESS_REPOSITORY, GEOCODER, ROUTE_CALCULATOR, DELIVERY_SETTINGS_REPOSITORY],
+    },
+    {
+      provide: DeleteAddress,
+      useFactory: (addresses: AddressRepository) => new DeleteAddress(addresses),
+      inject: [ADDRESS_REPOSITORY],
     },
     {
       provide: ListAddresses,
