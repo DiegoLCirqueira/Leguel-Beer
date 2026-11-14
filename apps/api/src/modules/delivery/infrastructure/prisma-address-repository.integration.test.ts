@@ -108,4 +108,21 @@ describe("PrismaAddressRepository (banco real)", () => {
 
     expect(await addresses.list(ownerId)).toEqual([casa, trabalho]);
   });
+
+  it("recusa gravar um id que já é de outro cliente, sem tocar na linha dele", async () => {
+    const theirs = anAddress({
+      id: crypto.randomUUID(),
+      ownerId: otherOwnerId,
+      isDefault: true,
+      street: "Rua do Outro",
+    });
+    await save(otherOwnerId, theirs);
+
+    await expect(
+      save(ownerId, anAddress({ id: theirs.id, ownerId, isDefault: true, street: "Roubada" })),
+    ).rejects.toThrow();
+
+    expect(await addresses.list(otherOwnerId)).toEqual([theirs]);
+    expect(await addresses.list(ownerId)).toEqual([]);
+  });
 });
