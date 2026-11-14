@@ -64,6 +64,36 @@ describe("POST /geladeira/validar (banco real)", () => {
       },
     });
 
+  /** Reserva `quantity` unidades de um pedido aguardando pagamento ainda dentro da validade. */
+  async function reserveUnits(beerId: string, quantity: number, number: string) {
+    const profile = await prisma.profile.create({
+      data: { id: crypto.randomUUID(), email: `${number}@x.test` },
+    });
+    const expiresAt = new Date(Date.now() + 20 * 60_000);
+    const order = await prisma.order.create({
+      data: {
+        number,
+        profileId: profile.id,
+        paymentMethod: "PIX",
+        subtotalCents: 100,
+        shippingCents: 0,
+        totalCents: 100,
+        expiresAt,
+        customerName: "Ana",
+        customerPhone: "82999990000",
+        shipZip: "57035000",
+        shipStreet: "Rua do Sol",
+        shipNumber: "1",
+        shipDistrict: "Farol",
+        shipCity: "Maceió",
+        shipState: "AL",
+      },
+    });
+    await prisma.stockReservation.create({
+      data: { orderId: order.id, beerId, quantity, expiresAt },
+    });
+  }
+
   const validar = (body: unknown) =>
     request(app.getHttpServer())
       .post("/geladeira/validar")
@@ -89,6 +119,29 @@ describe("POST /geladeira/validar (banco real)", () => {
     expect(body.ajustes).toEqual([]);
     expect(body.quantidadeTotal).toBe(3);
     expect(body.subtotalCentavos).toBe(9050);
+  });
+
+  it("desconta as reservas: reduz a quantidade ao que sobra e tira a cerveja toda reservada", async () => {
+    const parcial = await addBeer("parcial", { name: "Parcial", stock: 5 });
+    const total = await addBeer("total", { name: "Total", stock: 2 });
+    await reserveUnits(parcial.id, 3, "#LB200002");
+    await reserveUnits(total.id, 2, "#LB200003");
+
+    const response = await validar({
+      itens: [
+        { cervejaId: parcial.id, quantidade: 4, precoVistoCentavos: 3200 },
+        { cervejaId: total.id, quantidade: 1, precoVistoCentavos: 3200 },
+      ],
+    });
+
+    const body = geladeiraResponseSchema.parse(response.body);
+    expect(body.itens.map((item) => [item.cerveja.nome, item.quantidade])).toEqual([
+      ["Parcial", 2],
+    ]);
+    expect(body.ajustes.map((ajuste) => ajuste.tipo).sort()).toEqual([
+      "indisponivel",
+      "quantidade-reduzida",
+    ]);
   });
 
   it("id que não é UUID ou que não existe vira ajuste indisponível sem nome, nunca erro 500", async () => {
