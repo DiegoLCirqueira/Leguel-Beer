@@ -7,7 +7,7 @@ import { StyleBadge } from "./style-badge";
 
 export type LinhaDoResumoProps = {
   item: { cerveja: CervejaCard; quantidade: number };
-  /** Recebe a quantidade pedida, mesmo acima do limite: quem usa decide o aviso. */
+  /** Recebe a quantidade pedida, mesmo acima do limite (quem usa decide o aviso) e 0 no "−" com 1 unidade. */
   aoAlterar: (quantidade: number) => void;
   aoRemover: () => void;
 };
@@ -36,6 +36,7 @@ export function LinhaDoResumo({ item, aoAlterar, aoRemover }: LinhaDoResumoProps
         <div className="flex items-center gap-2">
           <Stepper
             valor={quantidade}
+            min={0}
             aoAlterar={aoAlterar}
             rotulo={`Quantidade de ${cerveja.nome}`}
           />

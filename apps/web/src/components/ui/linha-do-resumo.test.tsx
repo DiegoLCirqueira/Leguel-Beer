@@ -69,4 +69,13 @@ describe("LinhaDoResumo", () => {
 
     expect(aoAlterar).toHaveBeenCalledWith(10);
   });
+
+  it('o "−" com 1 unidade fica ativo e pede 0, para a cerveja sair (spec LB-50)', async () => {
+    const aoAlterar = vi.fn();
+    renderizar({ item: { cerveja: mare, quantidade: 1 }, aoAlterar });
+
+    await userEvent.click(screen.getByRole("button", { name: "Diminuir quantidade" }));
+
+    expect(aoAlterar).toHaveBeenCalledWith(0);
+  });
 });

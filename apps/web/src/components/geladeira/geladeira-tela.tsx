@@ -30,18 +30,35 @@ export function GeladeiraTela() {
   const [toast, setToast] = useState<{ mensagem: string; desfazer?: Desfazer } | null>(null);
   const { quantidadeTotal, subtotalCentavos } = resumirGeladeira(estado.itens);
   const comResumo = pronta && estado.itens.length > 0;
+  const removerComToast = (id: string) => {
+    const nome = estado.itens.find((i) => i.cerveja.id === id)?.cerveja.nome;
+    const d = remover(id);
+    if (d) setToast({ mensagem: `${nome} saiu da geladeira`, desfazer: d });
+  };
+  const avisoRapido = toast ? (
+    <Toast
+      mensagem={toast.mensagem}
+      acao={
+        toast.desfazer
+          ? { rotulo: "Desfazer", aoAcionar: () => desfazer(toast.desfazer!) }
+          : undefined
+      }
+      aoFechar={() => setToast(null)}
+      className="z-[60]"
+    />
+  ) : null;
+  // Com o sheet aberto o foco fica preso nele: o toast entra no sheet para o "Desfazer" ter foco.
+  const sheetComToast = comResumo && !larga && sheetAberto;
   const linhas = (
     <LinhasDoResumo
       itens={estado.itens}
       aoAlterar={(id, quantidade) => {
+        // "−" com 1 unidade pede 0: a cerveja sai, como em "Remover".
+        if (quantidade < 1) return removerComToast(id);
         const { limite } = alterarQuantidade(id, quantidade);
         if (limite !== undefined) setToast({ mensagem: mensagemDoLimite(limite) });
       }}
-      aoRemover={(id) => {
-        const nome = estado.itens.find((i) => i.cerveja.id === id)?.cerveja.nome;
-        const d = remover(id);
-        if (d) setToast({ mensagem: `${nome} saiu da geladeira`, desfazer: d });
-      }}
+      aoRemover={removerComToast}
     />
   );
   return (
@@ -83,21 +100,11 @@ export function GeladeiraTela() {
             rodape={<FechamentoDoResumo itens={estado.itens} />}
           >
             {linhas}
+            {avisoRapido}
           </BottomSheet>
         </>
       ) : null}
-      {toast ? (
-        <Toast
-          mensagem={toast.mensagem}
-          acao={
-            toast.desfazer
-              ? { rotulo: "Desfazer", aoAcionar: () => desfazer(toast.desfazer!) }
-              : undefined
-          }
-          aoFechar={() => setToast(null)}
-          className="z-[60]"
-        />
-      ) : null}
+      {sheetComToast ? null : avisoRapido}
     </main>
   );
 }
