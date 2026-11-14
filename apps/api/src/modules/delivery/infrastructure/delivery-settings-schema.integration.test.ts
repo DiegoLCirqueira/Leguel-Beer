@@ -23,4 +23,11 @@ describe("regras do schema das configurações de entrega (banco real)", () => {
     await expect(prisma.deliverySettings.create({ data: validSettings })).rejects.toThrow();
     expect(await prisma.deliverySettings.count()).toBe(1);
   });
+
+  it("recusa uma linha com outra chave, que burlaria a linha única", async () => {
+    await expect(
+      prisma.deliverySettings.create({ data: { ...validSettings, id: 2 } }),
+    ).rejects.toThrow();
+    expect(await prisma.deliverySettings.count()).toBe(0);
+  });
 });
