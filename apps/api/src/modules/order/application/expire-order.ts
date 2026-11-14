@@ -1,4 +1,5 @@
 import { pedidoVencido } from "@leguele/shared";
+import type { ApprovalApplier } from "../domain/approval-applier.js";
 import type { OrderRepository } from "../domain/order-repository.js";
 import { PaymentGatewayUnavailableError, type PaymentGateway } from "../domain/payment-gateway.js";
 
@@ -8,6 +9,7 @@ export class ExpireOrder {
   constructor(
     private readonly orders: OrderRepository,
     private readonly gateway: PaymentGateway,
+    private readonly approvals: ApprovalApplier,
     private readonly now: () => Date,
   ) {}
 
@@ -18,12 +20,19 @@ export class ExpireOrder {
     const at = this.now();
     if (!pedidoVencido(order.expiresAt, at)) return;
 
+    let approved;
     try {
-      await this.gateway.findApprovedPayment(orderId);
+      approved = await this.gateway.findApprovedPayment(orderId);
     } catch (error) {
       // Sem resposta do gateway o pedido segue aguardando, com a reserva; a próxima checagem tenta de novo.
       if (error instanceof PaymentGatewayUnavailableError) return;
       throw error;
+    }
+
+    // Vale a hora da aprovação no gateway: aprovada dentro da validade, aplica em vez de cancelar.
+    if (approved && !pedidoVencido(order.expiresAt, approved.approvedAt)) {
+      await this.approvals.apply(orderId, approved.approvedAt);
+      return;
     }
 
     await this.orders.cancelIfAwaitingPayment(orderId, EXPIRATION_REASON, at);
