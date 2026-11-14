@@ -53,9 +53,9 @@ Leitura: a rota é de 1,1 a 2,1 vezes a reta. Em linha reta, **Rio Largo (24,9 k
 ## Termos, retenção e transferência (Geoapify)
 
 - Hospedagem em data centers da UE (Hetzner); CDN e segurança por Cloudflare. Dados da requisição (corpo, cabeçalhos, IP, horário): guardados por no máximo 24 h nas requisições bem-sucedidas. Dados de contas cadastradas ficam no Google Firebase (afeta só o cadastro da nossa conta no serviço, não os dados dos clientes). Lei aplicável: Chipre. DPA sob pedido.
-- Transferência internacional: sim (UE, e Cloudflare). A Política já diz que os serviços de mapas recebem o endereço ([[termos-privacidade]]); o texto não nomeia os serviços nem diz que ficam fora do Brasil. **Se o Diego quiser nomear o serviço ou citar a transferência, é decisão dele (pergunta 3 mantida: sem novo aceite).**
+- Transferência internacional: sim (UE, e Cloudflare). A Política já diz que os serviços de mapas recebem o endereço ([[termos-privacidade]]); o texto não nomeia os serviços nem diz que ficam fora do Brasil. **Pendente do Diego, antes de qualquer dado real:** decidir se a Política passa a citar a transferência internacional (e o serviço). Até lá, só endereços fictícios; a decisão de não pedir novo aceite (pergunta 3) só vale se a Política cobrir o caso.
 - **Atribuição obrigatória no Free:** "Powered by Geoapify" e a atribuição do OpenStreetMap em lugar visível do site. É texto de marca: decisão do Diego (e do Front, onde aparece; sugestão: rodapé de "Entregas" ou do formulário de endereço).
-- **Guardar as coordenadas no endereço** (a spec exige): os termos não proíbem nem permitem de forma expressa. Risco baixo; a recomendação é pedir confirmação por escrito ao suporte do Geoapify antes de produção, e o plano B é regeocodificar (a porta permite).
+- **Guardar as coordenadas no endereço** (a spec exige): a FAQ oficial do Geoapify permite guardar os resultados, desde que com a atribuição (achado da auditoria do Codex no #261). Os termos em si não dizem nada. Sem pendência de confirmação; o plano B, se algo mudar, é regeocodificar (a porta permite).
 - Cotas "soft" (3.000/dia): cada endereço salvo gasta 2 créditos (geocodificar + rota) e cada recálculo por mudança de origem, 1. Folga ampla no MVP.
 
 ## Contrato proposto para as portas (fatias 3 e 4)
@@ -67,6 +67,7 @@ Leitura: a rota é de 1,1 a 2,1 vezes a reta. Em linha reta, **Rio Largo (24,9 k
 
 ## Pendências
 
-1. **Conta e chave Geoapify (plano Free, sem cartão)**: autorizada pela pergunta 11, mas o cadastro pede um e-mail e não usei o do Diego sem perguntar. Quem for criar usa um e-mail do projeto; a chave vai só no `.env` da API (`GEOAPIFY_API_KEY`, sem valor no `.env.example`). Com a chave, rodar a mesma tabela no Geoapify antes do green dos adaptadores.
+1. **Conta e chave Geoapify (plano Free, sem cartão)**: autorizada pela pergunta 11, mas o cadastro pede um e-mail e não usei o do Diego sem perguntar. Quem for criar usa um e-mail do projeto; a chave vai só no `.env` da API (`GEOAPIFY_API_KEY`, sem valor no `.env.example`). Com a chave, rodar os 13 endereços no Geoapify antes do green dos adaptadores (a chave segue só no `.env`, free tier já autorizado; sem conta nova além dele). Sem a chave, o green dos adaptadores fica bloqueado e o Back segue com as fatias que não dependem dela.
 2. Atribuição "Powered by Geoapify" e OSM no site (Diego e Front).
-3. Confirmar por escrito com o Geoapify o armazenamento das coordenadas (baixo risco).
+3. **Transferência internacional na Política** (Diego): ver "Termos, retenção e transferência".
+4. **Amostra incompleta:** a spec pede 10 bairros de Maceió e 3 cidades vizinhas (13); a tabela tem 9 bairros e 3 cidades (12). Completar com mais 1 bairro na rodada com o Geoapify.
