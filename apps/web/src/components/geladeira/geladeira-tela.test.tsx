@@ -120,4 +120,71 @@ describe("GeladeiraTela", () => {
       expect(within(resumo).getByText("Subtotal (2 itens)")).toBeInTheDocument();
     });
   });
+
+  describe("alterar e remover (LB-50)", () => {
+    const abrirResumo = async () => {
+      abrir();
+      await userEvent.click(screen.getByRole("button", { name: "Ver resumo" }));
+      return screen.getByRole("dialog", { name: "Resumo da Geladeira" });
+    };
+
+    it("'Remover' tira a cerveja e o toast 'saiu da geladeira' devolve com 'Desfazer'", async () => {
+      guardar([{ cerveja: mare, quantidade: 2 }]);
+      const sheet = await abrirResumo();
+
+      await userEvent.click(within(sheet).getByRole("button", { name: "Remover Maré Alta" }));
+
+      expect(screen.getByText("Maré Alta saiu da geladeira")).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Ver resumo" })).not.toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole("button", { name: "Desfazer" }));
+
+      expect(screen.queryByText("Maré Alta saiu da geladeira")).not.toBeInTheDocument();
+      const ipa = screen.getByRole("region", { name: "IPA" });
+      expect(within(ipa).getByText("Maré Alta, 2 unidades, R$ 64,00")).toBeInTheDocument();
+    });
+
+    it("'−' com 1 unidade não tira a cerveja; o Stepper muda a quantidade", async () => {
+      guardar([{ cerveja: mare, quantidade: 1 }]);
+      const sheet = await abrirResumo();
+
+      await userEvent.click(within(sheet).getByRole("button", { name: "Aumentar quantidade" }));
+
+      expect(
+        within(sheet).getByRole("group", { name: "Quantidade de Maré Alta" }),
+      ).toHaveTextContent("2");
+      await userEvent.click(within(sheet).getByRole("button", { name: "Diminuir quantidade" }));
+      expect(
+        within(sheet).getByRole("group", { name: "Quantidade de Maré Alta" }),
+      ).toHaveTextContent("1");
+    });
+
+    it("'+' no limite mostra 'Só temos N unidades' e nada muda", async () => {
+      guardar([{ cerveja: { ...mare, quantidadeDisponivel: 2 }, quantidade: 2 }]);
+      const sheet = await abrirResumo();
+
+      await userEvent.click(within(sheet).getByRole("button", { name: "Aumentar quantidade" }));
+
+      expect(screen.getByText("Só temos 2 unidades")).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Desfazer" })).not.toBeInTheDocument();
+      expect(
+        within(sheet).getByRole("group", { name: "Quantidade de Maré Alta" }),
+      ).toHaveTextContent("2");
+    });
+
+    it("um toast novo substitui o anterior: só o último remover pode ser desfeito", async () => {
+      const umbu = { ...mare, id: "umbu", slug: "umbu", nome: "Umbu" };
+      guardar([
+        { cerveja: mare, quantidade: 1 },
+        { cerveja: umbu, quantidade: 1 },
+      ]);
+      const sheet = await abrirResumo();
+
+      await userEvent.click(within(sheet).getByRole("button", { name: "Remover Maré Alta" }));
+      await userEvent.click(within(sheet).getByRole("button", { name: "Remover Umbu" }));
+
+      expect(screen.queryByText("Maré Alta saiu da geladeira")).not.toBeInTheDocument();
+      expect(screen.getByText("Umbu saiu da geladeira")).toBeInTheDocument();
+    });
+  });
 });
