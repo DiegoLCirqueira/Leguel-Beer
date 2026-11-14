@@ -55,9 +55,9 @@ Funcionalidade: Qualidade da compra
     Então responde 400 no formato de erro da API e não toca o banco
 
   Cenário: Recurso de outro cliente
-    Dado que o cliente A tem um pedido, um endereço e uma Geladeira
-    Quando o cliente B pede esses recursos pelo id ou tenta alterá-los
-    Então a API responde 404, igual a um id inexistente, e nada muda
+    Dado que o cliente A tem um pedido, um endereço e uma Geladeira com cervejas
+    Quando o cliente B pede o pedido ou o endereço de A pelo id, tenta alterá-los, ou lê e altera a própria Geladeira
+    Então a API responde 404 ao pedido e ao endereço de A, igual a um id inexistente, a Geladeira de A nunca aparece nem muda para B, e nada de A muda
 ```
 
 ## Regras de negócio
@@ -75,20 +75,20 @@ Funcionalidade: Qualidade da compra
 ### Revisão de segurança (LB-111)
 
 - **Inventário de rotas:** um teste percorre todas as rotas registradas na API e falha se alguma não tiver `@Public()` ou papel declarado; a lista de rotas públicas esperadas fica no próprio teste, e rota pública nova muda essa lista no mesmo PR ([[ADR-009-guard-global-fechado]]).
-- **Posse (IDOR):** para cada recurso do cliente (perfil e dados pessoais, endereços, Geladeira, pedidos, tela de pagamento, simular pagamento e relógio de teste), um teste de cliente B contra o recurso de A, na leitura e na escrita: 404 e nada muda ([[ADR-009-guard-global-fechado]]). Rotas de admin com cliente comum: 403 ([[admin]]).
+- **Posse (IDOR):** para cada recurso do cliente com id na rota (endereços, pedidos, tela de pagamento, simular pagamento e relógio de teste), um teste de cliente B contra o recurso de A, na leitura e na escrita: 404 e nada muda. Os recursos da sessão, sem id na rota (perfil e dados pessoais, Geladeira), têm o teste de que B lê e altera só os próprios: os de A nunca aparecem nem mudam ([[ADR-009-guard-global-fechado]]). Rotas de admin com cliente comum: 403 ([[admin]]).
 - **Validação:** toda entrada (corpo, parâmetros e query) passa por schema ([[ADR-010-validacao-com-zod]]); um teste por módulo manda entrada inválida e confere 400 sem consulta ao banco.
-- **Banco fechado por fora:** a Data API do Supabase não lê nem grava nenhuma tabela da loja com a chave anônima; as tabelas da loja têm RLS ligada sem política (negar tudo), como segunda barreira, sem virar a camada principal de autorização ([[guards-api]], fora de escopo). A API acessa pelo Prisma com a conexão do servidor, sem depender do RLS.
+- **Banco fechado por fora:** a Data API do Supabase não lê nem grava nenhuma tabela da loja com a chave anônima; as tabelas da loja têm RLS ligada sem política (negar tudo), como segunda barreira, sem virar a camada principal de autorização ([[guards-api]], fora de escopo). A API acessa pelo Prisma com a conexão do servidor, como dona das tabelas, sem depender do RLS; por isso não se usa `FORCE ROW LEVEL SECURITY`, que barraria também a dona. A função do papel admin usada pela política do armazenamento ([[ADR-017-fotos-com-sessao-do-admin]]) roda como dona da tabela de perfis (`SECURITY DEFINER`, só leitura, com o `search_path` fixo), e assim continua lendo o papel com a tabela fechada.
 - **Limite de requisições:** além do limite global da API, limites próprios na criação de pedido, na cobrança (Pix e cartão), em simular pagamento e no envio de foto do admin; o aviso do gateway não pode perder aviso legítimo por limite (o gateway reenvia, mas o limite dele fica acima do volume esperado). O login é do Supabase Auth, com os limites dele.
 
 > [!todo] Preencher (Back, técnico): os números dos limites por rota, com a justificativa na descrição do PR.
 
 - **Cabeçalhos:** API com Helmet e CORS só para a origem do site (já existem; o inventário confere). No site: `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, proibição de ser aberto em frame de outro site e HSTS em produção. A política de conteúdo (CSP) entra depois do spike LB-54, que define os domínios do formulário seguro do gateway.
 - **Segredos só no servidor:** nenhum segredo em `NEXT_PUBLIC_*` nem no pacote do navegador; um teste do build procura as chaves de serviço, do gateway e do aviso no código entregue ao navegador e falha se achar.
-- **Dependências:** `pnpm audit` no CI, falhando em vulnerabilidade alta ou crítica de dependência de produção.
+- **Dependências:** `pnpm audit` no CI, falhando em vulnerabilidade alta ou crítica de dependência de produção. Vulnerabilidade nova sem correção disponível não pode travar PR alheio: entra numa lista de exceções versionada no repositório, cada uma com o id do aviso, o motivo, quem registrou e o prazo de revisão (no máximo 30 dias); exceção vencida volta a falhar o CI. A exceção sai no PR que atualiza a dependência.
 - **Checklist OWASP:** o Reviewer passa os itens aplicáveis do OWASP Top 10 (controle de acesso, falhas de criptografia, injeção, configuração insegura, componentes vulneráveis, falhas de autenticação, falhas de log) e registra o resultado na descrição do PR da revisão, com o que ficou para o MVP+.
 - **Quando rodar:** a revisão final roda antes de fechar o milestone "MVP" (CLAUDE.md, uso previsto do ultracode pelo Reviewer, só com autorização do Diego). Os testes desta spec entram antes, nas fatias abaixo, e valem em todo PR.
 
-> [!warning] **Pendente de confirmação do Diego** (permissões de serviço, item 6): desligar a Data API ou mudar a exposição do schema no projeto Supabase de produção. No local e nas migrations (RLS negar tudo), segue sem esperar; em produção, só depois da resposta (cartão "Decisões pendentes").
+> [!warning] **Pendente de confirmação do Diego** (permissões de serviço, item 6): desligar a Data API ou mudar a exposição do schema no projeto Supabase de produção, **e** aplicar em produção a migration de RLS negar tudo (a migration roda pelo mesmo caminho em produção, então também muda permissões do serviço). No local e nos testes, a migration segue sem esperar; em produção, nenhuma das duas antes da resposta (cartão "Decisões pendentes"). O Back deixa a migration pronta e o Devops só a aplica em produção com o ok.
 
 ## Fora de escopo
 
@@ -104,9 +104,10 @@ Funcionalidade: Qualidade da compra
 
 - **E2E** (Playwright, celular 360 × 640, build no CI): compra feliz de ponta a ponta e Pix expirado, com o gateway falso e o aviso assinado; utilitário de teste que monta e assina o aviso falso; utilitário que lê o e-mail de confirmação no Mailpit.
 - **Inventário de rotas** (API, unitário sobre o app Nest montado): lê as rotas registradas e os metadados de acesso; falha apontando método e caminho. Visto falhando com um controller de teste sem declaração.
-- **Posse** (HTTP, Supertest e banco real): matriz recurso × ação (ler, alterar, apagar) com dois clientes; admin com cliente comum, 403.
+- **Posse** (HTTP, Supertest e banco real): matriz recurso × ação (ler, alterar, apagar) com dois clientes, com id para endereços e pedidos e pela sessão para perfil e Geladeira; admin com cliente comum, 403.
 - **Validação** (HTTP): por módulo, entrada inválida responde 400 e o repositório não é chamado (espião ou contagem de consultas).
-- **Banco fechado** (integração com o Supabase local): leitura e gravação pela Data API com a chave anônima recusadas em todas as tabelas da loja; teste que lista as tabelas do schema e falha se alguma estiver sem RLS.
+- **Banco fechado** (integração com o Supabase local): leitura e gravação pela Data API com a chave anônima recusadas em todas as tabelas da loja; teste que lista as tabelas do schema e falha se alguma estiver sem RLS; a API segue lendo e gravando pelo Prisma e a política do armazenamento segue reconhecendo o admin.
+- **Exceções do audit** (CI): exceção vencida faz o passo falhar; exceção no prazo deixa passar.
 - **Limites** (HTTP): a requisição acima do limite da rota responde 429; o aviso do gateway no volume esperado nunca recebe 429.
 - **Cabeçalhos** (E2E ou HTTP no build do site): os cabeçalhos da lista presentes na resposta da home.
 - **Segredos** (build do site): busca das chaves no pacote do navegador.
@@ -137,10 +138,10 @@ Recomendações aplicadas pelo Spec em 14/11; qualquer uma pode ser vetada.
 - **E2E sem pack nem Clube** e sem cartão (já coberto em [[pagamento]]).
 - **Compra até "Entregue"** passando pelas ações do admin.
 - **Aviso falso assinado** pelo endpoint real, com o gateway fake.
-- **RLS negar tudo como segunda barreira**, sem virar a autorização principal.
+- **RLS negar tudo como segunda barreira**, sem virar a autorização principal, sem `FORCE` e com a função do admin `SECURITY DEFINER`.
 - **Limites próprios** em pedido, cobrança, simular pagamento e foto; números com o Back.
 - **CSP só depois do spike LB-54.**
-- **`pnpm audit`** falhando em alta ou crítica de produção.
+- **`pnpm audit`** falhando em alta ou crítica de produção, com exceção registrada e prazo de até 30 dias.
 - **Testes de segurança nas fatias, revisão final antes do milestone.**
 
 ## Tickets propostos
