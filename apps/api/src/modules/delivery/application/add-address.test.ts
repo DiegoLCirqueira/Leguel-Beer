@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { DeliverySettingsRepository } from "../domain/delivery-settings-repository.js";
+import { AddressLimitReachedError } from "../domain/address-errors.js";
 import { InMemoryAddressRepository } from "../testing/in-memory-addresses.js";
 import { FakeGeocoder, FakeRouteCalculator } from "../testing/fake-maps.js";
 import { AddAddress } from "./add-address.js";
@@ -73,5 +74,17 @@ describe("AddAddress", () => {
       { id: "address-1", isDefault: true },
       { id: "address-2", isDefault: false },
     ]);
+  });
+
+  it("recusa o sexto endereço antes de chamar os mapas e sem gravar nada", async () => {
+    const { addresses, geocoder, router, add } = setup();
+    for (let i = 0; i < 5; i++) await add.execute("owner-1", input);
+    const callsBefore = geocoder.received.length;
+
+    await expect(add.execute("owner-1", input)).rejects.toBeInstanceOf(AddressLimitReachedError);
+
+    expect(await addresses.list("owner-1")).toHaveLength(5);
+    expect(geocoder.received).toHaveLength(callsBefore);
+    expect(router.received).toHaveLength(callsBefore);
   });
 });
