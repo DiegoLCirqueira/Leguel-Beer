@@ -16,7 +16,7 @@ export function GeladeiraTela() {
           <p role="status" className="sr-only">
             Carregando a Geladeira
           </p>
-          <Skeleton className="aspect-[710/1573] w-full max-w-xs rounded-2xl" />
+          <Skeleton className="aspect-[710/1573] min-h-0 flex-1 rounded-2xl" />
         </>
       )}
     </main>
