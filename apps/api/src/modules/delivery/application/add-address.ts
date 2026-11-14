@@ -34,6 +34,8 @@ export class AddAddress {
     const distanceMeters = await this.router.routeDistanceMeters(origem, coordinates);
 
     return this.addresses.update(ownerId, (current) => {
+      // Reconfere sob a trava: outra requisição pode ter ocupado a última vaga enquanto os mapas respondiam.
+      if (current.length >= LIMITE_DE_ENDERECOS) throw new AddressLimitReachedError();
       const address: Address = {
         ...input,
         id: this.newId(),

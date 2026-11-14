@@ -61,6 +61,8 @@ export class PrismaAddressRepository implements AddressRepository {
     decide: (current: Address[]) => AddressUpdate<T> | Promise<AddressUpdate<T>>,
   ): Promise<T> {
     return this.prisma.$transaction(async (tx) => {
+      // Trava a linha do perfil até o fim da transação: as operações da mesma conta passam uma de cada vez.
+      await tx.$queryRaw`SELECT id FROM profiles WHERE id = ${ownerId}::uuid FOR UPDATE`;
       const rows = await tx.address.findMany({
         where: { profileId: ownerId },
         orderBy: [{ createdAt: "asc" }, { id: "asc" }],
