@@ -94,6 +94,7 @@ test("o seletor sobe de 1 até a quantidade e o botão fixo fica no pé da tela,
 
 test("o card do catálogo abre a página da cerveja", async ({ page }) => {
   await page.goto("/catalogo");
+  await aguardarRevelacao(page);
 
   await page.getByRole("link", { name: "Maré Alta" }).click();
 
@@ -134,6 +135,7 @@ test("/catalogo/destaques não é cerveja: mostra Cerveja não encontrada, não 
 
 test("Voltar da página de produto volta ao catálogo quando veio dele", async ({ page }) => {
   await page.goto("/catalogo");
+  await aguardarRevelacao(page);
   await page.getByRole("link", { name: "Maré Alta" }).click();
   await expect(page).toHaveURL(/\/catalogo\/mare-alta$/);
 
@@ -146,6 +148,7 @@ test("Voltar do produto devolve o catálogo com o filtro de categoria que estava
   page,
 }) => {
   await page.goto("/catalogo?categoria=ipa");
+  await aguardarRevelacao(page);
   await page.getByRole("link", { name: "Maré Alta" }).click();
   await expect(page).toHaveURL(/\/catalogo\/mare-alta$/);
 
@@ -164,6 +167,7 @@ test("Voltar volta à home para quem abriu a cerveja pelos destaques", async ({
     { name: "leguele_convidado", value: "1", url: baseURL ?? "http://localhost:3000" },
   ]);
   await page.goto("/");
+  await aguardarRevelacao(page);
   await page
     .getByRole("region", { name: "Cervejas em destaque" })
     .getByRole("link", { name: "Maré Alta" })
