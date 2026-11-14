@@ -124,4 +124,23 @@ describe("ExpireOrder", () => {
     ]);
     expect(orders.cancellations).toEqual([]);
   });
+
+  it.each(["pago", "cancelado"] as const)(
+    "não consulta o gateway nem aplica aprovação em pedido já %s",
+    async (status) => {
+      const orders = new InMemoryOrderRepository([awaitingOrder({ status })]);
+      const approvals = new FakeApprovalApplier();
+      const expire = new ExpireOrder(
+        orders,
+        new FakePaymentGateway("approved-in-time"),
+        approvals,
+        () => minutesAfter(CREATED_AT, 31),
+      );
+
+      await expire.execute("order-1");
+
+      expect(approvals.applied).toEqual([]);
+      expect(orders.cancellations).toEqual([]);
+    },
+  );
 });
