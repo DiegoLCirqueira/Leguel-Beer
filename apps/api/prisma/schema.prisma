@@ -26,8 +26,9 @@ model Profile {
   createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  fridge Fridge?
-  orders Order[]
+  fridge          Fridge?
+  orders          Order[]
+  idempotencyKeys IdempotencyKey[]
 
   @@map("profiles")
 }
@@ -45,31 +46,33 @@ model Category {
 
 /// Cerveja do catálogo. O preço é sempre em centavos; `stock` é o estoque físico (as reservas entram com o LB-56).
 model Beer {
-  id                 String       @id @default(uuid()) @db.Uuid
-  slug               String       @unique
+  id                 String                   @id @default(uuid()) @db.Uuid
+  slug               String                   @unique
   name               String
   style              String
-  categoryId         String       @map("category_id") @db.Uuid
-  category           Category     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  categoryId         String                   @map("category_id") @db.Uuid
+  category           Category                 @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   /// Teor alcoólico em %, uma casa decimal.
-  abv                Decimal      @db.Decimal(3, 1)
+  abv                Decimal                  @db.Decimal(3, 1)
   ibu                Int
-  volumeMl           Int          @map("volume_ml")
-  priceCents         Int          @map("price_cents")
-  featured           Boolean      @default(false)
-  active             Boolean      @default(true)
-  stock              Int          @default(0)
+  volumeMl           Int                      @map("volume_ml")
+  priceCents         Int                      @map("price_cents")
+  featured           Boolean                  @default(false)
+  active             Boolean                  @default(true)
+  stock              Int                      @default(0)
   /// Texto curto da página de produto; nulo some a seção.
   description        String?
   /// Preço anterior em centavos, opcional: só vale como desconto se for maior que o atual.
-  previousPriceCents Int?         @map("previous_price_cents")
+  previousPriceCents Int?                     @map("previous_price_cents")
   /// Nulo usa a imagem padrão da categoria.
-  imageUrl           String?      @map("image_url")
+  imageUrl           String?                  @map("image_url")
   /// Data de cadastro: base da ordenação "mais novas".
-  createdAt          DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt          DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdAt          DateTime                 @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime                 @updatedAt @map("updated_at") @db.Timestamptz(3)
   fridgeItems        FridgeItem[]
   orderItems         OrderItem[]
+  reservations       StockReservation[]
+  pendingDeductions  FridgePendingDeduction[]
 
   @@index([categoryId])
   @@index([active, featured])
@@ -152,8 +155,11 @@ model Order {
   createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  items         OrderItem[]
-  statusHistory OrderStatusHistory[]
+  items             OrderItem[]
+  statusHistory     OrderStatusHistory[]
+  reservations      StockReservation[]
+  pendingDeductions FridgePendingDeduction[]
+  idempotencyKey    IdempotencyKey?
 
   @@index([profileId, createdAt(sort: Desc)])
   @@index([status, expiresAt])
@@ -188,4 +194,58 @@ model OrderStatusHistory {
 
   @@index([orderId, createdAt])
   @@map("order_status_history")
+}
+
+/// Reserva de estoque do pedido, uma por cerveja. Vale enquanto não foi liberada nem consumida e `expiresAt` não passou; disponível = estoque físico - reservas válidas.
+model StockReservation {
+  id         String    @id @default(uuid()) @db.Uuid
+  orderId    String    @map("order_id") @db.Uuid
+  order      Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  beerId     String    @map("beer_id") @db.Uuid
+  beer       Beer      @relation(fields: [beerId], references: [id], onDelete: Restrict)
+  quantity   Int
+  /// Igual à validade do pedido.
+  expiresAt  DateTime  @map("expires_at") @db.Timestamptz(3)
+  /// Cancelamento ou expiração do pedido.
+  releasedAt DateTime? @map("released_at") @db.Timestamptz(3)
+  /// Aprovação do pagamento: a reserva virou baixa no estoque físico.
+  consumedAt DateTime? @map("consumed_at") @db.Timestamptz(3)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@unique([orderId, beerId])
+  @@index([beerId, expiresAt])
+  @@map("stock_reservations")
+}
+
+/// Baixa pendente da Geladeira: o que sai da Geladeira da conta quando o pagamento do pedido for aprovado.
+model FridgePendingDeduction {
+  id       String @id @default(uuid()) @db.Uuid
+  orderId  String @map("order_id") @db.Uuid
+  order    Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  beerId   String @map("beer_id") @db.Uuid
+  beer     Beer   @relation(fields: [beerId], references: [id], onDelete: Restrict)
+  quantity Int
+
+  @@unique([orderId, beerId])
+  @@index([beerId])
+  @@map("fridge_pending_deductions")
+}
+
+/// Chave de idempotência da criação do pedido, guardada só quando o pedido é criado (24 h). Guarda o hash do corpo (sem o token do cartão) e a resposta; nunca o token.
+model IdempotencyKey {
+  id             String   @id @default(uuid()) @db.Uuid
+  profileId      String   @map("profile_id") @db.Uuid
+  profile        Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  key            String
+  requestHash    String   @map("request_hash")
+  responseStatus Int      @map("response_status")
+  responseBody   Json     @map("response_body")
+  orderId        String   @unique @map("order_id") @db.Uuid
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  expiresAt      DateTime @map("expires_at") @db.Timestamptz(3)
+
+  @@unique([profileId, key])
+  @@index([expiresAt])
+  @@map("idempotency_keys")
 }
