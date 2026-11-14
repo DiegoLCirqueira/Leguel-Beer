@@ -45,14 +45,14 @@ Funcionalidade: Qualidade da compra
     Então ele falha e aponta o método e o caminho da rota
 
   Cenário: Acesso direto ao banco
-    Dado a chave anônima do Supabase
-    Quando alguém tenta ler ou gravar a tabela de pedidos pela Data API
-    Então a requisição é recusada e nenhum dado é devolvido
+    Dado a tabela de pedidos com pedidos semeados e um cliente logado com o próprio token
+    Quando alguém, só com a chave anônima ou com o token desse cliente, tenta ler, gravar, alterar ou apagar pedidos pela Data API
+    Então a requisição é recusada ou não devolve nenhuma linha, e os pedidos semeados continuam iguais
 
   Cenário: Entrada malformada
     Dado uma rota da API que recebe corpo, parâmetro ou query
     Quando ela recebe dados fora do schema
-    Então responde 400 no formato de erro da API e não toca o banco
+    Então responde 400 no formato de erro da API e o caso de uso não chega a ler nem gravar nada
 
   Cenário: Recurso de outro cliente
     Dado que o cliente A tem um pedido, um endereço e uma Geladeira com cervejas
@@ -76,8 +76,8 @@ Funcionalidade: Qualidade da compra
 
 - **Inventário de rotas:** um teste percorre todas as rotas registradas na API e falha se alguma não tiver `@Public()` ou papel declarado; a lista de rotas públicas esperadas fica no próprio teste, e rota pública nova muda essa lista no mesmo PR ([[ADR-009-guard-global-fechado]]).
 - **Posse (IDOR):** para cada recurso do cliente com id na rota (endereços, pedidos, tela de pagamento, simular pagamento e relógio de teste), um teste de cliente B contra o recurso de A, na leitura e na escrita: 404 e nada muda. Os recursos da sessão, sem id na rota (perfil e dados pessoais, Geladeira), têm o teste de que B lê e altera só os próprios: os de A nunca aparecem nem mudam ([[ADR-009-guard-global-fechado]]). Rotas de admin com cliente comum: 403 ([[admin]]).
-- **Validação:** toda entrada (corpo, parâmetros e query) passa por schema ([[ADR-010-validacao-com-zod]]); um teste por módulo manda entrada inválida e confere 400 sem consulta ao banco.
-- **Banco fechado por fora:** a Data API do Supabase não lê nem grava nenhuma tabela da loja com a chave anônima; as tabelas da loja têm RLS ligada sem política (negar tudo), como segunda barreira, sem virar a camada principal de autorização ([[guards-api]], fora de escopo). A API acessa pelo Prisma com a conexão do servidor, como dona das tabelas, sem depender do RLS; por isso não se usa `FORCE ROW LEVEL SECURITY`, que barraria também a dona. A função do papel admin usada pela política do armazenamento ([[ADR-017-fotos-com-sessao-do-admin]]) roda como dona da tabela de perfis (`SECURITY DEFINER`, só leitura, com o `search_path` fixo), e assim continua lendo o papel com a tabela fechada.
+- **Validação:** toda entrada (corpo, parâmetros e query) passa por schema ([[ADR-010-validacao-com-zod]]); um teste por módulo manda entrada inválida e confere 400 sem nenhum acesso aos repositórios do caso de uso. A leitura do papel pelo guard ([[ADR-009-guard-global-fechado]], uma por requisição autenticada) é permitida e não conta.
+- **Banco fechado por fora:** a Data API do Supabase não lê nem grava nenhuma tabela da loja, nem com a chave anônima nem com o token de um cliente logado (papéis `anon` e `authenticated`); nenhuma tabela da loja tem política que abra acesso a esses papéis; as tabelas da loja têm RLS ligada sem política (negar tudo), como segunda barreira, sem virar a camada principal de autorização ([[guards-api]], fora de escopo). A API acessa pelo Prisma com a conexão do servidor, como dona das tabelas, sem depender do RLS; por isso não se usa `FORCE ROW LEVEL SECURITY`, que barraria também a dona. A função do papel admin usada pela política do armazenamento ([[ADR-017-fotos-com-sessao-do-admin]]) roda como dona da tabela de perfis (`SECURITY DEFINER`, só leitura, com o `search_path` fixo), e assim continua lendo o papel com a tabela fechada.
 - **Limite de requisições:** além do limite global da API, limites próprios na criação de pedido, na cobrança (Pix e cartão), em simular pagamento e no envio de foto do admin; o aviso do gateway não pode perder aviso legítimo por limite (o gateway reenvia, mas o limite dele fica acima do volume esperado). O login é do Supabase Auth, com os limites dele.
 
 > [!todo] Preencher (Back, técnico): os números dos limites por rota, com a justificativa na descrição do PR.
@@ -105,8 +105,8 @@ Funcionalidade: Qualidade da compra
 - **E2E** (Playwright, celular 360 × 640, build no CI): compra feliz de ponta a ponta e Pix expirado, com o gateway falso e o aviso assinado; utilitário de teste que monta e assina o aviso falso; utilitário que lê o e-mail de confirmação no Mailpit.
 - **Inventário de rotas** (API, unitário sobre o app Nest montado): lê as rotas registradas e os metadados de acesso; falha apontando método e caminho. Visto falhando com um controller de teste sem declaração.
 - **Posse** (HTTP, Supertest e banco real): matriz recurso × ação (ler, alterar, apagar) com dois clientes, com id para endereços e pedidos e pela sessão para perfil e Geladeira; admin com cliente comum, 403.
-- **Validação** (HTTP): por módulo, entrada inválida responde 400 e o repositório não é chamado (espião ou contagem de consultas).
-- **Banco fechado** (integração com o Supabase local): leitura e gravação pela Data API com a chave anônima recusadas em todas as tabelas da loja; teste que lista as tabelas do schema e falha se alguma estiver sem RLS; a API segue lendo e gravando pelo Prisma e a política do armazenamento segue reconhecendo o admin.
+- **Validação** (HTTP): por módulo, entrada inválida responde 400 e nenhum repositório do caso de uso é chamado (espião nos repositórios); a leitura do papel pelo guard fica fora da contagem.
+- **Banco fechado** (integração com o Supabase local): com linhas semeadas em cada tabela da loja, ler, gravar, alterar e apagar pela Data API com a chave anônima e com o token de um cliente logado: recusado ou zero linhas devolvidas, e as linhas semeadas conferidas iguais depois; teste que lista as tabelas do schema e falha se alguma estiver sem RLS ou tiver política para `anon`, `authenticated` ou `public`; a API segue lendo e gravando pelo Prisma e a política do armazenamento segue reconhecendo o admin.
 - **Exceções do audit** (CI): exceção vencida faz o passo falhar; exceção no prazo deixa passar.
 - **Limites** (HTTP): a requisição acima do limite da rota responde 429; o aviso do gateway no volume esperado nunca recebe 429.
 - **Cabeçalhos** (E2E ou HTTP no build do site): os cabeçalhos da lista presentes na resposta da home.
