@@ -47,4 +47,32 @@ describe("regras do schema dos endereços (banco real)", () => {
 
     expect(await prisma.address.count({ where: { isDefault: true } })).toBe(2);
   });
+
+  it.each([
+    ["UF fora de Alagoas", { state: "SP" }],
+    ["distância negativa", { distanceMeters: -1 }],
+    ["latitude fora da faixa", { latitude: 90.01 }],
+    ["longitude fora da faixa", { longitude: -180.01 }],
+    ["latitude da origem fora da faixa", { routeOriginLatitude: -90.01 }],
+    ["longitude da origem fora da faixa", { routeOriginLongitude: 180.01 }],
+  ])("recusa %s", async (_name, overrides) => {
+    await expect(prisma.address.create({ data: address(overrides) })).rejects.toThrow();
+  });
+
+  it("aceita endereço sem rota (distância nula) e com os limites das coordenadas", async () => {
+    await prisma.address.create({
+      data: address({ distanceMeters: null, latitude: -90, longitude: 180 }),
+    });
+
+    expect(await prisma.address.count()).toBe(1);
+  });
+
+  it("apagar o perfil apaga os endereços dele e só os dele", async () => {
+    await prisma.address.create({ data: address() });
+    await prisma.address.create({ data: address({ profileId: otherProfileId }) });
+
+    await prisma.profile.delete({ where: { id: profileId } });
+
+    expect((await prisma.address.findMany()).map((a) => a.profileId)).toEqual([otherProfileId]);
+  });
 });
