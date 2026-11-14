@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ExpirableOrder, OrderRepository } from "../domain/order-repository.js";
-import type { PaymentGateway } from "../domain/payment-gateway.js";
+import { PaymentGatewayUnavailableError, type PaymentGateway } from "../domain/payment-gateway.js";
 import { ExpireOrder } from "./expire-order.js";
 
 const CREATED_AT = new Date("2026-11-14T10:00:00.000Z");
@@ -28,7 +28,10 @@ class InMemoryOrderRepository implements OrderRepository {
 }
 
 class FakePaymentGateway implements PaymentGateway {
+  constructor(private readonly outcome: "not-approved" | "unavailable" = "not-approved") {}
+
   async findApprovedPayment(): Promise<{ approvedAt: Date } | null> {
+    if (this.outcome === "unavailable") throw new PaymentGatewayUnavailableError();
     return null;
   }
 }
@@ -59,6 +62,17 @@ describe("ExpireOrder", () => {
     const orders = new InMemoryOrderRepository([awaitingOrder()]);
     const expire = new ExpireOrder(orders, new FakePaymentGateway(), () =>
       minutesAfter(CREATED_AT, 10),
+    );
+
+    await expire.execute("order-1");
+
+    expect(orders.cancellations).toEqual([]);
+  });
+
+  it("não cancela o pedido vencido se o gateway não responde, para tentar de novo na próxima checagem", async () => {
+    const orders = new InMemoryOrderRepository([awaitingOrder()]);
+    const expire = new ExpireOrder(orders, new FakePaymentGateway("unavailable"), () =>
+      minutesAfter(CREATED_AT, 31),
     );
 
     await expire.execute("order-1");
