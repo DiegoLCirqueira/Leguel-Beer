@@ -1,5 +1,5 @@
-import { renderHook } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { act, renderHook } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { useAnimacaoDasGarrafas, type GarrafaBase } from "./animacao-das-garrafas";
 
 const garrafa = (cervejaId: string, k: number): GarrafaBase => ({
@@ -9,6 +9,8 @@ const garrafa = (cervejaId: string, k: number): GarrafaBase => ({
 
 const animacoes = (lista: { chave: string; animacao?: string }[]) =>
   Object.fromEntries(lista.map((g) => [g.chave, g.animacao ?? null]));
+
+afterEach(() => vi.useRealTimers());
 
 describe("useAnimacaoDasGarrafas", () => {
   it("na primeira leitura nenhuma garrafa anima (a Geladeira abre arrumada)", () => {
@@ -41,5 +43,26 @@ describe("useAnimacaoDasGarrafas", () => {
       "b#0": null,
     });
     expect(result.current.map((g) => g.atraso)).toEqual([0, 60, 0, 0]);
+  });
+
+  it("a garrafa que sai continua na tela por 300 ms, saindo, e depois some", () => {
+    vi.useFakeTimers();
+    const { result, rerender } = renderHook(({ lista }) => useAnimacaoDasGarrafas(lista), {
+      initialProps: { lista: [garrafa("a", 0), garrafa("b", 0)] },
+    });
+
+    rerender({ lista: [garrafa("a", 0)] });
+
+    expect(animacoes(result.current)).toEqual({ "a#0": null, "b#0": "saida" });
+
+    act(() => {
+      vi.advanceTimersByTime(299);
+    });
+    expect(result.current.map((g) => g.chave)).toContain("b#0");
+
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(result.current.map((g) => g.chave)).toEqual(["a#0"]);
   });
 });
