@@ -17,6 +17,7 @@ import { Authenticated, CurrentUser } from "../../account/presentation/access.de
 import { zodDto } from "../../../common/validation/zod-dto.js";
 import { AddAddress } from "../application/add-address.js";
 import { DeleteAddress } from "../application/delete-address.js";
+import { SetDefaultAddress } from "../application/set-default-address.js";
 import { UpdateAddress } from "../application/update-address.js";
 import { ListAddresses } from "../application/list-addresses.js";
 import { withAddressErrors } from "./address-http-errors.js";
@@ -34,6 +35,7 @@ export class AddressController {
     private readonly addAddress: AddAddress,
     private readonly updateAddress: UpdateAddress,
     private readonly deleteAddress: DeleteAddress,
+    private readonly setDefaultAddress: SetDefaultAddress,
   ) {}
 
   @Get()
@@ -81,6 +83,18 @@ export class AddressController {
       this.updateAddress.execute(user.id, id, toAddressInput(body)),
     );
     return enderecoRespostaSchema.parse(toEnderecoResposta(updated));
+  }
+
+  @Post(":id/padrao")
+  @HttpCode(204)
+  @ApiOperation({
+    summary: "Torna um endereço o padrão",
+    description:
+      "Só o escolhido fica com o selo de padrão. Endereço de outro cliente responde 404.",
+  })
+  @ApiNoContentResponse({ description: "Endereço padrão trocado." })
+  async makeDefault(@CurrentUser() user: AuthorizedUser, @Param("id") id: string): Promise<void> {
+    await withAddressErrors(() => this.setDefaultAddress.execute(user.id, id));
   }
 
   @Delete(":id")

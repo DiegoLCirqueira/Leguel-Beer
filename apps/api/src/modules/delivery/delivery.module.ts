@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { AddAddress } from "./application/add-address.js";
 import { DeleteAddress } from "./application/delete-address.js";
 import { ListAddresses } from "./application/list-addresses.js";
+import { SetDefaultAddress } from "./application/set-default-address.js";
 import { UpdateAddress } from "./application/update-address.js";
 import { ADDRESS_REPOSITORY, DELIVERY_SETTINGS_REPOSITORY } from "./delivery.tokens.js";
 import { GEOCODER, ROUTE_CALCULATOR } from "./delivery.tokens.js";
@@ -54,6 +55,11 @@ import { AddressController } from "./presentation/address.controller.js";
     {
       provide: DeleteAddress,
       useFactory: (addresses: AddressRepository) => new DeleteAddress(addresses),
+      inject: [ADDRESS_REPOSITORY],
+    },
+    {
+      provide: SetDefaultAddress,
+      useFactory: (addresses: AddressRepository) => new SetDefaultAddress(addresses),
       inject: [ADDRESS_REPOSITORY],
     },
     {
