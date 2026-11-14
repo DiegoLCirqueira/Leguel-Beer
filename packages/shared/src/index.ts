@@ -52,3 +52,24 @@ export type { EnderecoForm } from "./endereco/endereco.js";
 export { LIMITE_DE_ENDERECOS } from "./endereco/limite.js";
 export { calcularFrete } from "./entrega/frete.js";
 export type { ConfiguracaoDeEntrega, Frete } from "./entrega/frete.js";
+export { STATUS_DO_PEDIDO, statusDoPedidoSchema } from "./pedido/status.js";
+export type { StatusDoPedido } from "./pedido/status.js";
+export { pedidoVencido, validoAte, VALIDADE_DO_PEDIDO_MINUTOS } from "./pedido/validade.js";
+export { numeroDoPedidoSchema } from "./pedido/numero.js";
+export { calcularTotais } from "./pedido/totais.js";
+export type { TotaisDoPedido } from "./pedido/totais.js";
+export { chaveDeIdempotenciaSchema, criarPedidoRequestSchema } from "./pedido/criar.js";
+export type { CriarPedidoRequest } from "./pedido/criar.js";
+export { CODIGOS_DE_ERRO_DO_PEDIDO, erroDoPedidoSchema } from "./pedido/erros.js";
+export type { ErroDoPedido } from "./pedido/erros.js";
+export { pedidoCriadoSchema } from "./pedido/resposta.js";
+export type { PedidoCriado } from "./pedido/resposta.js";
+export { formaDePagamentoSchema, PARCELAS_MAXIMAS } from "./pagamento/forma.js";
+export type { FormaDePagamento } from "./pagamento/forma.js";
+export {
+  descreverParcela,
+  opcaoDeParcelaSchema,
+  tabelaDeParcelasSchema,
+} from "./pagamento/parcelas.js";
+export type { OpcaoDeParcela, TabelaDeParcelas } from "./pagamento/parcelas.js";
+export { MENSAGENS_DE_PAGAMENTO } from "./pagamento/mensagens.js";
