@@ -131,14 +131,17 @@ export function GeladeiraProvider({
 
   // Convidado: ao abrir, a API confere preço e estoque da Geladeira local (não grava nada) e o que ela
   // devolve vira a Geladeira, com os avisos. Falha da validação deixa tudo como estava.
+  const geracaoDaValidacao = useRef(0);
   const validarConvidado = useCallback(async () => {
     if (!conta || atual.current.itens.length === 0) return;
     const antes = versao.current;
+    // Cada visita à Geladeira abre uma geração nova: só a resposta da última chamada vale.
+    const geracao = ++geracaoDaValidacao.current;
     const resultado = await conta.validar(paraRequest(atual.current)).catch(() => undefined);
     // Mudança feita enquanto a validação estava em voo, ou saída da Geladeira antes da resposta
     // (os avisos não seriam vistos): a resposta é descartada, nem preço nem aviso.
     if (resultado?.tipo !== "ok" || versao.current !== antes) return;
-    if (paginaAtual.current !== "/geladeira") return;
+    if (paginaAtual.current !== "/geladeira" || geracao !== geracaoDaValidacao.current) return;
     setAjustes(resultado.resposta.ajustes);
     aplicar(aplicarResposta(atual.current, resultado.resposta));
   }, [conta, aplicar]);
