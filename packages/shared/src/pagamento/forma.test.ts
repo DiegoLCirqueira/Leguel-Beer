@@ -40,3 +40,26 @@ describe("formaDePagamentoSchema", () => {
     expect(resultado).toEqual({ tipo: "pix" });
   });
 });
+
+describe("formaDePagamentoSchema (tamanhos)", () => {
+  const cartao = (mudanca: object) => ({
+    tipo: "cartao",
+    token: "t",
+    parcelas: 1,
+    bandeira: "visa",
+    ...mudanca,
+  });
+
+  it("recusa token acima de 512 e bandeira acima de 40 caracteres", () => {
+    expect(formaDePagamentoSchema.safeParse(cartao({ token: "a".repeat(512) })).success).toBe(true);
+    expect(formaDePagamentoSchema.safeParse(cartao({ token: "a".repeat(513) })).success).toBe(
+      false,
+    );
+    expect(formaDePagamentoSchema.safeParse(cartao({ bandeira: "a".repeat(40) })).success).toBe(
+      true,
+    );
+    expect(formaDePagamentoSchema.safeParse(cartao({ bandeira: "a".repeat(41) })).success).toBe(
+      false,
+    );
+  });
+});

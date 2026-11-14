@@ -37,6 +37,7 @@ describe("criarPedidoRequestSchema", () => {
     ["total negativo", { ...corpo, totalVistoCentavos: -1 }],
     ["total quebrado", { ...corpo, totalVistoCentavos: 100.5 }],
     ["total zero", { ...corpo, totalVistoCentavos: 0 }],
+    ["id de endereço com mais de 64 caracteres", { ...corpo, enderecoId: "a".repeat(65) }],
   ])("recusa %s", (_nome, entrada) => {
     expect(criarPedidoRequestSchema.safeParse(entrada).success).toBe(false);
   });
