@@ -1,0 +1,64 @@
+import { describe, expect, it } from "vitest";
+import type { DeliverySettingsRepository } from "../domain/delivery-settings-repository.js";
+import { InMemoryAddressRepository } from "../testing/in-memory-addresses.js";
+import { FakeGeocoder, FakeRouteCalculator } from "../testing/fake-maps.js";
+import { AddAddress } from "./add-address.js";
+
+const NOW = new Date("2026-11-14T12:00:00.000Z");
+const ORIGIN = { latitude: -9.6649, longitude: -35.7313 };
+
+const settings: DeliverySettingsRepository = {
+  get: async () => ({
+    taxaBaseCentavos: 500,
+    valorPorKmCentavos: 150,
+    raioMaximoMetros: 25_000,
+    freteGratisMinimoCentavos: 15_000,
+    origem: ORIGIN,
+  }),
+};
+
+const input = {
+  zip: "57035000",
+  street: "Rua do Sol",
+  number: "100",
+  district: "Farol",
+  city: "Maceió",
+  state: "AL",
+} as const;
+
+function setup() {
+  const addresses = new InMemoryAddressRepository();
+  const geocoder = new FakeGeocoder({ latitude: -9.66, longitude: -35.74 });
+  const router = new FakeRouteCalculator(5_200);
+  let sequence = 0;
+  const add = new AddAddress(
+    addresses,
+    geocoder,
+    router,
+    settings,
+    () => `address-${++sequence}`,
+    () => NOW,
+  );
+  return { addresses, geocoder, router, add };
+}
+
+describe("AddAddress", () => {
+  it("salva o primeiro endereço como padrão, com as coordenadas, a distância de rota e a origem usada", async () => {
+    const { addresses, add } = setup();
+
+    await add.execute("owner-1", input);
+
+    expect(await addresses.list("owner-1")).toEqual([
+      {
+        ...input,
+        id: "address-1",
+        ownerId: "owner-1",
+        isDefault: true,
+        coordinates: { latitude: -9.66, longitude: -35.74 },
+        distanceMeters: 5_200,
+        routeOrigin: ORIGIN,
+        createdAt: NOW,
+      },
+    ]);
+  });
+});
