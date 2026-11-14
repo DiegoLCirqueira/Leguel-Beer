@@ -86,4 +86,20 @@ describe("PrateleiraDaGeladeira", () => {
     rerender(<PrateleiraDaGeladeira indice={0} categoria={IPA} itens={[]} />);
     expect(animacoes()).toEqual(["saida", "saida", "saida"]);
   });
+
+  it("dois aumentos seguidos balançam de novo: a garrafa já animada reinicia a animação", () => {
+    const { container, rerender } = render(
+      <PrateleiraDaGeladeira indice={0} categoria={IPA} itens={[mare(2)]} />,
+    );
+    rerender(<PrateleiraDaGeladeira indice={0} categoria={IPA} itens={[mare(3)]} />);
+    const primeira = container.querySelector("[data-garrafa] > div");
+
+    rerender(<PrateleiraDaGeladeira indice={0} categoria={IPA} itens={[mare(4)]} />);
+
+    const animacoes = [...container.querySelectorAll("[data-garrafa]")].map((g) =>
+      g.getAttribute("data-animacao"),
+    );
+    expect(animacoes).toEqual(["balanco", "balanco", "balanco", "queda"]);
+    expect(container.querySelector("[data-garrafa] > div")).not.toBe(primeira);
+  });
 });
