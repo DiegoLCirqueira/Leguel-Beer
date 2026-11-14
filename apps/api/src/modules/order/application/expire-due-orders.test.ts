@@ -36,4 +36,25 @@ describe("ExpireDueOrders", () => {
     expect(orders.askedAt).toEqual([NOW]);
     expect(expired).toEqual(["order-1", "order-2"]);
   });
+
+  it("segue a varredura quando um pedido falha e devolve as falhas", async () => {
+    const orders = repositoryWithDueOrders(["order-1", "order-2", "order-3"]);
+    const expired: string[] = [];
+    const boom = new Error("falha no pedido 2");
+    const expire = new ExpireDueOrders(
+      orders,
+      {
+        execute: async (orderId: string) => {
+          if (orderId === "order-2") throw boom;
+          expired.push(orderId);
+        },
+      },
+      () => NOW,
+    );
+
+    const result = await expire.execute();
+
+    expect(expired).toEqual(["order-1", "order-3"]);
+    expect(result).toEqual({ failures: [{ orderId: "order-2", error: boom }] });
+  });
 });
