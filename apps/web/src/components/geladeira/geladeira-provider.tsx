@@ -45,6 +45,8 @@ export type GeladeiraContexto = {
   quantidadeTotal: number;
   /** Avisos de preço e quantidade da última resposta da conta (a tela da Geladeira os mostra). */
   ajustes: AjusteDaGeladeira[];
+  /** Esquece os avisos (a tela os mostra uma vez e, ao sair dela, eles somem). */
+  limparAjustes: () => void;
   adicionar: (cerveja: CervejaCard, quantidade?: number) => Resultado;
   alterarQuantidade: (cervejaId: string, quantidade: number) => Resultado;
   remover: (cervejaId: string) => Desfazer | null;
@@ -159,12 +161,16 @@ export function GeladeiraProvider({
     };
   }, [conta, enviar, aplicar, sairDaConta, pagina]);
 
+  // Estável: a tela o usa na limpeza de um efeito.
+  const limparAjustes = useCallback(() => setAjustes([]), []);
+
   const contexto = useMemo<GeladeiraContexto>(
     () => ({
       pronta,
       estado,
       quantidadeTotal: quantidadeTotal(estado),
       ajustes,
+      limparAjustes,
       adicionar: (cerveja, quantidade) => {
         const resultado = adicionarOp(atual.current, cerveja, quantidade);
         if (resultado.estado !== atual.current) {
@@ -194,7 +200,7 @@ export function GeladeiraProvider({
         sincronizar();
       },
     }),
-    [pronta, estado, ajustes, aplicar, sincronizar],
+    [pronta, estado, ajustes, limparAjustes, aplicar, sincronizar],
   );
 
   return <Contexto.Provider value={contexto}>{children}</Contexto.Provider>;

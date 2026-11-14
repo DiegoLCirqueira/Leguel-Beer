@@ -63,7 +63,7 @@ describe("/dev/tokens", () => {
     expect(screen.getByText("Esgotado")).toBeInTheDocument();
     const grupo = screen.getByRole("group", { name: "Quantidade de exemplo" });
     expect(grupo).toHaveTextContent("1");
-    await userEvent.click(screen.getByRole("button", { name: "Aumentar quantidade" }));
+    await userEvent.click(within(grupo).getByRole("button", { name: "Aumentar quantidade" }));
 
     expect(grupo).toHaveTextContent("2");
   });

@@ -5,6 +5,8 @@ import { ArrowRight, Link2, Lock, UserRound } from "lucide-react";
 import { useState } from "react";
 import type { ItemLocal } from "@/lib/geladeira/estado";
 import {
+  AvisosDaGeladeira,
+  BarraDoResumo,
   BarraFixa,
   BlocoDePreco,
   BottomSheet,
@@ -14,6 +16,7 @@ import {
   CervejaNaoEncontrada,
   CategoryChips,
   DivisorOu,
+  LinhaDoResumo,
   LojaHeader,
   LojaTabBar,
   MolduraDaGeladeira,
@@ -22,6 +25,7 @@ import {
   Skeleton,
   StyleBadge,
   Toast,
+  TotaisDoResumo,
 } from "@/components/ui";
 
 const swatches = [
@@ -174,6 +178,36 @@ export function ComponentShowcase() {
       </Section>
       <Section title="Geladeira: moldura, prateleiras, garrafas e fantasmas">
         <MolduraDaGeladeira itens={itensDaMoldura} />
+      </Section>
+      <Section title="Geladeira: resumo (linha, totais, barra) e avisos">
+        <AvisosDaGeladeira
+          ajustes={[
+            {
+              tipo: "preco-mudou",
+              cervejaId: cervejaExemplo.id,
+              nome: cervejaExemplo.nome,
+              precoVistoCentavos: 3000,
+              precoAtualCentavos: 3200,
+            },
+            { tipo: "indisponivel", cervejaId: "2", nome: "Umbu Gose" },
+          ]}
+        />
+        <ul>
+          <LinhaDoResumo
+            item={{ cerveja: cervejaExemplo, quantidade }}
+            aoAlterar={setQuantidade}
+            aoRemover={() => undefined}
+          />
+        </ul>
+        <TotaisDoResumo
+          quantidadeTotal={quantidade}
+          subtotalCentavos={quantidade * cervejaExemplo.precoCentavos}
+        />
+        <BarraDoResumo
+          quantidadeTotal={quantidade}
+          subtotalCentavos={quantidade * cervejaExemplo.precoCentavos}
+          aoVerResumo={() => undefined}
+        />
       </Section>
       <Section title="Bottom sheet, toast e skeleton">
         <div className="flex flex-wrap gap-3">
