@@ -65,10 +65,10 @@ export class PrismaAddressRepository implements AddressRepository {
     decide: (current: Address[]) => AddressUpdate<T> | Promise<AddressUpdate<T>>,
   ): Promise<T> {
     return this.prisma.$transaction(async (tx) => {
-      // Trava a linha do perfil até o fim da transação: as operações da mesma conta passam uma de cada vez.
+      // Trava a linha do perfil até o fim da transação (NO KEY UPDATE basta e não bloqueia inserções que só referenciam o perfil, como pedidos): as operações da mesma conta passam uma de cada vez.
       const locked = await tx.$queryRaw<
         { id: string }[]
-      >`SELECT id FROM profiles WHERE id = ${ownerId}::uuid FOR UPDATE`;
+      >`SELECT id FROM profiles WHERE id = ${ownerId}::uuid FOR NO KEY UPDATE`;
       const rows = await tx.address.findMany({
         where: { profileId: ownerId },
         orderBy: [{ createdAt: "asc" }, { id: "asc" }],
@@ -82,7 +82,13 @@ export class PrismaAddressRepository implements AddressRepository {
         await tx.address.updateMany({ where: { profileId: ownerId }, data: { isDefault: false } });
         for (const address of outcome.addresses) {
           const { id, ...data } = toRow(address);
-          await tx.address.upsert({ where: { id }, create: { id, ...data }, update: data });
+          // O dono entra no filtro: um id de outro cliente nunca é reescrito. Sem linha do dono, cria; se o id
+          // já é de outro cliente, a chave primária recusa e a transação inteira desfaz.
+          const { count } = await tx.address.updateMany({
+            where: { id, profileId: ownerId },
+            data,
+          });
+          if (count === 0) await tx.address.create({ data: { id, ...data } });
         }
       }
       return outcome.result;
