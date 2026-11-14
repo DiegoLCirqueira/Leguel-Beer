@@ -26,7 +26,10 @@ model Profile {
   createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  fridge Fridge?
+  fridge          Fridge?
+  orders          Order[]
+  idempotencyKeys IdempotencyKey[]
+  statusChanges   OrderStatusHistory[] @relation("OrderStatusChangedBy")
 
   @@map("profiles")
 }
@@ -44,30 +47,33 @@ model Category {
 
 /// Cerveja do catálogo. O preço é sempre em centavos; `stock` é o estoque físico (as reservas entram com o LB-56).
 model Beer {
-  id                 String       @id @default(uuid()) @db.Uuid
-  slug               String       @unique
+  id                 String                   @id @default(uuid()) @db.Uuid
+  slug               String                   @unique
   name               String
   style              String
-  categoryId         String       @map("category_id") @db.Uuid
-  category           Category     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  categoryId         String                   @map("category_id") @db.Uuid
+  category           Category                 @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   /// Teor alcoólico em %, uma casa decimal.
-  abv                Decimal      @db.Decimal(3, 1)
+  abv                Decimal                  @db.Decimal(3, 1)
   ibu                Int
-  volumeMl           Int          @map("volume_ml")
-  priceCents         Int          @map("price_cents")
-  featured           Boolean      @default(false)
-  active             Boolean      @default(true)
-  stock              Int          @default(0)
+  volumeMl           Int                      @map("volume_ml")
+  priceCents         Int                      @map("price_cents")
+  featured           Boolean                  @default(false)
+  active             Boolean                  @default(true)
+  stock              Int                      @default(0)
   /// Texto curto da página de produto; nulo some a seção.
   description        String?
   /// Preço anterior em centavos, opcional: só vale como desconto se for maior que o atual.
-  previousPriceCents Int?         @map("previous_price_cents")
+  previousPriceCents Int?                     @map("previous_price_cents")
   /// Nulo usa a imagem padrão da categoria.
-  imageUrl           String?      @map("image_url")
+  imageUrl           String?                  @map("image_url")
   /// Data de cadastro: base da ordenação "mais novas".
-  createdAt          DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt          DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdAt          DateTime                 @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime                 @updatedAt @map("updated_at") @db.Timestamptz(3)
   fridgeItems        FridgeItem[]
+  orderItems         OrderItem[]
+  reservations       StockReservation[]
+  pendingDeductions  FridgePendingDeduction[]
 
   @@index([categoryId])
   @@index([active, featured])
@@ -104,4 +110,211 @@ model FridgeItem {
   @@unique([fridgeId, position])
   @@index([beerId])
   @@map("fridge_items")
+}
+
+enum OrderStatus {
+  AWAITING_PAYMENT
+  PAID
+  PREPARING
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  PIX
+  CARD
+}
+
+/// Pedido. Dinheiro em centavos; o total é sempre subtotal + frete (os juros do cartão ficam com o gateway). O pedido é histórico: apagar perfil ou cerveja com pedido é recusado, e os dados do cliente e do endereço são cópias do momento da compra.
+model Order {
+  id             String        @id @default(uuid()) @db.Uuid
+  /// "#LB" e 6 dígitos, sorteado e único.
+  number         String        @unique
+  profileId      String        @map("profile_id") @db.Uuid
+  profile        Profile       @relation(fields: [profileId], references: [id], onDelete: Restrict)
+  status         OrderStatus   @default(AWAITING_PAYMENT)
+  paymentMethod  PaymentMethod @map("payment_method")
+  /// Só no cartão; o token do cartão nunca é guardado.
+  installments   Int?
+  cardBrand      String?       @map("card_brand")
+  subtotalCents  Int           @map("subtotal_cents")
+  shippingCents  Int           @map("shipping_cents")
+  totalCents     Int           @map("total_cents")
+  /// Criação + 30 minutos; vencido a partir deste instante.
+  expiresAt      DateTime      @map("expires_at") @db.Timestamptz(3)
+  cancelReason   String?       @map("cancel_reason")
+  customerName   String        @map("customer_name")
+  customerPhone  String        @map("customer_phone")
+  shipZip        String        @map("ship_zip")
+  shipStreet     String        @map("ship_street")
+  shipNumber     String        @map("ship_number")
+  shipComplement String?       @map("ship_complement")
+  shipDistrict   String        @map("ship_district")
+  shipCity       String        @map("ship_city")
+  shipState      String        @map("ship_state")
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  items             OrderItem[]
+  statusHistory     OrderStatusHistory[]
+  reservations      StockReservation[]
+  pendingDeductions FridgePendingDeduction[]
+  idempotencyKey    IdempotencyKey?
+  payments          Payment[]
+  paymentEvents     PaymentEvent[]
+  paymentMarks      PaymentMark[]
+
+  @@index([profileId, createdAt(sort: Desc)])
+  @@index([status, expiresAt])
+  @@map("orders")
+}
+
+/// Cópia da cerveja no momento da compra (nome e preço).
+model OrderItem {
+  id             String @id @default(uuid()) @db.Uuid
+  orderId        String @map("order_id") @db.Uuid
+  order          Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  beerId         String @map("beer_id") @db.Uuid
+  beer           Beer   @relation(fields: [beerId], references: [id], onDelete: Restrict)
+  name           String
+  unitPriceCents Int    @map("unit_price_cents")
+  quantity       Int
+
+  @@unique([orderId, beerId])
+  @@index([beerId])
+  @@map("order_items")
+}
+
+model OrderStatusHistory {
+  id         String       @id @default(uuid()) @db.Uuid
+  orderId    String       @map("order_id") @db.Uuid
+  order      Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  /// Nulo na criação do pedido.
+  fromStatus OrderStatus? @map("from_status")
+  toStatus   OrderStatus  @map("to_status")
+  reason     String?
+  /// Quem mudou o status (admin); nulo quando foi o sistema (pagamento, expiração).
+  actorId    String?      @map("actor_id") @db.Uuid
+  actor      Profile?     @relation("OrderStatusChangedBy", fields: [actorId], references: [id], onDelete: SetNull)
+  createdAt  DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([orderId, createdAt])
+  @@index([actorId])
+  @@map("order_status_history")
+}
+
+/// Reserva de estoque do pedido, uma por cerveja. Vale enquanto não foi liberada nem consumida e `expiresAt` não passou; disponível = estoque físico - reservas válidas.
+model StockReservation {
+  id         String    @id @default(uuid()) @db.Uuid
+  orderId    String    @map("order_id") @db.Uuid
+  order      Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  beerId     String    @map("beer_id") @db.Uuid
+  beer       Beer      @relation(fields: [beerId], references: [id], onDelete: Restrict)
+  quantity   Int
+  /// Igual à validade do pedido.
+  expiresAt  DateTime  @map("expires_at") @db.Timestamptz(3)
+  /// Cancelamento ou expiração do pedido.
+  releasedAt DateTime? @map("released_at") @db.Timestamptz(3)
+  /// Aprovação do pagamento: a reserva virou baixa no estoque físico.
+  consumedAt DateTime? @map("consumed_at") @db.Timestamptz(3)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@unique([orderId, beerId])
+  @@index([beerId, expiresAt])
+  @@map("stock_reservations")
+}
+
+/// Baixa pendente da Geladeira: o que sai da Geladeira da conta quando o pagamento do pedido for aprovado.
+model FridgePendingDeduction {
+  id       String @id @default(uuid()) @db.Uuid
+  orderId  String @map("order_id") @db.Uuid
+  order    Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  beerId   String @map("beer_id") @db.Uuid
+  beer     Beer   @relation(fields: [beerId], references: [id], onDelete: Restrict)
+  quantity Int
+
+  @@unique([orderId, beerId])
+  @@index([beerId])
+  @@map("fridge_pending_deductions")
+}
+
+/// Chave de idempotência da criação do pedido, guardada só quando o pedido é criado (24 h). Guarda o hash do corpo (sem o token do cartão) e a resposta; nunca o token.
+model IdempotencyKey {
+  id             String   @id @default(uuid()) @db.Uuid
+  profileId      String   @map("profile_id") @db.Uuid
+  profile        Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  key            String
+  requestHash    String   @map("request_hash")
+  responseStatus Int      @map("response_status")
+  responseBody   Json     @map("response_body")
+  orderId        String   @unique @map("order_id") @db.Uuid
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  expiresAt      DateTime @map("expires_at") @db.Timestamptz(3)
+
+  @@unique([profileId, key])
+  @@index([expiresAt])
+  @@map("idempotency_keys")
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REFUSED
+  CANCELLED
+}
+
+enum PaymentMarkKind {
+  /// Aprovado depois do cancelamento: reembolso manual.
+  AFTER_CANCELLATION
+  /// Outro pagamento aprovado para pedido já pago: reembolso manual.
+  DUPLICATE
+  /// Pagamento de outro pedido ou com principal diferente do total.
+  DIVERGENT
+}
+
+/// Cobrança do pedido no gateway. Um pedido pode ter várias (troca de forma de pagamento); o efeito da aprovação é aplicado uma vez por pagamento. Nunca guarda token nem dados do cartão.
+model Payment {
+  id               String        @id @default(uuid()) @db.Uuid
+  orderId          String        @map("order_id") @db.Uuid
+  order            Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  gatewayPaymentId String        @unique @map("gateway_payment_id")
+  method           PaymentMethod
+  status           PaymentStatus @default(PENDING)
+  /// Hora da aprovação no gateway (vale para decidir a validade), não a do aviso.
+  approvedAt       DateTime?     @map("approved_at") @db.Timestamptz(3)
+  createdAt        DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([orderId])
+  @@map("payments")
+}
+
+/// Aviso do gateway já processado: o id do evento é único, e o evento repetido não repete nada. Fica mesmo sem pedido.
+model PaymentEvent {
+  id               String   @id @default(uuid()) @db.Uuid
+  gatewayEventId   String   @unique @map("gateway_event_id")
+  gatewayPaymentId String   @map("gateway_payment_id")
+  orderId          String?  @map("order_id") @db.Uuid
+  order            Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([orderId])
+  @@index([gatewayPaymentId])
+  @@map("payment_events")
+}
+
+/// Marca que o admin vê no detalhe do pedido.
+model PaymentMark {
+  id               String          @id @default(uuid()) @db.Uuid
+  orderId          String          @map("order_id") @db.Uuid
+  order            Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  gatewayPaymentId String          @map("gateway_payment_id")
+  kind             PaymentMarkKind
+  createdAt        DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@unique([gatewayPaymentId, kind])
+  @@index([orderId])
+  @@map("payment_marks")
 }
