@@ -116,4 +116,31 @@ describe("PrismaOrderRepository (banco real)", () => {
     });
     expect(await orders.findForExpiration(crypto.randomUUID())).toBeNull();
   });
+
+  it("lista só os pedidos aguardando pagamento vencidos, a partir do instante exato do vencimento", async () => {
+    const other = await prisma.order.create({
+      data: {
+        number: "#LB111111",
+        profileId,
+        paymentMethod: "PIX",
+        subtotalCents: 3200,
+        shippingCents: 0,
+        totalCents: 3200,
+        expiresAt: EXPIRES_AT,
+        status: "PAID",
+        customerName: "Ana Souza",
+        customerPhone: "82999990000",
+        shipZip: "57035000",
+        shipStreet: "Rua do Sol",
+        shipNumber: "100",
+        shipDistrict: "Farol",
+        shipCity: "Maceió",
+        shipState: "AL",
+      },
+    });
+
+    expect(await orders.findDueOrderIds(new Date(EXPIRES_AT.getTime() - 1))).toEqual([]);
+    expect(await orders.findDueOrderIds(EXPIRES_AT)).toEqual([orderId]);
+    expect(await orders.findDueOrderIds(NOW)).not.toContain(other.id);
+  });
 });
