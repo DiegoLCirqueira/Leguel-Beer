@@ -1,5 +1,6 @@
 import type { CervejaCard } from "@leguele/shared";
 import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -68,5 +69,55 @@ describe("GeladeiraTela", () => {
 
     expect(html).toContain("Carregando a Geladeira");
     expect(html).not.toContain("Adicionar IPA");
+  });
+
+  describe("resumo (LB-51)", () => {
+    const comMaisUma = { ...mare, id: "umbu", slug: "umbu", nome: "Umbu", precoCentavos: 2800 };
+
+    it("no celular, a barra mostra o subtotal e 'Ver resumo' abre o sheet com as linhas e as ações", async () => {
+      guardar([
+        { cerveja: mare, quantidade: 2 },
+        { cerveja: comMaisUma, quantidade: 1 },
+      ]);
+      abrir();
+
+      const barra = screen.getByRole("button", { name: "Ver resumo" }).parentElement!;
+      expect(within(barra).getByText("Subtotal (3 itens)")).toBeInTheDocument();
+      expect(within(barra).getByText("R$ 92,00")).toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole("button", { name: "Ver resumo" }));
+
+      const sheet = screen.getByRole("dialog", { name: "Resumo da Geladeira" });
+      expect(within(sheet).getAllByRole("listitem")).toHaveLength(2);
+      expect(within(sheet).getByRole("button", { name: "Finalizar compra" })).toBeDisabled();
+      expect(within(sheet).getByRole("link", { name: "Continuar comprando" })).toHaveAttribute(
+        "href",
+        "/catalogo",
+      );
+    });
+
+    it("vazia, não há barra nem resumo", () => {
+      abrir();
+
+      expect(screen.queryByRole("button", { name: "Ver resumo" })).not.toBeInTheDocument();
+    });
+
+    it("a partir de 1024 px o resumo é a coluna da direita, sem barra nem sheet", () => {
+      window.matchMedia = (consulta: string) =>
+        ({
+          matches: consulta === "(min-width: 1024px)",
+          media: consulta,
+          addEventListener: () => {},
+          removeEventListener: () => {},
+        }) as MediaQueryList;
+      guardar([{ cerveja: mare, quantidade: 2 }]);
+      abrir();
+
+      expect(screen.queryByRole("button", { name: "Ver resumo" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      const resumo = screen.getByRole("complementary", { name: "Resumo da Geladeira" });
+      expect(within(resumo).getAllByRole("listitem")).toHaveLength(1);
+      expect(within(resumo).getByText("Subtotal (2 itens)")).toBeInTheDocument();
+    });
   });
 });
