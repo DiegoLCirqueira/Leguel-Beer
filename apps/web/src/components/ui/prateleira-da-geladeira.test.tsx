@@ -71,4 +71,35 @@ describe("PrateleiraDaGeladeira", () => {
     );
     expect(new Set(garrafas.slice(0, 4).map((g) => g.style.left)).size).toBe(4);
   });
+
+  it("a unidade que entra cai e as do mesmo rótulo balançam; ao sair, a garrafa sai animada", () => {
+    const { container, rerender } = render(
+      <PrateleiraDaGeladeira indice={0} categoria={IPA} itens={[mare(2)]} />,
+    );
+    const animacoes = () =>
+      [...container.querySelectorAll("[data-garrafa]")].map((g) => g.getAttribute("data-animacao"));
+    expect(animacoes()).toEqual([null, null]);
+
+    rerender(<PrateleiraDaGeladeira indice={0} categoria={IPA} itens={[mare(3)]} />);
+    expect(animacoes()).toEqual(["balanco", "balanco", "queda"]);
+
+    rerender(<PrateleiraDaGeladeira indice={0} categoria={IPA} itens={[]} />);
+    expect(animacoes()).toEqual(["saida", "saida", "saida"]);
+  });
+
+  it("dois aumentos seguidos balançam de novo: a garrafa já animada reinicia a animação", () => {
+    const { container, rerender } = render(
+      <PrateleiraDaGeladeira indice={0} categoria={IPA} itens={[mare(2)]} />,
+    );
+    rerender(<PrateleiraDaGeladeira indice={0} categoria={IPA} itens={[mare(3)]} />);
+    const primeira = container.querySelector("[data-garrafa] > div");
+
+    rerender(<PrateleiraDaGeladeira indice={0} categoria={IPA} itens={[mare(4)]} />);
+
+    const animacoes = [...container.querySelectorAll("[data-garrafa]")].map((g) =>
+      g.getAttribute("data-animacao"),
+    );
+    expect(animacoes).toEqual(["balanco", "balanco", "balanco", "queda"]);
+    expect(container.querySelector("[data-garrafa] > div")).not.toBe(primeira);
+  });
 });

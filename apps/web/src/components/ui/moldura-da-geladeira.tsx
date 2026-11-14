@@ -19,7 +19,7 @@ export const PRATELEIRAS = [
 export function MolduraDaGeladeira({ itens, className }: MolduraDaGeladeiraProps) {
   return (
     <div
-      className={cn("relative overflow-hidden", className)}
+      className={cn("@container relative overflow-hidden", className)}
       style={{
         aspectRatio: "710 / 1573",
         backgroundImage: `url(${IMAGEM_DA_MOLDURA})`,

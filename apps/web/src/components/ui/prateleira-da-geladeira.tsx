@@ -1,4 +1,7 @@
+"use client";
+
 import type { CSSProperties } from "react";
+import { useAnimacaoDasGarrafas } from "@/lib/geladeira/animacao-das-garrafas";
 import { arrumarPrateleira } from "@/lib/geladeira/arrumar-prateleira";
 import type { ItemLocal } from "@/lib/geladeira/estado";
 import { posicaoDaFaixa, posicaoDaGarrafa } from "@/lib/geladeira/geometria";
@@ -29,15 +32,22 @@ export function PrateleiraDaGeladeira({ indice, categoria, itens }: PrateleiraDa
     itens.map((i) => ({ cervejaId: i.cerveja.id, nome: i.cerveja.nome, quantidade: i.quantidade })),
   );
   const porId = new Map(itens.map((i) => [i.cerveja.id, i]));
+  const garrafas = useAnimacaoDasGarrafas(
+    arrumacao.garrafas.map((g) => ({
+      ...g,
+      imagemUrl: porId.get(g.cervejaId)?.cerveja.imagemUrl ?? null,
+    })),
+  );
   const faixa = posicaoDaFaixa(indice);
   return (
     <section aria-label={categoria.nome} className="pointer-events-none absolute inset-0">
-      {arrumacao.garrafas.map((garrafa) => {
+      {garrafas.map((garrafa) => {
         const posicao = posicaoDaGarrafa(indice, garrafa.coluna, garrafa.fileira);
         return (
           <div
             key={garrafa.chave}
             data-garrafa=""
+            data-animacao={garrafa.animacao}
             className="absolute"
             style={{
               ...emPercentual(posicao),
@@ -45,11 +55,12 @@ export function PrateleiraDaGeladeira({ indice, categoria, itens }: PrateleiraDa
               filter: `brightness(${posicao.brilho})`,
             }}
           >
-            <div className="relative size-full origin-bottom">
-              <ImagemDaGarrafa
-                imagemUrl={porId.get(garrafa.cervejaId)?.cerveja.imagemUrl ?? null}
-                categoriaSlug={categoria.slug}
-              />
+            <div
+              key={garrafa.rodada}
+              className="relative size-full origin-bottom"
+              style={{ animationDelay: `${garrafa.atraso}ms` }}
+            >
+              <ImagemDaGarrafa imagemUrl={garrafa.imagemUrl} categoriaSlug={categoria.slug} />
             </div>
           </div>
         );

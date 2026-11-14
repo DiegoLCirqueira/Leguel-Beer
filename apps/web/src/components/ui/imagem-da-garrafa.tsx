@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { seloDaCategoria } from "./selo-da-categoria";
 
 export type ImagemDaGarrafaProps = {
   imagemUrl: string | null;
@@ -8,12 +9,6 @@ export type ImagemDaGarrafaProps = {
 /** Contorno da garrafa (viewBox 33 x 92), o mesmo da garrafa fantasma. */
 export const CONTORNO_DA_GARRAFA =
   "M13 3h7v20c0 6 4 9 7 13 3 3 4 7 4 11v39c0 3-2 5-5 5H7c-3 0-5-2-5-5V47c0-4 1-8 4-11 3-4 7-7 7-13z";
-
-/** Cor do selo da categoria; categoria sem selo próprio usa o neutro, como o `StyleBadge`. */
-const corDoSelo = (slug: string) =>
-  ["ipa", "frutas", "malt", "lager"].includes(slug)
-    ? `var(--color-badge-${slug})`
-    : "var(--color-badge-neutro)";
 
 /**
  * Foto da garrafa; sem foto, a garrafa sem rótulo na cor do selo da categoria. Preenche a caixa do
@@ -32,7 +27,7 @@ export function ImagemDaGarrafa({ imagemUrl, categoriaSlug }: ImagemDaGarrafaPro
       aria-hidden="true"
       className="absolute inset-0 size-full"
     >
-      <path d={CONTORNO_DA_GARRAFA} fill={corDoSelo(categoriaSlug)} />
+      <path d={CONTORNO_DA_GARRAFA} fill={seloDaCategoria(categoriaSlug).cor} />
     </svg>
   );
 }
