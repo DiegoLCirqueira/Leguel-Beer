@@ -51,8 +51,7 @@ export class PrismaBeerRepository implements BeerRepository {
    * exibir (catálogo, produto e Geladeira) e pode estar um instante defasado. Quem decide de verdade
    * é a criação do pedido, que confere o disponível dentro da transação, com trava por cerveja.
    *
-   * A validade é comparada com o relógio desta instância da API (`now`); no MVP há uma instância só,
-   * então não há diferença de relógio entre instâncias.
+   * A validade é comparada com o relógio da API (`now`), não com o do banco.
    */
   private async reservedByBeer(beerIds: readonly string[]): Promise<Map<string, number>> {
     if (beerIds.length === 0) return new Map();
