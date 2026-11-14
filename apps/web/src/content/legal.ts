@@ -4,7 +4,7 @@ import type { SecaoLegal } from "@/components/legal/legal-page";
 // correspondente em apps/api/src/modules/account/domain/legal-versions.ts.
 export const TERMOS_ATUALIZADO_EM = "2026-10-31";
 export const PRIVACIDADE_ATUALIZADA_EM = "2026-11-11";
-export const ENTREGAS_ATUALIZADO_EM = "2026-11-12";
+export const ENTREGAS_ATUALIZADO_EM = "2026-11-14";
 
 export const TERMOS: SecaoLegal[] = [
   {
