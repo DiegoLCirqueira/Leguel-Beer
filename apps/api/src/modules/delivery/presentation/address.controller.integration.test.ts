@@ -206,4 +206,29 @@ describe("endereços do cliente (HTTP, banco real)", () => {
 
     expect((await create(form)).status).toBe(409);
   });
+
+  const edit = (id: string, body: object, token = tokens.customer()) =>
+    request(app.getHttpServer())
+      .put(`/me/enderecos/${id}`)
+      .set({ Authorization: `Bearer ${token}` })
+      .send(body);
+
+  it("edita o endereço, recalcula a distância e devolve o resultado", async () => {
+    const { body: created } = await create(form);
+    router.respondWith(8_000);
+
+    const response = await edit(created.id, { ...form, rua: "Rua da Praia", apelido: "Casa" });
+
+    expect(response.status).toBe(200);
+    expect(enderecoRespostaSchema.parse(response.body)).toMatchObject({
+      id: created.id,
+      rua: "Rua da Praia",
+      apelido: "Casa",
+      padrao: true,
+    });
+    expect(await prisma.address.findUniqueOrThrow({ where: { id: created.id } })).toMatchObject({
+      street: "Rua da Praia",
+      distanceMeters: 8_000,
+    });
+  });
 });
