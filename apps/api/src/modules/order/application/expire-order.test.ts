@@ -54,4 +54,15 @@ describe("ExpireOrder", () => {
       { orderId: "order-1", reason: "pagamento não concluído", at: now },
     ]);
   });
+
+  it("não muda o pedido ainda dentro da validade, 10 minutos depois de criado", async () => {
+    const orders = new InMemoryOrderRepository([awaitingOrder()]);
+    const expire = new ExpireOrder(orders, new FakePaymentGateway(), () =>
+      minutesAfter(CREATED_AT, 10),
+    );
+
+    await expire.execute("order-1");
+
+    expect(orders.cancellations).toEqual([]);
+  });
 });
