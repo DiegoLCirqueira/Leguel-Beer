@@ -143,4 +143,40 @@ describe("PrismaOrderRepository (banco real)", () => {
     expect(await orders.findDueOrderIds(EXPIRES_AT)).toEqual([orderId]);
     expect(await orders.findDueOrderIds(NOW)).not.toContain(other.id);
   });
+
+  it("não grava nenhum efeito da expiração se a escrita do histórico falha", async () => {
+    await prisma.$executeRawUnsafe(
+      "CREATE OR REPLACE FUNCTION fail_history_insert() RETURNS trigger LANGUAGE plpgsql AS 'BEGIN RAISE EXCEPTION ''falha forçada no histórico''; END;'",
+    );
+    await prisma.$executeRawUnsafe(
+      "CREATE TRIGGER fail_history_insert BEFORE INSERT ON order_status_history FOR EACH ROW EXECUTE FUNCTION fail_history_insert()",
+    );
+    try {
+      await expect(
+        orders.cancelIfAwaitingPayment(orderId, "pagamento não concluído", NOW),
+      ).rejects.toThrow();
+
+      const order = await prisma.order.findUniqueOrThrow({ where: { id: orderId } });
+      expect(order).toMatchObject({ status: "AWAITING_PAYMENT", cancelReason: null });
+      expect(await prisma.stockReservation.count({ where: { orderId, releasedAt: null } })).toBe(1);
+      expect(await prisma.fridgePendingDeduction.count({ where: { orderId } })).toBe(1);
+      expect(await prisma.orderStatusHistory.count({ where: { orderId } })).toBe(0);
+    } finally {
+      await prisma.$executeRawUnsafe("DROP TRIGGER fail_history_insert ON order_status_history");
+      await prisma.$executeRawUnsafe("DROP FUNCTION fail_history_insert()");
+    }
+  });
+
+  it.each([
+    ["AWAITING_PAYMENT", "aguardando-pagamento"],
+    ["PAID", "pago"],
+    ["PREPARING", "em-preparo"],
+    ["OUT_FOR_DELIVERY", "saiu-para-entrega"],
+    ["DELIVERED", "entregue"],
+    ["CANCELLED", "cancelado"],
+  ] as const)("lê o status %s do pedido como %s", async (row, status) => {
+    await prisma.order.update({ where: { id: orderId }, data: { status: row } });
+
+    expect(await orders.findForExpiration(orderId)).toMatchObject({ status });
+  });
 });
