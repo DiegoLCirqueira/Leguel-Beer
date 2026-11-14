@@ -492,5 +492,33 @@ describe("GeladeiraProvider com a conta", () => {
       expect(screen.getByTestId("total")).toHaveTextContent("3");
       expect(screen.getByLabelText("Ajustes da Geladeira")).toBeEmptyDOMElement();
     });
+
+    it("sair e voltar à /geladeira: só a resposta da última visita vale, a antiga não a sobrescreve", async () => {
+      guardarLocal(3);
+      const respostas: ((r: ResultadoDaConta) => void)[] = [];
+      const conta = contaFalsa({ tipo: "sem-sessao" });
+      conta.validar.mockImplementation(
+        () => new Promise<ResultadoDaConta>((r) => respostas.push(r)),
+      );
+      const { rerender } = abrirComConta(conta);
+      await vi.waitFor(() => expect(conta.validar).toHaveBeenCalledTimes(1));
+      const irPara = (rota: string) => {
+        caminho.atual = rota;
+        rerender(
+          <GeladeiraProvider conta={conta}>
+            <Painel />
+          </GeladeiraProvider>,
+        );
+      };
+      irPara("/catalogo");
+      await vi.waitFor(() => expect(conta.buscar).toHaveBeenCalledTimes(2));
+      irPara("/geladeira");
+      await vi.waitFor(() => expect(conta.validar).toHaveBeenCalledTimes(2));
+
+      await act(async () => respostas[1]!(ok([{ cerveja, quantidade: 1 }])));
+      await act(async () => respostas[0]!(reduzida));
+
+      expect(screen.getByTestId("total")).toHaveTextContent("1");
+    });
   });
 });
