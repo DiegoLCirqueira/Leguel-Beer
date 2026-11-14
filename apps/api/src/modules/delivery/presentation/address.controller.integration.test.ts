@@ -52,6 +52,8 @@ describe("endereços do cliente (HTTP, banco real)", () => {
     await resetDatabase(prisma);
     await prisma.profile.create({ data: { id: tokens.customerId, email: "cliente@leguele.test" } });
     await seedDeliverySettings(prisma);
+    geocoder.received.length = 0;
+    router.received.length = 0;
     geocoder.respondWith({ latitude: -9.66, longitude: -35.74 });
     router.respondWith(5_200);
   });
@@ -120,5 +122,88 @@ describe("endereços do cliente (HTTP, banco real)", () => {
       distanceMeters: 5_200,
       isDefault: true,
     });
+  });
+
+  it("recusa o corpo fora do contrato (CEP de outro estado) com 400 e sem gravar nem chamar os mapas", async () => {
+    const response = await create({ ...form, cep: "01432-000" });
+
+    expect(response.status).toBe(400);
+    expect(response.body.code).toBe("VALIDATION_ERROR");
+    expect(await prisma.address.count()).toBe(0);
+    expect(geocoder.received).toEqual([]);
+  });
+
+  it("marca como fora da área o endereço sem rota ou além de 25 km", async () => {
+    router.respondWith(26_000);
+    const far = await create(form);
+    router.respondWith(null);
+    const noRoute = await create({ ...form, rua: "Rua sem estrada" });
+
+    expect(far.body).toMatchObject({ foraDaArea: true, padrao: true });
+    expect(noRoute.body).toMatchObject({ foraDaArea: true, padrao: false });
+  });
+
+  it("recusa o sexto endereço com 422 ADDRESS_LIMIT_REACHED, antes de chamar os mapas", async () => {
+    for (let i = 0; i < 5; i++) expect((await create(form)).status).toBe(201);
+    const callsBefore = geocoder.received.length;
+
+    const response = await create(form);
+
+    expect(response.status).toBe(422);
+    expect(response.body).toEqual({
+      code: "ADDRESS_LIMIT_REACHED",
+      message: "Você pode guardar até 5 endereços.",
+    });
+    expect(geocoder.received).toHaveLength(callsBefore);
+    expect(await prisma.address.count()).toBe(5);
+  });
+
+  it("endereço que o serviço de mapas não acha responde 422 ADDRESS_NOT_LOCATED e não grava nada", async () => {
+    geocoder.respondWith(null);
+
+    const response = await create(form);
+
+    expect(response.status).toBe(422);
+    expect(response.body).toEqual({
+      code: "ADDRESS_NOT_LOCATED",
+      message: "Não encontramos este endereço. Confira a rua, o número e o CEP.",
+    });
+    expect(await prisma.address.count()).toBe(0);
+  });
+
+  it.each([
+    ["geocodificação", () => geocoder.respondWith("unavailable")],
+    ["rota", () => router.respondWith("unavailable")],
+  ])(
+    "mapas fora do ar (%s): 503 MAPS_UNAVAILABLE, sem stack, e nada é gravado",
+    async (_nome, fail) => {
+      fail();
+
+      const response = await create(form);
+
+      expect(response.status).toBe(503);
+      expect(response.body).toEqual({
+        code: "MAPS_UNAVAILABLE",
+        message: "Não conseguimos calcular o frete agora. Tente de novo em instantes.",
+      });
+      expect(await prisma.address.count()).toBe(0);
+    },
+  );
+
+  it("sem a configuração de entrega: 503 DELIVERY_SETTINGS_MISSING, nada gravado e mapas intactos", async () => {
+    await prisma.deliverySettings.deleteMany();
+
+    const response = await create(form);
+
+    expect(response.status).toBe(503);
+    expect(response.body.code).toBe("DELIVERY_SETTINGS_MISSING");
+    expect(await prisma.address.count()).toBe(0);
+    expect(geocoder.received).toEqual([]);
+  });
+
+  it("conta sem perfil recebe 409", async () => {
+    await prisma.profile.delete({ where: { id: tokens.customerId } });
+
+    expect((await create(form)).status).toBe(409);
   });
 });
