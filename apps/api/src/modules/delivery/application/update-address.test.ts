@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { NotFoundError } from "../../../common/errors/not-found-error.js";
-import type { AddressInput } from "../domain/address.js";
+import type { Address, AddressInput, Coordinates } from "../domain/address.js";
+import type { AddressRepository, AddressUpdate } from "../domain/address-repository.js";
+import type { GeocodeQuery, Geocoder } from "../domain/maps.js";
 import type { DeliverySettingsRepository } from "../domain/delivery-settings-repository.js";
 import { AddressNotLocatedError } from "../domain/address-errors.js";
 import { MapsUnavailableError } from "../domain/maps.js";
@@ -128,5 +130,51 @@ describe("UpdateAddress", () => {
 
     expect(geocoder.received).toEqual([]);
     expect((await addresses.list("owner-2"))[0]?.street).toBe("Rua do Sol");
+  });
+
+  it("duas edições simultâneas: a que leu o lugar antigo recalcula, e rua e coordenadas continuam coerentes", async () => {
+    const byStreet: Record<string, Coordinates> = {
+      "Rua do Sol": { latitude: -9.66, longitude: -35.74 },
+      "Rua da Praia": { latitude: -9.7, longitude: -35.8 },
+    };
+    const geocoder: Geocoder = {
+      geocode: async (query: GeocodeQuery) => byStreet[query.street] ?? null,
+    };
+    const inMemory = new InMemoryAddressRepository();
+    await inMemory.update("owner-1", () => ({ addresses: [stored], result: undefined }));
+    // Segura a gravação da primeira edição a chegar (B) até a outra (A) terminar.
+    let release!: () => void;
+    const released = new Promise<void>((resolve) => (release = resolve));
+    let reachedHold!: () => void;
+    const reached = new Promise<void>((resolve) => (reachedHold = resolve));
+    let held = false;
+    const gated: AddressRepository = {
+      list: (ownerId) => inMemory.list(ownerId),
+      async update<T>(
+        ownerId: string,
+        decide: (current: Address[]) => AddressUpdate<T> | Promise<AddressUpdate<T>>,
+      ): Promise<T> {
+        if (!held) {
+          held = true;
+          reachedHold();
+          await released;
+        }
+        return inMemory.update(ownerId, decide);
+      },
+    };
+    const update = new UpdateAddress(gated, geocoder, new FakeRouteCalculator(8_000), settings);
+
+    const editB = update.execute("owner-1", "casa", { ...sameFields, nickname: "Casa" });
+    await reached;
+    await update.execute("owner-1", "casa", { ...sameFields, street: "Rua da Praia" });
+    release();
+    await editB;
+
+    const [saved] = await inMemory.list("owner-1");
+    expect(saved).toMatchObject({
+      street: "Rua do Sol",
+      nickname: "Casa",
+      coordinates: byStreet["Rua do Sol"],
+    });
   });
 });
