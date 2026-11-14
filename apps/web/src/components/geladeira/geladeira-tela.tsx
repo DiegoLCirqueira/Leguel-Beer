@@ -1,8 +1,15 @@
 "use client";
 
 import { resumirGeladeira } from "@leguele/shared";
-import { useState } from "react";
-import { BarraDoResumo, BottomSheet, MolduraDaGeladeira, Skeleton, Toast } from "@/components/ui";
+import { useEffect, useState } from "react";
+import {
+  AvisosDaGeladeira,
+  BarraDoResumo,
+  BottomSheet,
+  MolduraDaGeladeira,
+  Skeleton,
+  Toast,
+} from "@/components/ui";
 import type { Desfazer } from "@/lib/geladeira/estado";
 import { useTelaLarga } from "@/lib/use-tela-larga";
 import { useGeladeira } from "./geladeira-provider";
@@ -13,8 +20,11 @@ const mensagemDoLimite = (limite: number) =>
 
 /** A Geladeira em prateleiras, uma por categoria, com o resumo: barra e sheet no celular, coluna no desktop. */
 export function GeladeiraTela() {
-  const { pronta, estado, alterarQuantidade, remover, desfazer } = useGeladeira();
+  const { pronta, estado, ajustes, limparAjustes, alterarQuantidade, remover, desfazer } =
+    useGeladeira();
   const larga = useTelaLarga();
+  // Os avisos valem para esta visita: ao sair da Geladeira, somem.
+  useEffect(() => limparAjustes, [limparAjustes]);
   const [sheetAberto, setSheetAberto] = useState(false);
   // Só o toque mais recente tem toast (e pode ser desfeito): um toast novo substitui o anterior.
   const [toast, setToast] = useState<{ mensagem: string; desfazer?: Desfazer } | null>(null);
@@ -38,6 +48,7 @@ export function GeladeiraTela() {
     <main className="flex h-[calc(100dvh-var(--altura-header-loja)-var(--altura-barra-loja)-env(safe-area-inset-bottom,0px))] flex-col lg:flex-row lg:justify-center lg:gap-8">
       <div className="flex min-h-0 flex-1 flex-col items-center px-4 py-2 lg:flex-none">
         <h1 className="sr-only">Geladeira</h1>
+        <AvisosDaGeladeira ajustes={ajustes} />
         {pronta ? (
           <MolduraDaGeladeira itens={estado.itens} className="min-h-0 flex-1" />
         ) : (
