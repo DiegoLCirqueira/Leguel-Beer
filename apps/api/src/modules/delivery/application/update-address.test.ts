@@ -76,4 +76,18 @@ describe("UpdateAddress", () => {
       { ...stored, nickname: "Casa da praia", complement: "Apto 12" },
     ]);
   });
+
+  it("apagar o apelido e o complemento no formulário os remove do endereço", async () => {
+    const { addresses, update } = await setup();
+    await addresses.update("owner-1", () => ({
+      addresses: [{ ...stored, nickname: "Casa", complement: "Apto 12" }],
+      result: undefined,
+    }));
+
+    await update.execute("owner-1", "casa", sameFields);
+
+    const [saved] = await addresses.list("owner-1");
+    expect(saved?.nickname).toBeUndefined();
+    expect(saved?.complement).toBeUndefined();
+  });
 });
