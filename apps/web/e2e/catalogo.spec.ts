@@ -1,6 +1,7 @@
 import type { Page } from "@playwright/test";
 import { expect, test } from "./support/maior-de-idade";
 
+import { aguardarRevelacao } from "./support/revelacao";
 // Contra a API real com o seed do catálogo: 16 cervejas, 4 por categoria, 1 esgotada (Leguelé Comendador).
 test.use({ isMobile: false, hasTouch: false, viewport: { width: 390, height: 844 } });
 
@@ -14,6 +15,7 @@ const resultCount = (page: Page, count: number) =>
 
 test("os chips mostram o contador de cada categoria e a contagem total", async ({ page }) => {
   await page.goto("/catalogo");
+  await aguardarRevelacao(page);
 
   for (const nome of ["Todas (16)", "IPAs (4)", "Frutas (4)", "Malt (4)", "Lager (4)"]) {
     await expect(page.getByRole("button", { name: nome })).toBeVisible();
@@ -26,6 +28,7 @@ test("tocar num chip filtra pela categoria na URL e o contador dos chips não mu
   page,
 }) => {
   await page.goto("/catalogo");
+  await aguardarRevelacao(page);
 
   await page.getByRole("button", { name: "IPAs (4)" }).click();
 
@@ -41,6 +44,7 @@ test("tocar num chip filtra pela categoria na URL e o contador dos chips não mu
 
 test("filtros por faixa vêm da URL e Filtrar mostra quantos estão ativos", async ({ page }) => {
   await page.goto("/catalogo?teor=6-ou-mais&ibu=40-ou-mais");
+  await aguardarRevelacao(page);
 
   await expect(resultCount(page, 3)).toBeVisible();
   await expect(cards(page).filter({ hasText: "Maré Alta" })).toHaveCount(1);
@@ -51,6 +55,7 @@ test("filtros por faixa vêm da URL e Filtrar mostra quantos estão ativos", asy
 
 test("o sheet aplica uma faixa na URL", async ({ page }) => {
   await page.goto("/catalogo");
+  await aguardarRevelacao(page);
 
   await page.getByRole("button", { name: "Filtrar" }).click();
   await page.getByRole("radio", { name: "6% ou mais" }).check();
@@ -64,6 +69,7 @@ test("a esgotada vai para o fim com o selo e o Adicionar desabilitado; só dispo
   page,
 }) => {
   await page.goto("/catalogo");
+  await aguardarRevelacao(page);
 
   const ultimo = cards(page).last();
   await expect(ultimo).toContainText("Leguelé Comendador");
@@ -71,6 +77,7 @@ test("a esgotada vai para o fim com o selo e o Adicionar desabilitado; só dispo
   await expect(ultimo.getByRole("button", { name: "Adicionar" })).toBeDisabled();
 
   await page.goto("/catalogo?disponiveis=true");
+  await aguardarRevelacao(page);
 
   await expect(resultCount(page, 15)).toBeVisible();
   await expect(cards(page).getByText("Esgotado")).toHaveCount(0);
@@ -80,6 +87,7 @@ test("sem resultado mostra a mensagem e Limpar filtros volta ao catálogo inteir
   page,
 }) => {
   await page.goto("/catalogo?teor=abaixo-de-4-5&ibu=40-ou-mais");
+  await aguardarRevelacao(page);
 
   await expect(
     page.getByRole("main").getByText("Nenhuma cerveja encontrada com esses filtros."),
@@ -102,11 +110,13 @@ test("menor preço e maior preço ordenam a lista, com a esgotada sempre no fim"
   };
 
   await page.goto("/catalogo?ordem=menor-preco");
+  await aguardarRevelacao(page);
   const crescente = (await precos()).slice(0, 15);
   expect(crescente).toEqual([...crescente].sort((a, b) => a - b));
   await expect(cards(page).last()).toContainText("Esgotado");
 
   await page.goto("/catalogo?ordem=maior-preco");
+  await aguardarRevelacao(page);
   const decrescente = (await precos()).slice(0, 15);
   expect(decrescente).toEqual([...decrescente].sort((a, b) => b - a));
   await expect(cards(page).last()).toContainText("Esgotado");
@@ -115,6 +125,7 @@ test("menor preço e maior preço ordenam a lista, com a esgotada sempre no fim"
 test("em 195x422 (zoom de 200%) o catálogo não tem rolagem horizontal", async ({ page }) => {
   await page.setViewportSize({ width: 195, height: 422 });
   await page.goto("/catalogo");
+  await aguardarRevelacao(page);
   await expect(cards(page).first()).toBeVisible();
 
   const excesso = await page.evaluate(
@@ -128,6 +139,7 @@ test("combinar categoria, faixa e ordem mostra a lista certa e Limpar filtros ao
   page,
 }) => {
   await page.goto("/catalogo?categoria=ipa&teor=6-ou-mais&ordem=menor-preco");
+  await aguardarRevelacao(page);
 
   await expect(resultCount(page, 3)).toBeVisible();
   const nomes = await cards(page).getByRole("heading", { level: 3 }).allTextContents();
@@ -142,6 +154,7 @@ test("combinar categoria, faixa e ordem mostra a lista certa e Limpar filtros ao
 
 test("o sheet oferece a categoria e Aplicar a leva para a URL", async ({ page }) => {
   await page.goto("/catalogo");
+  await aguardarRevelacao(page);
 
   await page.getByRole("button", { name: "Filtrar" }).click();
   const sheet = page.getByRole("dialog", { name: "Filtros e ordenação" });
@@ -160,6 +173,7 @@ test("categoria que não existe na URL é ignorada: Todas marcada e sem Limpar f
   page,
 }) => {
   await page.goto("/catalogo?categoria=nao-existe");
+  await aguardarRevelacao(page);
 
   await expect(page.getByRole("button", { name: /^Todas \(\d+\)$/ })).toHaveAttribute(
     "aria-pressed",

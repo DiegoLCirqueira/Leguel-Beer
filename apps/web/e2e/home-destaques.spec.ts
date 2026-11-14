@@ -1,5 +1,6 @@
 import { expect, test } from "./support/maior-de-idade";
 
+import { aguardarRevelacao } from "./support/revelacao";
 // Contra a API real com o seed do catálogo (o seed do CI tem 8 cervejas em destaque: a home mostra 6).
 test.use({ isMobile: false, hasTouch: false, viewport: { width: 390, height: 844 } });
 
@@ -25,6 +26,7 @@ test("a home mostra até 6 destaques na ordem da API, com o selo nas esgotadas e
   expect(esperados.length).toBeLessThanOrEqual(6);
 
   await page.goto("/");
+  await aguardarRevelacao(page);
 
   await expect(page.getByRole("heading", { level: 2, name: "Cervejas em destaque" })).toBeVisible();
   const cards = page.getByRole("article");
@@ -38,6 +40,7 @@ test("a home mostra até 6 destaques na ordem da API, com o selo nas esgotadas e
 
 test("a hierarquia de títulos da home é h1, h2 e h3", async ({ page }) => {
   await page.goto("/");
+  await aguardarRevelacao(page);
   await expect(page.getByRole("heading", { level: 2, name: "Cervejas em destaque" })).toBeVisible();
 
   const niveis = await page
@@ -52,6 +55,7 @@ test("a hierarquia de títulos da home é h1, h2 e h3", async ({ page }) => {
 
 test("Ver todas abre o catálogo sem filtros", async ({ page }) => {
   await page.goto("/");
+  await aguardarRevelacao(page);
 
   await page.getByRole("link", { name: "Ver todas" }).click();
 
@@ -62,6 +66,7 @@ test("Ver todas abre o catálogo sem filtros", async ({ page }) => {
 test("em 195x422 (zoom de 200%) a home não tem rolagem horizontal", async ({ page }) => {
   await page.setViewportSize({ width: 195, height: 422 });
   await page.goto("/");
+  await aguardarRevelacao(page);
   await expect(page.getByRole("article").first()).toBeVisible();
 
   const excesso = await page.evaluate(

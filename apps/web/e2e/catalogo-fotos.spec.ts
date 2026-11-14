@@ -1,10 +1,12 @@
 import { expect, test } from "./support/maior-de-idade";
 import { expectBeerPhoto } from "./support/beer-photo";
 
+import { aguardarRevelacao } from "./support/revelacao";
 test("os cards do catálogo mostram a foto da garrafa (com o arquivo no ar) onde ela existe e a imagem padrão onde não", async ({
   page,
 }) => {
   await page.goto("/catalogo");
+  await aguardarRevelacao(page);
 
   const foto = page.getByRole("img", { name: "Maré Alta, American IPA" });
   await expectBeerPhoto(page, foto, "mare-alta");

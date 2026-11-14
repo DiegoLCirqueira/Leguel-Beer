@@ -1,5 +1,6 @@
 import { expect, test } from "./support/maior-de-idade";
 
+import { aguardarRevelacao } from "./support/revelacao";
 test.use({ isMobile: false, hasTouch: false, viewport: { width: 390, height: 844 } });
 
 const cerveja = (id: string, nome: string) => ({
@@ -46,6 +47,7 @@ test("o contador do header soma as unidades da Geladeira guardada no navegador, 
   );
 
   await page.goto("/");
+  await aguardarRevelacao(page);
 
   await expect(page.getByRole("link", { name: "Geladeira, 3 unidades" })).toBeVisible();
   await page.reload();
@@ -57,6 +59,7 @@ test("cópia local inválida começa vazia, sem quebrar a página", async ({ pag
   await page.addInitScript(() => window.localStorage.setItem("lb:geladeira", "{quebrado"));
 
   await page.goto("/");
+  await aguardarRevelacao(page);
 
   await expect(page.getByRole("link", { name: "Geladeira, 0 unidades" })).toBeVisible();
   await expect(page.getByRole("heading", { level: 1, name: "Leguelé Beer" })).toBeVisible();
@@ -75,6 +78,7 @@ test("sem sessão, a cópia de quem saiu da conta é apagada e o contador volta 
   );
 
   await page.goto("/");
+  await aguardarRevelacao(page);
 
   await expect(page.getByRole("link", { name: "Geladeira, 0 unidades" })).toBeVisible();
   await expect

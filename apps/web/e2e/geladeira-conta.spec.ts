@@ -1,6 +1,7 @@
 import { expect, test } from "./support/maior-de-idade";
 import { criarContaConfirmada, emailUnico, modo } from "./support/supabase-local";
 
+import { aguardarRevelacao } from "./support/revelacao";
 test.describe("Geladeira ao entrar na conta", () => {
   test.skip(modo === "pular", "precisa do Supabase local");
   test.beforeEach(() => {
@@ -17,6 +18,7 @@ test.describe("Geladeira ao entrar na conta", () => {
     expect(beerResponse.status()).toBe(200);
     const beer = await beerResponse.json();
     await page.goto("/catalogo");
+    await aguardarRevelacao(page);
     await page.evaluate((beer) => {
       localStorage.setItem(
         "lb:geladeira",
