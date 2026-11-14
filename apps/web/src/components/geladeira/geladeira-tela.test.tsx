@@ -146,19 +146,41 @@ describe("GeladeiraTela", () => {
       expect(within(ipa).getByText("Maré Alta, 2 unidades, R$ 64,00")).toBeInTheDocument();
     });
 
-    it("'−' com 1 unidade não tira a cerveja; o Stepper muda a quantidade", async () => {
+    it("o Stepper muda a quantidade", async () => {
       guardar([{ cerveja: mare, quantidade: 1 }]);
       const sheet = await abrirResumo();
 
       await userEvent.click(within(sheet).getByRole("button", { name: "Aumentar quantidade" }));
-
       expect(
         within(sheet).getByRole("group", { name: "Quantidade de Maré Alta" }),
       ).toHaveTextContent("2");
+
       await userEvent.click(within(sheet).getByRole("button", { name: "Diminuir quantidade" }));
       expect(
         within(sheet).getByRole("group", { name: "Quantidade de Maré Alta" }),
       ).toHaveTextContent("1");
+    });
+
+    it('toco em "−" da cerveja com 1 unidade: ela sai da Geladeira e vejo o toast com "Desfazer"', async () => {
+      guardar([
+        { cerveja: mare, quantidade: 2 },
+        {
+          cerveja: { ...mare, id: "ponta", slug: "ponta", nome: "Ponta Verde Pilsen" },
+          quantidade: 1,
+        },
+      ]);
+      const sheet = await abrirResumo();
+
+      await userEvent.click(
+        within(
+          within(sheet).getByRole("group", { name: "Quantidade de Ponta Verde Pilsen" }),
+        ).getByRole("button", { name: "Diminuir quantidade" }),
+      );
+
+      expect(within(sheet).getAllByRole("listitem")).toHaveLength(1);
+      expect(within(sheet).getByText("Ponta Verde Pilsen saiu da geladeira")).toBeInTheDocument();
+      await userEvent.click(within(sheet).getByRole("button", { name: "Desfazer" }));
+      expect(within(sheet).getAllByRole("listitem")).toHaveLength(2);
     });
 
     it("'+' no limite mostra 'Só temos N unidades' e nada muda", async () => {
