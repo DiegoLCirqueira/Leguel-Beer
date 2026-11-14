@@ -257,7 +257,8 @@ describe("endereços do cliente (HTTP, banco real)", () => {
     const missing = await edit(crypto.randomUUID(), form);
     const notAnId = await edit("nao-e-um-id", form);
 
-    expect([mine.status, missing.status, notAnId.status]).toEqual([404, 404, 404]);
+    expect([mine.status, missing.status]).toEqual([404, 404]);
+    expect(notAnId.status).toBe(400);
     expect(mine.body).toEqual({ code: "NOT_FOUND", message: "Recurso não encontrado." });
     expect((await prisma.address.findUniqueOrThrow({ where: { id: theirs.id } })).street).toBe(
       "Rua do Outro",
@@ -398,5 +399,16 @@ describe("endereços do cliente (HTTP, banco real)", () => {
     ],
   ])("%s sem token responde 401", async (_nome, act) => {
     expect((await act()).status).toBe(401);
+  });
+
+  it.each([
+    ["editar", (id: string) => edit(id, form)],
+    ["excluir", (id: string) => remove(id)],
+    ["tornar padrão", (id: string) => makeDefault(id)],
+  ])("%s com id que não é UUID responde 400 e não chama os mapas", async (_nome, act) => {
+    const response = await act("nao-e-um-id");
+
+    expect(response.status).toBe(400);
+    expect(geocoder.received).toEqual([]);
   });
 });
