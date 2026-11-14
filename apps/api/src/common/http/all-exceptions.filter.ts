@@ -4,6 +4,24 @@ import { toErrorResponse } from "../errors/error-response.js";
 import { AppLogger } from "../logging/app-logger.js";
 import { REQUEST_ID_HEADER } from "./request-id.middleware.js";
 
+/**
+ * Descrição do erro para o log, sem a mensagem: ela pode trazer dado pessoal (endereço devolvido por
+ * serviço de mapas, valores de uma chamada ao banco). Ficam o nome, o código e os quadros da pilha.
+ */
+function describeForLog(exception: unknown): Record<string, unknown> {
+  if (!(exception instanceof Error)) return { type: typeof exception };
+  const code = (exception as { code?: unknown }).code;
+  const frames = (exception.stack ?? "")
+    .split("\n")
+    .filter((line) => /^\s+at /.test(line))
+    .join("\n");
+  return {
+    name: exception.name,
+    ...(typeof code === "string" && { code }),
+    stack: frames,
+  };
+}
+
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   constructor(private readonly logger: AppLogger) {}
@@ -19,10 +37,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         requestId: req.header(REQUEST_ID_HEADER),
         method: req.method,
         path: req.originalUrl,
-        error:
-          exception instanceof Error
-            ? { name: exception.name, message: exception.message, stack: exception.stack }
-            : String(exception),
+        error: describeForLog(exception),
       });
     }
     res.status(status).json(body);
