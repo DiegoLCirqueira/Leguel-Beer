@@ -27,6 +27,7 @@ model Profile {
   updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   fridge Fridge?
+  orders Order[]
 
   @@map("profiles")
 }
@@ -68,6 +69,7 @@ model Beer {
   createdAt          DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt          DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
   fridgeItems        FridgeItem[]
+  orderItems         OrderItem[]
 
   @@index([categoryId])
   @@index([active, featured])
@@ -104,4 +106,86 @@ model FridgeItem {
   @@unique([fridgeId, position])
   @@index([beerId])
   @@map("fridge_items")
+}
+
+enum OrderStatus {
+  AWAITING_PAYMENT
+  PAID
+  PREPARING
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  PIX
+  CARD
+}
+
+/// Pedido. Dinheiro em centavos; o total é sempre subtotal + frete (os juros do cartão ficam com o gateway). O pedido é histórico: apagar perfil ou cerveja com pedido é recusado, e os dados do cliente e do endereço são cópias do momento da compra.
+model Order {
+  id             String        @id @default(uuid()) @db.Uuid
+  /// "#LB" e 6 dígitos, sorteado e único.
+  number         String        @unique
+  profileId      String        @map("profile_id") @db.Uuid
+  profile        Profile       @relation(fields: [profileId], references: [id], onDelete: Restrict)
+  status         OrderStatus   @default(AWAITING_PAYMENT)
+  paymentMethod  PaymentMethod @map("payment_method")
+  /// Só no cartão; o token do cartão nunca é guardado.
+  installments   Int?
+  cardBrand      String?       @map("card_brand")
+  subtotalCents  Int           @map("subtotal_cents")
+  shippingCents  Int           @map("shipping_cents")
+  totalCents     Int           @map("total_cents")
+  /// Criação + 30 minutos; vencido a partir deste instante.
+  expiresAt      DateTime      @map("expires_at") @db.Timestamptz(3)
+  cancelReason   String?       @map("cancel_reason")
+  customerName   String        @map("customer_name")
+  customerPhone  String        @map("customer_phone")
+  shipZip        String        @map("ship_zip")
+  shipStreet     String        @map("ship_street")
+  shipNumber     String        @map("ship_number")
+  shipComplement String?       @map("ship_complement")
+  shipDistrict   String        @map("ship_district")
+  shipCity       String        @map("ship_city")
+  shipState      String        @map("ship_state")
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  items         OrderItem[]
+  statusHistory OrderStatusHistory[]
+
+  @@index([profileId, createdAt(sort: Desc)])
+  @@index([status, expiresAt])
+  @@map("orders")
+}
+
+/// Cópia da cerveja no momento da compra (nome e preço).
+model OrderItem {
+  id             String @id @default(uuid()) @db.Uuid
+  orderId        String @map("order_id") @db.Uuid
+  order          Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  beerId         String @map("beer_id") @db.Uuid
+  beer           Beer   @relation(fields: [beerId], references: [id], onDelete: Restrict)
+  name           String
+  unitPriceCents Int    @map("unit_price_cents")
+  quantity       Int
+
+  @@unique([orderId, beerId])
+  @@index([beerId])
+  @@map("order_items")
+}
+
+model OrderStatusHistory {
+  id         String       @id @default(uuid()) @db.Uuid
+  orderId    String       @map("order_id") @db.Uuid
+  order      Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  /// Nulo na criação do pedido.
+  fromStatus OrderStatus? @map("from_status")
+  toStatus   OrderStatus  @map("to_status")
+  reason     String?
+  createdAt  DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([orderId, createdAt])
+  @@map("order_status_history")
 }
