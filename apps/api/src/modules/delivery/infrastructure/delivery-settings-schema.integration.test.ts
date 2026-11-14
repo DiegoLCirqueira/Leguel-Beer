@@ -30,4 +30,41 @@ describe("regras do schema das configurações de entrega (banco real)", () => {
     ).rejects.toThrow();
     expect(await prisma.deliverySettings.count()).toBe(0);
   });
+
+  it.each([
+    ["baseFeeCents", -1],
+    ["perKmFeeCents", -1],
+    ["maxRadiusMeters", -1],
+    ["freeShippingMinimumCents", -1],
+  ] as const)("recusa %s negativo", async (field, value) => {
+    await expect(
+      prisma.deliverySettings.create({ data: { ...validSettings, [field]: value } }),
+    ).rejects.toThrow();
+  });
+
+  it.each([
+    ["originLatitude", 90.01],
+    ["originLatitude", -90.01],
+    ["originLongitude", 180.01],
+    ["originLongitude", -180.01],
+  ] as const)("recusa %s fora da faixa (%s)", async (field, value) => {
+    await expect(
+      prisma.deliverySettings.create({ data: { ...validSettings, [field]: value } }),
+    ).rejects.toThrow();
+  });
+
+  it("aceita zero nos valores e as coordenadas nos limites", async () => {
+    await prisma.deliverySettings.create({
+      data: {
+        originLatitude: -90,
+        originLongitude: 180,
+        baseFeeCents: 0,
+        perKmFeeCents: 0,
+        maxRadiusMeters: 0,
+        freeShippingMinimumCents: 0,
+      },
+    });
+
+    expect(await prisma.deliverySettings.count()).toBe(1);
+  });
 });
