@@ -30,7 +30,6 @@ function toAddress(row: AddressRow): Address {
 function toRow(address: Address) {
   return {
     id: address.id,
-    profileId: address.ownerId,
     nickname: address.nickname ?? null,
     zip: address.zip,
     street: address.street,
@@ -81,14 +80,15 @@ export class PrismaAddressRepository implements AddressRepository {
         // Tira o padrão de todos antes de gravar: o índice único aceita um padrão só por cliente.
         await tx.address.updateMany({ where: { profileId: ownerId }, data: { isDefault: false } });
         for (const address of outcome.addresses) {
+          // O dono vem só da operação (`ownerId`), nunca do dado gravado: entra no filtro e na criação e
+          // fica fora do que o `updateMany` escreve, então nenhum endereço muda de dono. Um id de outro
+          // cliente cai no create, a chave primária recusa e a transação inteira desfaz.
           const { id, ...data } = toRow(address);
-          // O dono entra no filtro: um id de outro cliente nunca é reescrito. Sem linha do dono, cria; se o id
-          // já é de outro cliente, a chave primária recusa e a transação inteira desfaz.
           const { count } = await tx.address.updateMany({
             where: { id, profileId: ownerId },
             data,
           });
-          if (count === 0) await tx.address.create({ data: { id, ...data } });
+          if (count === 0) await tx.address.create({ data: { id, profileId: ownerId, ...data } });
         }
       }
       return outcome.result;
