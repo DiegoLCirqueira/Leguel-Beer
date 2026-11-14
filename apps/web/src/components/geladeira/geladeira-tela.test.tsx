@@ -2,10 +2,12 @@ import type { CervejaCard } from "@leguele/shared";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderToString } from "react-dom/server";
+import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/geladeira" }));
 import { CHAVE_DA_GELADEIRA } from "@/lib/geladeira/armazenamento";
+import type { ContaDaGeladeira } from "@/lib/geladeira/conta";
 import { GeladeiraProvider } from "./geladeira-provider";
 import { GeladeiraTela } from "./geladeira-tela";
 
@@ -185,6 +187,54 @@ describe("GeladeiraTela", () => {
 
       expect(screen.queryByText("Maré Alta saiu da geladeira")).not.toBeInTheDocument();
       expect(screen.getByText("Umbu saiu da geladeira")).toBeInTheDocument();
+    });
+  });
+
+  describe("avisos da revalidação (LB-52)", () => {
+    const resposta = {
+      itens: [{ cerveja: mare, quantidade: 2, totalCentavos: 6400 }],
+      ajustes: [
+        {
+          tipo: "preco-mudou" as const,
+          cervejaId: "mare",
+          nome: "Maré Alta",
+          precoVistoCentavos: 3000,
+          precoAtualCentavos: 3200,
+        },
+      ],
+      quantidadeTotal: 2,
+      subtotalCentavos: 6400,
+    };
+    const conta: ContaDaGeladeira = {
+      buscar: vi.fn().mockResolvedValue({ tipo: "ok", resposta }),
+      enviar: vi.fn().mockResolvedValue({ tipo: "ok", resposta }),
+    };
+
+    function ComSaida() {
+      const [naTela, setNaTela] = useState(true);
+      return (
+        <>
+          <button type="button" onClick={() => setNaTela((v) => !v)}>
+            alternar
+          </button>
+          {naTela ? <GeladeiraTela /> : null}
+        </>
+      );
+    }
+
+    it("mostra os avisos no topo e eles somem ao sair da Geladeira", async () => {
+      render(
+        <GeladeiraProvider conta={conta}>
+          <ComSaida />
+        </GeladeiraProvider>,
+      );
+
+      expect(await screen.findByText("O preço de Maré Alta mudou")).toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole("button", { name: "alternar" }));
+      await userEvent.click(screen.getByRole("button", { name: "alternar" }));
+
+      expect(screen.queryByText("O preço de Maré Alta mudou")).not.toBeInTheDocument();
     });
   });
 });
