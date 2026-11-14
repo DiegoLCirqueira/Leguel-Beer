@@ -1,5 +1,6 @@
 import { expect, test } from "./support/maior-de-idade";
 import { expectBeerPhoto } from "./support/beer-photo";
+import { aguardarRevelacao } from "./support/revelacao";
 
 // Contra a API real com o seed do catálogo: Maré Alta (R$ 32,00, antes R$ 36,90, 24 em estoque) e
 // Leguelé Comendador (esgotada).
@@ -7,6 +8,7 @@ test.use({ isMobile: false, hasTouch: false, viewport: { width: 390, height: 844
 
 test("a página da Maré Alta exibe a foto da garrafa servida pelo site", async ({ page }) => {
   await page.goto("/catalogo/mare-alta");
+  await aguardarRevelacao(page);
 
   await expect(page.getByRole("heading", { level: 1, name: "Maré Alta" })).toBeVisible();
   await expectBeerPhoto(
@@ -20,6 +22,7 @@ test("a ficha da Maré Alta mostra nome, estilo, selo, ficha técnica, preço co
   page,
 }) => {
   await page.goto("/catalogo/mare-alta");
+  await aguardarRevelacao(page);
 
   await expect(page.getByRole("heading", { level: 1, name: "Maré Alta" })).toBeVisible();
   await expect(page.getByText("American IPA", { exact: true })).toBeVisible();
@@ -38,6 +41,7 @@ test("a ficha da Maré Alta mostra nome, estilo, selo, ficha técnica, preço co
 
 test("cerveja sem preço anterior não mostra desconto", async ({ page }) => {
   await page.goto("/catalogo/leguele-carnaval");
+  await aguardarRevelacao(page);
 
   await expect(page.getByRole("heading", { level: 1, name: "Leguelé Carnaval" })).toBeVisible();
   await expect(page.locator("s")).toHaveCount(0);
@@ -46,6 +50,7 @@ test("cerveja sem preço anterior não mostra desconto", async ({ page }) => {
 
 test("a esgotada mostra o selo, sem seletor, e o botão fica desabilitado", async ({ page }) => {
   await page.goto("/catalogo/leguele-comendador");
+  await aguardarRevelacao(page);
 
   await expect(page.getByText("Esgotado", { exact: true })).toBeVisible();
   await expect(page.getByRole("group", { name: /Quantidade/ })).toHaveCount(0);
@@ -56,6 +61,7 @@ test("slug que não existe mostra Cerveja não encontrada e Ver catálogo leva a
   page,
 }) => {
   await page.goto("/catalogo/nao-existe");
+  await aguardarRevelacao(page);
 
   await expect(
     page.getByRole("heading", { level: 1, name: "Cerveja não encontrada" }),
@@ -69,6 +75,7 @@ test("o seletor sobe de 1 até a quantidade e o botão fixo fica no pé da tela,
   page,
 }) => {
   await page.goto("/catalogo/mare-alta");
+  await aguardarRevelacao(page);
 
   const grupo = page.getByRole("group", { name: "Quantidade de Maré Alta" });
   await expect(grupo).toContainText("1");
@@ -99,6 +106,7 @@ test("em 195x422 (zoom de 200%) não há rolagem horizontal e o botão fixo segu
 }) => {
   await page.setViewportSize({ width: 195, height: 422 });
   await page.goto("/catalogo/mare-alta");
+  await aguardarRevelacao(page);
   await expect(page.getByRole("heading", { level: 1, name: "Maré Alta" })).toBeVisible();
 
   const excesso = await page.evaluate(
@@ -115,6 +123,7 @@ test("/catalogo/destaques não é cerveja: mostra Cerveja não encontrada, não 
   page,
 }) => {
   await page.goto("/catalogo/destaques");
+  await aguardarRevelacao(page);
 
   await expect(
     page.getByRole("heading", { level: 1, name: "Cerveja não encontrada" }),
@@ -168,6 +177,7 @@ test("Voltar volta à home para quem abriu a cerveja pelos destaques", async ({
 
 test("Voltar em link direto (sem página anterior do site) vai ao catálogo", async ({ page }) => {
   await page.goto("/catalogo/mare-alta");
+  await aguardarRevelacao(page);
 
   await page.getByRole("link", { name: "Voltar" }).click();
 
