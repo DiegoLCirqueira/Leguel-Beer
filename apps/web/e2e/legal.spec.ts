@@ -34,7 +34,7 @@ test("os links do rodapé levam às outras páginas legais", async ({ page }) =>
 for (const [caminho, titulo, updatedAt] of [
   ["/termos", "Termos de Uso", "31 de outubro de 2026"],
   ["/privacidade", "Política de Privacidade", "11 de novembro de 2026"],
-  ["/entregas", "Entregas", "31 de outubro de 2026"],
+  ["/entregas", "Entregas", "14 de novembro de 2026"],
 ] as const) {
   test(`${caminho} mostra a data da última atualização e não tem rolagem horizontal`, async ({
     page,
