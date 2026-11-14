@@ -48,4 +48,13 @@ describe("GeladeiraTela", () => {
       ).toHaveLength(4);
     }
   });
+
+  it("com 2 Maré Alta, a faixa da IPA lê o rótulo e sobram 2 garrafas fantasma", () => {
+    guardar([{ cerveja: mare, quantidade: 2 }]);
+    abrir();
+
+    const ipa = screen.getByRole("region", { name: "IPA" });
+    expect(within(ipa).getByText("Maré Alta, 2 unidades, R$ 64,00")).toBeInTheDocument();
+    expect(within(ipa).getAllByRole("link", { name: "Adicionar IPA" })).toHaveLength(2);
+  });
 });
