@@ -72,3 +72,63 @@ test("a fonte da faixa acompanha a largura da moldura, não a da janela", async 
 
   expect(grande.fonte / pequena.fonte).toBeCloseTo(grande.largura / pequena.largura, 1);
 });
+
+const GELADEIRA_COM_UMA_MARE = {
+  versao: 1,
+  itens: [
+    {
+      cerveja: {
+        id: "mare",
+        slug: "mare-alta",
+        nome: "Maré Alta",
+        estilo: "American IPA",
+        categoria: { slug: "ipa", nome: "IPAs", ordem: 1 },
+        teorAlcoolico: 6.5,
+        ibu: 65,
+        volumeMl: 330,
+        precoCentavos: 3200,
+        destaque: false,
+        quantidadeDisponivel: 5,
+        esgotada: false,
+        imagemUrl: null,
+        cadastradaEm: "2026-10-01T10:00:00.000Z",
+      },
+      quantidade: 1,
+    },
+  ],
+};
+
+for (const [movimento, esperado] of [
+  ["no-preference", ["garrafa-queda"]],
+  ["reduce", []],
+] as const) {
+  test(`a garrafa que cai ${movimento === "reduce" ? "não se move com movimento reduzido" : "anima só transform e opacity"}`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: movimento });
+    await page.addInitScript((geladeira) => {
+      window.localStorage.setItem("lb:geladeira", JSON.stringify(geladeira));
+    }, GELADEIRA_COM_UMA_MARE);
+    await page.goto("/geladeira");
+
+    const garrafa = page.locator("[data-garrafa]").first();
+    await expect(garrafa).toBeAttached();
+    const animacoes = await garrafa.evaluate((e) => {
+      e.setAttribute("data-animacao", "queda");
+      return (e.firstElementChild as HTMLElement).getAnimations().map((a) => ({
+        nome: (a as CSSAnimation).animationName,
+        propriedades: [
+          ...new Set(
+            (a.effect as KeyframeEffect)
+              .getKeyframes()
+              .flatMap((k) => Object.keys(k))
+              .filter((p) => !["offset", "easing", "composite", "computedOffset"].includes(p)),
+          ),
+        ].sort(),
+      }));
+    });
+
+    expect(animacoes.map((a) => a.nome)).toEqual(esperado);
+    for (const a of animacoes) expect(a.propriedades).toEqual(["opacity", "transform"]);
+  });
+}
