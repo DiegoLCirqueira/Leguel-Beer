@@ -80,11 +80,14 @@ Funcionalidade: Qualidade da compra
 - **Banco fechado por fora:** a Data API do Supabase não lê nem grava nenhuma tabela da loja, nem com a chave anônima nem com o token de um cliente logado (papéis `anon` e `authenticated`); nenhuma tabela da loja (inclusive as configurações de entrega, `delivery_settings`, e os endereços, `addresses`) tem política que abra acesso a esses papéis (o armazenamento segue a política do [[ADR-017-fotos-com-sessao-do-admin]]); as tabelas da loja têm RLS ligada sem política (negar tudo), como segunda barreira, sem virar a camada principal de autorização ([[guards-api]], fora de escopo). A API acessa pelo Prisma com a conexão do servidor, como dona das tabelas, sem depender do RLS; por isso não se usa `FORCE ROW LEVEL SECURITY`, que barraria também a dona. A função do papel admin usada pela política do armazenamento ([[ADR-017-fotos-com-sessao-do-admin]]) roda como dona da tabela de perfis (`SECURITY DEFINER`, só leitura, com o `search_path` fixo), e assim continua lendo o papel com a tabela fechada.
 - **Limite de requisições:** além do limite global da API, limites próprios na criação de pedido, na cobrança (Pix e cartão), em simular pagamento, no envio de foto do admin e em criar e editar endereço (POST e PUT, que gastam a cota do serviço de geocodificação e rota, [[enderecos-entrega]]), contado por conta (o usuário do token), não por IP, e ligado antes ou junto do adaptador real do serviço de mapas; o aviso do gateway não pode perder aviso legítimo por limite (o gateway reenvia, mas o limite dele fica acima do volume esperado). O login é do Supabase Auth, com os limites dele.
 
-- **Chamadas do servidor do site:** as Server Actions do site chamam a API do servidor do site, então a API vê o IP do servidor, não o do visitante. Com o limite global por IP, um visitante sem sessão repetindo uma action esgota o balde de todos, e a sincronização da Geladeira dos outros clientes passa a receber 429 sem aviso. Antes de produção, uma das duas saídas: limite por visitante no próprio site (antes de chamar a API), ou repasse do IP real do visitante à API por um proxy confiável (a API só aceita o cabeçalho vindo do servidor do site). Em qualquer delas, o 429 nunca falha em silêncio: o site mostra o erro ou tenta de novo depois.
+- **Chamadas do servidor do site:** as Server Actions do site chamam a API do servidor do site, então a API vê o IP do servidor, não o do visitante. Com o limite global por IP, um visitante sem sessão repetindo uma action esgota o balde de todos, e a sincronização da Geladeira dos outros clientes passa a receber 429 sem aviso. Antes de produção, uma das duas saídas:
+  - **Limite por visitante no próprio site** (recomendada): o servidor do site conta as chamadas de cada visitante antes de chamar a API; não cria credencial nova.
+  - **Repasse do IP real por proxy confiável:** a API só aceita o cabeçalho com o IP do visitante se reconhecer que a chamada veio do servidor do site, por um segredo compartilhado entre site e API. Esse segredo é credencial nova e depende do Diego (item 6).
+  - Em qualquer delas, o 429 nunca falha em silêncio: o site mostra "Muitas tentativas seguidas. Espere um minuto e tente de novo." (texto novo desta spec, recomendação vetável do item 2) e não perde o que o cliente fez; a sincronização da Geladeira tenta de novo depois.
 
 > [!todo] Preencher (Back, técnico): os números dos limites por rota, com a justificativa na descrição do PR.
 
-> [!todo] Pendência de decisão técnica (Back e Devops, antes de produção): limite por visitante no site ou repasse do IP real com proxy confiável, para as chamadas das Server Actions; a escolha vai na descrição do PR e vira ADR se atender aos três critérios.
+> [!todo] Pendência de decisão técnica (fatia 3, Front e Devops, antes de produção): limite por visitante no site (recomendada) ou repasse do IP real com proxy confiável (este só com o segredo aprovado pelo Diego, item 6), para as chamadas das Server Actions; a escolha vai na descrição do PR e vira ADR se atender aos três critérios.
 
 > [!warning] **Pendente de confirmação do Diego** (custos e contas, item 4): o limite de criar e editar endereço protege a cota gratuita do serviço de mapas; o número final e o que fazer se a cota acabar ficam com o Diego (cartão "Decisões pendentes"). Até a resposta, vale o limite proposto pelo Back, dentro do plano gratuito.
 
@@ -124,7 +127,7 @@ Funcionalidade: Qualidade da compra
 | --- | --- | --- | --- |
 | 1 | LB-111 (#90) | Back | Inventário de rotas, matriz de posse e validação por módulo nos módulos que já existem |
 | 2 | LB-111 (#90) | Back e Devops | RLS negar tudo nas tabelas, inclusive `delivery_settings` e `addresses` (migration), teste da Data API no local com essas tabelas, limites por rota |
-| 3 | LB-111 (#90) | Front e Devops | Cabeçalhos do site, teste de segredos no build, `pnpm audit` no CI |
+| 3 | LB-111 (#90) | Front e Devops | Limite das Server Actions por visitante e o texto do 429, cabeçalhos do site, teste de segredos no build, `pnpm audit` no CI |
 | 4 | LB-112 (#91) | Front | E2E da compra feliz e do Pix expirado, com os utilitários do aviso falso e do Mailpit |
 | 5 | LB-111 (#90) | Reviewer | Checklist OWASP e revisão final antes de fechar o milestone "MVP" |
 
@@ -147,6 +150,7 @@ Recomendações aplicadas pelo Spec em 14/11; qualquer uma pode ser vetada.
 - **RLS negar tudo como segunda barreira**, sem virar a autorização principal, sem `FORCE` e com a função do admin `SECURITY DEFINER`.
 - **Limites próprios** em pedido, cobrança, simular pagamento e foto; números com o Back.
 - **CSP só depois do spike LB-54.**
+- **Limite das Server Actions por visitante no site** (sem segredo novo) e o texto "Muitas tentativas seguidas. Espere um minuto e tente de novo." para o 429.
 - **`pnpm audit`** falhando em alta ou crítica de produção, com exceção registrada e prazo de até 30 dias.
 - **Testes de segurança nas fatias, revisão final antes do milestone.**
 
