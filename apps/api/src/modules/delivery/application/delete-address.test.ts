@@ -29,4 +29,44 @@ describe("DeleteAddress", () => {
       { id: "sitio", isDefault: true },
     ]);
   });
+
+  it("excluir o último endereço deixa a lista vazia", async () => {
+    const addresses = await repositoryWith(anAddress({ id: "casa", isDefault: true }));
+
+    await new DeleteAddress(addresses).execute("owner-1", "casa");
+
+    expect(await addresses.list("owner-1")).toEqual([]);
+  });
+
+  it("excluir um endereço que não é o padrão mantém o padrão, mesmo havendo um mais recente", async () => {
+    const addresses = await repositoryWith(
+      anAddress({ id: "casa", isDefault: true, createdAt: at(8) }),
+      anAddress({ id: "trabalho", createdAt: at(9) }),
+      anAddress({ id: "sitio", createdAt: at(10) }),
+    );
+
+    await new DeleteAddress(addresses).execute("owner-1", "trabalho");
+
+    expect(
+      (await addresses.list("owner-1")).map(({ id, isDefault }) => ({ id, isDefault })),
+    ).toEqual([
+      { id: "casa", isDefault: true },
+      { id: "sitio", isDefault: false },
+    ]);
+  });
+
+  it("responde não encontrado para o endereço de outro cliente ou inexistente, sem apagar nada", async () => {
+    const addresses = await repositoryWith(anAddress({ id: "casa", isDefault: true }));
+    await addresses.update("owner-2", () => ({
+      addresses: [anAddress({ id: "do-outro", ownerId: "owner-2", isDefault: true })],
+      result: undefined,
+    }));
+    const remove = new DeleteAddress(addresses);
+
+    await expect(remove.execute("owner-1", "do-outro")).rejects.toBeInstanceOf(NotFoundError);
+    await expect(remove.execute("owner-1", "nao-existe")).rejects.toBeInstanceOf(NotFoundError);
+
+    expect(await addresses.list("owner-1")).toHaveLength(1);
+    expect(await addresses.list("owner-2")).toHaveLength(1);
+  });
 });
