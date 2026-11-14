@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { DeliverySettingsRepository } from "../domain/delivery-settings-repository.js";
 import { AddressLimitReachedError, AddressNotLocatedError } from "../domain/address-errors.js";
+import { DeliverySettingsNotConfiguredError } from "../domain/delivery-settings-repository.js";
+import { MapsUnavailableError } from "../domain/maps.js";
 import { InMemoryAddressRepository } from "../testing/in-memory-addresses.js";
 import { FakeGeocoder, FakeRouteCalculator } from "../testing/fake-maps.js";
 import { AddAddress } from "./add-address.js";
@@ -96,5 +98,50 @@ describe("AddAddress", () => {
 
     expect(await addresses.list("owner-1")).toEqual([]);
     expect(router.received).toEqual([]);
+  });
+
+  it.each(["geocoder", "router"] as const)(
+    "não salva nada quando o serviço de mapas (%s) está fora do ar",
+    async (failing) => {
+      const { addresses, geocoder, router, add } = setup();
+      (failing === "geocoder" ? geocoder : router).respondWith("unavailable");
+
+      await expect(add.execute("owner-1", input)).rejects.toBeInstanceOf(MapsUnavailableError);
+
+      expect(await addresses.list("owner-1")).toEqual([]);
+    },
+  );
+
+  it("salva sem distância quando não há rota até a cervejaria (fora da área)", async () => {
+    const { addresses, router, add } = setup();
+    router.respondWith(null);
+
+    await add.execute("owner-1", input);
+
+    expect((await addresses.list("owner-1"))[0]).toMatchObject({ distanceMeters: null });
+  });
+
+  it("falta de configuração de entrega não chama os mapas nem salva nada", async () => {
+    const { addresses, geocoder } = setup();
+    const missing: DeliverySettingsRepository = {
+      get: async () => {
+        throw new DeliverySettingsNotConfiguredError();
+      },
+    };
+    const add = new AddAddress(
+      addresses,
+      geocoder,
+      new FakeRouteCalculator(),
+      missing,
+      () => "address-1",
+      () => NOW,
+    );
+
+    await expect(add.execute("owner-1", input)).rejects.toBeInstanceOf(
+      DeliverySettingsNotConfiguredError,
+    );
+
+    expect(geocoder.received).toEqual([]);
+    expect(await addresses.list("owner-1")).toEqual([]);
   });
 });
