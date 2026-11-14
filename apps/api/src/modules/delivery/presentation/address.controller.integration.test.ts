@@ -84,6 +84,6 @@ describe("endereços do cliente (HTTP, banco real)", () => {
       code: "DELIVERY_SETTINGS_MISSING",
       message: "A entrega está indisponível no momento. Tente de novo em instantes.",
     });
-    expect(JSON.stringify(response.body)).not.toMatch(/stack|DeliverySettingsNotConfigured|at \w/);
+    expect(JSON.stringify(response.body)).not.toMatch(/stack|DeliverySettingsNotConfigured|at \w/);
   });
 });

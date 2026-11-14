@@ -4,6 +4,7 @@ import { listaDeEnderecosSchema, type EnderecoResposta } from "@leguele/shared";
 import type { AuthorizedUser } from "../../account/application/authorize-request.js";
 import { Authenticated, CurrentUser } from "../../account/presentation/access.decorators.js";
 import { ListAddresses } from "../application/list-addresses.js";
+import { withAddressErrors } from "./address-http-errors.js";
 import { toEnderecoResposta } from "./address.mapper.js";
 
 /** Os endereços são sempre os do dono do token: as rotas não recebem id de cliente. */
@@ -21,7 +22,7 @@ export class AddressController {
   })
   @ApiOkResponse({ description: "Lista de endereços (formato `listaDeEnderecosSchema`)." })
   async list(@CurrentUser() user: AuthorizedUser): Promise<EnderecoResposta[]> {
-    const items = await this.listAddresses.execute(user.id);
+    const items = await withAddressErrors(() => this.listAddresses.execute(user.id));
     return listaDeEnderecosSchema.parse(items.map(toEnderecoResposta));
   }
 }
