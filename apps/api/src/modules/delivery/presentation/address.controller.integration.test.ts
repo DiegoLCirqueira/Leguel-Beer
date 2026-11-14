@@ -428,6 +428,14 @@ describe("endereços do cliente (HTTP, banco real)", () => {
         },
       ],
       [
+        "erro do geocodificador com o endereço numa linha que imita um quadro de pilha",
+        async () => {
+          geocoder.geocode = async () => {
+            throw new Error("falha\n    at Rua do Sol 100 (Farol, Maceió, 57035000)");
+          };
+        },
+      ],
+      [
         "falha real na gravação do banco",
         async () => {
           await prisma.$executeRawUnsafe(
