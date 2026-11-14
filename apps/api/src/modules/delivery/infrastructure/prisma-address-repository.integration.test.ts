@@ -94,4 +94,18 @@ describe("PrismaAddressRepository (banco real)", () => {
 
     expect(await addresses.list(noProfile)).toEqual([]);
   });
+
+  it("uma falha no meio da gravação não deixa nada gravado: a lista anterior continua como estava", async () => {
+    const casa = anAddress({ id: crypto.randomUUID(), ownerId, isDefault: true, createdAt: at(8) });
+    const trabalho = anAddress({ id: crypto.randomUUID(), ownerId, createdAt: at(9) });
+    await save(ownerId, casa, trabalho);
+    // O CHECK de UF do banco recusa o último endereço, depois de o primeiro já ter sido gravado.
+    const invalid = anAddress({ id: crypto.randomUUID(), ownerId, createdAt: at(10) });
+
+    await expect(
+      save(ownerId, { ...trabalho, isDefault: true }, { ...invalid, state: "SP" as "AL" }),
+    ).rejects.toThrow();
+
+    expect(await addresses.list(ownerId)).toEqual([casa, trabalho]);
+  });
 });
