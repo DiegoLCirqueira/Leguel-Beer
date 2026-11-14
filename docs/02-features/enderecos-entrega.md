@@ -119,6 +119,7 @@ Funcionalidade: Endereços e entrega
 - **Valor:** taxa base + valor por km × distância de rota em km, arredondado para cima ao próximo múltiplo de R$ 0,50. Com os valores iniciais: R$ 5,00 + R$ 1,50 por km (5,2 km dá R$ 12,80, que vira R$ 13,00).
 - **Frete grátis:** subtotal de R$ 150,00 ou mais (inclusive). O subtotal é sempre calculado pela API a partir da Geladeira revalidada (preços atuais e quantidades disponíveis), nunca recebido no corpo do pedido nem da cotação; cupom e desconto de assinante são MVP+ e Pós-MVP.
 - **Configurações de entrega** no banco, uma só linha: origem (latitude e longitude), taxa base, valor por km, raio máximo e mínimo para frete grátis, com os valores iniciais acima pelo seed. Mudam sem novo deploy; a tela de admin para elas fica para o item 8.
+- **Configuração ausente:** se a linha das configurações de entrega faltar (banco sem seed ou apagada), a cotação, o salvar endereço (distância) e a criação do pedido respondem um erro controlado no formato de erro da API, sem stack nem detalhe interno, e nada é gravado; o log registra a falta da configuração.
 - **Uma regra só:** o cálculo é uma função pura compartilhada, usada pela cotação e pela criação do pedido. O frete gravado no pedido é recalculado pela API na hora, com as configurações em vigor e o subtotal revalidado por ela.
 - **Cotação:** a API recebe só o id de um endereço do cliente da sessão; o subtotal vem da Geladeira da conta ([[geladeira]], LB-47), revalidada pela API. Devolve o frete, se é grátis e se está na área. Para o convidado, a Geladeira continua com "Informe seu endereço para calcular o frete" ([[geladeira]]).
 - **No resumo da Geladeira** (cliente com endereço padrão): a linha do frete mostra o valor ou "Grátis", e o Total passa a somar o frete. Sem endereço salvo: "Cadastre um endereço para calcular o frete", com link para "Meus endereços".
@@ -176,7 +177,7 @@ Funcionalidade: Endereços e entrega
 | 1 | LB-62 (#48), spike | Back | Escolha do serviço de geocodificação e rota, com a tabela de precisão e limites na descrição do PR; ADR se couber |
 | 2 | Contrato (LB-30, LB-63, LB-64, LB-66) | Back | PR só em `@leguele/shared`: schema de endereço e a função pura de frete e área, com a tabela de testes |
 | 3 | LB-63, LB-64, LB-66 (#49, #50, #52), API | Back | Configurações de entrega (migration e seed) e cotação de frete |
-| 4 | LB-30 (#45), API | Back | Modelo de endereço (migration), CRUD do cliente da sessão, padrão, limite, CEP e geocodificação ao salvar |
+| 4 | LB-30 (#45), API | Back | Modelo de endereço (migration), CRUD do cliente da sessão, padrão, limite, CEP e geocodificação ao salvar; erro controlado, sem stack, se a configuração de entrega faltar |
 | 5 | LB-30 (#45), site | Front | `/conta/enderecos` com busca por CEP, lista, selos, padrão e exclusão |
 | 6 | LB-63, LB-64 no site | Front | Frete e "fora da área" no resumo da Geladeira; a tela 29 entra com o checkout (item 5) |
 
