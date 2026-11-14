@@ -1,0 +1,86 @@
+import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { PrismaService } from "../../../common/prisma/prisma.service.js";
+import { resetDatabase } from "../../../common/testing/database.js";
+import { PrismaOrderRepository } from "./prisma-order-repository.js";
+
+const EXPIRES_AT = new Date("2026-11-14T10:30:00.000Z");
+const NOW = new Date("2026-11-14T10:31:00.000Z");
+
+describe("PrismaOrderRepository (banco real)", () => {
+  const prisma = new PrismaService();
+  const orders = new PrismaOrderRepository(prisma);
+  let profileId: string;
+  let beerId: string;
+  let orderId: string;
+
+  beforeEach(async () => {
+    await resetDatabase(prisma);
+    profileId = (
+      await prisma.profile.create({ data: { id: crypto.randomUUID(), email: "a@x.test" } })
+    ).id;
+    const category = await prisma.category.create({
+      data: { slug: "ipa", name: "IPAs", order: 1 },
+    });
+    beerId = (
+      await prisma.beer.create({
+        data: {
+          slug: "mare-alta",
+          name: "Maré Alta",
+          style: "American IPA",
+          categoryId: category.id,
+          abv: 5,
+          ibu: 30,
+          volumeMl: 500,
+          priceCents: 3200,
+          stock: 10,
+        },
+      })
+    ).id;
+    orderId = (
+      await prisma.order.create({
+        data: {
+          number: "#LB482731",
+          profileId,
+          paymentMethod: "PIX",
+          subtotalCents: 6400,
+          shippingCents: 0,
+          totalCents: 6400,
+          expiresAt: EXPIRES_AT,
+          customerName: "Ana Souza",
+          customerPhone: "82999990000",
+          shipZip: "57035000",
+          shipStreet: "Rua do Sol",
+          shipNumber: "100",
+          shipDistrict: "Farol",
+          shipCity: "Maceió",
+          shipState: "AL",
+          reservations: { create: { beerId, quantity: 2, expiresAt: EXPIRES_AT } },
+          pendingDeductions: { create: { beerId, quantity: 2 } },
+        },
+      })
+    ).id;
+  });
+
+  afterAll(() => prisma.onModuleDestroy());
+
+  it("cancela o pedido aguardando pagamento, libera a reserva, descarta a baixa pendente e grava o histórico", async () => {
+    const cancelled = await orders.cancelIfAwaitingPayment(orderId, "pagamento não concluído", NOW);
+
+    expect(cancelled).toBe(true);
+    const order = await prisma.order.findUniqueOrThrow({ where: { id: orderId } });
+    expect(order.status).toBe("CANCELLED");
+    expect(order.cancelReason).toBe("pagamento não concluído");
+    const reservations = await prisma.stockReservation.findMany({ where: { orderId } });
+    expect(reservations.map((r) => r.releasedAt)).toEqual([NOW]);
+    expect(await prisma.fridgePendingDeduction.count({ where: { orderId } })).toBe(0);
+    const history = await prisma.orderStatusHistory.findMany({ where: { orderId } });
+    expect(history).toMatchObject([
+      {
+        fromStatus: "AWAITING_PAYMENT",
+        toStatus: "CANCELLED",
+        reason: "pagamento não concluído",
+        actorId: null,
+      },
+    ]);
+  });
+});
