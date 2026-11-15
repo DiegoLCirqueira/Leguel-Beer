@@ -2,39 +2,30 @@ import { expect, test } from "./support/maior-de-idade";
 
 test.use({ isMobile: false, hasTouch: false });
 
-test.beforeEach(async ({ context, page, baseURL }) => {
+const API = process.env.API_URL ?? "http://localhost:3333";
+
+test.beforeEach(async ({ context, page, baseURL, request }) => {
   await context.addCookies([
     { name: "leguele_convidado", value: "1", url: baseURL ?? "http://localhost:3000" },
   ]);
+  // Cervejas reais da API: a revalidação do convidado descarta ids que o catálogo não conhece.
+  const slugs = [
+    ["mare-alta", 2],
+    ["umbu-gose", 1],
+    ["cupuacu-ale", 3],
+  ] as const;
+  const itens = await Promise.all(
+    slugs.map(async ([slug, quantidade]) => ({
+      cerveja: await (await request.get(`${API}/catalogo/${slug}`)).json(),
+      quantidade,
+    })),
+  );
   // Semeia a Geladeira só na primeira carga, para recarregar não desfazer o que o teste fez.
-  await page.addInitScript(() => {
+  await page.addInitScript((semente) => {
     if (localStorage.getItem("semeado")) return;
     localStorage.setItem("semeado", "1");
-    const itens = [
-      ["mare", "Maré Alta", 3200, 2],
-      ["umbu", "Umbu Gose", 2800, 1],
-      ["cupuacu", "Cupuaçu Ale", 3000, 3],
-    ].map(([id, nome, preco, quantidade]) => ({
-      cerveja: {
-        id,
-        slug: id,
-        nome,
-        estilo: "American IPA",
-        categoria: { slug: "ipa", nome: "IPAs", ordem: 1 },
-        teorAlcoolico: 6.5,
-        ibu: 65,
-        volumeMl: 330,
-        precoCentavos: preco,
-        destaque: false,
-        quantidadeDisponivel: 9,
-        esgotada: false,
-        imagemUrl: null,
-        cadastradaEm: "2026-10-01T10:00:00.000Z",
-      },
-      quantidade,
-    }));
-    localStorage.setItem("lb:geladeira", JSON.stringify({ versao: 1, itens }));
-  });
+    localStorage.setItem("lb:geladeira", JSON.stringify({ versao: 1, itens: semente }));
+  }, itens);
 });
 
 const semRolagem = (page: import("@playwright/test").Page) =>
