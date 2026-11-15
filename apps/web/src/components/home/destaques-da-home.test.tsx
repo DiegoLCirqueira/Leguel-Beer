@@ -1,7 +1,13 @@
 import type { CervejaCard } from "@leguele/shared";
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { render as renderRtl, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
+import { GeladeiraProvider } from "@/components/geladeira/geladeira-provider";
 import { DestaquesDaHome } from "./destaques-da-home";
+
+const render = (ui: React.ReactElement) => renderRtl(ui, { wrapper: GeladeiraProvider });
 
 const cerveja = (id: string, nome: string, extra: Partial<CervejaCard> = {}): CervejaCard => ({
   id,
@@ -48,5 +54,13 @@ describe("DestaquesDaHome", () => {
     const { container } = render(<DestaquesDaHome itens={[]} />);
 
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it("'Adicionar' no card de destaque põe a cerveja na Geladeira e mostra o toast", async () => {
+    render(<DestaquesDaHome itens={[cerveja("1", "Maré Alta")]} />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Adicionar" }));
+
+    expect(screen.getByRole("status")).toHaveTextContent("Maré Alta foi para a geladeira");
   });
 });
