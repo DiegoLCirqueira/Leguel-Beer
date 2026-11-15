@@ -1,5 +1,6 @@
 ---
-status: proposto
+status: substituído
+substituido-por: "[[ADR-018-pagamento-simulado]]"
 data: 2026-10-28
 notion-adr: ADR-003
 fonte-notion: https://app.notion.com/p/3fd490a7ac7d81d4a752df142740c3a5
@@ -9,6 +10,9 @@ tags:
 ---
 
 # ADR-004: Mercado Pago em sandbox para pagamentos
+
+> [!warning] Substituído
+> Substituído pelo [[ADR-018-pagamento-simulado]] em 2026-11-15 (pagamento só visual, sem gateway).
 
 > [!info] Status
 > **Proposto, provisório até o spike LB-54** (comparar gateways gratuitos). Migrado do ADR-003 do Notion. Ver "Ajustes na migração".

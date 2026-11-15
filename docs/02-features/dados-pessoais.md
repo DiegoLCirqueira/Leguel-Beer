@@ -90,7 +90,7 @@ Funcionalidade: Dados pessoais
   - **E-mail**, só leitura: mostra o e-mail da conta; trocar o e-mail fica fora (card LB-29).
   - **Telefone**, obrigatório, brasileiro, com DDD, 10 ou 11 dígitos, máscara "(00) 00000-0000" (mesma regra do cadastro). Ajuda: "Informe um número com DDD." (tela 19).
   - **Data de nascimento**, no formato DD/MM/AAAA, com máscara. Opcional para salvar o perfil, obrigatória para criar pedido. Precisa ser uma data real, não futura e a partir de 01/01/1900. Ajuda: "Você precisa ter 18 anos ou mais para comprar." Uma data que dá menos de 18 anos é aceita no perfil: o bloqueio é no pedido.
-- **CPF:** não entra no perfil neste item. Ver "Decisões do Diego", pergunta 2.
+- **CPF:** não entra no perfil nem no pagamento: o pagamento é só visual desde 15/11 ([[ADR-018-pagamento-simulado]]). Ver "Decisões do Diego", pergunta 2.
 - **Salvar:** "Salvar alterações" grava e mostra "Perfil atualizado" (toast). "Cancelar" volta a `/conta` sem salvar. Enquanto salva, o botão fica desabilitado e com indicador de carregamento.
 - **Mesmas regras no site e na API:** os campos são validados pelo mesmo schema compartilhado ([[contratos-compartilhados]], [[ADR-010-validacao-com-zod]]); a API responde 400 `VALIDATION_ERROR` com dado inválido. O perfil alterado é sempre o da sessão; o e-mail, o id, o papel e o aceite dos termos não mudam por esta tela.
 - **Perfil incompleto antes do checkout:** sem data de nascimento, o checkout (item 5) leva a "Dados pessoais" com a mensagem do cenário, e depois de salvar volta ao checkout.

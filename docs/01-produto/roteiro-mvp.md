@@ -51,7 +51,7 @@ Agrupado por dependência. Dentro de cada grupo, a ordem da lista.
 | D. Página de produto | LB-40 (#82), LB-41 (#83), LB-42 (#84) | LB-42 depende do LB-47 |
 | E. Conta para a compra | LB-29 (#44), LB-62 (#48), LB-30 (#45), LB-31 (#46, P1), LB-20 (#98) | LB-30 depende do spike de geocodificação (LB-62); LB-31 sobe por ser dependência do checkout; LB-20 usa a data de nascimento do LB-29 |
 | F. Entrega | LB-63 (#49), LB-64 (#50), LB-66 (#52) | Dependem do LB-62 |
-| G. Checkout | LB-54 (#30), LB-55 (#31), LB-56 (#32), LB-38 (#27), LB-57 (#33), LB-58 (#34), LB-59 (#35), LB-60 (#36), LB-61 (#37), LB-81 (#103) | [[checkout]]. LB-54 pode já estar respondido pelo [[ADR-004-mercado-pago]]. LB-38 (esgotadas) depende da reserva do LB-56. LB-81 depende de um provedor de e-mail (conta nova: decisão do Diego) |
+| G. Checkout | LB-54 (#30), LB-55 (#31), LB-56 (#32), LB-38 (#27), LB-57 (#33), LB-58 (#34), LB-59 (#35), LB-60 (#36), LB-61 (#37), LB-81 (#103) | [[checkout]]. LB-54 e LB-59 saem: o pagamento é só visual ([[ADR-018-pagamento-simulado]]); LB-57 e LB-58 são só telas, feitas por último. LB-38 (esgotadas) depende da reserva do LB-56. LB-81 depende de um provedor de e-mail (conta nova: decisão do Diego) |
 | H. Pedidos do cliente | LB-67 (#108) | Depende do checkout |
 | I. Admin | LB-72 (#72), LB-73 (#73), LB-75 (#75), LB-76 (#76), LB-77 (#77) | LB-72 usa o papel admin do [[guards-api]]; LB-76 depende de pedidos |
 | J. Qualidade | LB-111 (#90), LB-112 (#91) | Fecham o MVP: checklist de segurança e E2E da compra de ponta a ponta |
