@@ -271,32 +271,32 @@ Depois do contrato (fatia 1), as fatias 2 a 4 (Back) e 5 a 7 (Front) andam em pa
 - **Bottom sheet:** em tela baixa ou com zoom de 200% rola por dentro e fecha com Esc.
 - **Componentes novos** em `apps/web/src/components/ui`, cada um na vitrine `/dev/tokens` ([[identidade-visual]], "Componentes reutilizáveis"): cabeçalho da loja, barra inferior, card de cerveja, stepper, bottom sheet, toast com "Desfazer", skeleton, select, faixa, switch, estado vazio, título de página e selo "Esgotado".
 
-> [!todo] Preencher: fotos das 7 cervejas que ainda não têm (Jaraguá Hazy IPA, Umbu Gose, Graviola Witbier, Rapadura Brown Ale, Barra Nova Porter, Pajuçara Amber Ale e Ponta Verde Pilsen); o Diego vai enviar. Sem `imagemUrl`, o card usa a imagem padrão da categoria. As 9 com foto recortada entram no PR #249 (LB-124, item 3 da [[sequencia-telas]]).
+> [!todo] Preencher: fotos das 7 cervejas que ainda não têm (Jaraguá Hazy IPA, Umbu Gose, Graviola Witbier, Rapadura Brown Ale, Barra Nova, Pajuçara Amber Ale e Ponta Verde Pilsen); o Diego vai enviar. Sem `imagemUrl`, o card usa a imagem padrão da categoria. As 9 com foto recortada entram no PR #249 (LB-124, item 3 da [[sequencia-telas]]).
 
 ## Catálogo do MVP (16 cervejas da marca)
 
 Decisão do Diego em 08/11: o catálogo do MVP tem **16 cervejas, 4 por categoria, todas da marca Leguelé Beer** ("trocar, tudo deve ser da nossa marca (leguelé beer)"). As 9 dos rótulos em `Imagens/figma/cervejas/` (fora do repo) ficam como base; as outras 7 são novas. Sobre as novas ("Falta criar o resto das cervejas que vão fechar 4 por categoria; quanto ao rótulo ou design faça o que ficar melhor; esses dados vão ser completamente inventados então tem liberdade pra fazê-los, pegue cervejas existentes como base pras pesquisas"), os dados são **inventados, de exemplo**, e serão trocados pelo cadastro (admin, LB-73). Comendador: "Não tenho certeza"; o Spec inventou estilo e dados (Helles, Lager).
 
-Onde rótulo e design divergem, o Diego delegou e vale (decisão do Spec, vetável): o **rótulo** para nome, estilo, teor e volume (Maré Alta 330 ml, Cupuaçu Ale 5,8%); o **design** para preço, preço anterior, IBU e descrição da Maré Alta (R$ 32,00, anterior R$ 36,90, IBU 65). **Fotos das garrafas** (decisão do Diego, 2026-11-12): o site usa as fotos do Diego, mesmo com os rótulos que trazem marca de terceiros (o Diego autorizou). As 9 cervejas com foto (Maré Alta, Leguelé Carnaval, Leguelé Maceió IPA, Cupuaçu Ale, Cajupá Sour, Avermelhou, Leguelé Kölsch, Leguelé Cream Ale e Leguelé Comendador) usam a foto recortada (PR #249); as outras 7 seguem com a imagem padrão da categoria até o Diego enviar as fotos.
+Onde rótulo e design divergem, o Diego delegou e vale (decisão do Spec, vetável): o **rótulo** para nome, estilo, teor e volume (Maré Alta 330 ml, Cupuaçu Ale 5,8%); o **design** para preço, preço anterior, IBU e descrição da Maré Alta (R$ 32,00, anterior R$ 36,90, IBU 65). Em 15/11, as 7 cervejas novas foram alinhadas aos rótulos das fotos do PR #267 (teor, volume, estilo e o nome "Barra Nova"; slug e preço iguais), recomendação aplicada e vetável: 5 delas passam de 330 para 500 ml com o mesmo preço. **Fotos das garrafas** (decisão do Diego, 2026-11-12): o site usa as fotos do Diego, mesmo com os rótulos que trazem marca de terceiros (o Diego autorizou). As 9 cervejas com foto (Maré Alta, Leguelé Carnaval, Leguelé Maceió IPA, Cupuaçu Ale, Cajupá Sour, Avermelhou, Leguelé Kölsch, Leguelé Cream Ale e Leguelé Comendador) usam a foto recortada (PR #249); as outras 7 seguem com a imagem padrão da categoria até o Diego enviar as fotos.
 
 | Cerveja (slug) | Estilo | Categoria | Teor | Vol. | Preço | IBU | Destaque | Referência de estilo |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Maré Alta (`mare-alta`) | American IPA | IPA | 6,5% | 330 ml | R$ 32,00 (anterior R$ 36,90) | 65 | sim | American IPA artesanal: 6–7%, 55–70 IBU |
 | Leguelé Carnaval (`leguele-carnaval`) | Session IPA | IPA | 4,2% | 330 ml | R$ 30,00 | 30 | sim | Session IPA: 4–4,5%, 25–40 IBU |
 | Leguelé Maceió IPA (`leguele-maceio-ipa`) | IPA | IPA | 6,0% | 330 ml | R$ 31,00 | 55 | não | IPA clássica nacional: 6–6,5%, 50–60 IBU |
-| Jaraguá Hazy IPA (`jaragua-hazy-ipa`) | New England IPA | IPA | 6,8% | 500 ml | R$ 33,50 | 42 | sim | NEIPA artesanal nacional: 6,5–7%, 30–50 IBU |
+| Jaraguá Hazy IPA (`jaragua-hazy-ipa`) | Juicy Hazy IPA | IPA | 6,6% | 500 ml | R$ 33,50 | 42 | sim | Juicy Hazy IPA artesanal nacional: 6,5–7%, 30–50 IBU |
 | Cupuaçu Ale (`cupuacu-ale`) | Amazonian Fruit Ale | Frutas | 5,8% | 500 ml | R$ 26,50 | 15 | sim | Fruit ale com fruta amazônica: 5–6%, 10–20 IBU |
 | Cajupá Sour (`cajupa-sour`) | Sour Ale com cajá | Frutas | 6,5% | 500 ml | R$ 26,00 (anterior R$ 29,90) | 8 | sim | Fruited sour: 4,5–6,5%, 5–10 IBU |
-| Umbu Gose (`umbu-gose`) | Gose com umbu | Frutas | 4,0% | 330 ml | R$ 27,50 | 6 | não | Gose frutada: 4–4,5%, 5–10 IBU |
-| Graviola Witbier (`graviola-witbier`) | Witbier com graviola | Frutas | 4,8% | 500 ml | R$ 28,00 | 12 | não | Witbier com fruta: 4,5–5%, 10–15 IBU |
+| Umbu Gose (`umbu-gose`) | Gose com umbu | Frutas | 4,6% | 500 ml | R$ 27,50 | 6 | não | Gose frutada: 4–4,5%, 5–10 IBU |
+| Graviola Witbier (`graviola-witbier`) | Witbier com graviola | Frutas | 4,9% | 500 ml | R$ 28,00 | 12 | não | Witbier com fruta: 4,5–5%, 10–15 IBU |
 | Avermelhou (`avermelhou`) | Red Ale (hibisco e frutas vermelhas) | Malt | 5,8% | 330 ml | R$ 29,00 | 20 | sim | Irish/American Red Ale: 5–6%, 20–28 IBU |
-| Rapadura Brown Ale (`rapadura-brown-ale`) | Brown Ale com rapadura | Malt | 5,5% | 330 ml | R$ 28,50 | 24 | não | American Brown Ale: 5–6%, 20–35 IBU |
-| Barra Nova Porter (`barra-nova-porter`) | Robust Porter | Malt | 6,4% | 330 ml | R$ 31,50 | 35 | sim | Robust Porter: 5,5–7%, 30–45 IBU |
-| Pajuçara Amber Ale (`pajucara-amber-ale`) | American Amber Ale | Malt | 5,0% | 330 ml | R$ 27,00 | 25 | não | American Amber: 4,5–5,5%, 25–35 IBU |
+| Rapadura Brown Ale (`rapadura-brown-ale`) | English Brown Ale | Malt | 5,5% | 500 ml | R$ 28,50 | 24 | não | Brown Ale: 5–6%, 20–35 IBU |
+| Barra Nova (`barra-nova-porter`) | Robust Porter | Malt | 6,0% | 500 ml | R$ 31,50 | 35 | sim | Robust Porter: 5,5–7%, 30–45 IBU |
+| Pajuçara Amber Ale (`pajucara-amber-ale`) | American Amber Ale | Malt | 5,4% | 500 ml | R$ 27,00 | 25 | não | American Amber: 4,5–5,5%, 25–35 IBU |
 | Leguelé Kölsch (`leguele-kolsch`) | Kölsch | Lager | 4,8% | 330 ml | R$ 24,90 | 22 | sim | Kölsch: 4,5–5%, 18–25 IBU |
 | Leguelé Cream Ale (`leguele-cream-ale`) | Cream Ale | Lager | 5,2% | 330 ml | R$ 25,00 | 18 | não | Cream Ale: 4,5–5,5%, 10–20 IBU |
 | Leguelé Comendador (`leguele-comendador`) | Helles (inventado) | Lager | 4,9% | 500 ml | R$ 25,90 | 17 | não (esgotada) | Munich Helles: 4,5–5%, 16–22 IBU |
-| Ponta Verde Pilsen (`ponta-verde-pilsen`) | German Pilsner | Lager | 4,6% | 500 ml | R$ 23,90 | 28 | não | German Pils: 4,4–5,2%, 22–40 IBU |
+| Ponta Verde Pilsen (`ponta-verde-pilsen`) | German Pilsner | Lager | 4,7% | 500 ml | R$ 23,90 | 28 | não | German Pils: 4,4–5,2%, 22–40 IBU |
 
 Valores inventados para o seed; a coluna "Referência de estilo" mostra só a faixa típica do estilo em cervejas artesanais existentes, sem nome nem marca de terceiros. O preço anterior (Maré Alta, Cajupá Sour) só alimenta o dado; o preço riscado no card não tem spec ainda (na página de produto tem, ver [[produto]]).
 
@@ -314,21 +314,21 @@ Valores inventados para o seed; a coluna "Referência de estilo" mostra só a fa
 | Graviola Witbier | Witbier de trigo com coentro, casca de laranja e graviola. Cremosa e refrescante. |
 | Avermelhou | Red Ale com hibisco e frutas vermelhas. Malte caramelado, cor rubi e toque floral. |
 | Rapadura Brown Ale | Brown Ale com rapadura nordestina. Notas de caramelo, nozes e um doce discreto no final. |
-| Barra Nova Porter | Porter encorpada com malte torrado, chocolate amargo e café. Para os dias de chuva e de conversa. |
+| Barra Nova | Porter encorpada com malte torrado, chocolate amargo e café. Para os dias de chuva e de conversa. |
 | Pajuçara Amber Ale | Amber Ale equilibrada, de malte tostado e lúpulo cítrico. A cerveja de todo dia, com personalidade. |
 | Leguelé Kölsch | Dourada, limpa e delicada, com frutado suave. Leve como a brisa da orla. |
 | Leguelé Cream Ale | Cremosa, macia e fácil de beber. Corpo leve, milho no malte e final suave. |
 | Leguelé Comendador | Helles dourada de malte macio e amargor discreto. Uma lager clássica com a assinatura da casa. |
 | Ponta Verde Pilsen | Pilsen crocante, de amargor nobre e aroma floral. Gelada na medida. |
 
-**Cobertura das faixas:** teor, "Abaixo de 4,5%" (Carnaval 4,2%, Umbu Gose 4,0%), "4,5% a menos de 6%" (Cupuaçu Ale, Graviola Witbier, Avermelhou, Rapadura, Pajuçara, Kölsch, Cream Ale, Comendador, Ponta Verde) e "6% ou mais" (Maré Alta, Maceió IPA, Jaraguá, Cajupá Sour, Barra Nova); IBU, "Abaixo de 20" (Cupuaçu Ale, Cajupá Sour, Umbu Gose, Graviola, Cream Ale, Comendador), "20 a menos de 40" (Carnaval, Avermelhou, Rapadura, Barra Nova, Pajuçara, Kölsch, Ponta Verde) e "40 ou mais" (Maré Alta, Maceió IPA, Jaraguá); preço, "Abaixo de R$ 25" (Kölsch, Ponta Verde), "R$ 25 a menos de R$ 30" (Cupuaçu Ale, Cajupá Sour, Umbu Gose, Graviola, Avermelhou, Rapadura, Pajuçara, Cream Ale, Comendador) e "R$ 30 ou mais" (Maré Alta, Carnaval, Maceió IPA, Jaraguá, Barra Nova). Todas as 9 faixas têm cerveja.
+**Cobertura das faixas:** teor, "Abaixo de 4,5%" (Carnaval 4,2%), "4,5% a menos de 6%" (Umbu Gose, Cupuaçu Ale, Graviola Witbier, Avermelhou, Rapadura, Pajuçara, Kölsch, Cream Ale, Comendador, Ponta Verde) e "6% ou mais" (Maré Alta, Maceió IPA, Jaraguá, Cajupá Sour, Barra Nova); IBU, "Abaixo de 20" (Cupuaçu Ale, Cajupá Sour, Umbu Gose, Graviola, Cream Ale, Comendador), "20 a menos de 40" (Carnaval, Avermelhou, Rapadura, Barra Nova, Pajuçara, Kölsch, Ponta Verde) e "40 ou mais" (Maré Alta, Maceió IPA, Jaraguá); preço, "Abaixo de R$ 25" (Kölsch, Ponta Verde), "R$ 25 a menos de R$ 30" (Cupuaçu Ale, Cajupá Sour, Umbu Gose, Graviola, Avermelhou, Rapadura, Pajuçara, Cream Ale, Comendador) e "R$ 30 ou mais" (Maré Alta, Carnaval, Maceió IPA, Jaraguá, Barra Nova). Todas as 9 faixas têm cerveja.
 
-**Destaques:** 8 cervejas em destaque, para exercitar o corte em 6 da home: Maré Alta, Leguelé Carnaval, Jaraguá Hazy IPA, Cupuaçu Ale, Cajupá Sour, Avermelhou, Barra Nova Porter e Leguelé Kölsch. Pela relevância (ordem das categorias, depois o nome), a home mostra Jaraguá Hazy IPA, Leguelé Carnaval, Maré Alta, Cajupá Sour, Cupuaçu Ale e Avermelhou; Barra Nova Porter e Leguelé Kölsch ficam de fora.
+**Destaques:** 8 cervejas em destaque, para exercitar o corte em 6 da home: Maré Alta, Leguelé Carnaval, Jaraguá Hazy IPA, Cupuaçu Ale, Cajupá Sour, Avermelhou, Barra Nova e Leguelé Kölsch. Pela relevância (ordem das categorias, depois o nome), a home mostra Jaraguá Hazy IPA, Leguelé Carnaval, Maré Alta, Cajupá Sour, Cupuaçu Ale e Avermelhou; Barra Nova e Leguelé Kölsch ficam de fora.
 
 ### Categorias
 
-4 por categoria: **IPA** (Maré Alta, Leguelé Carnaval, Leguelé Maceió IPA, Jaraguá Hazy IPA), **Frutas** (Cupuaçu Ale, Cajupá Sour, Umbu Gose, Graviola Witbier), **Malt** (Avermelhou, Rapadura Brown Ale, Barra Nova Porter, Pajuçara Amber Ale) e **Lager** (Leguelé Kölsch, Leguelé Cream Ale, Leguelé Comendador, Ponta Verde Pilsen). Sem Stout. Kölsch e Cream Ale são ales de perfil limpo, postas em Lager por decisão do Diego.
+4 por categoria: **IPA** (Maré Alta, Leguelé Carnaval, Leguelé Maceió IPA, Jaraguá Hazy IPA), **Frutas** (Cupuaçu Ale, Cajupá Sour, Umbu Gose, Graviola Witbier), **Malt** (Avermelhou, Rapadura Brown Ale, Barra Nova, Pajuçara Amber Ale) e **Lager** (Leguelé Kölsch, Leguelé Cream Ale, Leguelé Comendador, Ponta Verde Pilsen). Sem Stout. Kölsch e Cream Ale são ales de perfil limpo, postas em Lager por decisão do Diego.
 
 ### A confirmar
 
-- **Fotos das garrafas** (LB-124): as 9 cervejas com foto do Diego já a usam (PR #249), inclusive as de rótulo com marca de terceiros (Cupuaçu Ale, Avermelhou, Cajupá Sour e Maré Alta), que o Diego autorizou em 2026-11-12 e não precisam mais ser refeitas. Faltam as fotos das 7 cervejas novas (Jaraguá Hazy IPA, Umbu Gose, Graviola Witbier, Rapadura Brown Ale, Barra Nova Porter, Pajuçara Amber Ale e Ponta Verde Pilsen), que o Diego vai enviar; até lá, imagem padrão da categoria.
+- **Fotos das garrafas** (LB-124): as 9 cervejas com foto do Diego já a usam (PR #249), inclusive as de rótulo com marca de terceiros (Cupuaçu Ale, Avermelhou, Cajupá Sour e Maré Alta), que o Diego autorizou em 2026-11-12 e não precisam mais ser refeitas. Faltam as fotos das 7 cervejas novas (Jaraguá Hazy IPA, Umbu Gose, Graviola Witbier, Rapadura Brown Ale, Barra Nova, Pajuçara Amber Ale e Ponta Verde Pilsen), que o Diego vai enviar; até lá, imagem padrão da categoria.

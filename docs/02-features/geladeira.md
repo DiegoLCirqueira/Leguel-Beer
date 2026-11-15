@@ -127,7 +127,7 @@ Funcionalidade: Geladeira em prateleiras por categoria
 - Uma imagem por cerveja: foto da garrafa de frente, fundo transparente, recortada em caixa justa (sem margem), com a base na borda inferior da imagem (eixo do balanço). Os tamanhos variam de foto para foto (as 9 atuais vão de 110 a 149 px de largura e de 391 a 452 px de altura); o site alinha todas pela base. No site, WebP com no máximo 40 KB.
 - A mesma imagem serve ao card, à página de produto e à Geladeira (o `imagemUrl` da cerveja). Arquivos em `apps/web/public/cervejas/<slug>.webp`; o seed preenche o `imageUrl` das cervejas que têm imagem. O cadastro de imagem pelo admin é o LB-73 (item 8).
 - **Imagem padrão da categoria**, para cerveja sem imagem: garrafa sem rótulo, com o contorno da garrafa fantasma preenchido na cor do selo da categoria (tokens do `StyleBadge`), uma por categoria, com o mesmo enquadramento.
-- **Fotos do Diego** (decisão do Diego, 2026-11-12, [[catalogo]], "Catálogo do MVP"): o site usa as fotos das garrafas do Diego, mesmo com rótulo que traz marca de terceiros. Entram as 9 que têm foto (PR #249): Maré Alta, Leguelé Carnaval, Leguelé Maceió IPA, Cupuaçu Ale, Cajupá Sour, Avermelhou, Leguelé Kölsch, Leguelé Cream Ale e Leguelé Comendador. As outras 7 (Jaraguá Hazy IPA, Umbu Gose, Graviola Witbier, Rapadura Brown Ale, Barra Nova Porter, Pajuçara Amber Ale e Ponta Verde Pilsen) usam a imagem padrão da categoria até o Diego enviar as fotos.
+- **Fotos do Diego** (decisão do Diego, 2026-11-12, [[catalogo]], "Catálogo do MVP"): o site usa as fotos das garrafas do Diego, mesmo com rótulo que traz marca de terceiros. Entram as 9 que têm foto (PR #249): Maré Alta, Leguelé Carnaval, Leguelé Maceió IPA, Cupuaçu Ale, Cajupá Sour, Avermelhou, Leguelé Kölsch, Leguelé Cream Ale e Leguelé Comendador. As outras 7 (Jaraguá Hazy IPA, Umbu Gose, Graviola Witbier, Rapadura Brown Ale, Barra Nova, Pajuçara Amber Ale e Ponta Verde Pilsen) usam a imagem padrão da categoria até o Diego enviar as fotos.
 - **Moldura:** a imagem da geladeira do estúdio (710 × 1573), extraída para `apps/web/public/geladeira/`, com o parapeito de cada prateleira redesenhado por cima das garrafas, como no estúdio.
 
 ### Alterar e remover (LB-50)
@@ -161,7 +161,7 @@ Funcionalidade: Geladeira em prateleiras por categoria
 - Cupom de desconto (LB-53, MVP+), favoritar (Pós-MVP) e "Limpar geladeira" (botão da tela 24 sem card no backlog).
 - Cálculo de frete e endereço padrão (item 4), checkout e exigência de login ao finalizar (item 5, LB-55 e LB-31).
 - Reserva de estoque (LB-56, #32): até ela existir, a quantidade disponível é o estoque.
-- **Fotos que faltam** (follow-up do LB-124): as 7 cervejas sem foto (Jaraguá Hazy IPA, Umbu Gose, Graviola Witbier, Rapadura Brown Ale, Barra Nova Porter, Pajuçara Amber Ale e Ponta Verde Pilsen), que o Diego vai enviar. Cada foto entra depois, só com a imagem e o seed, sem mudar esta spec. Os rótulos com marca de terceiros não precisam mais ser refeitos (decisão do Diego, 2026-11-12).
+- **Fotos que faltam** (follow-up do LB-124): as 7 cervejas sem foto (Jaraguá Hazy IPA, Umbu Gose, Graviola Witbier, Rapadura Brown Ale, Barra Nova, Pajuçara Amber Ale e Ponta Verde Pilsen), que o Diego vai enviar. Cada foto entra depois, só com a imagem e o seed, sem mudar esta spec. Os rótulos com marca de terceiros não precisam mais ser refeitos (decisão do Diego, 2026-11-12).
 
 ## Referência visual
 
