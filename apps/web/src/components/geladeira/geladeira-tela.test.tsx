@@ -230,6 +230,7 @@ describe("GeladeiraTela", () => {
     const conta: ContaDaGeladeira = {
       buscar: vi.fn().mockResolvedValue({ tipo: "ok", resposta }),
       enviar: vi.fn().mockResolvedValue({ tipo: "ok", resposta }),
+      validar: vi.fn().mockResolvedValue({ tipo: "erro" }),
     };
 
     function ComSaida() {

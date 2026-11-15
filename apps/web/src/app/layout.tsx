@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import {
   buscarGeladeiraDaContaAction,
   enviarGeladeiraParaContaAction,
+  validarGeladeiraAction,
 } from "@/app/geladeira/actions";
 import { GeladeiraProvider } from "@/components/geladeira/geladeira-provider";
 import "./globals.css";
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           conta={{
             buscar: buscarGeladeiraDaContaAction,
             enviar: enviarGeladeiraParaContaAction,
+            validar: validarGeladeiraAction,
           }}
         >
           {children}

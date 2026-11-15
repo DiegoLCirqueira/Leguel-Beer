@@ -9,7 +9,8 @@ vi.mock("next/headers", () => ({
   }),
 }));
 
-const { buscarGeladeiraDaContaAction, enviarGeladeiraParaContaAction } = await import("./actions");
+const { buscarGeladeiraDaContaAction, enviarGeladeiraParaContaAction, validarGeladeiraAction } =
+  await import("./actions");
 
 const vazia: GeladeiraResponse = {
   itens: [],
@@ -86,6 +87,52 @@ describe("Server Actions da Geladeira da conta", () => {
     fetchFalso.mockClear();
     const invalido = { itens: [{ cervejaId: "a", quantidade: 0, precoVistoCentavos: 1 }] };
     expect(await enviarGeladeiraParaContaAction(invalido)).toEqual({ tipo: "erro" });
+    expect(fetchFalso).not.toHaveBeenCalled();
+  });
+});
+
+describe("Server Action de validar a Geladeira do convidado", () => {
+  const fetchFalso = vi.fn();
+  beforeEach(() => {
+    sessao.token = undefined;
+    vi.stubGlobal("fetch", fetchFalso);
+    vi.stubEnv("API_URL", "http://api.test");
+  });
+  afterEach(() => {
+    fetchFalso.mockReset();
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
+
+  it("POST /geladeira/validar leva os itens, sem token, e devolve a Geladeira validada", async () => {
+    fetchFalso.mockResolvedValue(json(200, vazia));
+
+    const resultado = await validarGeladeiraAction(pedido);
+
+    const [url, opcoes] = fetchFalso.mock.calls[0] as [
+      string,
+      { method: string; body: string; headers: Record<string, string> },
+    ];
+    expect(url).toBe("http://api.test/geladeira/validar");
+    expect(opcoes.method).toBe("POST");
+    expect(JSON.parse(opcoes.body)).toEqual(pedido);
+    expect(opcoes.headers).not.toHaveProperty("Authorization");
+    expect(resultado).toEqual({ tipo: "ok", resposta: vazia });
+  });
+
+  it("falha de rede, outro status, resposta fora do contrato e pedido inválido viram erro, sem lançar", async () => {
+    fetchFalso.mockRejectedValueOnce(new Error("sem rede"));
+    expect(await validarGeladeiraAction(pedido)).toEqual({ tipo: "erro" });
+
+    fetchFalso.mockResolvedValueOnce(json(429, {}));
+    expect(await validarGeladeiraAction(pedido)).toEqual({ tipo: "erro" });
+
+    fetchFalso.mockResolvedValueOnce(json(200, { itens: 1 }));
+    expect(await validarGeladeiraAction(pedido)).toEqual({ tipo: "erro" });
+
+    fetchFalso.mockClear();
+    const invalido = { itens: [{ cervejaId: "a", quantidade: 0, precoVistoCentavos: 1 }] };
+    expect(await validarGeladeiraAction(invalido)).toEqual({ tipo: "erro" });
     expect(fetchFalso).not.toHaveBeenCalled();
   });
 });
