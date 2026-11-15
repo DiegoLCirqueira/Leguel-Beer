@@ -102,7 +102,6 @@ Funcionalidade: Checkout
 
 - Só **Pix** e **Cartão de crédito**; Pix vem selecionado. Sem cartão de débito, boleto e cupom.
 - Cartão: campos do cartão de teste e parcelas, só visuais, como em [[pagamento]] (entram com as telas de pagamento, por último). Pix: só a escolha; o QR decorativo aparece depois de confirmar.
-- Aviso fixo: "Projeto de portfólio: o pagamento é simulado, nenhum valor é cobrado." ([[pagamento]]).
 
 ### Etapa Revisão (tela 07)
 

@@ -37,7 +37,7 @@ Funcionalidade: Pagamento só visual com Pix e cartão
   Cenário: Tela do Pix
     Dado que confirmei na Revisão um pedido de R$ 162,00 com Pix
     Quando a tela de pagamento do pedido abre
-    Então vejo a imagem decorativa do QR, o código de demonstração com "Copiar código", "Expira em 30:00" contando para trás e o aviso "Projeto de portfólio: o pagamento é simulado, nenhum valor é cobrado."
+    Então vejo a imagem decorativa do QR, o código de demonstração com "Copiar código" e "Expira em 30:00" contando para trás, sem aviso de portfólio
     E nada é cobrado e o pedido continua "Aguardando pagamento"
 
   Cenário: Pix expirado
@@ -86,7 +86,7 @@ Funcionalidade: Pagamento só visual com Pix e cartão
 
 - **Nenhuma lógica de pagamento:** sem gateway (nem real, nem simulado), sem cobrança, sem webhook nem aviso de pagamento, sem aprovação automática ou tardia, sem idempotência por pagamento ([[ADR-018-pagamento-simulado]]). A API não tem rota de pagamento.
 - **O pedido continua o mesmo:** criado "Aguardando pagamento" com reserva e validade de 30 minutos ([[checkout]]), expiração no uso e pelo cron (LB-60, já mergeado), status e estoque como em [[pedidos-cliente]] e [[admin]].
-- **Aviso fixo** (texto vetável): na etapa Pagamento do checkout e na tela de pagamento do pedido, "Projeto de portfólio: o pagamento é simulado, nenhum valor é cobrado.".
+- **Sem aviso de portfólio:** vale a decisão do Diego de 30/10 ([[termos-privacidade]]): nenhuma tela de pagamento diz que o site é projeto de portfólio ou que o pagamento é simulado.
 - Nenhum dado pessoal ou de cartão vai à API ou a terceiros por causa do pagamento. A Política de Privacidade não muda por esta spec.
 
 ### De "Aguardando pagamento" a "Pago"
@@ -111,7 +111,7 @@ Funcionalidade: Pagamento só visual com Pix e cartão
 
 ### Pix (LB-57, telas 18 e 30)
 
-- **Tela:** imagem decorativa do QR, código de demonstração com "Copiar código", contagem "Expira em mm:ss", "Aguardando pagamento", os passos "Como pagar", o resumo (quantidade de itens, subtotal, frete e total), "Já paguei" e o aviso fixo.
+- **Tela:** imagem decorativa do QR, código de demonstração com "Copiar código", contagem "Expira em mm:ss", "Aguardando pagamento", os passos "Como pagar", o resumo (quantidade de itens, subtotal, frete e total) e "Já paguei".
 - **QR inválido:** a imagem é uma ilustração fixa do site, igual para todos os pedidos, que não é um QR legível e não paga nada. O código de demonstração também é um texto fixo do site, fora do formato do Pix, que nenhum app de banco aceita.
 - **Copiar código:** leva o texto à área de transferência e mostra o toast "Código copiado". Se o navegador recusar, o texto fica selecionado para copiar à mão.
 - **Expirado** (pergunta 2 de 13/11): ao zerar a contagem (ou ao abrir depois), a tela relê o pedido e mostra "Pix expirado", "O tempo para pagamento se esgotou." e "Refazer pedido", que leva ao checkout com a Geladeira como estava (novo pedido, nova reserva).
@@ -122,7 +122,7 @@ Funcionalidade: Pagamento só visual com Pix e cartão
 - **Só cartões de teste:** o site aceita só esses dois números; qualquer outro mostra "Use um dos cartões de teste." e não deixa seguir. Validade no futuro e CVV de 3 dígitos, conferidos no site. Assim ninguém digita um cartão real.
 - **Nada do cartão sai do aparelho:** número, nome, validade e CVV nunca vão à API, nunca ficam em armazenamento local, URL ou log, e só ficam na memória da página. Voltar etapas ou recarregar pede o cartão de novo.
 - **Parcelas** (pergunta 1 de 13/11, opção B, sem gateway): de 1x a 12x para qualquer total. 1x e 2x sem juros; de 3x a 12x com a taxa fixa de 2,99% a.m., tabela Price: parcela = total × 0,0299 / (1 − 1,0299^−n), arredondada ao centavo (meio centavo para cima), e total com juros = parcela × n. Cálculo puro no `@leguele/shared`, em centavos, só para mostrar. O total do pedido na loja não muda.
-- **Depois de confirmar:** a tela de pagamento do pedido mostra "Pagamento em análise", "A loja confirma o pagamento em instantes.", a contagem da validade, o resumo com as parcelas e o aviso fixo. Os dois cartões de teste dão o mesmo resultado (não há recusa).
+- **Depois de confirmar:** a tela de pagamento do pedido mostra "Pagamento em análise", "A loja confirma o pagamento em instantes.", a contagem da validade e o resumo com as parcelas. Os dois cartões de teste dão o mesmo resultado (não há recusa).
 - Salvar cartão fica fora.
 
 ## Ajustes no código já mergeado
@@ -138,8 +138,8 @@ Para o Back, no item 6 ou antes, se atrapalhar: a porta `PaymentGateway` da expi
 
 ## Referência visual
 
-- **Tela 17:** o passo Pagamento do checkout com os campos do cartão, a ajuda dos cartões de teste, as parcelas e o aviso fixo; parcelas e "sem juros" conforme esta spec (não 3x sem juros do design); "Continuar para revisão".
-- **Tela 18:** a tela de pagamento do pedido, depois de confirmar, sem o indicador de etapas; QR decorativo, contagem, código com "Copiar código", "Como pagar", resumo, "Já paguei" e o aviso fixo.
+- **Tela 17:** o passo Pagamento do checkout com os campos do cartão, a ajuda dos cartões de teste e as parcelas; parcelas e "sem juros" conforme esta spec (não 3x sem juros do design); "Continuar para revisão".
+- **Tela 18:** a tela de pagamento do pedido, depois de confirmar, sem o indicador de etapas; QR decorativo, contagem, código com "Copiar código", "Como pagar", resumo e "Já paguei".
 - **Tela 30:** "Aguardando pagamento" e "Pix expirado" são estados da mesma tela; "Gerar novo Pix" vira "Refazer pedido"; sem "Voltar para o pedido" (o detalhe do pedido é MVP+).
 - Normalizado ao padrão aprovado (regra da revisão em [[sequencia-telas]]).
 
@@ -150,7 +150,7 @@ Para o Back, no item 6 ou antes, se atrapalhar: a porta `PaymentGateway` da expi
 - **Parcelas** (`@leguele/shared`, unitário): 1x e 2x sem juros, 3x e 12x pela Price de 2,99% com o arredondamento da spec (R$ 154,30: 3x de R$ 54,54, total R$ 163,62; 12x de R$ 15,49, total R$ 185,88).
 - **Cartão de teste** (site, componente): só os dois números passam; número, nome, validade e CVV fora do armazenamento local, da URL e do corpo enviado à API.
 - **Confirmar pagamento** (API, no LB-76): caso de uso com repositório em memória e relógio fake (na validade fica "Pago" com baixa; vencido expira e 409; repetido 409); integração com banco real (confirmar × expirar × cancelar ao mesmo tempo deixa um só resultado, uma baixa de estoque e uma da Geladeira).
-- **Telas** (componente, relógio controlado): contagem a partir do vencimento da API, aviso fixo, "Código copiado", leitura a cada 5 s e no "Já paguei", estado expirado, "Pagamento em análise", posse.
+- **Telas** (componente, relógio controlado): contagem a partir do vencimento da API, "Código copiado", leitura a cada 5 s e no "Já paguei", estado expirado, "Pagamento em análise", posse.
 - **E2E** (celular, 360 × 640): Pix até a tela de pagamento e, com o admin confirmando, a confirmação; Pix expirado pelo relógio da API de teste ([[qualidade-compra]]); cartão de teste até "Pagamento em análise".
 
 ## Fatias, com dono e ordem
@@ -174,7 +174,7 @@ Candidatos a ADR: nenhum (a decisão já está no [[ADR-018-pagamento-simulado]]
 
 ### 15/11
 
-- **Pagamento não é real e é só visual:** sem Mercado Pago, conta, chave, gateway (real ou simulado), cobrança, webhook, CPF ou cartão reais; QR inválido; cartão de teste só na tela; aviso fixo "Projeto de portfólio: o pagamento é simulado, nenhum valor é cobrado." (texto vetável); as telas de pagamento são feitas por último. Ver [[ADR-018-pagamento-simulado]].
+- **Pagamento não é real e é só visual:** sem Mercado Pago, conta, chave, gateway (real ou simulado), cobrança, webhook, CPF ou cartão reais; QR inválido; cartão de teste só na tela; sem aviso de portfólio (mantida a decisão de 30/10); as telas de pagamento são feitas por último. Ver [[ADR-018-pagamento-simulado]].
 
 ### 13/11
 
@@ -192,7 +192,6 @@ Perguntas levadas pelo Orchestrator. Resposta do Diego: "todas as recomendadas".
 Recomendações aplicadas pelo Spec (13/11, revistas em 15/11); qualquer uma pode ser vetada.
 
 - **"Pago" pela ação "Confirmar pagamento" do admin**, só na validade (ver a recomendação acima). Muda o "Pago só pelo pagamento, nunca pelo admin" do [[admin]].
-- **Aviso fixo com a palavra "portfólio"**, como na ordem de 15/11. Contraria o "Sem aviso de portfólio" de 30/10 ([[termos-privacidade]]); aqui vale só na etapa Pagamento e na tela de pagamento. Alternativa sem a palavra: "Pagamento simulado: nenhum valor é cobrado.".
 - **Cartões de teste fixos** e qualquer outro número recusado no site, para ninguém digitar um cartão real; os dois dão o mesmo resultado.
 - **QR e código fixos do site**, iguais para todos os pedidos e ilegíveis como Pix.
 - **Parcelas de 1x a 12x para qualquer total**, com arredondamento da parcela ao centavo e total = parcela × n.

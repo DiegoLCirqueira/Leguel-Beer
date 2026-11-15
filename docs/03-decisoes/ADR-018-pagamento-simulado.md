@@ -17,7 +17,7 @@ O Leguelé Beer é projeto de portfólio, sem venda real. O [[ADR-004-mercado-pa
 ## Decisão
 
 - **Sem gateway de nenhum tipo:** nem real, nem simulado com lógica. Não há cobrança, webhook, aviso de pagamento, conta, chave, CPF nem dado de cartão.
-- **Telas de pagamento só visuais:** Pix com um QR **inválido** (imagem decorativa, que não paga nada) e cartão de teste só na tela (os dados não saem do aparelho). Um aviso fixo diz que o pagamento é simulado.
+- **Telas de pagamento só visuais:** Pix com um QR **inválido** (imagem decorativa, que não paga nada) e cartão de teste só na tela (os dados não saem do aparelho). Sem aviso de portfólio: segue a decisão do Diego de 30/10 ([[termos-privacidade]]).
 - **O pedido não depende do pagamento:** criação "Aguardando pagamento", reserva, expiração em 30 minutos, status e estoque seguem como no [[checkout]]. A passagem para "Pago" é feita por uma ação do admin (recomendação vetável, ver [[pagamento]]).
 - **Por último:** as telas de pagamento são o último item da implementação, fora do caminho do checkout, do pedido e de "Meus pedidos".
 
