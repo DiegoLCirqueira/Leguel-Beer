@@ -10,7 +10,7 @@ import { GeladeiraProvider } from "@/components/geladeira/geladeira-provider";
 import { DestaquesServidor } from "./destaques-servidor";
 import { DestaquesSkeleton } from "./destaques-skeleton";
 
-const render = (ui: React.ReactElement) => renderRtl(ui, { wrapper: GeladeiraProvider });
+const render = (ui: React.ReactNode) => renderRtl(<>{ui}</>, { wrapper: GeladeiraProvider });
 
 const cerveja: CervejaCard = {
   id: "1",
