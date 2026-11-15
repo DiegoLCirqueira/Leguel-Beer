@@ -76,7 +76,9 @@ Os 14 épicos MVP somam 98 cards (301 pontos): 64 no núcleo, 32 adiáveis e 2 q
 | LB-20 Bloquear compra para menores | Confirmação de maioridade no checkout, sem validação de documento. |
 | LB-81 E-mails transacionais do pedido | Só o e-mail de confirmação do pedido, enviado de forma síncrona pela API de um provedor com plano gratuito. |
 | LB-67 Listar histórico de pedidos | Lista de pedidos do cliente com status, sem tempo real. |
-| LB-59 Webhooks de pagamento idempotentes | Processamento síncrono no endpoint do webhook, sem fila. |
+| LB-59 Webhooks de pagamento idempotentes | **Sai do MVP** (2026-11-15): o pagamento é só visual, sem webhook ([[ADR-018-pagamento-simulado]]). O pedido passa a "Pago" pelo admin ([[pagamento]]). |
+| LB-54 Comparar gateways gratuitos | **Sai do MVP** (2026-11-15): sem gateway ([[ADR-018-pagamento-simulado]]). |
+| LB-57 e LB-58 Pagar com Pix e com cartão | Só as telas, sem lógica de pagamento: Pix com QR inválido e cartão de teste; feitas por último ([[pagamento]]). |
 | LB-60 Cancelar pedidos expirados | Expiração verificada sob demanda + cron diário da plataforma, conforme [[ADR-002-hospedagem-api]]. |
 
 ## Cards Pós-MVP

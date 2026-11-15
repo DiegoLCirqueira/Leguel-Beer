@@ -125,8 +125,12 @@ _Evite_: prazo, timeout
 Unidades de uma cerveja presas a um pedido "Aguardando pagamento" dentro da validade; só a reserva válida conta na quantidade disponível. Ver [[checkout]] e [[pagamento]].
 _Evite_: bloqueio, separação
 
+**Pagamento simulado**:
+O pagamento do Leguelé Beer é só visual: telas de Pix (QR inválido, decorativo) e de cartão de teste, sem gateway, cobrança nem dado real, e nenhum valor é cobrado. O pedido passa a "Pago" pela ação "Confirmar pagamento" do admin. Ver [[pagamento]] e [[ADR-018-pagamento-simulado]].
+_Evite_: sandbox, modo de testes, pagamento fake
+
 **Aviso de pagamento**:
-Mensagem que o gateway manda à API quando um pagamento muda; a API confere a assinatura, consulta o pagamento no gateway e aplica a mudança uma vez só. Ver [[pagamento]].
+**Fora do MVP** desde 15/11: o pagamento é só visual, sem gateway nem aviso ([[ADR-018-pagamento-simulado]]). Era a mensagem do gateway à API quando um pagamento mudava.
 _Evite_: webhook (fora do código), notificação, callback
 
 ## Estoque
@@ -136,7 +140,7 @@ Unidades de uma cerveja que estão na cervejaria, inclusive as reservadas. Muda 
 _Evite_: estoque total, saldo
 
 **Reservado**:
-Unidades de uma cerveja presas em pedidos "Aguardando pagamento". Viram baixa no estoque físico quando o pagamento é aprovado e voltam a ficar disponíveis quando o pedido é cancelado. Ver [[pagamento]].
+Unidades de uma cerveja presas em pedidos "Aguardando pagamento". Viram baixa no estoque físico quando o admin confirma o pagamento e voltam a ficar disponíveis quando o pedido é cancelado. Ver [[pagamento]].
 _Evite_: bloqueado, separado
 
 **Estoque mínimo**:

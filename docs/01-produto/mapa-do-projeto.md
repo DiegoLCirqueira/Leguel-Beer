@@ -40,7 +40,7 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[checkout]]: Entrega → Pagamento → Revisão, com Pix e cartão.
 - [[pedidos-cliente]]: pedido confirmado e "Meus pedidos" com o status de cada pedido (LB-61, LB-67; e-mail LB-81 em aberto).
 - [[admin]]: área admin com cervejas e foto, estoque com mínimo, pedidos e status, e regras de entrega (LB-72, LB-73, LB-75, LB-76, LB-77).
-- [[pagamento]]: Pix com QR e validade de 30 min, cartão em até 12x, avisos do gateway idempotentes e expiração (LB-57, LB-58, LB-59, LB-60).
+- [[pagamento]]: telas só visuais, feitas por último: Pix com QR inválido e validade de 30 min, cartão de teste em até 12x e "Confirmar pagamento" do admin (LB-57, LB-58, LB-60).
 - [[qualidade-compra]]: E2E da compra de ponta a ponta e revisão de segurança (inventário de rotas, posse, validação, banco fechado, limites, cabeçalhos) (LB-111, LB-112).
 
 ## Decisões (ADRs)
@@ -48,7 +48,7 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[ADR-001-stack]]: Next.js + NestJS + Prisma + Supabase + Vercel.
 - [[ADR-002-hospedagem-api]]: hospedagem gratuita da API no MVP.
 - [[ADR-003-pwa-mobile-first]]: site mobile-first em Next.js.
-- [[ADR-004-mercado-pago]]: Mercado Pago em sandbox para pagamentos.
+- [[ADR-004-mercado-pago]] (substituído pelo ADR-018): Mercado Pago em sandbox para pagamentos.
 - [[ADR-005-monorepo-camadas]]: monorepo com arquitetura em camadas (com a seção Complemento).
 - [[ADR-006-merge-por-agentes]]: merge de PRs pelo Orchestrator e pelo Devops.
 - [[ADR-007-banco-de-teste]]: banco separado no Postgres local e service container no CI para os testes de integração.
@@ -62,6 +62,7 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[ADR-015-ferramentas-monorepo]]: pnpm + Turborepo, `@leguele/shared` compilado com `tsc`, Vitest em todos os pacotes e dependency-cruiser no CI.
 - [[ADR-016-ciclo-continuo-da-banda]]: a ordem vira ciclo contínuo; decisão do Diego vai ao cartão de pendências e a banda segue; recomendada é aplicada e vetável.
 - [[ADR-017-fotos-com-sessao-do-admin]] (aceito pelo Diego em 13/11): fotos das cervejas enviadas pelo servidor do site com a sessão do admin e política do armazenamento pelo papel admin, sem chave de serviço.
+- [[ADR-018-pagamento-simulado]] (Diego, 15/11): pagamento só visual, sem gateway, cobrança nem webhook; substitui o ADR-004.
 
 ## Arquitetura
 

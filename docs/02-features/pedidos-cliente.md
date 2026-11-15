@@ -14,7 +14,7 @@ tags:
 # Pedido confirmado e Meus pedidos
 
 > [!info] Origem
-> Item 7 da [[sequencia-telas]]. Derivada dos cards do Notion **LB-61** (#37, tela de pedido confirmado) e **LB-67** (#108, histórico de pedidos do cliente, no escopo reduzido do [[mvp-corte]]: lista com status, sem tempo real), e das telas 08 (Pedido confirmado) e 13 (Histórico de pedidos). A tela 09 (Acompanhar pedido) fica fora: o detalhe com linha do tempo (LB-68) é MVP+ e o tempo real (LB-69) é Pós-MVP. O e-mail de confirmação (LB-81, #103) depende da escolha de um provedor e fica como ponto em aberto. O pedido nasce no checkout (item 5, [[checkout]], LB-56) e é pago no item 6 (Pix e cartão); esta spec só lê pedidos. Os termos seguem o [[GLOSSARY]].
+> Item 7 da [[sequencia-telas]]. Derivada dos cards do Notion **LB-61** (#37, tela de pedido confirmado) e **LB-67** (#108, histórico de pedidos do cliente, no escopo reduzido do [[mvp-corte]]: lista com status, sem tempo real), e das telas 08 (Pedido confirmado) e 13 (Histórico de pedidos). A tela 09 (Acompanhar pedido) fica fora: o detalhe com linha do tempo (LB-68) é MVP+ e o tempo real (LB-69) é Pós-MVP. O e-mail de confirmação (LB-81, #103) depende da escolha de um provedor e fica como ponto em aberto. O pedido nasce no checkout (item 5, [[checkout]], LB-56) e passa a "Pago" pela ação "Confirmar pagamento" do admin (recomendação vetável de 15/11; o pagamento é só visual, [[ADR-018-pagamento-simulado]], e suas telas, item 6, são feitas por último); esta spec só lê pedidos. Os termos seguem o [[GLOSSARY]].
 
 As perguntas de produto foram ao Diego em 13/11 pelo Orchestrator; as respostas estão em "Decisões do Diego (13/11)".
 
@@ -79,7 +79,7 @@ Funcionalidade: Pedido confirmado e Meus pedidos
   | Status | Quando | Selo |
   | --- | --- | --- |
   | Aguardando pagamento | pedido criado, pagamento ainda não aprovado ([[checkout]], LB-56) | neutro |
-  | Pago | pagamento aprovado (item 6, LB-59) | sucesso |
+  | Pago | o admin confirmou o pagamento ([[pagamento]], LB-76) | sucesso |
   | Em preparo | o admin iniciou o preparo (LB-76) | atenção |
   | Saiu para entrega | o admin despachou (LB-76) | informação |
   | Entregue | o admin marcou a entrega (LB-76) | sucesso |
@@ -106,7 +106,7 @@ Funcionalidade: Pedido confirmado e Meus pedidos
 - **Geladeira depois do pagamento:** ao aprovar o pagamento (item 6), a API tira da Geladeira da conta as unidades do pedido que ainda estão lá, **uma única vez por pedido**, e preserva o que o cliente pôs depois de criar o pedido. Semântica:
   - ao criar o pedido, cada cerveja do pedido ganha uma **baixa pendente** igual à quantidade pedida;
   - se, antes da aprovação, o cliente diminui a quantidade dessa cerveja na Geladeira (ou a remove), a baixa pendente diminui na mesma medida, sem ficar negativa (com mais de um pedido aguardando, desconta primeiro do mais antigo);
-  - ao aprovar, a API tira de cada cerveja a baixa pendente (sem deixar a quantidade negativa) e zera a baixa; a aprovação repetida (webhook reenviado, LB-59) não tira nada;
+  - ao aprovar, a API tira de cada cerveja a baixa pendente (sem deixar a quantidade negativa) e zera a baixa; a confirmação repetida (segundo toque do admin) não tira nada;
   - pedido cancelado (expirado ou pelo admin) descarta as baixas pendentes sem mexer na Geladeira;
   - abrir ou recarregar a confirmação nunca tira nada da Geladeira: só a aprovação tira.
 - Exemplos (pedido de 2 Maré Alta):
@@ -164,7 +164,7 @@ Funcionalidade: Pedido confirmado e Meus pedidos
 
 - **Contrato** (shared, unitário): a lista de status com os rótulos, o texto da quantidade ("1 item", "5 itens"), o "e mais N" das cervejas e a data no fuso de Maceió (inclusive um pedido às 23:30 de Maceió, que em UTC já é o dia seguinte).
 - **Leitura de pedidos** (API): casos de uso com repositório em memória e relógio fake (ordem do mais recente, paginação de 20 com 21 e 41 pedidos, pedidos no mesmo segundo, pedido aguardando com o Pix vencido, com o relógio fixo e o cron sem rodar, volta como "Cancelado" na lista e na leitura e não muda a Geladeira); rotas com Supertest e banco real: sem token 401; matriz de posse (pedido de outro cliente Pago, Aguardando pagamento e Cancelado, e id inexistente) com o mesmo 404 e nada do pedido no corpo nem no log; paginação com pedidos de A e B intercalados no tempo traz só os de A, sem buraco nem repetição; nenhuma rota responde a leitura pelo número. Pedidos criados direto no banco de teste, sem depender do checkout.
-- **Geladeira ao aprovar** (API, entra com o item 6): caso de uso com repositório em memória: tira as cervejas do pedido e mantém o que entrou depois; as 4 linhas da tabela de exemplos, cada uma aprovando 1 e 2 vezes; diminuir com dois pedidos aguardando desconta do mais antigo; cancelamento descarta a baixa pendente. Os reds desta fatia entram com o webhook (item 6), e a spec do item 6 repete esta regra.
+- **Geladeira ao aprovar** (API, entra com o item 6): caso de uso com repositório em memória: tira as cervejas do pedido e mantém o que entrou depois; as 4 linhas da tabela de exemplos, cada uma aprovando 1 e 2 vezes; diminuir com dois pedidos aguardando desconta do mais antigo; cancelamento descarta a baixa pendente. Os reds desta fatia entram com "Confirmar pagamento" do admin (LB-76).
 - **Telas** (componente): pedido "Aguardando pagamento" tocável e levando ao pagamento, os outros não tocáveis; confirmação com frete e com "Grátis"; desvios da confirmação (aguardando, cancelado, Pix vencido, sem sessão) e a página "não encontrada" sem dados do pedido; recarregar a confirmação não chama nada que altere a Geladeira; lista com os 6 status, vazia, com erro e com "Carregar mais".
 - **E2E** (celular, 360 × 640): confirmação de um pedido pago criado pela API de teste; pedido aguardando pagamento redireciona ao pagamento; pedido cancelado vai a "Meus pedidos"; sem sessão vai a `/entrar` e volta; pedido de outro cliente dá 404; "Meus pedidos" com 3 pedidos e vazio; tocar num pedido "Aguardando pagamento" da lista abre o pagamento dele.
 
@@ -176,9 +176,9 @@ Funcionalidade: Pedido confirmado e Meus pedidos
 | 2 | LB-67 (#108), API | Back | Lista paginada e leitura de um pedido do cliente da sessão, sobre o modelo de pedido do LB-56 (item 5) |
 | 3 | LB-67 (#108), site | Front | `/conta/pedidos` e o link "Meus pedidos" em `/conta` |
 | 4 | LB-61 (#37), site | Front | `/pedido/[id]/confirmado`, com os desvios para pagamento, "Meus pedidos" e 404 |
-| 5 | LB-61 (#37), API | Back | Baixa pendente na Geladeira ao criar o pedido e baixa única ao aprovar o pagamento; entra com o webhook do item 6 (LB-59) |
+| 5 | LB-61 (#37), API | Back | Baixa pendente na Geladeira ao criar o pedido e baixa única ao confirmar o pagamento; entra com "Confirmar pagamento" do admin (LB-76) |
 
-A fatia 2 depende do modelo de pedido do item 5 (LB-56). A 3 depende da 2; a 4, da 2 e da tela de pagamento do item 6. A 5 se divide: a baixa pendente nasce com a criação do pedido (LB-56, item 5) e o desconto ao diminuir a Geladeira mexe na escrita da Geladeira da conta; a baixa única entra no PR do webhook (item 6).
+A fatia 2 depende do modelo de pedido do item 5 (LB-56). A 3 depende da 2; a 4, da 2 e da tela de pagamento do item 6. A 5 se divide: a baixa pendente nasce com a criação do pedido (LB-56, item 5) e o desconto ao diminuir a Geladeira mexe na escrita da Geladeira da conta; a baixa única entra no PR de "Confirmar pagamento" do admin (LB-76).
 
 Candidatos a ADR: nenhum.
 
