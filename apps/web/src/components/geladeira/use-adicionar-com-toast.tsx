@@ -1,12 +1,14 @@
 "use client";
 
 import type { CervejaCard } from "@leguele/shared";
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { Toast } from "@/components/ui";
 import { mensagemDoLimite } from "@/lib/geladeira/estado";
 import { useGeladeira } from "./geladeira-provider";
 
 type AvisoDeAdicionar = {
+  /** Um por toque: o toast recomeça os 5 segundos mesmo com a mesma mensagem. */
+  toque: number;
   mensagem: string;
   desfazer?: { cervejaId: string; antes: number; depois: number };
 };
@@ -21,14 +23,17 @@ export function useAdicionarComToast(): {
 } {
   const { estado, adicionar, reverterAdicao } = useGeladeira();
   const [aviso, setAviso] = useState<AvisoDeAdicionar | null>(null);
+  const toques = useRef(0);
 
   const adicionarComToast = (cerveja: CervejaCard, quantidade = 1) => {
     const antes = estado.itens.find((i) => i.cerveja.id === cerveja.id)?.quantidade ?? 0;
     const { limite } = adicionar(cerveja, quantidade);
+    const toque = ++toques.current;
     setAviso(
       limite !== undefined
-        ? { mensagem: mensagemDoLimite(limite) }
+        ? { toque, mensagem: mensagemDoLimite(limite) }
         : {
+            toque,
             mensagem: `${cerveja.nome} foi para a geladeira`,
             desfazer: { cervejaId: cerveja.id, antes, depois: antes + quantidade },
           },
@@ -38,6 +43,7 @@ export function useAdicionarComToast(): {
   const desfazer = aviso?.desfazer;
   const toast = aviso ? (
     <Toast
+      key={aviso.toque}
       mensagem={aviso.mensagem}
       acao={
         desfazer
