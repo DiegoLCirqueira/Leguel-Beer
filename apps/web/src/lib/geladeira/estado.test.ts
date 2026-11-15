@@ -55,12 +55,23 @@ describe("adicionar", () => {
     expect(resultado.limite).toBe(2);
   });
 
-  it("nunca passa de 99 por cerveja, mesmo com muito estoque", () => {
+  it("recusa a soma que passa do disponível: com 5 disponíveis e 3 na Geladeira, +3 não vira 5", () => {
+    const a = cerveja("a", { quantidadeDisponivel: 5 });
+    const { estado } = adicionar(GELADEIRA_VAZIA, a, 3);
+
+    const resultado = adicionar(estado, a, 3);
+
+    expect(resultado.estado).toBe(estado);
+    expect(resultado.estado.itens[0]?.quantidade).toBe(3);
+    expect(resultado.limite).toBe(5);
+  });
+
+  it("nunca passa de 99 por cerveja, mesmo com muito estoque: o pedido que passa é recusado", () => {
     const a = cerveja("a", { quantidadeDisponivel: 500 });
 
     const resultado = adicionar(GELADEIRA_VAZIA, a, 120);
 
-    expect(resultado.estado.itens[0]?.quantidade).toBe(99);
+    expect(resultado.estado).toBe(GELADEIRA_VAZIA);
     expect(resultado.limite).toBe(99);
   });
 
