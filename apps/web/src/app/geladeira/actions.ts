@@ -16,13 +16,21 @@ const TEMPO_LIMITE_MS = 8000;
 async function chamar(method: "GET" | "PUT", corpo?: GeladeiraRequest): Promise<ResultadoDaConta> {
   const token = await lerTokenDeAcesso();
   if (!token) return { tipo: "sem-sessao" };
+  return pedirGeladeira("/me/geladeira", method, { token, corpo });
+}
+
+async function pedirGeladeira(
+  caminho: string,
+  method: "GET" | "PUT" | "POST",
+  { token, corpo }: { token?: string; corpo?: GeladeiraRequest },
+): Promise<ResultadoDaConta> {
   try {
-    const resposta = await fetch(`${urlDaApi()}/me/geladeira`, {
+    const resposta = await fetch(`${urlDaApi()}${caminho}`, {
       method,
       cache: "no-store",
       signal: AbortSignal.timeout(TEMPO_LIMITE_MS),
       headers: {
-        Authorization: `Bearer ${token}`,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(corpo ? { "Content-Type": "application/json" } : {}),
       },
       body: corpo ? JSON.stringify(corpo) : undefined,
@@ -48,4 +56,12 @@ export async function enviarGeladeiraParaContaAction(
 ): Promise<ResultadoDaConta> {
   const valido = geladeiraRequestSchema.safeParse(request);
   return valido.success ? chamar("PUT", valido.data) : { tipo: "erro" };
+}
+
+/** Revalida a Geladeira do convidado (sem sessão) com o preço e o estoque atuais; não grava nada. Nunca lança. */
+export async function validarGeladeiraAction(request: GeladeiraRequest): Promise<ResultadoDaConta> {
+  const valido = geladeiraRequestSchema.safeParse(request);
+  return valido.success
+    ? pedirGeladeira("/geladeira/validar", "POST", { corpo: valido.data })
+    : { tipo: "erro" };
 }

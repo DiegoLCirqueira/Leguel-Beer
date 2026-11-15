@@ -1,6 +1,6 @@
 ---
 tipo: produto
-atualizado: 2026-10-28
+atualizado: 2026-11-15
 fonte-notion: https://app.notion.com/p/3fd490a7ac7d81d2bc58c7ff9e7091b8
 tags:
   - produto
@@ -13,7 +13,7 @@ tags:
 
 E-commerce mobile-first (PWA) da cervejaria artesanal **Leguelé Beer**: catálogo de cervejas, carrinho (chamado oficialmente de **Geladeira**), checkout completo e, depois, packs Mix & Match e assinatura do Clube do Leguelé.
 
-É um **projeto de portfólio** com um único desenvolvedor (Diego). Não é lançamento comercial: dados da empresa são fictícios e os pagamentos rodam em sandbox.
+É um **projeto de portfólio** com um único desenvolvedor (Diego). Não é lançamento comercial: dados da empresa são fictícios e o pagamento é **só visual**: sem gateway, cobrança, conta ou dado de cartão real, e nenhum valor é cobrado (decisão do Diego, 2026-11-15; ver [[ADR-018-pagamento-simulado]]).
 
 ## Público
 
@@ -26,7 +26,7 @@ E-commerce mobile-first (PWA) da cervejaria artesanal **Leguelé Beer**: catálo
 
 - **Catálogo:** listagem, página de produto, filtros por categoria e atributos, ordenação. Ver [[catalogo]].
 - **Geladeira (carrinho):** prateleiras por categoria, persistida localmente e na conta.
-- **Checkout completo:** Entrega → Pagamento → Revisão; Pix (validade 30 min) e cartão até 12x. Ver [[checkout]].
+- **Checkout completo:** Entrega → Pagamento → Revisão, com pedido, reserva e validade de 30 min. Telas de pagamento só visuais (Pix com QR inválido e cartão de teste até 12x), feitas por último; o pedido passa a "Pago" pelo admin. Ver [[checkout]] e [[pagamento]].
 - **Entrega:** apenas Maceió e região, frete por distância, frete grátis a partir de R$ 150 (decisão do Diego, 2026-11-12; ver [[enderecos-entrega]]).
 - **Conta:** e-mail/senha, Google e Facebook. Convidado navega e monta a Geladeira; finalizar a compra exige conta (decisão do Diego, 2026-10-28; ver [[adicionar-do-card]]).
 

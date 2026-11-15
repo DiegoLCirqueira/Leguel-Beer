@@ -10,4 +10,6 @@ export type ResultadoDaConta =
 export interface ContaDaGeladeira {
   buscar: () => Promise<ResultadoDaConta>;
   enviar: (request: GeladeiraRequest) => Promise<ResultadoDaConta>;
+  /** Revalida a Geladeira do convidado (sem sessão) com o preço e o estoque atuais; não grava nada. */
+  validar: (request: GeladeiraRequest) => Promise<ResultadoDaConta>;
 }

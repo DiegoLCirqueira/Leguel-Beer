@@ -70,7 +70,7 @@ Funcionalidade: Admin
 
     Exemplos:
       | status               | acoes                                   |
-      | Aguardando pagamento | "Cancelar pedido"                       |
+      | Aguardando pagamento | "Confirmar pagamento" e "Cancelar pedido" |
       | Pago                 | "Iniciar preparo" e "Cancelar pedido"   |
       | Em preparo           | "Saiu para entrega" e "Cancelar pedido" |
       | Saiu para entrega    | "Marcar como entregue"                  |
@@ -133,13 +133,13 @@ Funcionalidade: Admin
 - **Fila** `/admin/pedidos`: número, data e hora, status, total e bairro, do mais recente ao mais antigo, 20 por vez, com filtro por status (os 6 de [[pedidos-cliente]]). Sem tempo real e sem som ([[ADR-002-hospedagem-api]]: sem WebSocket): a lista se atualiza ao abrir e pelo botão "Atualizar".
 - **Detalhe** `/admin/pedidos/[id]`: itens com quantidade e preço da compra, subtotal, frete, total, forma de pagamento, status e os dados de entrega da pergunta 5 (nome, telefone, endereço completo e "Abrir no mapa").
 - **"Abrir no mapa":** link externo para o Google Maps com só o endereço (sem nome nem telefone), aberto em outra aba com `rel="noopener noreferrer"` e só quando o admin toca; sem mapa embutido nem pré-carregamento.
-- **Transições**, só para a frente: Pago → Em preparo ("Iniciar preparo") → Saiu para entrega → Entregue ("Marcar como entregue"). Pago só pelo pagamento (item 6), nunca pelo admin. A API recusa qualquer outra transição com 409, mesmo que o botão não apareça.
-- **Cancelar** (pergunta 4): em "Aguardando pagamento", "Pago" e "Em preparo", com motivo obrigatório (até 120 caracteres). O motivo é interno: o cliente vê só "Cancelado". As unidades voltam a ficar disponíveis (a reserva é liberada ou o físico volta, conforme o modelo do LB-56) e entram no histórico do estoque. Se o pedido estava pago, a tela avisa "Faça o reembolso no painel do Mercado Pago." (reembolso manual; automático fora).
-- **Concorrência:** toda mudança de status (avançar, cancelar, aprovar pelo pagamento, expirar) só acontece se o pedido ainda estiver no status que a ação espera, na mesma transação que mexe no estoque e no histórico do estoque e do pedido (efeito único). Nas ações do admin, a segunda tentativa conflitante responde 409 e não muda nada; o aviso de pagamento e a expiração (cron ou checagem no uso) continuam idempotentes: o repetido responde 200 sem mudar nada ([[checkout]]). Assim:
+- **Transições**, só para a frente: Pago → Em preparo ("Iniciar preparo") → Saiu para entrega → Entregue ("Marcar como entregue"). Aguardando pagamento → Pago pela ação "Confirmar pagamento", só dentro da validade (recomendação vetável de 15/11, [[pagamento]]: o pagamento é só visual, [[ADR-018-pagamento-simulado]]); vencido, a API expira o pedido e responde 409. A API recusa qualquer outra transição com 409, mesmo que o botão não apareça.
+- **Cancelar** (pergunta 4): em "Aguardando pagamento", "Pago" e "Em preparo", com motivo obrigatório (até 120 caracteres). O motivo é interno: o cliente vê só "Cancelado". As unidades voltam a ficar disponíveis (a reserva é liberada ou o físico volta, conforme o modelo do LB-56) e entram no histórico do estoque. Sem aviso de reembolso: o pagamento é simulado e nada foi cobrado ([[ADR-018-pagamento-simulado]]).
+- **Concorrência:** toda mudança de status (avançar, confirmar o pagamento, cancelar, expirar) só acontece se o pedido ainda estiver no status que a ação espera, na mesma transação que mexe no estoque e no histórico do estoque e do pedido (efeito único). Nas ações do admin, a segunda tentativa conflitante responde 409 e não muda nada; a expiração (cron ou checagem no uso) continua idempotente: o repetido responde 200 sem mudar nada ([[checkout]]). Assim:
   - dois toques em "Cancelar pedido" devolvem o estoque uma vez só;
-  - cancelar um pedido "Aguardando pagamento" enquanto chega a aprovação do pagamento ou a expiração: uma das ações vence; o pedido nunca fica pago e cancelado ao mesmo tempo, nem com estoque devolvido e baixado, e um "Cancelado" nunca volta a outro status;
+  - cancelar um pedido "Aguardando pagamento" enquanto outro toque confirma o pagamento ou o pedido expira: uma das ações vence; o pedido nunca fica pago e cancelado ao mesmo tempo, nem com estoque devolvido e baixado, e um "Cancelado" nunca volta a outro status;
   - cancelar enquanto outro toque marca "Saiu para entrega": uma das duas vence; se o despacho vencer, o cancelamento responde 409;
-  - aprovação que chega para pedido já cancelado segue a resposta 5 do item 6 ([[pagamento]]): o pedido continua "Cancelado" e o detalhe mostra "Pagamento recebido após o cancelamento: faça o reembolso no painel do Mercado Pago.".
+  - "Confirmar pagamento" num pedido já cancelado ou vencido responde 409 e o pedido continua "Cancelado".
 - Cada mudança de status grava quem, quando e o status anterior (histórico do pedido, base do LB-68).
 - O cliente vê o novo status em "Meus pedidos" na próxima abertura ([[pedidos-cliente]]).
 
@@ -177,7 +177,7 @@ Funcionalidade: Admin
 - **Contrato** (shared, unitário): schema da cerveja (preço anterior maior, limites de volume, teor e IBU, nome até 80), gerador de slug (acento, repetido, `destaques`), schema do ajuste de estoque e das configurações de entrega (faixas).
 - **Cervejas** (API): caso de uso de cadastro e edição com repositório em memória (limite de 4 ao criar, ativar e trocar de categoria; inativa não conta; nome repetido); rotas com Supertest e banco real (cliente 403, sem token 401, só admin pede o caminho de envio; endereço de foto fora do caminho gerado, arquivo ausente, não WebP ou acima de 40 KB recusados sem mudar a cerveja). Publicação com o bucket privado: a URL pública do arquivo não serve nada antes da validação nem depois de uma recusa (o arquivo recusado é apagado); só a foto aprovada aparece no bucket público. O token da sessão e a chave nunca chegam ao navegador (nem no HTML, nem no JavaScript, nem em resposta de rota do site). Política do armazenamento testada no Supabase local, com envio direto (sem o site): admin grava no caminho gerado; cliente comum e sem sessão não gravam; escrita pública negada; caminho diferente do autorizado ou vencido (mais de 10 min) recusado pela API; envio para um caminho existente não sobrescreve; tipo ou extensão falsos (PNG com nome .webp), arquivo inválido e acima de 40 KB recusados pelo bucket ou pela API antes de publicar. Nenhuma chave de serviço no processo da API. A API recusa o que não for WebP ou passar de 40 KB (o limite de 5 MB vale só para o original, no navegador). Integração com banco real: duas gravações simultâneas pela 4ª vaga da categoria, só uma passa.
 - **Estoque** (API): caso de uso de ajuste com repositório em memória (as 4 linhas do Esquema); integração com banco real para ajuste e venda simultâneos na mesma cerveja.
-- **Pedidos** (API): máquina de status pura (todas as transições, válidas e inválidas) e cancelamento com devolução ao estoque; rotas com Supertest (cliente 403, transição inválida 409). A máquina pura não prova a concorrência; o aviso de pagamento e a expiração repetidos respondem 200 sem efeito (seus reds ficam na spec de pagamento); integração com banco real: dois cancelamentos simultâneos devolvem o estoque e gravam o histórico uma vez (o segundo 409); cancelar × expirar × aprovar o mesmo pedido "Aguardando pagamento" ao mesmo tempo deixa um só resultado, sem saldo duplicado nem "Cancelado" ressuscitado; cancelar × "Saiu para entrega" deixa um só; aprovação de pedido já cancelado mantém "Cancelado" e grava a marca de reembolso.
+- **Pedidos** (API): máquina de status pura (todas as transições, válidas e inválidas) e cancelamento com devolução ao estoque; rotas com Supertest (cliente 403, transição inválida 409). A máquina pura não prova a concorrência; a expiração repetida responde 200 sem efeito; integração com banco real: dois cancelamentos simultâneos devolvem o estoque e gravam o histórico uma vez (o segundo 409); cancelar × expirar × confirmar o pagamento do mesmo pedido "Aguardando pagamento" ao mesmo tempo deixa um só resultado, sem saldo duplicado nem "Cancelado" ressuscitado; cancelar × "Saiu para entrega" deixa um só; confirmar o pagamento de pedido já cancelado responde 409 e mantém "Cancelado".
 - **Acesso** (API, Supertest e banco real): matriz de todas as rotas de admin com sem token (401), cliente comum (403) e token de cliente com papel admin forjado nos metadados (403), sem dados no erro nem no log; o admin lê pedidos de clientes diferentes.
 - **Dados pessoais** (API e telas): a resposta da fila não traz nome, telefone nem endereço completo (só o bairro); os logs de sucesso e de erro das rotas de pedidos não registram dados pessoais; no detalhe, nenhuma requisição ao serviço de mapas antes do toque em "Abrir no mapa", e o link leva só o endereço.
 - **Entrega** (API): salvar configurações e simular com o serviço de mapas fake; mapas fora do ar não salva a origem.
@@ -194,7 +194,7 @@ Funcionalidade: Admin
 | 4 | LB-73 (#73), site | Front | Lista, formulário, envio da foto em WebP e prévia |
 | 5 | LB-75 (#75) | Back e Front | Movimentos de estoque (migration), ajuste com trava, histórico e a tela |
 | 6 | LB-77 (#77) | Back e Front | Rotas de admin das configurações de entrega, simulador e a tela; depende das configurações do item 4 |
-| 7 | LB-76 (#76) | Back e Front | Fila, detalhe, transições e cancelamento; depende do modelo de pedido (item 5) e do pagamento (item 6) |
+| 7 | LB-76 (#76) | Back e Front | Fila, detalhe, transições e cancelamento; depende do modelo de pedido (item 5); inclui "Confirmar pagamento" ([[pagamento]]) |
 
 A 1 vem antes das 3 a 6. A 2 pode andar junto. A 7 vem por último.
 
@@ -233,7 +233,7 @@ Recomendações aplicadas pelo Spec em 13/11; qualquer uma pode ser vetada.
 - **Origem editada por endereço**, com as coordenadas calculadas pela API.
 - **Faixas dos campos** (nome 80, estilo 40, volume 100 a 2000 ml, teor 0 a 20 %, IBU 0 a 150, frete e raio nas faixas acima).
 - **Sem sessão em `/admin/*`, "não encontrada"** (não leva a `/entrar`).
-- **Textos novos:** "Nova cerveja", "Inativa", "Baixo", "Entrada inicial", "Envie uma imagem PNG, JPG ou WebP de até 5 MB.", "O estoque físico não pode ficar negativo.", "O estoque físico não pode ficar abaixo das N unidades reservadas.", "Iniciar preparo", "Saiu para entrega", "Marcar como entregue", "Cancelar pedido", "Faça o reembolso no painel do Mercado Pago.", "Atualizar" e os alertas do início.
+- **Textos novos:** "Nova cerveja", "Inativa", "Baixo", "Entrada inicial", "Envie uma imagem PNG, JPG ou WebP de até 5 MB.", "O estoque físico não pode ficar negativo.", "O estoque físico não pode ficar abaixo das N unidades reservadas.", "Iniciar preparo", "Saiu para entrega", "Marcar como entregue", "Cancelar pedido", "Confirmar pagamento" (15/11), "Atualizar" e os alertas do início.
 
 ## Tickets propostos
 

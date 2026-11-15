@@ -1,7 +1,7 @@
 import type { AjusteDaGeladeira, CervejaCard, GeladeiraResponse } from "@leguele/shared";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const caminho = vi.hoisted(() => ({ atual: "/" }));
 vi.mock("next/navigation", () => ({ usePathname: () => caminho.atual }));
@@ -138,10 +138,15 @@ const ok = (itens: { cerveja: CervejaCard; quantidade: number }[]): ResultadoDaC
   resposta: daConta(itens),
 });
 
-const contaFalsa = (buscar: ResultadoDaConta, enviar: ResultadoDaConta = ok([])) =>
+const contaFalsa = (
+  buscar: ResultadoDaConta,
+  enviar: ResultadoDaConta = ok([]),
+  validar: ResultadoDaConta = { tipo: "erro" },
+) =>
   ({
     buscar: vi.fn().mockResolvedValue(buscar),
     enviar: vi.fn().mockResolvedValue(enviar),
+    validar: vi.fn().mockResolvedValue(validar),
   }) satisfies ContaDaGeladeira;
 
 const abrirComConta = (conta: ContaDaGeladeira) =>
@@ -377,5 +382,204 @@ describe("GeladeiraProvider com a conta", () => {
       3,
     );
     expect(localStorage.getItem(CHAVE_PENDENTE)).toBe("1");
+  });
+
+  describe("convidado: revalidação ao abrir (7b)", () => {
+    beforeEach(() => {
+      caminho.atual = "/geladeira";
+    });
+
+    const reduzida: ResultadoDaConta = {
+      tipo: "ok",
+      resposta: {
+        ...daConta([{ cerveja, quantidade: 2 }]),
+        ajustes: [
+          {
+            tipo: "quantidade-reduzida",
+            cervejaId: cerveja.id,
+            nome: cerveja.nome,
+            quantidadeAnterior: 3,
+            quantidadeAtual: 2,
+          },
+        ],
+      },
+    };
+
+    it("manda os itens para validar e aplica o que a API devolve, com os avisos", async () => {
+      guardarLocal(3);
+      const conta = contaFalsa({ tipo: "sem-sessao" }, ok([]), reduzida);
+
+      abrirComConta(conta);
+
+      await vi.waitFor(() =>
+        expect(screen.getByLabelText("Ajustes da Geladeira")).toHaveTextContent(cerveja.nome),
+      );
+      expect(screen.getByTestId("total")).toHaveTextContent("2");
+      expect(conta.validar).toHaveBeenCalledWith({
+        itens: [
+          { cervejaId: cerveja.id, quantidade: 3, precoVistoCentavos: cerveja.precoCentavos },
+        ],
+      });
+      expect(conta.enviar).not.toHaveBeenCalled();
+      expect(localStorage.getItem(CHAVE_DA_GELADEIRA)).toContain('"quantidade":2');
+    });
+
+    it("fora da /geladeira o convidado não revalida (a API é chamada ao abrir a Geladeira)", async () => {
+      caminho.atual = "/catalogo";
+      guardarLocal(3);
+      const conta = contaFalsa({ tipo: "sem-sessao" }, ok([]), reduzida);
+
+      abrirComConta(conta);
+      await vi.waitFor(() => expect(conta.buscar).toHaveBeenCalled());
+      await act(async () => {
+        await new Promise((resolver) => setTimeout(resolver, 0));
+      });
+
+      expect(conta.validar).not.toHaveBeenCalled();
+      expect(screen.getByTestId("total")).toHaveTextContent("3");
+    });
+
+    it("Geladeira vazia não chama a validação", async () => {
+      const conta = contaFalsa({ tipo: "sem-sessao" }, ok([]), reduzida);
+
+      abrirComConta(conta);
+      await screen.findByText("0");
+
+      expect(conta.validar).not.toHaveBeenCalled();
+    });
+
+    it("se a validação falha, a Geladeira local fica como estava, sem avisos", async () => {
+      guardarLocal(3);
+      const conta = contaFalsa({ tipo: "sem-sessao" }, ok([]), { tipo: "erro" });
+
+      abrirComConta(conta);
+
+      await vi.waitFor(() => expect(conta.validar).toHaveBeenCalled());
+      expect(screen.getByTestId("total")).toHaveTextContent("3");
+      expect(screen.getByLabelText("Ajustes da Geladeira")).toBeEmptyDOMElement();
+    });
+
+    it("mudança feita enquanto a validação estava em voo vale mais que a resposta antiga", async () => {
+      guardarLocal(3);
+      let responder: (r: ResultadoDaConta) => void = () => {};
+      const conta = contaFalsa({ tipo: "sem-sessao" });
+      conta.validar.mockReturnValue(new Promise<ResultadoDaConta>((r) => (responder = r)));
+      abrirComConta(conta);
+      await vi.waitFor(() => expect(conta.validar).toHaveBeenCalled());
+
+      await userEvent.click(screen.getByRole("button", { name: "adicionar" }));
+      await act(async () => responder(reduzida));
+
+      expect(screen.getByTestId("total")).toHaveTextContent("4");
+    });
+
+    it("se a pessoa sai da /geladeira antes da resposta, ela é descartada: nem preço nem aviso", async () => {
+      guardarLocal(3);
+      let responder: (r: ResultadoDaConta) => void = () => {};
+      const conta = contaFalsa({ tipo: "sem-sessao" });
+      conta.validar.mockReturnValue(new Promise<ResultadoDaConta>((r) => (responder = r)));
+      const { rerender } = abrirComConta(conta);
+      await vi.waitFor(() => expect(conta.validar).toHaveBeenCalled());
+
+      caminho.atual = "/catalogo";
+      rerender(
+        <GeladeiraProvider conta={conta}>
+          <Painel />
+        </GeladeiraProvider>,
+      );
+      await act(async () => responder(reduzida));
+
+      expect(screen.getByTestId("total")).toHaveTextContent("3");
+      expect(screen.getByLabelText("Ajustes da Geladeira")).toBeEmptyDOMElement();
+    });
+
+    it("sair e voltar à /geladeira: só a resposta da última visita vale, a antiga não a sobrescreve", async () => {
+      guardarLocal(3);
+      const respostas: ((r: ResultadoDaConta) => void)[] = [];
+      const conta = contaFalsa({ tipo: "sem-sessao" });
+      conta.validar.mockImplementation(
+        () => new Promise<ResultadoDaConta>((r) => respostas.push(r)),
+      );
+      const { rerender } = abrirComConta(conta);
+      await vi.waitFor(() => expect(conta.validar).toHaveBeenCalledTimes(1));
+      const irPara = (rota: string) => {
+        caminho.atual = rota;
+        rerender(
+          <GeladeiraProvider conta={conta}>
+            <Painel />
+          </GeladeiraProvider>,
+        );
+      };
+      irPara("/catalogo");
+      await vi.waitFor(() => expect(conta.buscar).toHaveBeenCalledTimes(2));
+      irPara("/geladeira");
+      await vi.waitFor(() => expect(conta.validar).toHaveBeenCalledTimes(2));
+
+      await act(async () => respostas[1]!(ok([{ cerveja, quantidade: 1 }])));
+      await act(async () => respostas[0]!(reduzida));
+
+      expect(screen.getByTestId("total")).toHaveTextContent("1");
+    });
+
+    // Toda mudança de identidade invalida a validação em voo: a resposta é de quem já saiu.
+    const comValidacaoPendente = (buscas: ResultadoDaConta[]) => {
+      guardarLocal(3);
+      let responder: (r: ResultadoDaConta) => void = () => {};
+      const conta = contaFalsa({ tipo: "sem-sessao" });
+      conta.buscar.mockReset();
+      for (const busca of buscas) conta.buscar.mockResolvedValueOnce(busca);
+      conta.buscar.mockResolvedValue({ tipo: "sem-sessao" });
+      conta.validar.mockReturnValue(new Promise<ResultadoDaConta>((r) => (responder = r)));
+      const { rerender } = abrirComConta(conta);
+      const irPara = async (rota: string, chamadas: number) => {
+        caminho.atual = rota;
+        rerender(
+          <GeladeiraProvider conta={conta}>
+            <Painel />
+          </GeladeiraProvider>,
+        );
+        await vi.waitFor(() => expect(conta.buscar).toHaveBeenCalledTimes(chamadas));
+        await act(async () => {
+          await new Promise((resolver) => setTimeout(resolver, 0));
+        });
+      };
+      return { conta, irPara, responder: (r: ResultadoDaConta) => act(async () => responder(r)) };
+    };
+
+    it("login com a validação pendente: a resposta antiga não sobrescreve a Geladeira da conta", async () => {
+      const { conta, irPara, responder } = comValidacaoPendente([
+        { tipo: "sem-sessao" },
+        { tipo: "sem-sessao" },
+        ok([{ cerveja, quantidade: 5 }]),
+      ]);
+      await vi.waitFor(() => expect(conta.validar).toHaveBeenCalledTimes(1));
+      await irPara("/entrar", 2);
+      await irPara("/geladeira", 3);
+      expect(screen.getByTestId("total")).toHaveTextContent("5");
+
+      await responder(reduzida);
+
+      expect(screen.getByTestId("total")).toHaveTextContent("5");
+    });
+
+    it("login e logout com a validação pendente: a resposta antiga não ressuscita a Geladeira esvaziada", async () => {
+      const { conta, irPara, responder } = comValidacaoPendente([
+        { tipo: "sem-sessao" },
+        { tipo: "sem-sessao" },
+        ok([{ cerveja, quantidade: 5 }]),
+        { tipo: "sem-sessao" },
+        { tipo: "sem-sessao" },
+      ]);
+      await vi.waitFor(() => expect(conta.validar).toHaveBeenCalledTimes(1));
+      await irPara("/entrar", 2);
+      await irPara("/geladeira", 3);
+      await irPara("/", 4);
+      await irPara("/geladeira", 5);
+      expect(screen.getByTestId("total")).toHaveTextContent("0");
+
+      await responder(reduzida);
+
+      expect(screen.getByTestId("total")).toHaveTextContent("0");
+    });
   });
 });
