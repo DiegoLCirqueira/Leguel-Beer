@@ -27,7 +27,7 @@ export interface SeedCategory {
   beers: SeedBeer[];
 }
 
-/** Cervejas cuja foto recortada já está em `apps/web/public/cervejas` (as outras usam a imagem padrão). */
+/** Cervejas cuja foto recortada já está em `apps/web/public/cervejas` (todas as 16 têm). */
 const SLUGS_COM_FOTO = new Set([
   "mare-alta",
   "leguele-carnaval",
@@ -38,6 +38,13 @@ const SLUGS_COM_FOTO = new Set([
   "leguele-kolsch",
   "leguele-cream-ale",
   "leguele-comendador",
+  "jaragua-hazy-ipa",
+  "umbu-gose",
+  "graviola-witbier",
+  "rapadura-brown-ale",
+  "barra-nova-porter",
+  "pajucara-amber-ale",
+  "ponta-verde-pilsen",
 ]);
 
 const beer = (
@@ -120,8 +127,8 @@ export const SEED_CATEGORIES: SeedCategory[] = [
       beer(
         "jaragua-hazy-ipa",
         "Jaraguá Hazy IPA",
-        "New England IPA",
-        6.8,
+        "Juicy Hazy IPA",
+        6.6,
         42,
         500,
         3350,
@@ -170,9 +177,9 @@ export const SEED_CATEGORIES: SeedCategory[] = [
         "umbu-gose",
         "Umbu Gose",
         "Gose com umbu",
-        4.0,
+        4.6,
         6,
-        330,
+        500,
         2750,
         null,
         false,
@@ -184,7 +191,7 @@ export const SEED_CATEGORIES: SeedCategory[] = [
         "graviola-witbier",
         "Graviola Witbier",
         "Witbier com graviola",
-        4.8,
+        4.9,
         12,
         500,
         2800,
@@ -218,10 +225,10 @@ export const SEED_CATEGORIES: SeedCategory[] = [
       beer(
         "rapadura-brown-ale",
         "Rapadura Brown Ale",
-        "Brown Ale com rapadura",
+        "English Brown Ale",
         5.5,
         24,
-        330,
+        500,
         2850,
         null,
         false,
@@ -231,11 +238,11 @@ export const SEED_CATEGORIES: SeedCategory[] = [
       ),
       beer(
         "barra-nova-porter",
-        "Barra Nova Porter",
+        "Barra Nova",
         "Robust Porter",
-        6.4,
+        6.0,
         35,
-        330,
+        500,
         3150,
         null,
         true,
@@ -247,9 +254,9 @@ export const SEED_CATEGORIES: SeedCategory[] = [
         "pajucara-amber-ale",
         "Pajuçara Amber Ale",
         "American Amber Ale",
-        5.0,
+        5.4,
         25,
-        330,
+        500,
         2700,
         null,
         false,
@@ -310,7 +317,7 @@ export const SEED_CATEGORIES: SeedCategory[] = [
         "ponta-verde-pilsen",
         "Ponta Verde Pilsen",
         "German Pilsner",
-        4.6,
+        4.7,
         28,
         500,
         2390,
