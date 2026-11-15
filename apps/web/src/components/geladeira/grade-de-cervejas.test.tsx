@@ -1,10 +1,11 @@
 import type { CervejaCard } from "@leguele/shared";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/catalogo" }));
 import { CHAVE_DA_GELADEIRA } from "@/lib/geladeira/armazenamento";
+import type { ContaDaGeladeira, ResultadoDaConta } from "@/lib/geladeira/conta";
 import { GeladeiraProvider, useGeladeira } from "./geladeira-provider";
 import { GradeDeCervejas } from "./grade-de-cervejas";
 
@@ -80,5 +81,59 @@ describe("GradeDeCervejas", () => {
     await userEvent.click(screen.getByRole("button", { name: "Desfazer" }));
 
     expect(screen.getByTestId("contador")).toHaveTextContent("2");
+  });
+
+  it("o Desfazer não apaga os itens da conta que chegaram depois do toque do convidado", async () => {
+    const mare = cerveja("a", "Maré Alta");
+    let chegou!: (r: ResultadoDaConta) => void;
+    const conta: ContaDaGeladeira = {
+      buscar: () => new Promise<ResultadoDaConta>((resolve) => (chegou = resolve)),
+      enviar: vi.fn().mockResolvedValue({ tipo: "erro" }),
+      validar: vi.fn().mockResolvedValue({ tipo: "erro" }),
+    };
+    render(
+      <GeladeiraProvider conta={conta}>
+        <Contador />
+        <GradeDeCervejas itens={[cerveja("pilsen", "Ponta Verde Pilsen")]} />
+      </GeladeiraProvider>,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "Adicionar" }));
+    await act(async () =>
+      chegou({
+        tipo: "ok",
+        resposta: {
+          itens: [{ cerveja: mare, quantidade: 2, totalCentavos: 2 * mare.precoCentavos }],
+          ajustes: [],
+          quantidadeTotal: 2,
+          subtotalCentavos: 2 * mare.precoCentavos,
+        },
+      }),
+    );
+    expect(screen.getByTestId("contador")).toHaveTextContent("2");
+    await userEvent.click(screen.getByRole("button", { name: "Desfazer" }));
+
+    expect(screen.getByTestId("contador")).toHaveTextContent("2");
+  });
+
+  it("um toque repetido na mesma cerveja reinicia o toast (5 s a partir do último toque)", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      abrir([cerveja("pilsen", "Ponta Verde Pilsen")]);
+      const adicionar = screen.getByRole("button", { name: "Adicionar" });
+
+      await userEvent.click(adicionar);
+      await act(async () => void vi.advanceTimersByTime(3000));
+      await userEvent.click(adicionar);
+      await act(async () => void vi.advanceTimersByTime(3000));
+
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "Ponta Verde Pilsen foi para a geladeira",
+      );
+      await act(async () => void vi.advanceTimersByTime(2500));
+      expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
