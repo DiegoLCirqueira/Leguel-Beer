@@ -162,4 +162,42 @@ describe("GradeDeCervejas", () => {
 
     expect(screen.getByRole("status")).toHaveTextContent("Só temos 1 unidade");
   });
+
+  it("a conta chegando com a mesma cerveja na mesma quantidade invalida o Desfazer: nada sai da conta", async () => {
+    const pilsen = cerveja("pilsen", "Ponta Verde Pilsen");
+    const mare = cerveja("a", "Maré Alta");
+    let chegou!: (r: ResultadoDaConta) => void;
+    const conta: ContaDaGeladeira = {
+      buscar: () => new Promise<ResultadoDaConta>((resolve) => (chegou = resolve)),
+      enviar: vi.fn().mockResolvedValue({ tipo: "erro" }),
+      validar: vi.fn().mockResolvedValue({ tipo: "erro" }),
+    };
+    render(
+      <GeladeiraProvider conta={conta}>
+        <Contador />
+        <GradeDeCervejas itens={[pilsen]} />
+      </GeladeiraProvider>,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "Adicionar" }));
+    await act(async () =>
+      chegou({
+        tipo: "ok",
+        resposta: {
+          itens: [
+            { cerveja: pilsen, quantidade: 1, totalCentavos: pilsen.precoCentavos },
+            { cerveja: mare, quantidade: 2, totalCentavos: 2 * mare.precoCentavos },
+          ],
+          ajustes: [],
+          quantidadeTotal: 3,
+          subtotalCentavos: pilsen.precoCentavos + 2 * mare.precoCentavos,
+        },
+      }),
+    );
+    expect(screen.getByTestId("contador")).toHaveTextContent("3");
+    await userEvent.click(screen.getByRole("button", { name: "Desfazer" }));
+
+    expect(screen.getByTestId("contador")).toHaveTextContent("3");
+    expect(conta.enviar).not.toHaveBeenCalled();
+  });
 });
