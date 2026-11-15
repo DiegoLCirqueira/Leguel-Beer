@@ -10,7 +10,7 @@ type AvisoDeAdicionar = {
   /** Um por toque: o toast recomeça os 5 segundos mesmo com a mesma mensagem. */
   toque: number;
   mensagem: string;
-  desfazer?: { cervejaId: string; antes: number; depois: number };
+  desfazer?: { cervejaId: string; antes: number; depois: number; geracao: number };
 };
 
 /**
@@ -27,7 +27,7 @@ export function useAdicionarComToast(): {
 
   const adicionarComToast = (cerveja: CervejaCard, quantidade = 1) => {
     const antes = estado.itens.find((i) => i.cerveja.id === cerveja.id)?.quantidade ?? 0;
-    const { limite } = adicionar(cerveja, quantidade);
+    const { limite, geracao } = adicionar(cerveja, quantidade);
     const toque = ++toques.current;
     setAviso(
       limite !== undefined
@@ -35,7 +35,7 @@ export function useAdicionarComToast(): {
         : {
             toque,
             mensagem: `${cerveja.nome} foi para a geladeira`,
-            desfazer: { cervejaId: cerveja.id, antes, depois: antes + quantidade },
+            desfazer: { cervejaId: cerveja.id, antes, depois: antes + quantidade, geracao },
           },
     );
   };
@@ -49,7 +49,7 @@ export function useAdicionarComToast(): {
         desfazer
           ? {
               rotulo: "Desfazer",
-              aoAcionar: () => reverterAdicao(desfazer.cervejaId, desfazer),
+              aoAcionar: () => reverterAdicao(desfazer.cervejaId, desfazer, desfazer.geracao),
             }
           : undefined
       }
