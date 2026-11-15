@@ -48,6 +48,13 @@ describe("dados do seed do catálogo", () => {
     ]);
   });
 
+  it("a Barra Nova se chama só Barra Nova, como no rótulo da foto", () => {
+    const barraNova = SEED_CATEGORIES.flatMap((c) => c.beers).find(
+      (b) => b.slug === "barra-nova-porter",
+    );
+    expect(barraNova?.name).toBe("Barra Nova");
+  });
+
   it("segue a tabela da spec: 4 cervejas por categoria, com estilo, teor, IBU, volume e preço", () => {
     expect(SEED_CATEGORIES.map((c) => [c.slug, c.beers.map((b) => b.slug)])).toEqual([
       ["ipa", ["mare-alta", "leguele-carnaval", "leguele-maceio-ipa", "jaragua-hazy-ipa"]],
@@ -62,19 +69,19 @@ describe("dados do seed do catálogo", () => {
       ["mare-alta", "American IPA", 6.5, 65, 330, 3200],
       ["leguele-carnaval", "Session IPA", 4.2, 30, 330, 3000],
       ["leguele-maceio-ipa", "IPA", 6.0, 55, 330, 3100],
-      ["jaragua-hazy-ipa", "New England IPA", 6.8, 42, 500, 3350],
+      ["jaragua-hazy-ipa", "Juicy Hazy IPA", 6.6, 42, 500, 3350],
       ["cupuacu-ale", "Amazonian Fruit Ale", 5.8, 15, 500, 2650],
       ["cajupa-sour", "Sour Ale com cajá", 6.5, 8, 500, 2600],
-      ["umbu-gose", "Gose com umbu", 4.0, 6, 330, 2750],
-      ["graviola-witbier", "Witbier com graviola", 4.8, 12, 500, 2800],
+      ["umbu-gose", "Gose com umbu", 4.6, 6, 500, 2750],
+      ["graviola-witbier", "Witbier com graviola", 4.9, 12, 500, 2800],
       ["avermelhou", "Red Ale (hibisco e frutas vermelhas)", 5.8, 20, 330, 2900],
-      ["rapadura-brown-ale", "Brown Ale com rapadura", 5.5, 24, 330, 2850],
-      ["barra-nova-porter", "Robust Porter", 6.4, 35, 330, 3150],
-      ["pajucara-amber-ale", "American Amber Ale", 5.0, 25, 330, 2700],
+      ["rapadura-brown-ale", "English Brown Ale", 5.5, 24, 500, 2850],
+      ["barra-nova-porter", "Robust Porter", 6.0, 35, 500, 3150],
+      ["pajucara-amber-ale", "American Amber Ale", 5.4, 25, 500, 2700],
       ["leguele-kolsch", "Kölsch", 4.8, 22, 330, 2490],
       ["leguele-cream-ale", "Cream Ale", 5.2, 18, 330, 2500],
       ["leguele-comendador", "Helles", 4.9, 17, 500, 2590],
-      ["ponta-verde-pilsen", "German Pilsner", 4.6, 28, 500, 2390],
+      ["ponta-verde-pilsen", "German Pilsner", 4.7, 28, 500, 2390],
     ]);
   });
 
