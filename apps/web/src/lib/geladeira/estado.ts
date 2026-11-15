@@ -11,6 +11,10 @@ export type EstadoDaGeladeira = { itens: ItemLocal[] };
 /** `limite` vem quando o pedido passou do que cabe: nada muda e o limite alimenta o "Só temos N unidades". */
 export type Resultado = { estado: EstadoDaGeladeira; limite?: number };
 
+/** O aviso de limite: "Só temos N unidades" (singular com 1). */
+export const mensagemDoLimite = (limite: number) =>
+  `Só temos ${limite} ${limite === 1 ? "unidade" : "unidades"}`;
+
 export const GELADEIRA_VAZIA: EstadoDaGeladeira = { itens: [] };
 
 /** Até onde a cerveja pode ir: a quantidade disponível, no máximo 99 (0 se esgotada). */

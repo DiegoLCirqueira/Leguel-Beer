@@ -11,12 +11,10 @@ import {
   Toast,
 } from "@/components/ui";
 import type { Desfazer } from "@/lib/geladeira/estado";
+import { mensagemDoLimite } from "@/lib/geladeira/estado";
 import { useTelaLarga } from "@/lib/use-tela-larga";
 import { useGeladeira } from "./geladeira-provider";
 import { FechamentoDoResumo, LinhasDoResumo } from "./resumo-da-geladeira";
-
-const mensagemDoLimite = (limite: number) =>
-  `Só temos ${limite} ${limite === 1 ? "unidade" : "unidades"}`;
 
 /** A Geladeira em prateleiras, uma por categoria, com o resumo: barra e sheet no celular, coluna no desktop. */
 export function GeladeiraTela() {
