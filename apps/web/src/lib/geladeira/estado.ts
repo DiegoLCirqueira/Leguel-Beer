@@ -43,6 +43,24 @@ export function adicionar(
   return { estado: { itens } };
 }
 
+/**
+ * Desfaz uma adição só daquela cerveja: volta à quantidade de `antes` (0 tira a cerveja). Só mexe se a
+ * cerveja ainda está com a quantidade de `depois` do toque; se a Geladeira mudou (por exemplo, a conta
+ * chegou), não toca em nada.
+ */
+export function reverterAdicao(
+  estado: EstadoDaGeladeira,
+  cervejaId: string,
+  { antes, depois }: { antes: number; depois: number },
+): EstadoDaGeladeira {
+  const atual = estado.itens.find((i) => i.cerveja.id === cervejaId);
+  if (!atual || atual.quantidade !== depois) return estado;
+  if (antes === 0) return { itens: estado.itens.filter((i) => i.cerveja.id !== cervejaId) };
+  return {
+    itens: estado.itens.map((i) => (i.cerveja.id === cervejaId ? { ...i, quantidade: antes } : i)),
+  };
+}
+
 /** Troca a quantidade de uma cerveja que já está na Geladeira (de 1 até o que cabe). */
 export function alterarQuantidade(
   estado: EstadoDaGeladeira,

@@ -28,6 +28,7 @@ import {
   adicionar as adicionarOp,
   alterarQuantidade as alterarOp,
   desfazer as desfazerOp,
+  reverterAdicao as reverterAdicaoOp,
   GELADEIRA_VAZIA,
   aplicarResposta,
   paraRequest,
@@ -51,8 +52,8 @@ export type GeladeiraContexto = {
   alterarQuantidade: (cervejaId: string, quantidade: number) => Resultado;
   remover: (cervejaId: string) => Desfazer | null;
   desfazer: (d: Desfazer) => void;
-  /** Volta a Geladeira a um estado anterior (o "Desfazer" de um adicionar). */
-  restaurar: (anterior: EstadoDaGeladeira) => void;
+  /** O "Desfazer" de um adicionar: reverte só aquela cerveja, e só se nada mudou nela desde o toque. */
+  reverterAdicao: (cervejaId: string, quantidades: { antes: number; depois: number }) => void;
 };
 
 const semAssinatura = () => () => {};
@@ -226,9 +227,12 @@ export function GeladeiraProvider({
         aplicar(desfazerOp(atual.current, d));
         sincronizar();
       },
-      restaurar: (anterior) => {
-        aplicar(anterior);
-        sincronizar();
+      reverterAdicao: (cervejaId, quantidades) => {
+        const proximo = reverterAdicaoOp(atual.current, cervejaId, quantidades);
+        if (proximo !== atual.current) {
+          aplicar(proximo);
+          sincronizar();
+        }
       },
     }),
     [pronta, estado, ajustes, limparAjustes, aplicar, sincronizar],
