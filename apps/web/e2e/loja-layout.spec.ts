@@ -1,5 +1,6 @@
 import { expect, test } from "./support/maior-de-idade";
 
+import { aguardarRevelacao } from "./support/revelacao";
 test.use({ isMobile: false, hasTouch: false, viewport: { width: 390, height: 844 } });
 
 test.beforeEach(async ({ context, baseURL }) => {
@@ -12,6 +13,7 @@ test("a home tem cabeçalho com a Geladeira, barra inferior fixa, sem rodapé, e
   page,
 }) => {
   await page.goto("/");
+  await aguardarRevelacao(page);
 
   await expect(page.getByRole("link", { name: "Geladeira, 0 unidades" })).toBeVisible();
   const barra = page.getByRole("navigation", { name: "Menu da loja" });
@@ -59,6 +61,7 @@ for (const medida of [
   }) => {
     await page.setViewportSize(medida);
     await page.goto("/");
+    await aguardarRevelacao(page);
     const barra = page.getByRole("navigation", { name: "Menu da loja" });
 
     const rotulos = await barra.locator("a span").evaluateAll((spans) =>
@@ -95,6 +98,7 @@ for (const medida of [
   }) => {
     await page.setViewportSize(medida);
     await page.goto("/");
+    await aguardarRevelacao(page);
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
     const barra = await page.getByRole("navigation", { name: "Menu da loja" }).boundingBox();
 

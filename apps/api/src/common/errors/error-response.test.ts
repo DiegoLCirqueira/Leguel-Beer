@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { describe, expect, it } from "vitest";
+import { CodedHttpError } from "./coded-http-error.js";
 import { NotFoundError } from "./not-found-error.js";
 import { ValidationError } from "./validation-error.js";
 import { toErrorResponse } from "./error-response.js";
@@ -79,5 +80,18 @@ describe("toErrorResponse", () => {
 
   it("trata valores não-Error lançados como erro interno", () => {
     expect(toErrorResponse("boom").status).toBe(500);
+  });
+
+  it("transforma CodedHttpError no status, no código e na mensagem dele, sem detalhes internos", () => {
+    const error = new CodedHttpError(
+      503,
+      "MAPS_UNAVAILABLE",
+      "Não conseguimos calcular o frete agora.",
+    );
+
+    expect(toErrorResponse(error)).toEqual({
+      status: 503,
+      body: { code: "MAPS_UNAVAILABLE", message: "Não conseguimos calcular o frete agora." },
+    });
   });
 });

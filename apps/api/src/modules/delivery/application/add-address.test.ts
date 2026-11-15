@@ -1,0 +1,186 @@
+import { describe, expect, it } from "vitest";
+import type { DeliverySettingsRepository } from "../domain/delivery-settings-repository.js";
+import { AddressLimitReachedError, AddressNotLocatedError } from "../domain/address-errors.js";
+import { DeliverySettingsNotConfiguredError } from "../domain/delivery-settings-repository.js";
+import { MapsUnavailableError } from "../domain/maps.js";
+import { InMemoryAddressRepository } from "../testing/in-memory-addresses.js";
+import { FakeGeocoder, FakeRouteCalculator } from "../testing/fake-maps.js";
+import { AddAddress } from "./add-address.js";
+
+const NOW = new Date("2026-11-14T12:00:00.000Z");
+const ORIGIN = { latitude: -9.6649, longitude: -35.7313 };
+
+const settings: DeliverySettingsRepository = {
+  get: async () => ({
+    taxaBaseCentavos: 500,
+    valorPorKmCentavos: 150,
+    raioMaximoMetros: 25_000,
+    freteGratisMinimoCentavos: 15_000,
+    origem: ORIGIN,
+  }),
+};
+
+const input = {
+  zip: "57035000",
+  street: "Rua do Sol",
+  number: "100",
+  district: "Farol",
+  city: "Maceió",
+  state: "AL",
+} as const;
+
+function setup() {
+  const addresses = new InMemoryAddressRepository();
+  const geocoder = new FakeGeocoder({ latitude: -9.66, longitude: -35.74 });
+  const router = new FakeRouteCalculator(5_200);
+  let sequence = 0;
+  const add = new AddAddress(
+    addresses,
+    geocoder,
+    router,
+    settings,
+    () => `address-${++sequence}`,
+    () => NOW,
+  );
+  return { addresses, geocoder, router, add };
+}
+
+describe("AddAddress", () => {
+  it("salva o primeiro endereço como padrão, com as coordenadas, a distância de rota e a origem usada", async () => {
+    const { addresses, add } = setup();
+
+    await add.execute("owner-1", input);
+
+    expect(await addresses.list("owner-1")).toEqual([
+      {
+        ...input,
+        id: "address-1",
+        ownerId: "owner-1",
+        isDefault: true,
+        coordinates: { latitude: -9.66, longitude: -35.74 },
+        distanceMeters: 5_200,
+        routeOrigin: ORIGIN,
+        createdAt: NOW,
+      },
+    ]);
+  });
+
+  it("o segundo endereço não vira padrão e o primeiro continua padrão", async () => {
+    const { addresses, add } = setup();
+    await add.execute("owner-1", input);
+
+    await add.execute("owner-1", { ...input, nickname: "Trabalho", street: "Rua da Praia" });
+
+    const saved = await addresses.list("owner-1");
+    expect(saved.map(({ id, isDefault }) => ({ id, isDefault }))).toEqual([
+      { id: "address-1", isDefault: true },
+      { id: "address-2", isDefault: false },
+    ]);
+  });
+
+  it("recusa o sexto endereço antes de chamar os mapas e sem gravar nada", async () => {
+    const { addresses, geocoder, router, add } = setup();
+    for (let i = 0; i < 5; i++) await add.execute("owner-1", input);
+    const callsBefore = geocoder.received.length;
+
+    await expect(add.execute("owner-1", input)).rejects.toBeInstanceOf(AddressLimitReachedError);
+
+    expect(await addresses.list("owner-1")).toHaveLength(5);
+    expect(geocoder.received).toHaveLength(callsBefore);
+    expect(router.received).toHaveLength(callsBefore);
+  });
+
+  it("não salva nem calcula a rota quando o serviço de mapas não acha o endereço", async () => {
+    const { addresses, geocoder, router, add } = setup();
+    geocoder.respondWith(null);
+
+    await expect(add.execute("owner-1", input)).rejects.toBeInstanceOf(AddressNotLocatedError);
+
+    expect(await addresses.list("owner-1")).toEqual([]);
+    expect(router.received).toEqual([]);
+  });
+
+  it.each(["geocoder", "router"] as const)(
+    "não salva nada quando o serviço de mapas (%s) está fora do ar",
+    async (failing) => {
+      const { addresses, geocoder, router, add } = setup();
+      (failing === "geocoder" ? geocoder : router).respondWith("unavailable");
+
+      await expect(add.execute("owner-1", input)).rejects.toBeInstanceOf(MapsUnavailableError);
+
+      expect(await addresses.list("owner-1")).toEqual([]);
+    },
+  );
+
+  it("salva sem distância quando não há rota até a cervejaria (fora da área)", async () => {
+    const { addresses, router, add } = setup();
+    router.respondWith(null);
+
+    await add.execute("owner-1", input);
+
+    expect((await addresses.list("owner-1"))[0]).toMatchObject({ distanceMeters: null });
+  });
+
+  it("falta de configuração de entrega não chama os mapas nem salva nada", async () => {
+    const { addresses, geocoder } = setup();
+    const missing: DeliverySettingsRepository = {
+      get: async () => {
+        throw new DeliverySettingsNotConfiguredError();
+      },
+    };
+    const add = new AddAddress(
+      addresses,
+      geocoder,
+      new FakeRouteCalculator(),
+      missing,
+      () => "address-1",
+      () => NOW,
+    );
+
+    await expect(add.execute("owner-1", input)).rejects.toBeInstanceOf(
+      DeliverySettingsNotConfiguredError,
+    );
+
+    expect(geocoder.received).toEqual([]);
+    expect(await addresses.list("owner-1")).toEqual([]);
+  });
+
+  it("envia aos mapas só os campos permitidos: nunca apelido nem complemento, e a rota só com coordenadas", async () => {
+    const { geocoder, router, add } = setup();
+
+    await add.execute("owner-1", { ...input, nickname: "Casa da Ana", complement: "Apto 12" });
+
+    expect(geocoder.received).toEqual([
+      {
+        street: "Rua do Sol",
+        number: "100",
+        district: "Farol",
+        city: "Maceió",
+        state: "AL",
+        zip: "57035000",
+      },
+    ]);
+    expect(router.received).toEqual([
+      { origin: ORIGIN, destination: { latitude: -9.66, longitude: -35.74 } },
+    ]);
+  });
+
+  it.each([
+    ["latitude fora da faixa", "geocoder", { latitude: 91, longitude: -35.74 }],
+    ["longitude fora da faixa", "geocoder", { latitude: -9.66, longitude: 181 }],
+    ["coordenada que não é número", "geocoder", { latitude: Number.NaN, longitude: -35.74 }],
+    ["distância negativa", "router", -1],
+    ["distância fracionária", "router", 12.5],
+    ["distância infinita", "router", Number.POSITIVE_INFINITY],
+  ] as const)(
+    "trata %s devolvida pelos mapas como serviço indisponível e não salva nada",
+    async (_nome, which, value) => {
+      const { addresses, geocoder, router, add } = setup();
+      (which === "geocoder" ? geocoder : router).respondWith(value as never);
+
+      await expect(add.execute("owner-1", input)).rejects.toBeInstanceOf(MapsUnavailableError);
+
+      expect(await addresses.list("owner-1")).toEqual([]);
+    },
+  );
+});
