@@ -18,7 +18,7 @@ describe("/entregas", () => {
     expect(screen.getByText("Só Maceió e região.")).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Calculado pela distância até a cervejaria, com frete grátis para pedidos acima de R$ 150.",
+        "Calculado pela distância até a cervejaria, com frete grátis para pedidos a partir de R$ 150.",
       ),
     ).toBeInTheDocument();
     expect(screen.getByText("Não há retirada no local.")).toBeInTheDocument();

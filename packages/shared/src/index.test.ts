@@ -53,6 +53,42 @@ describe("API pública de @leguele/shared", () => {
     );
   });
 
+  it("exporta o contrato de endereços e entrega: CEP, formulário, limite e frete", () => {
+    expect(Object.keys(shared)).toEqual(
+      expect.arrayContaining([
+        "cepSchema",
+        "enderecoFormSchema",
+        "LIMITE_DE_ENDERECOS",
+        "calcularFrete",
+      ]),
+    );
+  });
+
+  it("exporta o contrato do pedido e do pagamento", () => {
+    expect(Object.keys(shared)).toEqual(
+      expect.arrayContaining([
+        "STATUS_DO_PEDIDO",
+        "statusDoPedidoSchema",
+        "VALIDADE_DO_PEDIDO_MINUTOS",
+        "validoAte",
+        "pedidoVencido",
+        "numeroDoPedidoSchema",
+        "calcularTotais",
+        "criarPedidoRequestSchema",
+        "chaveDeIdempotenciaSchema",
+        "CODIGOS_DE_ERRO_DO_PEDIDO",
+        "erroDoPedidoSchema",
+        "pedidoCriadoSchema",
+        "formaDePagamentoSchema",
+        "PARCELAS_MAXIMAS",
+        "opcaoDeParcelaSchema",
+        "tabelaDeParcelasSchema",
+        "descreverParcela",
+        "MENSAGENS_DE_PAGAMENTO",
+      ]),
+    );
+  });
+
   it("exporta os tipos do contrato do catálogo", () => {
     expectTypeOf<OrdemDoCatalogo>().toEqualTypeOf<
       "relevancia" | "menor-preco" | "maior-preco" | "mais-novas"

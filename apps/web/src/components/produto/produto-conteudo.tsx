@@ -93,7 +93,7 @@ export function ProdutoConteudo({ cerveja }: { cerveja: CervejaDetalhe }) {
         ) : null}
         <p className="flex items-center gap-3 rounded-2xl border border-borda px-4 py-3 text-texto">
           <Truck aria-hidden="true" className="size-6 shrink-0 text-primaria" />
-          Frete grátis em compras acima de R$ 150,00
+          Frete grátis em compras a partir de R$ 150,00
         </p>
         {descricao ? (
           <section className="flex flex-col gap-2">

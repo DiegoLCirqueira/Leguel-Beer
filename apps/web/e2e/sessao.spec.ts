@@ -1,5 +1,6 @@
 import type { BrowserContext, Page } from "@playwright/test";
 import { expect, test } from "./support/maior-de-idade";
+import { aguardarRevelacao } from "./support/revelacao";
 import {
   SUPABASE_ANON_KEY,
   SUPABASE_URL,
@@ -52,6 +53,7 @@ test("home só vale como logada com token válido ou renovado: token vencido sem
   );
 
   await page.goto("/");
+  await aguardarRevelacao(page);
 
   await expect(page).toHaveURL(/\/boas-vindas$/);
   expect(await cookieDe(context, "lb_acesso")).toBeUndefined();
@@ -65,6 +67,7 @@ test("home com sessão renovada segue como logada", async ({ page, context }) =>
   await context.addCookies([{ name: "lb_acesso", value: falso, url: page.url() }]);
 
   await page.goto("/");
+  await aguardarRevelacao(page);
 
   await expect(page).toHaveURL(/\/$/);
   const renovado = (await cookieDe(context, "lb_acesso"))?.value;

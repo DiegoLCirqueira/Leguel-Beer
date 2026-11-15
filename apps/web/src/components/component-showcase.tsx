@@ -3,7 +3,10 @@
 import type { CervejaCard } from "@leguele/shared";
 import { ArrowRight, Link2, Lock, UserRound } from "lucide-react";
 import { useState } from "react";
+import type { ItemLocal } from "@/lib/geladeira/estado";
 import {
+  AvisosDaGeladeira,
+  BarraDoResumo,
   BarraFixa,
   BlocoDePreco,
   BottomSheet,
@@ -13,13 +16,16 @@ import {
   CervejaNaoEncontrada,
   CategoryChips,
   DivisorOu,
+  LinhaDoResumo,
   LojaHeader,
   LojaTabBar,
+  MolduraDaGeladeira,
   ProdutoHeader,
   Stepper,
   Skeleton,
   StyleBadge,
   Toast,
+  TotaisDoResumo,
 } from "@/components/ui";
 
 const swatches = [
@@ -27,6 +33,8 @@ const swatches = [
   { name: "superficie", className: "bg-superficie" },
   { name: "superficie-elevada", className: "bg-superficie-elevada" },
   { name: "veu", className: "bg-veu" },
+  { name: "fantasma", className: "bg-fantasma" },
+  { name: "sombra", className: "bg-sombra" },
   { name: "borda", className: "bg-borda" },
   { name: "borda-campo", className: "bg-borda-campo" },
   { name: "texto", className: "bg-texto" },
@@ -66,6 +74,11 @@ const cervejaEsgotada: CervejaCard = {
   quantidadeDisponivel: 0,
   esgotada: true,
 };
+
+const itensDaMoldura: ItemLocal[] = [
+  { cerveja: cervejaExemplo, quantidade: 6 },
+  { cerveja: cervejaEsgotada, quantidade: 1 },
+];
 
 const categories = [
   { id: "todas", label: "Todas", count: 16 },
@@ -161,6 +174,39 @@ export function ComponentShowcase() {
           aoAlterar={setQuantidade}
           max={12}
           rotulo="Quantidade de exemplo"
+        />
+      </Section>
+      <Section title="Geladeira: moldura, prateleiras, garrafas e fantasmas">
+        <MolduraDaGeladeira itens={itensDaMoldura} />
+      </Section>
+      <Section title="Geladeira: resumo (linha, totais, barra) e avisos">
+        <AvisosDaGeladeira
+          ajustes={[
+            {
+              tipo: "preco-mudou",
+              cervejaId: cervejaExemplo.id,
+              nome: cervejaExemplo.nome,
+              precoVistoCentavos: 3000,
+              precoAtualCentavos: 3200,
+            },
+            { tipo: "indisponivel", cervejaId: "2", nome: "Umbu Gose" },
+          ]}
+        />
+        <ul>
+          <LinhaDoResumo
+            item={{ cerveja: cervejaExemplo, quantidade }}
+            aoAlterar={setQuantidade}
+            aoRemover={() => undefined}
+          />
+        </ul>
+        <TotaisDoResumo
+          quantidadeTotal={quantidade}
+          subtotalCentavos={quantidade * cervejaExemplo.precoCentavos}
+        />
+        <BarraDoResumo
+          quantidadeTotal={quantidade}
+          subtotalCentavos={quantidade * cervejaExemplo.precoCentavos}
+          aoVerResumo={() => undefined}
         />
       </Section>
       <Section title="Bottom sheet, toast e skeleton">

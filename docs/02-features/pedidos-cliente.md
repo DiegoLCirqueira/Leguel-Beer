@@ -33,13 +33,13 @@ Funcionalidade: Pedido confirmado e Meus pedidos
   Cenário: Confirmação de um pedido pago
     Dado que entrei na conta com 3 Maré Alta e 2 Cupuaçu Ale na Geladeira
     E criei o pedido "#LB482731" com subtotal de R$ 149,00 (3 × R$ 32,00 + 2 × R$ 26,50) e frete de R$ 13,00
-    Quando o pagamento do pedido é aprovado e chego a "/pedido/<id>/confirmado"
+    Quando o pagamento do pedido é aprovado e chego a "/pedido/{id}/confirmado"
     Então vejo "Pedido confirmado!", o número "#LB482731", a data e a hora do pedido, "5 itens", o subtotal R$ 149,00, o frete R$ 13,00 e o total R$ 162,00
     E a Geladeira da conta não tem mais as cervejas do pedido, e o contador do cabeçalho mostra 0
 
   Esquema do Cenário: Confirmação de pedido que não pode ser mostrado
     Dado <situacao>
-    Quando abro "/pedido/<id>/confirmado"
+    Quando abro "/pedido/{id}/confirmado"
     Então <resultado>
 
     Exemplos:
@@ -124,10 +124,7 @@ Funcionalidade: Pedido confirmado e Meus pedidos
 
 - **Rota** `/conta/pedidos` ("Meus pedidos"), aberta pelo link "Meus pedidos" em `/conta` e pelo botão da confirmação. Exige conta.
 - **Lista** dos pedidos do cliente da sessão, do mais recente ao mais antigo (data de criação), inclusive os "Aguardando pagamento" e os "Cancelado". Um pedido "Aguardando pagamento" com o Pix já vencido aparece como "Cancelado" (checagem sob demanda, ver "API").
-- **Cada pedido mostra:** número, data e hora, selo do status, quantidade de itens, os nomes das duas primeiras cervejas (com "e mais N" quando houver mais) e o total. O pedido não é tocável: o detalhe com linha do tempo é o LB-68 (MVP+).
-
-> [!todo] Ponto em aberto para a spec do item 6: retomar o pagamento
-> Um pedido "Aguardando pagamento" na lista não leva de volta ao Pix, porque o pedido não é tocável (pergunta 4). Se o cliente sair da tela do Pix, só volta a ela pela URL. A spec do item 6 (Pix e cartão) decide como retomar o pagamento; tornar esse pedido tocável muda a resposta 4 e vai ao Diego como pergunta.
+- **Cada pedido mostra:** número, data e hora, selo do status, quantidade de itens, os nomes das duas primeiras cervejas (com "e mais N" quando houver mais) e o total. Só o pedido "Aguardando pagamento" é tocável: leva à tela de pagamento do pedido (`/pedido/{id}/pagamento`, [[pagamento]]), para retomar o Pix ou o cartão dentro da validade. Os outros status não são tocáveis: o detalhe com linha do tempo é o LB-68 (MVP+).
 - **Paginação:** 20 pedidos por vez; com mais, o botão "Carregar mais" traz os 20 seguintes no fim da lista, sem repetir nem pular pedido.
 - **Vazio:** "Você ainda não fez nenhum pedido." e o botão "Ver catálogo" (`/catalogo`).
 - **Erro ao carregar:** "Não foi possível carregar seus pedidos." e o botão "Tentar de novo".
@@ -167,9 +164,9 @@ Funcionalidade: Pedido confirmado e Meus pedidos
 
 - **Contrato** (shared, unitário): a lista de status com os rótulos, o texto da quantidade ("1 item", "5 itens"), o "e mais N" das cervejas e a data no fuso de Maceió (inclusive um pedido às 23:30 de Maceió, que em UTC já é o dia seguinte).
 - **Leitura de pedidos** (API): casos de uso com repositório em memória e relógio fake (ordem do mais recente, paginação de 20 com 21 e 41 pedidos, pedidos no mesmo segundo, pedido aguardando com o Pix vencido, com o relógio fixo e o cron sem rodar, volta como "Cancelado" na lista e na leitura e não muda a Geladeira); rotas com Supertest e banco real: sem token 401; matriz de posse (pedido de outro cliente Pago, Aguardando pagamento e Cancelado, e id inexistente) com o mesmo 404 e nada do pedido no corpo nem no log; paginação com pedidos de A e B intercalados no tempo traz só os de A, sem buraco nem repetição; nenhuma rota responde a leitura pelo número. Pedidos criados direto no banco de teste, sem depender do checkout.
-- **Geladeira ao aprovar** (API, entra com o item 6): caso de uso com repositório em memória: tira as cervejas do pedido nas quantidades do pedido e mantém o que entrou depois; as 4 linhas da tabela de exemplos, cada uma aprovando 1 e 2 vezes; diminuir com dois pedidos aguardando desconta do mais antigo; cancelamento descarta a baixa pendente. Os reds desta fatia entram com o webhook (item 6), e a spec do item 6 repete esta regra.
-- **Telas** (componente): confirmação com frete e com "Grátis"; desvios da confirmação (aguardando, cancelado, Pix vencido, sem sessão) e a página "não encontrada" sem dados do pedido; recarregar a confirmação não chama nada que altere a Geladeira; lista com os 6 status, vazia, com erro e com "Carregar mais".
-- **E2E** (celular, 360 × 640): confirmação de um pedido pago criado pela API de teste; pedido aguardando pagamento redireciona ao pagamento; pedido cancelado vai a "Meus pedidos"; sem sessão vai a `/entrar` e volta; pedido de outro cliente dá 404; "Meus pedidos" com 3 pedidos e vazio.
+- **Geladeira ao aprovar** (API, entra com o item 6): caso de uso com repositório em memória: tira as cervejas do pedido e mantém o que entrou depois; as 4 linhas da tabela de exemplos, cada uma aprovando 1 e 2 vezes; diminuir com dois pedidos aguardando desconta do mais antigo; cancelamento descarta a baixa pendente. Os reds desta fatia entram com o webhook (item 6), e a spec do item 6 repete esta regra.
+- **Telas** (componente): pedido "Aguardando pagamento" tocável e levando ao pagamento, os outros não tocáveis; confirmação com frete e com "Grátis"; desvios da confirmação (aguardando, cancelado, Pix vencido, sem sessão) e a página "não encontrada" sem dados do pedido; recarregar a confirmação não chama nada que altere a Geladeira; lista com os 6 status, vazia, com erro e com "Carregar mais".
+- **E2E** (celular, 360 × 640): confirmação de um pedido pago criado pela API de teste; pedido aguardando pagamento redireciona ao pagamento; pedido cancelado vai a "Meus pedidos"; sem sessão vai a `/entrar` e volta; pedido de outro cliente dá 404; "Meus pedidos" com 3 pedidos e vazio; tocar num pedido "Aguardando pagamento" da lista abre o pagamento dele.
 
 ## Fatias, com dono e ordem
 
@@ -197,7 +194,7 @@ Perguntas levadas pelo Orchestrator. Resposta do Diego: "todas as recomendadas".
 1. **Previsão de entrega na confirmação: A.** Sem previsão: o prazo de entrega (LB-65) está fora do MVP, e o texto fixo (B) só valeria com um prazo dado pelo Diego.
 2. **Quando a confirmação aparece: A.** Só com o pagamento aprovado; pedido aguardando volta à tela do pagamento; a Geladeira muda só quando o pagamento é aprovado.
 3. **Texto do topo da tela 08: A.** "Pagamento aprovado! Seu pedido já está com a gente. Acompanhe o status em Meus pedidos." Sem promessa de e-mail nem WhatsApp.
-4. **Escopo de "Meus pedidos": A.** Só o do card, com os nomes das duas primeiras cervejas e o pedido não tocável; sem chips de status, sem "Comprar novamente", sem "Acompanhar pedido" e sem o banner do Clube.
+4. **Escopo de "Meus pedidos": A.** Só o do card, com os nomes das duas primeiras cervejas e o pedido não tocável (exceto "Aguardando pagamento", pela resposta 3 de [[pagamento]], de 13/11); sem chips de status, sem "Comprar novamente", sem "Acompanhar pedido" e sem o banner do Clube.
 5. **Pix expirado: A.** Vira "Cancelado"; são 6 status (Aguardando pagamento, Pago, Em preparo, Saiu para entrega, Entregue, Cancelado).
 
 As decisões abaixo, tomadas sem consulta, ficam valendo e continuam vetáveis pelo Diego.

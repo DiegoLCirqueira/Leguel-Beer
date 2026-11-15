@@ -1,0 +1,108 @@
+import { describe, expect, it } from "vitest";
+import { calcularFrete, type ConfiguracaoDeEntrega } from "./frete.js";
+
+const config: ConfiguracaoDeEntrega = {
+  taxaBaseCentavos: 500,
+  valorPorKmCentavos: 150,
+  raioMaximoMetros: 25_000,
+  freteGratisMinimoCentavos: 15_000,
+};
+
+describe("calcularFrete: valor cobrado", () => {
+  it.each([
+    [5_200, 9_050, 1_300],
+    [5_200, 14_999, 1_300],
+    [25_000, 9_050, 4_250],
+    [0, 9_050, 500],
+  ])("distância %i m e subtotal %i dá frete de %i centavos", (distanciaMetros, subtotal, frete) => {
+    expect(calcularFrete({ distanciaMetros, subtotalCentavos: subtotal }, config)).toEqual({
+      naArea: true,
+      freteCentavos: frete,
+      gratis: false,
+    });
+  });
+});
+
+describe("calcularFrete: frete grátis", () => {
+  it.each([15_000, 15_001, 40_000])(
+    "subtotal de %i centavos ou mais não paga frete",
+    (subtotal) => {
+      expect(calcularFrete({ distanciaMetros: 5_200, subtotalCentavos: subtotal }, config)).toEqual(
+        {
+          naArea: true,
+          freteCentavos: 0,
+          gratis: true,
+        },
+      );
+    },
+  );
+});
+
+describe("calcularFrete: área de entrega", () => {
+  it.each([
+    [25_001, 9_050],
+    [26_000, 9_050],
+    [26_000, 40_000],
+  ])("distância de %i m com subtotal %i fica fora da área, até com frete grátis", (d, subtotal) => {
+    expect(calcularFrete({ distanciaMetros: d, subtotalCentavos: subtotal }, config)).toEqual({
+      naArea: false,
+    });
+  });
+});
+
+describe("calcularFrete: arredondamento e configuração", () => {
+  const porCem = { ...config, valorPorKmCentavos: 100 };
+
+  it.each([
+    [8_000, 1_300],
+    [8_010, 1_350],
+    [7_990, 1_300],
+    [8_500, 1_350],
+    [8_510, 1_400],
+  ])(
+    "com R$ 1,00 por km, %i m dá %i centavos (sempre para cima, de R$ 0,50 em R$ 0,50)",
+    (d, frete) => {
+      expect(calcularFrete({ distanciaMetros: d, subtotalCentavos: 1_000 }, porCem)).toMatchObject({
+        freteCentavos: frete,
+      });
+    },
+  );
+
+  it("usa a configuração recebida: mudar o valor por km muda a cotação", () => {
+    const entrada = { distanciaMetros: 5_200, subtotalCentavos: 9_050 };
+
+    expect(calcularFrete(entrada, config)).toMatchObject({ freteCentavos: 1_300 });
+    expect(calcularFrete(entrada, { ...config, valorPorKmCentavos: 200 })).toMatchObject({
+      freteCentavos: 1_550,
+    });
+  });
+
+  it("usa o raio e o mínimo de frete grátis da configuração", () => {
+    expect(
+      calcularFrete(
+        { distanciaMetros: 30_000, subtotalCentavos: 1_000 },
+        { ...config, raioMaximoMetros: 30_000 },
+      ),
+    ).toMatchObject({ naArea: true });
+    expect(
+      calcularFrete(
+        { distanciaMetros: 5_000, subtotalCentavos: 10_000 },
+        { ...config, freteGratisMinimoCentavos: 10_000 },
+      ),
+    ).toMatchObject({ gratis: true });
+  });
+});
+
+describe("calcularFrete: entradas inválidas", () => {
+  it.each([
+    [-1, 1_000],
+    [5_200.5, 1_000],
+    [Number.NaN, 1_000],
+    [5_200, -1],
+    [5_200, 10.5],
+  ])("recusa distância %s m e subtotal %s centavos (inteiros, sem negativos)", (d, subtotal) => {
+    expect(() => calcularFrete({ distanciaMetros: d, subtotalCentavos: subtotal }, config)).toThrow(
+      RangeError,
+    );
+  });
+});

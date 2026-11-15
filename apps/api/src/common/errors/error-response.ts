@@ -1,4 +1,5 @@
 import { HttpException } from "@nestjs/common";
+import { CodedHttpError } from "./coded-http-error.js";
 import { NotFoundError } from "./not-found-error.js";
 import { ValidationError, type FieldIssue } from "./validation-error.js";
 
@@ -38,6 +39,9 @@ export function toErrorResponse(error: unknown): ErrorResponse {
       status: 400,
       body: { code: "VALIDATION_ERROR", message: error.message, details: error.issues },
     };
+  }
+  if (error instanceof CodedHttpError) {
+    return { status: error.status, body: { code: error.code, message: error.message } };
   }
   if (error instanceof NotFoundError) {
     return { status: 404, body: BY_STATUS[404] as ErrorBody };

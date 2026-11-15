@@ -1,9 +1,11 @@
 import { expect, test } from "./support/maior-de-idade";
 
+import { aguardarRevelacao } from "./support/revelacao";
 test("a home sem sessão leva para a boas-vindas e mostra os caminhos de acesso", async ({
   page,
 }) => {
   await page.goto("/");
+  await aguardarRevelacao(page);
 
   await expect(page).toHaveURL(/\/boas-vindas$/);
   await expect(page.getByRole("heading", { level: 1, name: "Leguelé Beer" })).toBeVisible();
@@ -34,6 +36,7 @@ test("continuar como convidado leva à home e a boas-vindas não volta na mesma 
   await expect(page.getByRole("heading", { level: 1, name: "Leguelé Beer" })).toBeVisible();
 
   await page.goto("/");
+  await aguardarRevelacao(page);
   await expect(page).toHaveURL(/\/$/);
 });
 

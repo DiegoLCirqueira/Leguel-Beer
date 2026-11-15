@@ -42,6 +42,20 @@ describe("/dev/tokens", () => {
     );
   });
 
+  it("mostra a moldura da Geladeira com 6 garrafas na IPA, 1 em Frutas e fantasmas nas outras", () => {
+    render(<DevTokens />);
+
+    const ipa = screen.getByRole("region", { name: "IPA" });
+    expect(within(ipa).getByText(/^Maré Alta IPA, 6 unidades, R\$\s192,00$/)).toBeInTheDocument();
+    const frutas = screen.getByRole("region", { name: "Frutas" });
+    expect(within(frutas).getByText(/^Cupuaçu Ale, 1 unidade/)).toBeInTheDocument();
+    expect(
+      within(screen.getByRole("region", { name: "Malt" })).getAllByRole("link", {
+        name: "Adicionar Malt",
+      }),
+    ).toHaveLength(4);
+  });
+
   it("mostra o card de cerveja (disponível e esgotado) e o stepper, para conferir", async () => {
     render(<DevTokens />);
 
@@ -49,7 +63,7 @@ describe("/dev/tokens", () => {
     expect(screen.getByText("Esgotado")).toBeInTheDocument();
     const grupo = screen.getByRole("group", { name: "Quantidade de exemplo" });
     expect(grupo).toHaveTextContent("1");
-    await userEvent.click(screen.getByRole("button", { name: "Aumentar quantidade" }));
+    await userEvent.click(within(grupo).getByRole("button", { name: "Aumentar quantidade" }));
 
     expect(grupo).toHaveTextContent("2");
   });
