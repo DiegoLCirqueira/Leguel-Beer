@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   GELADEIRA_VAZIA,
   adicionar,
+  mensagemDoLimite,
   reverterAdicao,
   alterarQuantidade,
   aplicarResposta,
@@ -226,5 +227,13 @@ describe("reverterAdicao", () => {
     const { estado } = adicionar(GELADEIRA_VAZIA, cerveja("a"));
 
     expect(reverterAdicao(estado, "b", { antes: 0, depois: 1 })).toBe(estado);
+  });
+});
+
+describe("mensagemDoLimite", () => {
+  it("fala em unidades, no singular com 1, e nunca em 'Só temos 0 unidades'", () => {
+    expect(mensagemDoLimite(2)).toBe("Só temos 2 unidades");
+    expect(mensagemDoLimite(1)).toBe("Só temos 1 unidade");
+    expect(mensagemDoLimite(0)).toBe("A Geladeira está cheia.");
   });
 });

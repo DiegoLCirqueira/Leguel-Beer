@@ -136,4 +136,20 @@ describe("GradeDeCervejas", () => {
       vi.useRealTimers();
     }
   });
+
+  it("com 50 cervejas diferentes na Geladeira, uma nova mostra 'A Geladeira está cheia.', sem 'Desfazer'", async () => {
+    guardar(
+      Array.from({ length: 50 }, (_, i) => ({
+        cerveja: cerveja(`c${i}`, `Cerveja ${i}`),
+        quantidade: 1,
+      })),
+    );
+    abrir([cerveja("nova", "Cerveja Nova")]);
+
+    await userEvent.click(screen.getByRole("button", { name: "Adicionar" }));
+
+    expect(screen.getByRole("status")).toHaveTextContent("A Geladeira está cheia.");
+    expect(screen.queryByRole("button", { name: "Desfazer" })).not.toBeInTheDocument();
+    expect(screen.getByTestId("contador")).toHaveTextContent("50");
+  });
 });
