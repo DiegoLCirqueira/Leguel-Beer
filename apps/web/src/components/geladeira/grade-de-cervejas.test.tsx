@@ -152,4 +152,14 @@ describe("GradeDeCervejas", () => {
     expect(screen.queryByRole("button", { name: "Desfazer" })).not.toBeInTheDocument();
     expect(screen.getByTestId("contador")).toHaveTextContent("50");
   });
+
+  it("com 1 disponível e 1 na Geladeira o aviso fica no singular: 'Só temos 1 unidade'", async () => {
+    const pilsen = cerveja("pilsen", "Ponta Verde Pilsen", { quantidadeDisponivel: 1 });
+    guardar([{ cerveja: pilsen, quantidade: 1 }]);
+    abrir([pilsen]);
+
+    await userEvent.click(screen.getByRole("button", { name: "Adicionar" }));
+
+    expect(screen.getByRole("status")).toHaveTextContent("Só temos 1 unidade");
+  });
 });

@@ -9,6 +9,13 @@ import { ProdutoConteudo } from "./produto-conteudo";
 
 afterEach(() => localStorage.clear());
 
+/** O seletor de quantidade também é um `status`: junta o texto de todos para achar o do toast. */
+const textosDeStatus = () =>
+  screen
+    .getAllByRole("status")
+    .map((e) => e.textContent)
+    .join(" | ");
+
 function Contador() {
   const { quantidadeTotal } = useGeladeira();
   return <span data-testid="contador">{quantidadeTotal}</span>;
@@ -117,7 +124,7 @@ describe("ProdutoConteudo", () => {
     await userEvent.click(screen.getByRole("button", { name: "Adicionar à geladeira" }));
 
     expect(screen.getByTestId("contador")).toHaveTextContent("3");
-    expect(screen.getByText("Maré Alta foi para a geladeira")).toBeInTheDocument();
+    expect(textosDeStatus()).toContain("Maré Alta foi para a geladeira");
     await userEvent.click(screen.getByRole("button", { name: "Desfazer" }));
     expect(screen.getByTestId("contador")).toHaveTextContent("0");
   });
@@ -131,7 +138,7 @@ describe("ProdutoConteudo", () => {
     await userEvent.click(botao);
 
     expect(screen.getByTestId("contador")).toHaveTextContent("2");
-    expect(screen.getByText("Só temos 2 unidades")).toBeInTheDocument();
+    expect(textosDeStatus()).toContain("Só temos 2 unidades");
   });
 
   it("esgotada mostra o selo Esgotado, sem seletor, com o botão desabilitado", () => {
@@ -153,5 +160,22 @@ describe("ProdutoConteudo", () => {
     rerender(<ProdutoConteudo cerveja={cerveja({ imagemUrl: null })} />);
 
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
+  });
+
+  it("com 3 na Geladeira e 5 disponíveis, escolher 3 não vai a 5: avisa o limite e nada muda", async () => {
+    const mare = cerveja({ quantidadeDisponivel: 5 });
+    localStorage.setItem(
+      "lb:geladeira",
+      JSON.stringify({ versao: 1, itens: [{ cerveja: mare, quantidade: 3 }] }),
+    );
+    render(<ProdutoConteudo cerveja={mare} />);
+
+    const mais = screen.getByRole("button", { name: "Aumentar quantidade" });
+    await userEvent.click(mais);
+    await userEvent.click(mais);
+    await userEvent.click(screen.getByRole("button", { name: "Adicionar à geladeira" }));
+
+    expect(screen.getByTestId("contador")).toHaveTextContent("3");
+    expect(textosDeStatus()).toContain("Só temos 5 unidades");
   });
 });
