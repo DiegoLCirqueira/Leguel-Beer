@@ -14,7 +14,7 @@ test("os cards do catálogo mostram a foto da garrafa, com o arquivo no ar, nas 
   // Uma das 7 fotos que entraram depois (antes usava a imagem padrão).
   await expectBeerPhoto(
     page,
-    page.getByRole("img", { name: "Jaraguá Hazy IPA, New England IPA" }),
+    page.getByRole("img", { name: "Jaraguá Hazy IPA, Juicy Hazy IPA" }),
     "jaragua-hazy-ipa",
   );
 });
