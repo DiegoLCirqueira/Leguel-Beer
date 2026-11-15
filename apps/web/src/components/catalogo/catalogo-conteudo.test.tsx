@@ -1,12 +1,15 @@
 import type { CatalogoQuery, CatalogoResponse, CervejaCard } from "@leguele/shared";
-import { render, screen } from "@testing-library/react";
+import { render as renderRtl, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const push = vi.hoisted(() => vi.fn());
-vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push }), usePathname: () => "/catalogo" }));
 
+import { GeladeiraProvider } from "@/components/geladeira/geladeira-provider";
 import { CatalogoConteudo } from "./catalogo-conteudo";
+
+const render = (ui: React.ReactElement) => renderRtl(ui, { wrapper: GeladeiraProvider });
 
 const padrao: CatalogoQuery = { disponiveis: false, ordem: "relevancia" };
 
@@ -115,5 +118,13 @@ describe("CatalogoConteudo", () => {
     rerender(<CatalogoConteudo query={padrao} dados={dados([cerveja("1", "Maré Alta IPA")])} />);
 
     expect(screen.queryByRole("button", { name: "Limpar filtros" })).not.toBeInTheDocument();
+  });
+
+  it("'Adicionar' no card põe a cerveja na Geladeira e mostra o toast", async () => {
+    render(<CatalogoConteudo query={padrao} dados={dados([cerveja("1", "Maré Alta IPA")])} />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Adicionar" }));
+
+    expect(screen.getByRole("status")).toHaveTextContent("Maré Alta IPA foi para a geladeira");
   });
 });

@@ -1,8 +1,34 @@
 import type { CervejaDetalhe } from "@leguele/shared";
-import { render, screen, within } from "@testing-library/react";
+import { render as renderRtl, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("next/navigation", () => ({ usePathname: () => "/catalogo/mare-alta" }));
+import { GeladeiraProvider, useGeladeira } from "@/components/geladeira/geladeira-provider";
 import { ProdutoConteudo } from "./produto-conteudo";
+
+afterEach(() => localStorage.clear());
+
+/** O seletor de quantidade também é um `status`: junta o texto de todos para achar o do toast. */
+const textosDeStatus = () =>
+  screen
+    .getAllByRole("status")
+    .map((e) => e.textContent)
+    .join(" | ");
+
+function Contador() {
+  const { quantidadeTotal } = useGeladeira();
+  return <span data-testid="contador">{quantidadeTotal}</span>;
+}
+
+const render = (ui: React.ReactNode) =>
+  renderRtl(
+    <>
+      <Contador />
+      {ui}
+    </>,
+    { wrapper: GeladeiraProvider },
+  );
 
 const cerveja = (extra: Partial<CervejaDetalhe> = {}): CervejaDetalhe => ({
   id: "1",
@@ -76,7 +102,7 @@ describe("ProdutoConteudo", () => {
     expect(screen.getByText("Frete grátis em compras a partir de R$ 150,00")).toBeInTheDocument();
   });
 
-  it("o seletor vai de 1 até a quantidade disponível e o botão fixo fica desabilitado até a Geladeira existir", async () => {
+  it("o seletor vai de 1 até a quantidade disponível", async () => {
     render(<ProdutoConteudo cerveja={cerveja({ quantidadeDisponivel: 2 })} />);
 
     const grupo = screen.getByRole("group", { name: "Quantidade de Maré Alta" });
@@ -87,9 +113,32 @@ describe("ProdutoConteudo", () => {
       "aria-disabled",
       "true",
     );
+  });
+
+  it("escolher 3 e tocar em 'Adicionar à geladeira' põe 3 unidades e mostra o toast com 'Desfazer'", async () => {
+    render(<ProdutoConteudo cerveja={cerveja({ quantidadeDisponivel: 5 })} />);
+
+    const mais = screen.getByRole("button", { name: "Aumentar quantidade" });
+    await userEvent.click(mais);
+    await userEvent.click(mais);
+    await userEvent.click(screen.getByRole("button", { name: "Adicionar à geladeira" }));
+
+    expect(screen.getByTestId("contador")).toHaveTextContent("3");
+    expect(textosDeStatus()).toContain("Maré Alta foi para a geladeira");
+    await userEvent.click(screen.getByRole("button", { name: "Desfazer" }));
+    expect(screen.getByTestId("contador")).toHaveTextContent("0");
+  });
+
+  it("passando do disponível mostra 'Só temos N unidades' e nada muda", async () => {
+    render(<ProdutoConteudo cerveja={cerveja({ quantidadeDisponivel: 2 })} />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Aumentar quantidade" }));
     const botao = screen.getByRole("button", { name: "Adicionar à geladeira" });
-    expect(botao).toBeDisabled();
-    expect(botao).toHaveAccessibleDescription("A Geladeira ainda não está disponível.");
+    await userEvent.click(botao);
+    await userEvent.click(botao);
+
+    expect(screen.getByTestId("contador")).toHaveTextContent("2");
+    expect(textosDeStatus()).toContain("Só temos 2 unidades");
   });
 
   it("esgotada mostra o selo Esgotado, sem seletor, com o botão desabilitado", () => {
@@ -111,5 +160,22 @@ describe("ProdutoConteudo", () => {
     rerender(<ProdutoConteudo cerveja={cerveja({ imagemUrl: null })} />);
 
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
+  });
+
+  it("com 3 na Geladeira e 5 disponíveis, escolher 3 não vai a 5: avisa o limite e nada muda", async () => {
+    const mare = cerveja({ quantidadeDisponivel: 5 });
+    localStorage.setItem(
+      "lb:geladeira",
+      JSON.stringify({ versao: 1, itens: [{ cerveja: mare, quantidade: 3 }] }),
+    );
+    render(<ProdutoConteudo cerveja={mare} />);
+
+    const mais = screen.getByRole("button", { name: "Aumentar quantidade" });
+    await userEvent.click(mais);
+    await userEvent.click(mais);
+    await userEvent.click(screen.getByRole("button", { name: "Adicionar à geladeira" }));
+
+    expect(screen.getByTestId("contador")).toHaveTextContent("3");
+    expect(textosDeStatus()).toContain("Só temos 5 unidades");
   });
 });

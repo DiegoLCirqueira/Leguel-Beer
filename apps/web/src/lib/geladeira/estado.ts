@@ -11,13 +11,19 @@ export type EstadoDaGeladeira = { itens: ItemLocal[] };
 /** `limite` vem quando o pedido passou do que cabe: nada muda e o limite alimenta o "Só temos N unidades". */
 export type Resultado = { estado: EstadoDaGeladeira; limite?: number };
 
+/** O aviso de limite: "Só temos N unidades" (singular com 1); sem lugar (limite 0), "A Geladeira está cheia.". */
+export const mensagemDoLimite = (limite: number) =>
+  limite === 0
+    ? "A Geladeira está cheia."
+    : `Só temos ${limite} ${limite === 1 ? "unidade" : "unidades"}`;
+
 export const GELADEIRA_VAZIA: EstadoDaGeladeira = { itens: [] };
 
 /** Até onde a cerveja pode ir: a quantidade disponível, no máximo 99 (0 se esgotada). */
 const tetoDaCerveja = (cerveja: CervejaCard) =>
   cerveja.esgotada ? 0 : Math.min(cerveja.quantidadeDisponivel, QUANTIDADE_MAXIMA_POR_ITEM);
 
-/** Soma `quantidade` à cerveja (entra no fim da lista se for nova), respeitando os limites. */
+/** Soma `quantidade` à cerveja (entra no fim da lista se for nova); se passar dos limites, recusa e nada muda. */
 export function adicionar(
   estado: EstadoDaGeladeira,
   cerveja: CervejaCard,
@@ -29,15 +35,31 @@ export function adicionar(
     return { estado, limite: 0 };
   }
   if (teto === 0) return { estado, limite: 0 };
-  const nova = Math.min((atual?.quantidade ?? 0) + quantidade, teto);
-  if (atual && nova === atual.quantidade) return { estado, limite: teto };
+  // A soma que passa do teto é recusada inteira: nada muda (sem adição parcial).
+  const nova = (atual?.quantidade ?? 0) + quantidade;
+  if (nova > teto) return { estado, limite: teto };
   const item: ItemLocal = { cerveja, quantidade: nova };
   const itens = atual
     ? estado.itens.map((i) => (i.cerveja.id === cerveja.id ? item : i))
     : [...estado.itens, item];
+  return { estado: { itens } };
+}
+
+/**
+ * Desfaz uma adição só daquela cerveja: volta à quantidade de `antes` (0 tira a cerveja). Só mexe se a
+ * cerveja ainda está com a quantidade de `depois` do toque; se a Geladeira mudou (por exemplo, a conta
+ * chegou), não toca em nada.
+ */
+export function reverterAdicao(
+  estado: EstadoDaGeladeira,
+  cervejaId: string,
+  { antes, depois }: { antes: number; depois: number },
+): EstadoDaGeladeira {
+  const atual = estado.itens.find((i) => i.cerveja.id === cervejaId);
+  if (!atual || atual.quantidade !== depois) return estado;
+  if (antes === 0) return { itens: estado.itens.filter((i) => i.cerveja.id !== cervejaId) };
   return {
-    estado: { itens },
-    limite: nova < (atual?.quantidade ?? 0) + quantidade ? teto : undefined,
+    itens: estado.itens.map((i) => (i.cerveja.id === cervejaId ? { ...i, quantidade: antes } : i)),
   };
 }
 

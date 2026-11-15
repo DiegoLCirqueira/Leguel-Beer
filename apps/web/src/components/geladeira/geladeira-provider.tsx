@@ -28,6 +28,7 @@ import {
   adicionar as adicionarOp,
   alterarQuantidade as alterarOp,
   desfazer as desfazerOp,
+  reverterAdicao as reverterAdicaoOp,
   GELADEIRA_VAZIA,
   aplicarResposta,
   paraRequest,
@@ -47,10 +48,17 @@ export type GeladeiraContexto = {
   ajustes: AjusteDaGeladeira[];
   /** Esquece os avisos (a tela os mostra uma vez e, ao sair dela, eles somem). */
   limparAjustes: () => void;
-  adicionar: (cerveja: CervejaCard, quantidade?: number) => Resultado;
+  /** `geracao` é a da Geladeira logo depois do toque: o "Desfazer" só vale se ela não mudou. */
+  adicionar: (cerveja: CervejaCard, quantidade?: number) => Resultado & { geracao: number };
   alterarQuantidade: (cervejaId: string, quantidade: number) => Resultado;
   remover: (cervejaId: string) => Desfazer | null;
   desfazer: (d: Desfazer) => void;
+  /** O "Desfazer" de um adicionar: reverte só aquela cerveja, e só se nada mudou nela desde o toque. */
+  reverterAdicao: (
+    cervejaId: string,
+    quantidades: { antes: number; depois: number },
+    geracao: number,
+  ) => void;
 };
 
 const semAssinatura = () => () => {};
@@ -202,7 +210,7 @@ export function GeladeiraProvider({
           aplicar(resultado.estado);
           sincronizar();
         }
-        return resultado;
+        return { ...resultado, geracao: geracao.current };
       },
       alterarQuantidade: (cervejaId, quantidade) => {
         const resultado = alterarOp(atual.current, cervejaId, quantidade);
@@ -223,6 +231,15 @@ export function GeladeiraProvider({
       desfazer: (d) => {
         aplicar(desfazerOp(atual.current, d));
         sincronizar();
+      },
+      reverterAdicao: (cervejaId, quantidades, daGeracao) => {
+        // Login, logout, chegada da conta ou outra mudança local desde o toque: o Desfazer não vale mais.
+        if (daGeracao !== geracao.current) return;
+        const proximo = reverterAdicaoOp(atual.current, cervejaId, quantidades);
+        if (proximo !== atual.current) {
+          aplicar(proximo);
+          sincronizar();
+        }
       },
     }),
     [pronta, estado, ajustes, limparAjustes, aplicar, sincronizar],

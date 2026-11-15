@@ -1,12 +1,16 @@
 import type { CervejaCard } from "@leguele/shared";
-import { render, screen } from "@testing-library/react";
+import { render as renderRtl, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const buscar = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/catalogo/destaques", () => ({ buscarDestaques: buscar }));
+vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 
+import { GeladeiraProvider } from "@/components/geladeira/geladeira-provider";
 import { DestaquesServidor } from "./destaques-servidor";
 import { DestaquesSkeleton } from "./destaques-skeleton";
+
+const render = (ui: React.ReactNode) => renderRtl(<>{ui}</>, { wrapper: GeladeiraProvider });
 
 const cerveja: CervejaCard = {
   id: "1",

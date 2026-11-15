@@ -2,7 +2,8 @@
 
 import type { CatalogoQuery, CatalogoResponse } from "@leguele/shared";
 import { useRouter } from "next/navigation";
-import { Button, CardCerveja, CategoryChips } from "@/components/ui";
+import { GradeDeCervejas } from "@/components/geladeira/grade-de-cervejas";
+import { Button, CategoryChips } from "@/components/ui";
 import { contarFiltros, paraQueryString } from "@/lib/catalogo/url";
 
 const TODAS = "todas";
@@ -45,11 +46,7 @@ export function CatalogoConteudo({
       {itens.length === 0 ? (
         <p className="py-8 text-center text-texto">Nenhuma cerveja encontrada com esses filtros.</p>
       ) : (
-        <div className="grid grid-cols-1 gap-3 min-[360px]:grid-cols-2">
-          {itens.map((cerveja) => (
-            <CardCerveja key={cerveja.id} cerveja={cerveja} />
-          ))}
-        </div>
+        <GradeDeCervejas itens={itens} />
       )}
     </div>
   );

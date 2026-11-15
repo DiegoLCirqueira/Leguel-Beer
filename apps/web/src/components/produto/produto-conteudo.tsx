@@ -12,6 +12,7 @@ import {
   Stepper,
   StyleBadge,
 } from "@/components/ui";
+import { useAdicionarComToast } from "@/components/geladeira/use-adicionar-com-toast";
 import { IMAGEM_PADRAO, formatarTeor } from "@/lib/catalogo/formato";
 
 const avisoDeEstoque = (n: number) =>
@@ -21,6 +22,7 @@ const avisoDeEstoque = (n: number) =>
 export function ProdutoConteudo({ cerveja }: { cerveja: CervejaDetalhe }) {
   const idMotivo = useId();
   const [quantidade, setQuantidade] = useState(1);
+  const { adicionarComToast, toast } = useAdicionarComToast();
   const {
     nome,
     estilo,
@@ -104,16 +106,20 @@ export function ProdutoConteudo({ cerveja }: { cerveja: CervejaDetalhe }) {
       </main>
       <BarraFixa>
         <Button
-          disabled
-          aria-describedby={idMotivo}
+          disabled={esgotada}
+          onClick={() => adicionarComToast(cerveja, quantidade)}
+          aria-describedby={esgotada ? idMotivo : undefined}
           iconLeft={<Refrigerator aria-hidden="true" className="size-5" />}
         >
           Adicionar à geladeira
         </Button>
-        <span id={idMotivo} className="sr-only">
-          {esgotada ? "Cerveja esgotada." : "A Geladeira ainda não está disponível."}
-        </span>
+        {esgotada ? (
+          <span id={idMotivo} className="sr-only">
+            Cerveja esgotada.
+          </span>
+        ) : null}
       </BarraFixa>
+      {toast}
     </>
   );
 }

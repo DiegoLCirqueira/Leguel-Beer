@@ -3,8 +3,10 @@ import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const buscar = vi.hoisted(() => vi.fn());
+vi.mock("next/navigation", () => ({ usePathname: () => "/catalogo/mare-alta" }));
 vi.mock("@/lib/catalogo/cerveja", () => ({ buscarCerveja: buscar }));
 
+import { GeladeiraProvider } from "@/components/geladeira/geladeira-provider";
 import Produto from "./page";
 
 const cerveja: CervejaDetalhe = {
@@ -27,7 +29,8 @@ const cerveja: CervejaDetalhe = {
   descontoPercentual: null,
 };
 
-const abrir = async (slug: string) => render(await Produto({ params: Promise.resolve({ slug }) }));
+const abrir = async (slug: string) =>
+  render(await Produto({ params: Promise.resolve({ slug }) }), { wrapper: GeladeiraProvider });
 
 describe("/catalogo/[slug]", () => {
   beforeEach(() => buscar.mockReset());

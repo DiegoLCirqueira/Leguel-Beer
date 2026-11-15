@@ -1,6 +1,6 @@
 import type { CervejaCard } from "@leguele/shared";
 import Link from "next/link";
-import { CardCerveja } from "@/components/ui";
+import { GradeDeCervejas } from "@/components/geladeira/grade-de-cervejas";
 
 /** "Cervejas em destaque": até 6 cards na ordem da API (esgotadas no fim) e o link para o catálogo. Sem destaques, some. */
 export function DestaquesDaHome({ itens }: { itens: CervejaCard[] }) {
@@ -18,11 +18,7 @@ export function DestaquesDaHome({ itens }: { itens: CervejaCard[] }) {
           Ver todas
         </Link>
       </div>
-      <div className="grid grid-cols-1 gap-3 min-[360px]:grid-cols-2">
-        {itens.map((cerveja) => (
-          <CardCerveja key={cerveja.id} cerveja={cerveja} />
-        ))}
-      </div>
+      <GradeDeCervejas itens={itens} />
     </section>
   );
 }

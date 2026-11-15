@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   GELADEIRA_VAZIA,
   adicionar,
+  mensagemDoLimite,
+  reverterAdicao,
   alterarQuantidade,
   aplicarResposta,
   desfazer,
@@ -55,12 +57,23 @@ describe("adicionar", () => {
     expect(resultado.limite).toBe(2);
   });
 
-  it("nunca passa de 99 por cerveja, mesmo com muito estoque", () => {
+  it("recusa a soma que passa do disponível: com 5 disponíveis e 3 na Geladeira, +3 não vira 5", () => {
+    const a = cerveja("a", { quantidadeDisponivel: 5 });
+    const { estado } = adicionar(GELADEIRA_VAZIA, a, 3);
+
+    const resultado = adicionar(estado, a, 3);
+
+    expect(resultado.estado).toBe(estado);
+    expect(resultado.estado.itens[0]?.quantidade).toBe(3);
+    expect(resultado.limite).toBe(5);
+  });
+
+  it("nunca passa de 99 por cerveja, mesmo com muito estoque: o pedido que passa é recusado", () => {
     const a = cerveja("a", { quantidadeDisponivel: 500 });
 
     const resultado = adicionar(GELADEIRA_VAZIA, a, 120);
 
-    expect(resultado.estado.itens[0]?.quantidade).toBe(99);
+    expect(resultado.estado).toBe(GELADEIRA_VAZIA);
     expect(resultado.limite).toBe(99);
   });
 
@@ -182,5 +195,45 @@ describe("aplicarResposta", () => {
       ["a", 3000, 2],
       ["c", 3200, 1],
     ]);
+  });
+});
+
+describe("reverterAdicao", () => {
+  it("desfaz a adição de uma cerveja nova: ela sai e as outras ficam", () => {
+    let { estado } = adicionar(GELADEIRA_VAZIA, cerveja("a"), 2);
+    ({ estado } = adicionar(estado, cerveja("b")));
+
+    const revertido = reverterAdicao(estado, "b", { antes: 0, depois: 1 });
+
+    expect(revertido.itens.map((i) => [i.cerveja.id, i.quantidade])).toEqual([["a", 2]]);
+  });
+
+  it("desfaz a soma em uma cerveja que já estava: volta à quantidade de antes", () => {
+    let { estado } = adicionar(GELADEIRA_VAZIA, cerveja("a"), 2);
+    ({ estado } = adicionar(estado, cerveja("a"), 1));
+
+    const revertido = reverterAdicao(estado, "a", { antes: 2, depois: 3 });
+
+    expect(revertido.itens[0]?.quantidade).toBe(2);
+  });
+
+  it("se a quantidade já não é a de depois do toque (a Geladeira mudou), não mexe em nada", () => {
+    const { estado } = adicionar(GELADEIRA_VAZIA, cerveja("a"), 4);
+
+    expect(reverterAdicao(estado, "a", { antes: 2, depois: 3 })).toBe(estado);
+  });
+
+  it("se a cerveja já não está na Geladeira, não mexe em nada", () => {
+    const { estado } = adicionar(GELADEIRA_VAZIA, cerveja("a"));
+
+    expect(reverterAdicao(estado, "b", { antes: 0, depois: 1 })).toBe(estado);
+  });
+});
+
+describe("mensagemDoLimite", () => {
+  it("fala em unidades, no singular com 1, e nunca em 'Só temos 0 unidades'", () => {
+    expect(mensagemDoLimite(2)).toBe("Só temos 2 unidades");
+    expect(mensagemDoLimite(1)).toBe("Só temos 1 unidade");
+    expect(mensagemDoLimite(0)).toBe("A Geladeira está cheia.");
   });
 });
