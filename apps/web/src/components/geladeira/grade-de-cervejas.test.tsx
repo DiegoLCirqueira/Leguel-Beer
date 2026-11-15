@@ -58,4 +58,27 @@ describe("GradeDeCervejas", () => {
     expect(screen.getByRole("button", { name: "Desfazer" })).toBeInTheDocument();
     expect(screen.getByTestId("contador")).toHaveTextContent("3");
   });
+
+  it("no limite da quantidade disponível mostra 'Só temos 2 unidades', sem 'Desfazer', e nada muda", async () => {
+    const pilsen = cerveja("pilsen", "Ponta Verde Pilsen", { quantidadeDisponivel: 2 });
+    guardar([{ cerveja: pilsen, quantidade: 2 }]);
+    abrir([pilsen]);
+
+    await userEvent.click(screen.getByRole("button", { name: "Adicionar" }));
+
+    expect(screen.getByRole("status")).toHaveTextContent("Só temos 2 unidades");
+    expect(screen.queryByRole("button", { name: "Desfazer" })).not.toBeInTheDocument();
+    expect(screen.getByTestId("contador")).toHaveTextContent("2");
+  });
+
+  it("'Desfazer' devolve a Geladeira e o contador ao que eram antes do toque", async () => {
+    guardar([{ cerveja: cerveja("a", "Maré Alta"), quantidade: 2 }]);
+    abrir([cerveja("pilsen", "Ponta Verde Pilsen")]);
+
+    await userEvent.click(screen.getByRole("button", { name: "Adicionar" }));
+    expect(screen.getByTestId("contador")).toHaveTextContent("3");
+    await userEvent.click(screen.getByRole("button", { name: "Desfazer" }));
+
+    expect(screen.getByTestId("contador")).toHaveTextContent("2");
+  });
 });
