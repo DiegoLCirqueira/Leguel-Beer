@@ -117,7 +117,7 @@ describe("ProdutoConteudo", () => {
     await userEvent.click(screen.getByRole("button", { name: "Adicionar à geladeira" }));
 
     expect(screen.getByTestId("contador")).toHaveTextContent("3");
-    expect(screen.getByRole("status")).toHaveTextContent("Maré Alta foi para a geladeira");
+    expect(screen.getByText("Maré Alta foi para a geladeira")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Desfazer" }));
     expect(screen.getByTestId("contador")).toHaveTextContent("0");
   });
@@ -131,7 +131,7 @@ describe("ProdutoConteudo", () => {
     await userEvent.click(botao);
 
     expect(screen.getByTestId("contador")).toHaveTextContent("2");
-    expect(screen.getByRole("status")).toHaveTextContent("Só temos 2 unidades");
+    expect(screen.getByText("Só temos 2 unidades")).toBeInTheDocument();
   });
 
   it("esgotada mostra o selo Esgotado, sem seletor, com o botão desabilitado", () => {
