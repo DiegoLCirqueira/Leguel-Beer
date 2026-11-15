@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
@@ -30,5 +30,10 @@ describe("fotos das cervejas no site", () => {
     );
 
     expect(existsSync(file), `${slug}.webp`).toBe(true);
+    // Arquivo vazio ou truncado não pode passar: cabeçalho RIFF/WEBP e tamanho declarado batendo com o arquivo.
+    const bytes = readFileSync(file);
+    expect(bytes.subarray(0, 4).toString("ascii"), `${slug}.webp: RIFF`).toBe("RIFF");
+    expect(bytes.subarray(8, 12).toString("ascii"), `${slug}.webp: WEBP`).toBe("WEBP");
+    expect(bytes.readUInt32LE(4) + 8, `${slug}.webp: tamanho`).toBe(bytes.length);
   });
 });
