@@ -149,7 +149,7 @@ Para o Back, no item 6 ou antes, se atrapalhar: a porta `PaymentGateway` da expi
 
 - **Parcelas** (`@leguele/shared`, unitário): 1x e 2x sem juros, 3x e 12x pela Price de 2,99% com o arredondamento da spec (R$ 154,30: 3x de R$ 54,54, total R$ 163,62; 12x de R$ 15,49, total R$ 185,88).
 - **Cartão de teste** (site, componente): só os dois números passam; número, nome, validade e CVV fora do armazenamento local, da URL e do corpo enviado à API.
-- **Confirmar pagamento** (API, no LB-76): caso de uso com repositório em memória e relógio fake (na validade fica "Pago" com baixa; vencido expira e 409; repetido 409); integração com banco real (confirmar × expirar × cancelar ao mesmo tempo deixa um só resultado, uma baixa de estoque e uma da Geladeira).
+- **Confirmar pagamento** (API, no LB-76): caso de uso com repositório em memória e relógio fake (na validade fica "Pago" com baixa; vencido expira e 409; repetido 409); integração com banco real (confirmar × expirar × cancelar ao mesmo tempo deixa um só resultado: se confirmar vencer, uma baixa de estoque físico e uma da Geladeira; se expirar ou cancelar vencer, nenhuma baixa de estoque físico nem da Geladeira e a reserva liberada uma vez).
 - **Telas** (componente, relógio controlado): contagem a partir do vencimento da API, "Código copiado", leitura a cada 5 s e no "Já paguei", estado expirado, "Pagamento em análise", posse.
 - **E2E** (celular, 360 × 640): Pix até a tela de pagamento e, com o admin confirmando, a confirmação; Pix expirado pelo relógio da API de teste ([[qualidade-compra]]); cartão de teste até "Pagamento em análise".
 

@@ -94,7 +94,7 @@ Funcionalidade: Pedido confirmado e Meus pedidos
 ### Pedido confirmado (LB-61, tela 08)
 
 - **Rota** `/pedido/[id]/confirmado`. Exige conta (sem sessão, vai a `/entrar` e volta depois, como em [[cadastro-login]]).
-- **Só para pedido pago:** a tela aparece quando o pedido está "Pago" ou em qualquer status depois dele (Em preparo, Saiu para entrega, Entregue). Pedido "Aguardando pagamento" leva à tela de pagamento desse pedido (item 6); pedido "Cancelado" leva a "Meus pedidos" (pergunta 2).
+- **Só para pedido pago:** a tela aparece quando o pedido está "Pago" ou em qualquer status depois dele (Em preparo, Saiu para entrega, Entregue). Pedido "Aguardando pagamento" leva à tela de pagamento desse pedido (item 6; até ela existir, feita por último, a "Meus pedidos"); pedido "Cancelado" leva a "Meus pedidos" (pergunta 2).
 - **Posse primeiro:** a posse é conferida antes de qualquer desvio por status. Pedido de outro cliente, em qualquer status (Pago, Aguardando pagamento, Cancelado etc.), e id inexistente dão a mesma página "não encontrada" (404), sem redirecionar para pagamento ou "Meus pedidos" e sem dados do pedido no corpo, na URL de destino ou nos logs.
 - **Conteúdo, de cima para baixo:**
   - título "Pedido confirmado!" e o texto "Pagamento aprovado! Seu pedido já está com a gente. Acompanhe o status em Meus pedidos." (pergunta 3);
@@ -175,10 +175,10 @@ Funcionalidade: Pedido confirmado e Meus pedidos
 | 1 | Contrato (LB-61, LB-67) | Back | PR só em `@leguele/shared`: status e rótulos, schema da lista e do pedido, quantidade de itens, data no fuso de Maceió |
 | 2 | LB-67 (#108), API | Back | Lista paginada e leitura de um pedido do cliente da sessão, sobre o modelo de pedido do LB-56 (item 5) |
 | 3 | LB-67 (#108), site | Front | `/conta/pedidos` e o link "Meus pedidos" em `/conta` |
-| 4 | LB-61 (#37), site | Front | `/pedido/[id]/confirmado`, com os desvios para pagamento, "Meus pedidos" e 404 |
+| 4 | LB-61 (#37), site | Front | `/pedido/[id]/confirmado`, com os desvios para "Meus pedidos" (provisório no lugar da tela de pagamento) e 404 |
 | 5 | LB-61 (#37), API | Back | Baixa pendente na Geladeira ao criar o pedido e baixa única ao confirmar o pagamento; entra com "Confirmar pagamento" do admin (LB-76) |
 
-A fatia 2 depende do modelo de pedido do item 5 (LB-56). A 3 depende da 2; a 4, da 2 e da tela de pagamento do item 6. A 5 se divide: a baixa pendente nasce com a criação do pedido (LB-56, item 5) e o desconto ao diminuir a Geladeira mexe na escrita da Geladeira da conta; a baixa única entra no PR de "Confirmar pagamento" do admin (LB-76).
+A fatia 2 depende do modelo de pedido do item 5 (LB-56). A 3 depende da 2; a 4, só da 2: até a tela de pagamento existir (item 6, feito por último, [[pagamento]]), o pedido "Aguardando pagamento" desvia para "Meus pedidos", e o desvio passa à tela de pagamento quando ela entrar. A 5 se divide: a baixa pendente nasce com a criação do pedido (LB-56, item 5) e o desconto ao diminuir a Geladeira mexe na escrita da Geladeira da conta; a baixa única entra no PR de "Confirmar pagamento" do admin (LB-76).
 
 Candidatos a ADR: nenhum.
 
