@@ -21,7 +21,7 @@ export const GELADEIRA_VAZIA: EstadoDaGeladeira = { itens: [] };
 const tetoDaCerveja = (cerveja: CervejaCard) =>
   cerveja.esgotada ? 0 : Math.min(cerveja.quantidadeDisponivel, QUANTIDADE_MAXIMA_POR_ITEM);
 
-/** Soma `quantidade` à cerveja (entra no fim da lista se for nova), respeitando os limites. */
+/** Soma `quantidade` à cerveja (entra no fim da lista se for nova); se passar dos limites, recusa e nada muda. */
 export function adicionar(
   estado: EstadoDaGeladeira,
   cerveja: CervejaCard,
@@ -33,16 +33,14 @@ export function adicionar(
     return { estado, limite: 0 };
   }
   if (teto === 0) return { estado, limite: 0 };
-  const nova = Math.min((atual?.quantidade ?? 0) + quantidade, teto);
-  if (atual && nova === atual.quantidade) return { estado, limite: teto };
+  // A soma que passa do teto é recusada inteira: nada muda (sem adição parcial).
+  const nova = (atual?.quantidade ?? 0) + quantidade;
+  if (nova > teto) return { estado, limite: teto };
   const item: ItemLocal = { cerveja, quantidade: nova };
   const itens = atual
     ? estado.itens.map((i) => (i.cerveja.id === cerveja.id ? item : i))
     : [...estado.itens, item];
-  return {
-    estado: { itens },
-    limite: nova < (atual?.quantidade ?? 0) + quantidade ? teto : undefined,
-  };
+  return { estado: { itens } };
 }
 
 /** Troca a quantidade de uma cerveja que já está na Geladeira (de 1 até o que cabe). */
