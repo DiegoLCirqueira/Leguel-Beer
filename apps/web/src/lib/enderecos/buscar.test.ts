@@ -41,4 +41,18 @@ describe("buscarEnderecos", () => {
     );
     expect(resultado).toEqual({ tipo: "ok", enderecos: [casa] });
   });
+
+  it("401 vira sem-sessao", async () => {
+    fetchFalso.mockResolvedValue(new Response("{}", { status: 401 }));
+    expect(await buscarEnderecos("t")).toEqual({ tipo: "sem-sessao" });
+  });
+
+  it("erro da API, rede fora do ar e corpo fora do contrato viram erro", async () => {
+    fetchFalso.mockResolvedValueOnce(new Response("[]", { status: 500 }));
+    expect(await buscarEnderecos("t")).toEqual({ tipo: "erro" });
+    fetchFalso.mockRejectedValueOnce(new Error("rede"));
+    expect(await buscarEnderecos("t")).toEqual({ tipo: "erro" });
+    fetchFalso.mockResolvedValueOnce(new Response(JSON.stringify([{ id: 1 }]), { status: 200 }));
+    expect(await buscarEnderecos("t")).toEqual({ tipo: "erro" });
+  });
 });
