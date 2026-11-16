@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { criarPerfilRequestSchema, papelResponseSchema, perfilResponseSchema } from "./perfil.js";
+import {
+  criarPerfilRequestSchema,
+  editarPerfilRequestSchema,
+  papelResponseSchema,
+  perfilResponseSchema,
+} from "./perfil.js";
 
 describe("criarPerfilRequestSchema", () => {
   const valido = { nome: "Ana Souza", telefone: "(82) 91234-5678", aceite: true };
@@ -53,6 +58,19 @@ describe("perfilResponseSchema", () => {
     expect(perfilResponseSchema.parse({ ...perfil, papel: "admin" }).papel).toBe("admin");
   });
 
+  it("traz a data de nascimento ou null quando o cliente ainda não informou", () => {
+    expect(perfilResponseSchema.parse({ ...perfil, dataNascimento: "1992-03-15" })).toMatchObject({
+      dataNascimento: "1992-03-15",
+    });
+    expect(perfilResponseSchema.parse(perfil).dataNascimento).toBeNull();
+  });
+
+  it("recusa uma data de nascimento fora do formato AAAA-MM-DD", () => {
+    expect(
+      perfilResponseSchema.safeParse({ ...perfil, dataNascimento: "15/03/1992" }).success,
+    ).toBe(false);
+  });
+
   it("recusa um papel desconhecido", () => {
     expect(perfilResponseSchema.safeParse({ ...perfil, papel: "dono" }).success).toBe(false);
   });
@@ -64,5 +82,42 @@ describe("papelResponseSchema", () => {
     expect(papelResponseSchema.parse({ papel: "admin" })).toEqual({ papel: "admin" });
     expect(papelResponseSchema.safeParse({ papel: "dono" }).success).toBe(false);
     expect(papelResponseSchema.safeParse({}).success).toBe(false);
+  });
+});
+
+describe("editarPerfilRequestSchema", () => {
+  const valido = { nome: "Ana Souza", telefone: "(82) 99876-5432", dataNascimento: "15/03/1992" };
+
+  it("aceita nome, telefone e data, e entrega telefone só com dígitos e data AAAA-MM-DD", () => {
+    expect(editarPerfilRequestSchema.parse(valido)).toEqual({
+      nome: "Ana Souza",
+      telefone: "82998765432",
+      dataNascimento: "1992-03-15",
+    });
+  });
+
+  it("a data é opcional: ausente, nula ou em branco guarda null", () => {
+    const { dataNascimento: _data, ...semData } = valido;
+    for (const corpo of [semData, { ...semData, dataNascimento: null }, { ...semData, dataNascimento: "" }]) {
+      expect(editarPerfilRequestSchema.parse(corpo).dataNascimento).toBeNull();
+    }
+  });
+
+  it("aponta o campo de cada dado inválido", () => {
+    const campo = (extra: object) =>
+      editarPerfilRequestSchema.safeParse({ ...valido, ...extra }).error?.issues[0];
+
+    expect(campo({ nome: "  " })?.path).toEqual(["nome"]);
+    expect(campo({ telefone: "(82) 1234" })?.path).toEqual(["telefone"]);
+    expect(campo({ dataNascimento: "31/04/1990" })?.path).toEqual(["dataNascimento"]);
+    expect(campo({ dataNascimento: "31/04/1990" })?.message).toBe(
+      "Informe uma data de nascimento válida.",
+    );
+  });
+
+  it("recusa e-mail, id, papel e aceite no corpo: não mudam por esta tela", () => {
+    for (const extra of [{ email: "x@y.com" }, { id: "1" }, { papel: "admin" }, { aceite: true }]) {
+      expect(editarPerfilRequestSchema.safeParse({ ...valido, ...extra }).success).toBe(false);
+    }
   });
 });
