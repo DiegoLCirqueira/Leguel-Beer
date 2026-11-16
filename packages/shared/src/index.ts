@@ -11,11 +11,20 @@ export { novaSenhaSchema } from "./conta/nova-senha.js";
 export type { NovaSenhaForm } from "./conta/nova-senha.js";
 export {
   criarPerfilRequestSchema,
+  editarPerfilRequestSchema,
   papelResponseSchema,
   papelSchema,
   perfilResponseSchema,
 } from "./conta/perfil.js";
-export type { CriarPerfilRequest, Papel, PapelResponse, PerfilResponse } from "./conta/perfil.js";
+export type {
+  CriarPerfilRequest,
+  EditarPerfilRequest,
+  Papel,
+  PapelResponse,
+  PerfilResponse,
+} from "./conta/perfil.js";
+export { dataDeNascimentoSchema } from "./conta/nascimento.js";
+export { hojeEmMaceio, temMaioridade } from "./conta/maioridade.js";
 export { senhaSchema } from "./conta/senha.js";
 export { telefoneSchema } from "./conta/telefone.js";
 export { cervejaCardSchema } from "./catalogo/cerveja-card.js";

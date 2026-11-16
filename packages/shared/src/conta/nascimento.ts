@@ -19,17 +19,15 @@ function paraIso(valor: string): string | null {
  * devolve) e entrega "AAAA-MM-DD". Precisa ser uma data real, de 01/01/1900 em diante e não futura
  * (hoje no fuso de Maceió). Menor de 18 anos é aceito: quem recusa é a criação do pedido.
  */
-export const dataDeNascimentoSchema = z
-  .string(MENSAGEM)
-  .transform((valor, ctx) => {
-    const iso = paraIso(valor.trim());
-    if (iso === null || iso < PRIMEIRO_DIA) {
-      ctx.addIssue({ code: "custom", message: MENSAGEM });
-      return z.NEVER;
-    }
-    if (iso > hojeEmMaceio()) {
-      ctx.addIssue({ code: "custom", message: "A data de nascimento não pode ser no futuro." });
-      return z.NEVER;
-    }
-    return iso;
-  });
+export const dataDeNascimentoSchema = z.string(MENSAGEM).transform((valor, ctx) => {
+  const iso = paraIso(valor.trim());
+  if (iso === null || iso < PRIMEIRO_DIA) {
+    ctx.addIssue({ code: "custom", message: MENSAGEM });
+    return z.NEVER;
+  }
+  if (iso > hojeEmMaceio()) {
+    ctx.addIssue({ code: "custom", message: "A data de nascimento não pode ser no futuro." });
+    return z.NEVER;
+  }
+  return iso;
+});

@@ -54,7 +54,7 @@ describe("perfilResponseSchema", () => {
   };
 
   it("aceita o perfil do cliente e do admin", () => {
-    expect(perfilResponseSchema.parse(perfil)).toEqual(perfil);
+    expect(perfilResponseSchema.parse(perfil)).toEqual({ ...perfil, dataNascimento: null });
     expect(perfilResponseSchema.parse({ ...perfil, papel: "admin" }).papel).toBe("admin");
   });
 
@@ -98,7 +98,11 @@ describe("editarPerfilRequestSchema", () => {
 
   it("a data é opcional: ausente, nula ou em branco guarda null", () => {
     const { dataNascimento: _data, ...semData } = valido;
-    for (const corpo of [semData, { ...semData, dataNascimento: null }, { ...semData, dataNascimento: "" }]) {
+    for (const corpo of [
+      semData,
+      { ...semData, dataNascimento: null },
+      { ...semData, dataNascimento: "" },
+    ]) {
       expect(editarPerfilRequestSchema.parse(corpo).dataNascimento).toBeNull();
     }
   });
