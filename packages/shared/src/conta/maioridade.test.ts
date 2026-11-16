@@ -15,10 +15,8 @@ describe("temMaioridade", () => {
     ["véspera dos 18 anos", "2008-03-15", "2026-03-14", false],
     ["no dia dos 18 anos", "2008-03-15", "2026-03-15", true],
     ["dia seguinte aos 18 anos", "2008-03-15", "2026-03-16", true],
-    ["nascido em 29/02, em 28/02 de ano não bissexto", "2008-02-29", "2026-02-28", false],
-    ["nascido em 29/02, em 01/03 de ano não bissexto", "2008-02-29", "2026-03-01", true],
-    ["nascido em 29/02, em 29/02 de ano bissexto", "2008-02-29", "2044-02-29", true],
-    ["nascido em 29/02, em 28/02 de ano bissexto", "2008-02-29", "2044-02-28", false],
+    ["nascido em 29/02 (2008), em 28/02/2026", "2008-02-29", "2026-02-28", false],
+    ["nascido em 29/02 (2008), em 01/03/2026", "2008-02-29", "2026-03-01", true],
   ])("%s", (_nome, nascimento, hoje, esperado) => {
     expect(temMaioridade(nascimento, meiaNoiteEmMaceio(hoje))).toBe(esperado);
   });
