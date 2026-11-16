@@ -2,9 +2,7 @@ import { listaDeEnderecosSchema, type EnderecoResposta } from "@leguele/shared";
 import { urlDaApi } from "@/lib/auth/config";
 
 export type ResultadoDosEnderecos =
-  | { tipo: "ok"; enderecos: EnderecoResposta[] }
-  | { tipo: "sem-sessao" }
-  | { tipo: "erro" };
+  { tipo: "ok"; enderecos: EnderecoResposta[] } | { tipo: "sem-sessao" } | { tipo: "erro" };
 
 /** Uma API que não responde não pode deixar a tela esperando. */
 const TEMPO_LIMITE_MS = 8000;
