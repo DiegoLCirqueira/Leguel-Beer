@@ -1,6 +1,6 @@
 import type { AuthAdmin, AuthUser } from "../domain/auth-admin.js";
 import type { Profile } from "../domain/profile.js";
-import type { ProfileRepository, ProfileRecord } from "../domain/profile-repository.js";
+import type { ProfileEdit, ProfileRepository, ProfileRecord } from "../domain/profile-repository.js";
 import type { Role } from "../domain/role.js";
 
 /** Fakes de teste: contas do Auth e perfis em memória. */
@@ -44,6 +44,14 @@ export class InMemoryProfileRepository implements ProfileRepository {
 
   findProfile(id: string): Promise<Profile | null> {
     return Promise.resolve(this.complete.get(id) ?? null);
+  }
+
+  updateProfile(id: string, data: ProfileEdit): Promise<Profile | null> {
+    const current = this.complete.get(id);
+    if (!current) return Promise.resolve(null);
+    const updated = { ...current, ...data };
+    this.complete.set(id, updated);
+    return Promise.resolve(updated);
   }
 
   createProfile(profile: Profile): Promise<{ profile: Profile; created: boolean }> {

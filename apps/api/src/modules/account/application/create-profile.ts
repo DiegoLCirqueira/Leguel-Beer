@@ -39,6 +39,7 @@ export class CreateProfile {
       email,
       nome: input.nome,
       telefone: input.telefone,
+      dataNascimento: null,
       role: isAdmin ? "admin" : "customer",
       aceite: { ...this.options.legal, aceitoEm: this.options.now() },
     });

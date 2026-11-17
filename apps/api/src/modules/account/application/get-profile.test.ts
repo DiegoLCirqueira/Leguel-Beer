@@ -8,6 +8,7 @@ const perfil = {
   email: "ana@exemplo.com",
   nome: "Ana Souza",
   telefone: "82912345678",
+  dataNascimento: null,
   role: "customer" as const,
   aceite: {
     termosVersao: "2026-10-30",
