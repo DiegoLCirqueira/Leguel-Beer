@@ -12,7 +12,7 @@ vi.mock("@/lib/enderecos/cep", () => ({ consultarCep: consultar }));
 const revalidar = vi.hoisted(() => vi.fn());
 vi.mock("next/cache", () => ({ revalidatePath: revalidar }));
 
-const { tornarPadraoAction, excluirEnderecoAction, salvarEnderecoAction } =
+const { tornarPadraoAction, excluirEnderecoAction, salvarEnderecoAction, buscarCepAction } =
   await import("./actions");
 
 const ID = "0b9c6f0e-8f4e-4f43-a5a3-0b1a3f1f2c11";
