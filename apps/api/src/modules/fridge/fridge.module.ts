@@ -17,6 +17,7 @@ import { FridgeController } from "./presentation/fridge.controller.js";
 @Module({
   imports: [CatalogModule],
   controllers: [FridgeController, AccountFridgeController],
+  exports: [GetAccountFridge],
   providers: [
     {
       provide: ACCOUNT_FRIDGE_REPOSITORY,

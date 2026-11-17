@@ -17,9 +17,11 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import {
+  cotacaoDeFreteSchema,
   enderecoFormSchema,
   enderecoRespostaSchema,
   listaDeEnderecosSchema,
+  type CotacaoDeFrete,
   type EnderecoResposta,
 } from "@leguele/shared";
 import type { AuthorizedUser } from "../../account/application/authorize-request.js";
@@ -27,6 +29,7 @@ import { Authenticated, CurrentUser } from "../../account/presentation/access.de
 import { zodDto } from "../../../common/validation/zod-dto.js";
 import { AddAddress } from "../application/add-address.js";
 import { DeleteAddress } from "../application/delete-address.js";
+import { QuoteShipping } from "../application/quote-shipping.js";
 import { SetDefaultAddress } from "../application/set-default-address.js";
 import { UpdateAddress } from "../application/update-address.js";
 import { ListAddresses } from "../application/list-addresses.js";
@@ -46,6 +49,7 @@ export class AddressController {
     private readonly updateAddress: UpdateAddress,
     private readonly deleteAddress: DeleteAddress,
     private readonly setDefaultAddress: SetDefaultAddress,
+    private readonly quoteShipping: QuoteShipping,
   ) {}
 
   @Get()
@@ -75,6 +79,21 @@ export class AddressController {
       this.addAddress.execute(user.id, toAddressInput(body)),
     );
     return enderecoRespostaSchema.parse(toEnderecoResposta(created));
+  }
+
+  @Get(":id/frete")
+  @ApiOperation({
+    summary: "Cota o frete de um endereço",
+    description:
+      "Recebe só o id do endereço do cliente. O subtotal vem da Geladeira da conta, revalidada pela API; qualquer valor enviado na consulta é ignorado. Devolve o frete e se é grátis, ou só a marca de fora da área. Endereço de outro cliente responde 404.",
+  })
+  @ApiOkResponse({ description: "Cotação (formato `cotacaoDeFreteSchema`)." })
+  async quote(
+    @CurrentUser() user: AuthorizedUser,
+    @Param("id", ParseUUIDPipe) id: string,
+  ): Promise<CotacaoDeFrete> {
+    const quote = await withAddressErrors(() => this.quoteShipping.execute(user.id, id));
+    return cotacaoDeFreteSchema.parse(quote);
   }
 
   @Put(":id")
