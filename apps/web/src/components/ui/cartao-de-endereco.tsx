@@ -37,7 +37,7 @@ export function CartaoDeEndereco({
           {endereco.bairro} — {endereco.cidade}/{endereco.uf}
         </p>
         <p className="text-texto-suave">CEP {comMascara(endereco.cep)}</p>
-        {acoes}
+        {acoes ? <div className="mt-2">{acoes}</div> : null}
       </div>
     </li>
   );
