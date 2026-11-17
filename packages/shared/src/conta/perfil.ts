@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { nomeCompletoSchema } from "./nome.js";
+import { dataDeNascimentoSchema } from "./nascimento.js";
 import { telefoneSchema } from "./telefone.js";
 
 /**
@@ -13,6 +14,22 @@ export const criarPerfilRequestSchema = z.strictObject({
 });
 
 export type CriarPerfilRequest = z.infer<typeof criarPerfilRequestSchema>;
+
+/**
+ * Corpo de "editar perfil" (substitui os dados editáveis). A data de nascimento é opcional: ausente,
+ * nula ou em branco guarda `null`. E-mail, id, papel e aceite dos termos não mudam por aqui, então
+ * o objeto é estrito e recusa esses campos.
+ */
+export const editarPerfilRequestSchema = z.strictObject({
+  nome: nomeCompletoSchema,
+  telefone: telefoneSchema,
+  dataNascimento: z.preprocess(
+    (valor) => (valor === undefined || valor === "" ? null : valor),
+    dataDeNascimentoSchema.nullable(),
+  ),
+});
+
+export type EditarPerfilRequest = z.output<typeof editarPerfilRequestSchema>;
 
 export const papelSchema = z.enum(["cliente", "admin"]);
 
@@ -28,6 +45,8 @@ export const perfilResponseSchema = z.object({
   email: z.email(),
   nome: z.string(),
   telefone: z.string(),
+  /** "AAAA-MM-DD", ou null enquanto o cliente não informou. */
+  dataNascimento: z.iso.date().nullable().default(null),
   papel: papelSchema,
   aceite: z.object({
     termosVersao: z.string(),

@@ -34,6 +34,8 @@ function toResponse(profile: Profile): PerfilResponse {
     email: profile.email,
     nome: profile.nome,
     telefone: profile.telefone,
+    // A data de nascimento só passa a ser gravada na fatia da API de dados pessoais.
+    dataNascimento: null,
     papel: profile.role === "admin" ? "admin" : "cliente",
     aceite: {
       termosVersao: profile.aceite.termosVersao,
