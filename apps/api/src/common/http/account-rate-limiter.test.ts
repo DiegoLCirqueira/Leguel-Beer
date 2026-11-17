@@ -39,8 +39,10 @@ describe("AccountRateLimiter", () => {
   it("recusar não gasta cota nem estende a janela", () => {
     let agora = 0;
     const limiter = new AccountRateLimiter(() => agora);
-    for (let i = 0; i < 5; i++) limiter.allow("enderecos", "ana", regra);
+    for (let i = 0; i < 3; i++) limiter.allow("enderecos", "ana", regra);
 
+    agora = 30_000;
+    expect(limiter.allow("enderecos", "ana", regra)).toBe(false);
     agora = 60_000;
 
     expect(limiter.allow("enderecos", "ana", regra)).toBe(true);
