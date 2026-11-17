@@ -47,4 +47,10 @@ describe("CartaoDeEndereco", () => {
     rerender(<CartaoDeEndereco endereco={{ ...casa, foraDaArea: true }} />);
     expect(screen.getByText("Fora da área")).toBeInTheDocument();
   });
+
+  it("mostra as ações recebidas dentro do cartão", () => {
+    render(<CartaoDeEndereco endereco={casa} acoes={<button type="button">Excluir</button>} />);
+
+    expect(screen.getByRole("button", { name: "Excluir" })).toBeInTheDocument();
+  });
 });

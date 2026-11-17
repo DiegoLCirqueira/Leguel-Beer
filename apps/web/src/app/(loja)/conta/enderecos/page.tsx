@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { AcoesDoEndereco } from "@/components/enderecos/acoes-do-endereco";
 import { CartaoDeEndereco } from "@/components/ui";
 import { lerTokenDeAcesso } from "@/lib/auth/servidor";
 import { buscarEnderecos } from "@/lib/enderecos/buscar";
@@ -40,7 +41,17 @@ export default async function MeusEnderecos() {
       ) : (
         <ul className="flex flex-col gap-3">
           {resultado.enderecos.map((endereco) => (
-            <CartaoDeEndereco key={endereco.id} endereco={endereco} />
+            <CartaoDeEndereco
+              key={endereco.id}
+              endereco={endereco}
+              acoes={
+                <AcoesDoEndereco
+                  id={endereco.id}
+                  nome={endereco.apelido ?? "Endereço"}
+                  padrao={endereco.padrao}
+                />
+              }
+            />
           ))}
         </ul>
       )}

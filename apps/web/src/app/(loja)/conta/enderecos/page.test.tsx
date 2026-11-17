@@ -11,6 +11,7 @@ const { lerToken, buscar, redirecionar } = vi.hoisted(() => ({
 }));
 vi.mock("@/lib/auth/servidor", () => ({ lerTokenDeAcesso: lerToken }));
 vi.mock("@/lib/enderecos/buscar", () => ({ buscarEnderecos: buscar }));
+vi.mock("./actions", () => ({ tornarPadraoAction: vi.fn(), excluirEnderecoAction: vi.fn() }));
 vi.mock("next/navigation", () => ({ redirect: redirecionar }));
 
 import MeusEnderecos from "./page";
@@ -41,6 +42,19 @@ describe("/conta/enderecos", () => {
     expect(screen.getByText("Gerencie seus endereços de entrega")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Casa" })).toBeInTheDocument();
     expect(buscar).toHaveBeenCalledWith("token-1");
+  });
+
+  it("cada endereço traz Excluir e, se não é o padrão, Tornar padrão", async () => {
+    buscar.mockResolvedValue({
+      tipo: "ok",
+      enderecos: [casa, { ...casa, id: "e2", apelido: "Trabalho", padrao: false }],
+    });
+    render(await MeusEnderecos());
+
+    expect(screen.getByRole("button", { name: "Excluir: Casa" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Excluir: Trabalho" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Tornar padrão: Casa" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Tornar padrão: Trabalho" })).toBeInTheDocument();
   });
 
   it("sem endereço salvo, mostra 'Você ainda não tem endereço salvo.'", async () => {
