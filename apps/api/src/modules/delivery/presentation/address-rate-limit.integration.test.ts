@@ -70,11 +70,16 @@ describe("limite de salvar e editar endereço por conta (HTTP, banco real)", () 
     uf: "AL",
   };
 
-  const call = (method: "post" | "put" | "get", path: string, token: string, body?: object) =>
-    request(app.getHttpServer())
-      [method](path)
-      .set({ Authorization: `Bearer ${token}` })
-      .send(body);
+  const call = (method: "post" | "put" | "get", path: string, token: string, body?: object) => {
+    const server = request(app.getHttpServer());
+    const pending =
+      method === "post"
+        ? server.post(path)
+        : method === "put"
+          ? server.put(path)
+          : server.get(path);
+    return pending.set({ Authorization: `Bearer ${token}` }).send(body);
+  };
 
   const LIMIT = 10;
 
