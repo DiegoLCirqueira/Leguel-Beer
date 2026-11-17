@@ -104,6 +104,15 @@ class PrismaCreateOrderUnit implements CreateOrderUnit {
     order: NewOrder,
     idempotency: { key: string; hash: string; response: PedidoCriado },
   ): Promise<void> {
+    // A chave vencida (24 h) já não vale, mas a restrição única (cliente, chave) continua: a linha velha
+    // sai na mesma transação, para a chave poder ser usada de novo sem erro.
+    await this.tx.idempotencyKey.deleteMany({
+      where: {
+        profileId: order.ownerId,
+        key: idempotency.key,
+        expiresAt: { lte: order.createdAt },
+      },
+    });
     const card = order.payment.tipo === "cartao" ? order.payment : null;
     await this.tx.order.create({
       data: {
