@@ -56,7 +56,7 @@ Funcionalidade: Termos, privacidade e entregas
 ## Regras de negócio
 
 - **Páginas:** `/termos` (Termos de Uso), `/privacidade` (Política de Privacidade) e `/entregas` (Entregas). Conteúdo estático, versionado no repositório, com a data da última atualização.
-- **Sem aviso de portfólio:** nenhuma página do site mostra faixa, nota ou texto dizendo que o site é um projeto de portfólio (decisão do Diego, 2026-10-30).
+- **Sem aviso de portfólio, salvo nas telas de pagamento:** nenhuma outra página do site mostra faixa, nota ou texto dizendo que o site é um projeto de portfólio (decisão do Diego, 2026-10-30). Exceção de 16/11: as telas de pagamento levam o aviso de projeto sem fins lucrativos ([[pagamento]], [[ADR-020-aviso-de-portfolio-no-pagamento]]).
 - **Rodapé:** só em `/conta`, `/termos` e `/privacidade`; sem rodapé na loja (`/`, `/catalogo` e demais páginas de compra), em `/entregas` nem nas telas de acesso (ver "Rodapé fora da loja e de /entregas" e "Rodapé fora das telas de acesso"): os avisos (texto em "Textos", linha "Rodapé, avisos", fonte única também para o checkout), e os links para as três páginas. A linha da empresa (razão social, CNPJ e cidade) sai do rodapé (decisão do Diego, 2026-10-31).
   - **Rodapé discreto:** pequeno, praticamente um detalhe (decisão do Diego, 2026-10-31). Por isso os links do rodapé têm área de toque de 24 px (WCAG 2.5.8, nível AA), e não os 44 px dos botões. É deliberado: não aumentar para 44 px.
 - **Sem pergunta de maioridade** em `/termos` e `/privacidade`, para quem quer ler antes de entrar ([[maioridade-entrada]]). `/entregas` segue a regra normal.
@@ -166,8 +166,8 @@ Decisões pequenas e fáceis de reverter, pela política de autonomia. Qualquer 
 - **Links do cadastro em nova aba,** para não perder o formulário.
 - **Termos e Entregas sem citar o portfólio (2026-10-30):** o item 1 dos Termos perde só a frase do portfólio e continua dizendo que a empresa e os produtos são fictícios, que nada é entregue e que os pagamentos são de teste, para o texto seguir verdadeiro. Em Entregas, o item 1 vira "Como funciona.", com o mesmo aviso de que os pedidos não são entregues.
 
-> [!todo] Texto pendente para a Política (13/11, pendente de confirmação do Diego, LGPD)
-> "Quais dados coletamos" ganha os dados guardados nos pedidos (cópia do nome, do telefone e do endereço usados na compra), conforme [[checkout]], "Dados pessoais no pedido". Só entra no site depois da confirmação do Diego, junto com o checkout, sem novo aceite.
+> [!success] Texto aprovado pelo Diego (16/11, LGPD, recomendada)
+> "Quais dados coletamos" ganha os dados guardados nos pedidos (cópia do nome, do telefone e do endereço usados na compra), conforme [[checkout]], "Dados pessoais no pedido". Entra no site junto com o checkout, sem novo aceite. O texto sobre o envio do CEP e do endereço aos serviços de CEP e de mapas ("Com quem compartilhamos", [[enderecos-entrega]], "LGPD") também está aprovado.
 
 ## Tickets propostos
 

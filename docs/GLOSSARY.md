@@ -126,7 +126,7 @@ Unidades de uma cerveja presas a um pedido "Aguardando pagamento" dentro da vali
 _Evite_: bloqueio, separação
 
 **Pagamento simulado**:
-O pagamento do Leguelé Beer é só visual: telas de Pix (QR inválido, decorativo) e de cartão de teste, sem gateway, cobrança nem dado real, e nenhum valor é cobrado. O pedido passa a "Pago" pela ação "Confirmar pagamento" do admin. Ver [[pagamento]] e [[ADR-018-pagamento-simulado]].
+O pagamento do Leguelé Beer é só visual: telas de Pix (QR inválido, decorativo) e de cartão de teste, sem gateway, cobrança nem dado real, e nenhum valor é cobrado. O pedido passa a "Pago" pela ação "Confirmar pagamento" do admin. Toda tela de pagamento leva o aviso de projeto sem fins lucrativos e o botão "Voltar" (16/11). Ver [[pagamento]] e [[ADR-020-aviso-de-portfolio-no-pagamento]] (que substitui o [[ADR-018-pagamento-simulado]]).
 _Evite_: sandbox, modo de testes, pagamento fake
 
 **Aviso de pagamento**:

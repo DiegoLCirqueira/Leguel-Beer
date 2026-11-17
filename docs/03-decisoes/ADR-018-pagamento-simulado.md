@@ -1,5 +1,5 @@
 ---
-status: aceito
+status: substituído
 data: 2026-11-15
 tags:
   - adr
@@ -8,7 +8,7 @@ tags:
 # ADR-018: Pagamento simulado, só visual
 
 > [!info] Status
-> **Aceito** (decisão do Diego, 15/11). Substitui o [[ADR-004-mercado-pago]].
+> **Substituído** em 16/11 pelo [[ADR-020-aviso-de-portfolio-no-pagamento]], que mantém tudo e acrescenta o aviso de projeto sem fins lucrativos e o botão "Voltar" nas telas de pagamento. Era: aceito (decisão do Diego, 15/11), substituindo o [[ADR-004-mercado-pago]].
 
 ## Contexto
 
