@@ -46,3 +46,15 @@ export async function tornarPadraoAction(id: string): Promise<ResultadoDaAcao> {
 export async function excluirEnderecoAction(id: string): Promise<ResultadoDaAcao> {
   return chamar("DELETE", id);
 }
+
+export type ResultadoDoSalvar =
+  | { tipo: "ok" | "sem-sessao" }
+  | { tipo: "invalido"; erros: Record<string, string> }
+  | { tipo: "erro"; mensagem: string };
+
+export async function salvarEnderecoAction(
+  _entrada: unknown,
+  _id?: string,
+): Promise<ResultadoDoSalvar> {
+  return { tipo: "sem-sessao" };
+}

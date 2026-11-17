@@ -10,7 +10,8 @@ vi.mock("next/headers", () => ({
 const revalidar = vi.hoisted(() => vi.fn());
 vi.mock("next/cache", () => ({ revalidatePath: revalidar }));
 
-const { tornarPadraoAction, excluirEnderecoAction } = await import("./actions");
+const { tornarPadraoAction, excluirEnderecoAction, salvarEnderecoAction } =
+  await import("./actions");
 
 const ID = "0b9c6f0e-8f4e-4f43-a5a3-0b1a3f1f2c11";
 
@@ -86,5 +87,120 @@ describe("Server Actions dos endereços", () => {
     expect(await excluirEnderecoAction(`../x/${ID}`)).toEqual({ tipo: "erro" });
     expect(await tornarPadraoAction(`${ID}/../x`)).toEqual({ tipo: "erro" });
     expect(fetchFalso).not.toHaveBeenCalled();
+  });
+
+  describe("salvarEnderecoAction", () => {
+    const form = {
+      apelido: "Casa",
+      cep: "57035-000",
+      rua: "Avenida Fernandes Lima",
+      numero: "100",
+      complemento: "",
+      bairro: "Farol",
+      cidade: "Maceió",
+      uf: "AL",
+    };
+    const erroDaApi = (status: number, code: string, message: string) =>
+      new Response(JSON.stringify({ code, message }), { status });
+
+    it("endereço novo: POST /me/enderecos com o corpo validado e atualiza a lista", async () => {
+      fetchFalso.mockResolvedValue(new Response("{}", { status: 201 }));
+
+      const resultado = await salvarEnderecoAction(form);
+
+      const [url, init] = fetchFalso.mock.calls[0] as [string, RequestInit];
+      expect(url).toBe("http://api.test/me/enderecos");
+      expect(init.method).toBe("POST");
+      expect(JSON.parse(init.body as string)).toEqual({
+        apelido: "Casa",
+        cep: "57035000",
+        rua: "Avenida Fernandes Lima",
+        numero: "100",
+        bairro: "Farol",
+        cidade: "Maceió",
+        uf: "AL",
+      });
+      expect(resultado).toEqual({ tipo: "ok" });
+      expect(revalidar).toHaveBeenCalledWith("/conta/enderecos");
+    });
+
+    it("edição: PUT /me/enderecos/:id", async () => {
+      fetchFalso.mockResolvedValue(new Response("{}", { status: 200 }));
+
+      await salvarEnderecoAction(form, ID);
+
+      const [url, init] = fetchFalso.mock.calls[0] as [string, RequestInit];
+      expect(url).toBe(`http://api.test/me/enderecos/${ID}`);
+      expect(init.method).toBe("PUT");
+    });
+
+    it("dados inválidos voltam com a mensagem de cada campo e não chegam à API", async () => {
+      const resultado = await salvarEnderecoAction({ ...form, rua: "", cep: "01432-000" });
+
+      expect(resultado).toEqual({
+        tipo: "invalido",
+        erros: { rua: "Informe a rua.", cep: "Por enquanto só entregamos em Alagoas." },
+      });
+      expect(fetchFalso).not.toHaveBeenCalled();
+    });
+
+    it("endereço não localizado e mapas fora do ar mostram a mensagem da API", async () => {
+      fetchFalso.mockResolvedValueOnce(
+        erroDaApi(
+          422,
+          "ADDRESS_NOT_LOCATED",
+          "Não encontramos este endereço. Confira a rua, o número e o CEP.",
+        ),
+      );
+      expect(await salvarEnderecoAction(form)).toEqual({
+        tipo: "erro",
+        mensagem: "Não encontramos este endereço. Confira a rua, o número e o CEP.",
+      });
+      fetchFalso.mockResolvedValueOnce(
+        erroDaApi(
+          503,
+          "MAPS_UNAVAILABLE",
+          "Não conseguimos calcular o frete agora. Tente de novo em instantes.",
+        ),
+      );
+      expect(await salvarEnderecoAction(form)).toEqual({
+        tipo: "erro",
+        mensagem: "Não conseguimos calcular o frete agora. Tente de novo em instantes.",
+      });
+      expect(revalidar).not.toHaveBeenCalled();
+    });
+
+    it("429, falha da rede e erro desconhecido mostram textos próprios, sem repassar a resposta", async () => {
+      fetchFalso.mockResolvedValueOnce(new Response("{}", { status: 429 }));
+      expect(await salvarEnderecoAction(form)).toEqual({
+        tipo: "erro",
+        mensagem: "Muitas tentativas. Tente de novo em instantes.",
+      });
+      fetchFalso.mockRejectedValueOnce(new Error("rede"));
+      expect(await salvarEnderecoAction(form)).toEqual({
+        tipo: "erro",
+        mensagem: "Não foi possível salvar agora. Tente de novo.",
+      });
+      fetchFalso.mockResolvedValueOnce(erroDaApi(500, "INTERNAL", "stack secreta"));
+      expect(await salvarEnderecoAction(form)).toEqual({
+        tipo: "erro",
+        mensagem: "Não foi possível salvar agora. Tente de novo.",
+      });
+    });
+
+    it("sem sessão e 401 viram sem-sessao", async () => {
+      fetchFalso.mockResolvedValueOnce(new Response("{}", { status: 401 }));
+      expect(await salvarEnderecoAction(form)).toEqual({ tipo: "sem-sessao" });
+      sessao.token = undefined;
+      expect(await salvarEnderecoAction(form)).toEqual({ tipo: "sem-sessao" });
+    });
+
+    it("id de edição que não é UUID não chega à API", async () => {
+      expect(await salvarEnderecoAction(form, "../x")).toEqual({
+        tipo: "erro",
+        mensagem: "Não foi possível salvar agora. Tente de novo.",
+      });
+      expect(fetchFalso).not.toHaveBeenCalled();
+    });
   });
 });
