@@ -6,8 +6,8 @@ describe("formaDePagamentoSchema", () => {
     expect(formaDePagamentoSchema.parse({ tipo: "pix" })).toEqual({ tipo: "pix" });
   });
 
-  it("aceita cartão com token, parcelas e bandeira", () => {
-    const cartao = { tipo: "cartao", token: "tok_123", parcelas: 3, bandeira: "visa" };
+  it("aceita cartão só com as parcelas", () => {
+    const cartao = { tipo: "cartao", parcelas: 3 };
 
     expect(formaDePagamentoSchema.parse(cartao)).toEqual(cartao);
   });
@@ -15,7 +15,7 @@ describe("formaDePagamentoSchema", () => {
   it("limita as parcelas de 1 a 12", () => {
     expect(PARCELAS_MAXIMAS).toBe(12);
     const com = (parcelas: number) =>
-      formaDePagamentoSchema.safeParse({ tipo: "cartao", token: "t", parcelas, bandeira: "visa" });
+      formaDePagamentoSchema.safeParse({ tipo: "cartao", parcelas });
 
     expect(com(1).success).toBe(true);
     expect(com(12).success).toBe(true);
@@ -24,13 +24,7 @@ describe("formaDePagamentoSchema", () => {
     expect(com(2.5).success).toBe(false);
   });
 
-  it.each([
-    [{ tipo: "cartao", parcelas: 1, bandeira: "visa" }],
-    [{ tipo: "cartao", token: "", parcelas: 1, bandeira: "visa" }],
-    [{ tipo: "cartao", token: "t", parcelas: 1 }],
-    [{ tipo: "boleto" }],
-    [{}],
-  ])("recusa %j", (entrada) => {
+  it.each([[{ tipo: "cartao" }], [{ tipo: "boleto" }], [{}]])("recusa %j", (entrada) => {
     expect(formaDePagamentoSchema.safeParse(entrada).success).toBe(false);
   });
 
@@ -41,25 +35,16 @@ describe("formaDePagamentoSchema", () => {
   });
 });
 
-describe("formaDePagamentoSchema (tamanhos)", () => {
-  const cartao = (mudanca: object) => ({
-    tipo: "cartao",
-    token: "t",
-    parcelas: 1,
-    bandeira: "visa",
-    ...mudanca,
-  });
+describe("formaDePagamentoSchema (sem dados do cartão)", () => {
+  it("descarta token e bandeira mandados no cartão: a API só recebe o tipo e as parcelas", () => {
+    const resultado = formaDePagamentoSchema.parse({
+      tipo: "cartao",
+      parcelas: 2,
+      token: "tok_secreto",
+      bandeira: "visa",
+      numero: "4111111111111111",
+    });
 
-  it("recusa token acima de 512 e bandeira acima de 40 caracteres", () => {
-    expect(formaDePagamentoSchema.safeParse(cartao({ token: "a".repeat(512) })).success).toBe(true);
-    expect(formaDePagamentoSchema.safeParse(cartao({ token: "a".repeat(513) })).success).toBe(
-      false,
-    );
-    expect(formaDePagamentoSchema.safeParse(cartao({ bandeira: "a".repeat(40) })).success).toBe(
-      true,
-    );
-    expect(formaDePagamentoSchema.safeParse(cartao({ bandeira: "a".repeat(41) })).success).toBe(
-      false,
-    );
+    expect(resultado).toEqual({ tipo: "cartao", parcelas: 2 });
   });
 });

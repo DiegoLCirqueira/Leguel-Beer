@@ -32,7 +32,7 @@ const PEDIDO: CriarPedidoRequest = {
   totalVistoCentavos: 10_300,
 };
 
-const CARTAO = { tipo: "cartao", parcelas: 2, bandeira: "visa" } as const;
+const CARTAO = { tipo: "cartao", parcelas: 2 } as const;
 
 function setup(now: () => Date = () => AGORA) {
   const customers = new FakeCustomers();
@@ -94,13 +94,13 @@ describe("CreateOrder", () => {
     });
   });
 
-  it("no cartão guarda parcelas e bandeira, nunca o token", async () => {
+  it("no cartão guarda só as parcelas", async () => {
     const { run, creation } = setup();
 
-    const { body } = await run({ ...PEDIDO, pagamento: { ...CARTAO, token: "tok_secreto" } });
+    const { body } = await run({ ...PEDIDO, pagamento: CARTAO });
 
     expect(body.pagamento).toEqual(CARTAO);
-    expect(JSON.stringify([body, creation.orders, creation.keys])).not.toContain("tok_secreto");
+    expect(creation.orders[0]?.payment).toEqual(CARTAO);
   });
 
   describe("maioridade", () => {
@@ -151,18 +151,21 @@ describe("CreateOrder", () => {
       const { run } = setup();
       await run();
 
-      await expect(run({ ...PEDIDO, pagamento: { ...CARTAO, token: "t" } })).rejects.toBeInstanceOf(
+      await expect(run({ ...PEDIDO, pagamento: CARTAO })).rejects.toBeInstanceOf(
         IdempotencyKeyReusedError,
       );
     });
 
-    it("o token do cartão não entra no hash: outro token com a mesma chave repete a resposta", async () => {
+    it("o mesmo corpo de cartão com a mesma chave repete a resposta; outras parcelas contam como outro corpo", async () => {
       const { run } = setup();
-      await run({ ...PEDIDO, pagamento: { ...CARTAO, token: "tok_a" } });
+      await run({ ...PEDIDO, pagamento: CARTAO });
 
+      await expect(run({ ...PEDIDO, pagamento: CARTAO })).resolves.toMatchObject({
+        replayed: true,
+      });
       await expect(
-        run({ ...PEDIDO, pagamento: { ...CARTAO, token: "tok_b" } }),
-      ).resolves.toMatchObject({ replayed: true });
+        run({ ...PEDIDO, pagamento: { tipo: "cartao", parcelas: 3 } }),
+      ).rejects.toBeInstanceOf(IdempotencyKeyReusedError);
     });
 
     it("a chave de uma conta não vale para outra: a outra conta cria o próprio pedido", async () => {
@@ -300,6 +303,13 @@ describe("CreateOrder", () => {
         { beerId: "mare-alta", name: "Maré Alta" },
       ]);
       expect(creation.orders).toHaveLength(0);
+    });
+
+    it("disponível igual ao pedido ainda cria o pedido", async () => {
+      const { run, creation } = setup();
+      creation.available.set("mare-alta", 2);
+
+      await expect(run()).resolves.toMatchObject({ replayed: false });
     });
 
     it("cerveja que não existe mais no estoque também falta", async () => {

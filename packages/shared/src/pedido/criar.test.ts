@@ -12,8 +12,8 @@ describe("criarPedidoRequestSchema", () => {
     expect(criarPedidoRequestSchema.parse(corpo)).toEqual(corpo);
   });
 
-  it("aceita cartão com token e parcelas", () => {
-    const cartao = { tipo: "cartao", token: "tok_1", parcelas: 3, bandeira: "visa" };
+  it("aceita cartão só com as parcelas", () => {
+    const cartao = { tipo: "cartao", parcelas: 3 };
 
     expect(criarPedidoRequestSchema.parse({ ...corpo, pagamento: cartao }).pagamento).toEqual(
       cartao,

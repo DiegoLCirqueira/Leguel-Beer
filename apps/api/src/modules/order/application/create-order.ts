@@ -52,7 +52,7 @@ export interface CreateOrderResult {
   replayed: boolean;
 }
 
-/** Hash do corpo sem o token do cartão, que nunca é guardado nem entra na comparação. */
+/** Hash do corpo canônico: endereço, forma de pagamento e total visto. */
 function hashOf(request: CriarPedidoRequest): string {
   const canonical = JSON.stringify({
     enderecoId: request.enderecoId,
@@ -149,7 +149,7 @@ export class CreateOrder {
 function toPaymentRecord(request: CriarPedidoRequest): PaymentRecord {
   const { pagamento } = request;
   return pagamento.tipo === "cartao"
-    ? { tipo: "cartao", parcelas: pagamento.parcelas, bandeira: pagamento.bandeira }
+    ? { tipo: "cartao", parcelas: pagamento.parcelas }
     : { tipo: "pix" };
 }
 

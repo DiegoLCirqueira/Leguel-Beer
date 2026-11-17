@@ -4,12 +4,13 @@ export const PARCELAS_MAXIMAS = 12;
 
 export const pixSchema = z.object({ tipo: z.literal("pix") });
 
-/** O cartão chega à API só como token do gateway: número e CVV nunca passam por aqui. */
+/**
+ * O cartão chega à API só com as parcelas: o pagamento é simulado (ADR-018), então não há token,
+ * bandeira nem número. Campos extras são descartados.
+ */
 export const cartaoSchema = z.object({
   tipo: z.literal("cartao"),
-  token: z.string().min(1).max(512),
   parcelas: z.int().min(1).max(PARCELAS_MAXIMAS),
-  bandeira: z.string().min(1).max(40),
 });
 
 export const formaDePagamentoSchema = z.discriminatedUnion("tipo", [pixSchema, cartaoSchema]);
