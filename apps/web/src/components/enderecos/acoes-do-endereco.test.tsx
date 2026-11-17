@@ -48,7 +48,9 @@ describe("AcoesDoEndereco", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "Não foi possível concluir agora. Tente de novo.",
     );
-    await waitFor(() => expect(screen.getByRole("button", { name: "Excluir: Casa" })).toBeEnabled());
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Excluir: Casa" })).toBeEnabled(),
+    );
   });
 
   it("endereço que já não existe pede para recarregar a lista", async () => {
