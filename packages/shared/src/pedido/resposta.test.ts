@@ -7,7 +7,7 @@ const pedido = {
   status: "aguardando-pagamento",
   criadoEm: "2026-11-13T10:00:00.000Z",
   validoAte: "2026-11-13T10:30:00.000Z",
-  pagamento: { tipo: "cartao", parcelas: 3, bandeira: "visa" },
+  pagamento: { tipo: "cartao", parcelas: 3 },
   itens: [
     { cervejaId: "mare-alta", nome: "Maré Alta", precoCentavos: 3200, quantidade: 3 },
     { cervejaId: "cupuacu-ale", nome: "Cupuaçu Ale", precoCentavos: 2650, quantidade: 2 },
@@ -28,13 +28,14 @@ describe("pedidoCriadoSchema", () => {
     );
   });
 
-  it("nunca ecoa o token do cartão", () => {
+  it("nunca ecoa token nem bandeira do cartão", () => {
     const resultado = pedidoCriadoSchema.parse({
       ...pedido,
-      pagamento: { ...pedido.pagamento, token: "tok_secreto" },
+      pagamento: { ...pedido.pagamento, token: "tok_secreto", bandeira: "visa" },
     });
 
     expect(JSON.stringify(resultado)).not.toContain("tok_secreto");
+    expect(JSON.stringify(resultado)).not.toContain("visa");
   });
 
   it.each([
