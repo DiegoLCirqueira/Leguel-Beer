@@ -114,7 +114,7 @@ Funcionalidade: Checkout
 
 ### Criar o pedido (LB-56)
 
-- **Rota** de criar pedido do cliente, com o cabeçalho `Idempotency-Key`. O corpo traz só o id do endereço, a forma de pagamento (com as parcelas, no cartão; nunca dados do cartão) e o **total que o cliente viu** (sem juros). Itens e preços vêm da Geladeira da conta, revalidada pela API; preço, frete ou itens mandados pelo site são ignorados.
+- **Rota** de criar pedido do cliente, com o cabeçalho `Idempotency-Key`. O corpo traz só o id do endereço, a forma de pagamento (`{ tipo: "pix" }` ou `{ tipo: "cartao", parcelas }`, com 1 a 12 parcelas; sem token, sem bandeira e nunca dados do cartão, pois não há gateway, [[ADR-018-pagamento-simulado]]) e o **total que o cliente viu** (sem juros). Itens e preços vêm da Geladeira da conta, revalidada pela API; preço, frete ou itens mandados pelo site são ignorados.
 - **Numa transação**, nesta ordem (a reserva de pedido vencido já não conta no disponível, então a criação não expira pedidos: isso fica com a leitura e o cron, [[pagamento]]):
   1. confere a maioridade (422 `UNDERAGE` ou `BIRTH_DATE_REQUIRED`, [[dados-pessoais]]);
   2. já dentro da mesma serialização por cliente do passo 3 (a trava ou a restrição vale desde este passo, para que dois toques com a mesma chave recebam a resposta repetida e não 409 `PENDING_ORDER`), busca a chave de idempotência do cliente: se a mesma chave já criou um pedido com o mesmo corpo, repete a resposta guardada (status e corpo) e para aqui, sem conferir o pendente (o pedido dessa chave não vira `PENDING_ORDER` para ela mesma); com outro corpo, responde 422 `IDEMPOTENCY_KEY_REUSED` ("Idempotência");
