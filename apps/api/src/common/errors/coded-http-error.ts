@@ -7,6 +7,8 @@ export class CodedHttpError extends Error {
     readonly status: number,
     readonly code: string,
     message: string,
+    /** Campos próprios do código no corpo da resposta (ex.: `pedidoId`); nunca dado pessoal. */
+    readonly extra: Record<string, unknown> = {},
   ) {
     super(message);
     this.name = "CodedHttpError";

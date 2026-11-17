@@ -7,6 +7,7 @@ export interface ErrorBody {
   code: string;
   message: string;
   details?: FieldIssue[];
+  [extra: string]: unknown;
 }
 
 export interface ErrorResponse {
@@ -41,7 +42,10 @@ export function toErrorResponse(error: unknown): ErrorResponse {
     };
   }
   if (error instanceof CodedHttpError) {
-    return { status: error.status, body: { code: error.code, message: error.message } };
+    return {
+      status: error.status,
+      body: { ...error.extra, code: error.code, message: error.message },
+    };
   }
   if (error instanceof NotFoundError) {
     return { status: 404, body: BY_STATUS[404] as ErrorBody };

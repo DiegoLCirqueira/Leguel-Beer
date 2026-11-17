@@ -29,6 +29,7 @@ import { AddressController } from "./presentation/address.controller.js";
 @Module({
   imports: [FridgeModule],
   controllers: [AddressController],
+  exports: [QuoteShipping],
   providers: [
     // Uma contagem por instância da API, compartilhada pelas rotas de gravação de endereço.
     AccountRateLimiter,
