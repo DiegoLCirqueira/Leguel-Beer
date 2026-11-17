@@ -1,10 +1,18 @@
 import type { EnderecoResposta } from "@leguele/shared";
 import { MapPin } from "lucide-react";
+import type { ReactNode } from "react";
 
 const comMascara = (cep: string) => `${cep.slice(0, 5)}-${cep.slice(5)}`;
 
 /** Um endereço da lista de "Meus endereços", com os selos "Padrão" e "Fora da área". */
-export function CartaoDeEndereco({ endereco }: { endereco: EnderecoResposta }) {
+export function CartaoDeEndereco({
+  endereco,
+  acoes,
+}: {
+  endereco: EnderecoResposta;
+  /** Botões do endereço (tornar padrão, excluir), vindos da tela. */
+  acoes?: ReactNode;
+}) {
   return (
     <li className="flex gap-3 rounded-2xl border border-borda-campo bg-superficie/70 p-4">
       <MapPin aria-hidden="true" className="mt-0.5 size-6 shrink-0 text-primaria" />
@@ -29,6 +37,7 @@ export function CartaoDeEndereco({ endereco }: { endereco: EnderecoResposta }) {
           {endereco.bairro} — {endereco.cidade}/{endereco.uf}
         </p>
         <p className="text-texto-suave">CEP {comMascara(endereco.cep)}</p>
+        {acoes}
       </div>
     </li>
   );
