@@ -312,6 +312,39 @@ describe("PrismaOrderCreation (banco real)", () => {
     ).resolves.toMatchObject({ replayed: false });
   });
 
+  describe("pool de conexões", () => {
+    it("limita as criações simultâneas da instância: nunca mais que o máximo dentro da transação", async () => {
+      const creation = new PrismaOrderCreation(prisma, 2);
+      let inside = 0;
+      let peak = 0;
+      const owners = await Promise.all([1, 2, 3, 4, 5, 6].map(() => addCustomer()));
+
+      await Promise.all(
+        owners.map((owner) =>
+          creation.run(owner, async () => {
+            inside += 1;
+            peak = Math.max(peak, inside);
+            await new Promise((resolve) => setTimeout(resolve, 40));
+            inside -= 1;
+          }),
+        ),
+      );
+
+      expect(peak).toBe(2);
+    });
+
+    it("libera a vaga quando a criação falha, e as seguintes passam", async () => {
+      const creation = new PrismaOrderCreation(prisma, 1);
+      const owner = await addCustomer();
+
+      await expect(creation.run(owner, () => Promise.reject(new Error("falhou")))).rejects.toThrow(
+        "falhou",
+      );
+
+      await expect(creation.run(owner, () => Promise.resolve("ok"))).resolves.toBe("ok");
+    });
+  });
+
   describe("concorrência", () => {
     it("N pedidos simultâneos de clientes diferentes para M unidades criam no máximo M pedidos", async () => {
       const beer = await addBeer("Mare Alta", 2);
