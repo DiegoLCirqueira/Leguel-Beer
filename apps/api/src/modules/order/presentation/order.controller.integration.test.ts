@@ -64,7 +64,7 @@ describe("POST /me/pedidos (HTTP, banco real)", () => {
 
   beforeEach(async () => {
     await resetDatabase(prisma);
-    app.get(AccountRateLimiter, { strict: false }).reset();
+    app.select(OrderModule).get(AccountRateLimiter).reset();
     geocoder.respondWith({ latitude: -9.66, longitude: -35.74 });
     router.respondWith(5_200);
     await seedDeliverySettings(prisma);
@@ -82,18 +82,26 @@ describe("POST /me/pedidos (HTTP, banco real)", () => {
     });
     categoryId = (await prisma.category.create({ data: { slug: "ipa", name: "IPAs", order: 1 } }))
       .id;
-    const response = await request(app.getHttpServer())
-      .post("/me/enderecos")
-      .set({ Authorization: `Bearer ${tokens.customer()}` })
-      .send({
-        cep: "57035-000",
-        rua: "Rua do Sol",
-        numero: "100",
-        bairro: "Farol",
-        cidade: "Maceió",
-        uf: "AL",
-      });
-    addressId = (response.body as { id: string }).id;
+    // O endereço entra direto no banco, já com distância e origem da rota, como a API o grava.
+    addressId = (
+      await prisma.address.create({
+        data: {
+          profileId: tokens.customerId,
+          zip: "57035000",
+          street: "Rua do Sol",
+          number: "100",
+          district: "Farol",
+          city: "Maceió",
+          state: "AL",
+          isDefault: true,
+          latitude: -9.66,
+          longitude: -35.74,
+          distanceMeters: 5_200,
+          routeOriginLatitude: -9.6649,
+          routeOriginLongitude: -35.7313,
+        },
+      })
+    ).id;
   });
 
   afterAll(() => app.close());
@@ -210,44 +218,44 @@ describe("POST /me/pedidos (HTTP, banco real)", () => {
     expect(geladeiraResponseSchema.parse(fridge.body).ajustes).toEqual([]);
   });
 
-  it("sem estoque responde 409 OUT_OF_STOCK com as cervejas que faltam", async () => {
+  it("reserva de outro pedido reduz o disponível: responde 409 TOTAL_CHANGED com a quantidade reduzida", async () => {
     const beer = await fillFridge(4_500, 2, 5);
-    await prisma.stockReservation.create({
+    const reserver = await prisma.profile.create({
+      data: { id: crypto.randomUUID(), email: "reservou@leguele.test", nome: "R" },
+    });
+    await prisma.order.create({
       data: {
-        beerId: beer.id,
-        quantity: 4,
+        number: "#LB000009",
+        profileId: reserver.id,
+        paymentMethod: "PIX",
+        subtotalCents: 1,
+        shippingCents: 0,
+        totalCents: 1,
         expiresAt: new Date(Date.now() + 10 * 60_000),
-        order: {
-          create: {
-            number: "#LB000009",
-            profile: {
-              create: { id: crypto.randomUUID(), email: "reservou@leguele.test", nome: "R" },
-            },
-            paymentMethod: "PIX",
-            subtotalCents: 1,
-            shippingCents: 0,
-            totalCents: 1,
-            expiresAt: new Date(Date.now() + 10 * 60_000),
-            customerName: "R",
-            customerPhone: "1",
-            shipZip: "1",
-            shipStreet: "1",
-            shipNumber: "1",
-            shipDistrict: "1",
-            shipCity: "1",
-            shipState: "AL",
-          },
+        customerName: "R",
+        customerPhone: "1",
+        shipZip: "1",
+        shipStreet: "1",
+        shipNumber: "1",
+        shipDistrict: "1",
+        shipCity: "1",
+        shipState: "AL",
+        reservations: {
+          create: [{ beerId: beer.id, quantity: 4, expiresAt: new Date(Date.now() + 10 * 60_000) }],
         },
       },
     });
 
     const response = await post(body(10_300));
 
+    // A Geladeira revalidada já enxerga só 1 unidade disponível, então o total muda antes da trava.
     expect(response.status).toBe(409);
     expect(erroDoPedidoSchema.parse(response.body)).toMatchObject({
-      code: "OUT_OF_STOCK",
-      cervejas: [{ cervejaId: beer.id, nome: "Maré Alta" }],
+      code: "TOTAL_CHANGED",
+      totalAtualCentavos: 5_800,
+      ajustes: [{ tipo: "quantidade-reduzida", quantidadeAnterior: 2, quantidadeAtual: 1 }],
     });
+    expect(await prisma.order.count({ where: { profileId: tokens.customerId } })).toBe(0);
   });
 
   it("com pedido aguardando pagamento dentro da validade responde 409 PENDING_ORDER com o id dele", async () => {

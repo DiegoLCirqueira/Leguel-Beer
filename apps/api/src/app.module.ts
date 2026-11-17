@@ -11,6 +11,7 @@ import { CatalogModule } from "./modules/catalog/catalog.module.js";
 import { DeliveryModule } from "./modules/delivery/delivery.module.js";
 import { FridgeModule } from "./modules/fridge/fridge.module.js";
 import { HealthModule } from "./modules/health/health.module.js";
+import { OrderModule } from "./modules/order/order.module.js";
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { HealthModule } from "./modules/health/health.module.js";
     CatalogModule,
     FridgeModule,
     DeliveryModule,
+    OrderModule,
     HealthModule,
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
   ],

@@ -25,6 +25,7 @@ function authUrl(): string {
 
 @Module({
   controllers: [ProfileController, RoleController],
+  exports: [PROFILE_REPOSITORY],
   providers: [
     {
       provide: TOKEN_VERIFIER,

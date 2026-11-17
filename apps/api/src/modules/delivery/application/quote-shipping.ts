@@ -19,19 +19,49 @@ export class QuoteShipping {
   ) {}
 
   async execute(ownerId: string, addressId: string): Promise<CotacaoDeFrete> {
+    // O subtotal só é lido depois de o endereço e as configurações existirem, como sempre foi.
+    const found = await this.find(ownerId, addressId);
+    const subtotalCentavos = await this.fridgeSubtotal.subtotalCents(ownerId);
+    return (await this.quoteFor(ownerId, found, subtotalCentavos)).quote;
+  }
+
+  /**
+   * Cota o frete do endereço para um subtotal já conhecido (o da Geladeira revalidada que o pedido
+   * usa) e devolve também o endereço, para o pedido guardar a cópia.
+   */
+  async forSubtotal(
+    ownerId: string,
+    addressId: string,
+    subtotalCentavos: number,
+  ): Promise<{ address: Address; quote: CotacaoDeFrete }> {
+    return this.quoteFor(ownerId, await this.find(ownerId, addressId), subtotalCentavos);
+  }
+
+  private async find(ownerId: string, addressId: string) {
     const address = (await this.addresses.list(ownerId)).find(({ id }) => id === addressId);
     if (!address) throw new NotFoundError();
-    const config = await this.settings.get();
-    const subtotalCentavos = await this.fridgeSubtotal.subtotalCents(ownerId);
+    return { address, config: await this.settings.get() };
+  }
 
+  private async quoteFor(
+    ownerId: string,
+    {
+      address,
+      config,
+    }: { address: Address; config: Awaited<ReturnType<DeliverySettingsRepository["get"]>> },
+    subtotalCentavos: number,
+  ): Promise<{ address: Address; quote: CotacaoDeFrete }> {
     const distanceMeters = sameCoordinates(address.routeOrigin, config.origem)
       ? address.distanceMeters
       : await this.recalculate(ownerId, address, config.origem);
 
     // Sem rota até a cervejaria o endereço está fora da área, e a distância nunca é inventada.
-    if (distanceMeters === null) return { naArea: false };
+    if (distanceMeters === null) return { address, quote: { naArea: false } };
 
-    return calcularFrete({ distanciaMetros: distanceMeters, subtotalCentavos }, config);
+    return {
+      address,
+      quote: calcularFrete({ distanciaMetros: distanceMeters, subtotalCentavos }, config),
+    };
   }
 
   /**
