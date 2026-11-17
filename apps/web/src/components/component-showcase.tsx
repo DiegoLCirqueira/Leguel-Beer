@@ -1,6 +1,6 @@
 "use client";
 
-import type { CervejaCard } from "@leguele/shared";
+import type { CervejaCard, EnderecoResposta } from "@leguele/shared";
 import { ArrowRight, Link2, Lock, UserRound } from "lucide-react";
 import { useState } from "react";
 import type { ItemLocal } from "@/lib/geladeira/estado";
@@ -12,6 +12,7 @@ import {
   BottomSheet,
   Button,
   CardCerveja,
+  CartaoDeEndereco,
   Campo,
   CervejaNaoEncontrada,
   CategoryChips,
@@ -44,6 +45,19 @@ const swatches = [
   { name: "erro", className: "bg-erro" },
   { name: "aviso", className: "bg-aviso" },
 ];
+
+const enderecoExemplo: EnderecoResposta = {
+  id: "1",
+  apelido: "Casa",
+  cep: "57035000",
+  rua: "Avenida Fernandes Lima",
+  numero: "100",
+  bairro: "Farol",
+  cidade: "Maceió",
+  uf: "AL",
+  padrao: true,
+  foraDaArea: false,
+};
 
 const cervejaExemplo: CervejaCard = {
   id: "1",
@@ -175,6 +189,20 @@ export function ComponentShowcase() {
           max={12}
           rotulo="Quantidade de exemplo"
         />
+      </Section>
+      <Section title="Meus endereços: cartão de endereço">
+        <ul className="flex flex-col gap-3">
+          <CartaoDeEndereco endereco={enderecoExemplo} />
+          <CartaoDeEndereco
+            endereco={{
+              ...enderecoExemplo,
+              id: "2",
+              apelido: undefined,
+              padrao: false,
+              foraDaArea: true,
+            }}
+          />
+        </ul>
       </Section>
       <Section title="Geladeira: moldura, prateleiras, garrafas e fantasmas">
         <MolduraDaGeladeira itens={itensDaMoldura} />
