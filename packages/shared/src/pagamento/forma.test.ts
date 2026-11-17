@@ -24,11 +24,7 @@ describe("formaDePagamentoSchema", () => {
     expect(com(2.5).success).toBe(false);
   });
 
-  it.each([
-    [{ tipo: "cartao" }],
-    [{ tipo: "boleto" }],
-    [{}],
-  ])("recusa %j", (entrada) => {
+  it.each([[{ tipo: "cartao" }], [{ tipo: "boleto" }], [{}]])("recusa %j", (entrada) => {
     expect(formaDePagamentoSchema.safeParse(entrada).success).toBe(false);
   });
 

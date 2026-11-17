@@ -48,9 +48,8 @@ export interface FridgeSource {
   revalidated(ownerId: string): Promise<{ lines: FridgeLine[]; adjustments: AjusteDaGeladeira[] }>;
 }
 
-/** Forma de pagamento como o pedido a guarda: o token do cartão nunca é guardado. */
-export type PaymentRecord =
-  { tipo: "pix" } | { tipo: "cartao"; parcelas: number; bandeira: string };
+/** Forma de pagamento como o pedido a guarda: só o tipo e as parcelas (pagamento simulado, ADR-018). */
+export type PaymentRecord = { tipo: "pix" } | { tipo: "cartao"; parcelas: number };
 
 export interface NewOrder {
   id: string;
@@ -69,7 +68,6 @@ export interface NewOrder {
 
 export interface StoredResponse {
   requestHash: string;
-  status: number;
   body: PedidoCriado;
 }
 

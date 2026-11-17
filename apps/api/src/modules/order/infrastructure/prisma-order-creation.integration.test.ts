@@ -105,7 +105,7 @@ describe("PrismaOrderCreation (banco real)", () => {
       key: key("0001"),
       request: {
         ...request(10_300),
-        pagamento: { tipo: "cartao", token: "tok_secreto", parcelas: 3, bandeira: "visa" },
+        pagamento: { tipo: "cartao", parcelas: 3 },
       },
     });
 
@@ -125,7 +125,6 @@ describe("PrismaOrderCreation (banco real)", () => {
       status: "AWAITING_PAYMENT",
       paymentMethod: "CARD",
       installments: 3,
-      cardBrand: "visa",
       subtotalCents: 9_000,
       shippingCents: 1_300,
       totalCents: 10_300,
@@ -151,7 +150,6 @@ describe("PrismaOrderCreation (banco real)", () => {
       expiresAt: new Date("2026-11-17T15:00:00.000Z"),
       responseBody: body,
     });
-    expect(JSON.stringify(order)).not.toContain("tok_secreto");
   });
 
   it("repete a resposta guardada para a mesma chave, sem segundo pedido nem segunda reserva", async () => {
@@ -193,7 +191,7 @@ describe("PrismaOrderCreation (banco real)", () => {
         key: key("0001"),
         request: {
           ...request(10_300),
-          pagamento: { tipo: "cartao", token: "t", parcelas: 1, bandeira: "visa" },
+          pagamento: { tipo: "cartao", parcelas: 1 },
         },
       })
       .catch((e: unknown) => e as IdempotencyKeyReusedError);

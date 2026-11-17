@@ -93,9 +93,7 @@ export class FakeOrderCreation implements OrderCreation {
         const found = this.keys.find(
           (stored) => stored.ownerId === ownerId && stored.key === key && stored.expiresAt > at,
         );
-        return Promise.resolve(
-          found ? { requestHash: found.hash, status: 201, body: found.response } : null,
-        );
+        return Promise.resolve(found ? { requestHash: found.hash, body: found.response } : null);
       },
       findPendingOrderId: (at) =>
         Promise.resolve(

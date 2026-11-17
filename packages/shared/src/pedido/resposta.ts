@@ -4,11 +4,8 @@ import { numeroDoPedidoSchema } from "./numero.js";
 import { statusDoPedidoSchema } from "./status.js";
 import { VALIDADE_DO_PEDIDO_MINUTOS } from "./validade.js";
 
-/** Forma de pagamento registrada no pedido: a do cartão, sem o token, que nunca é guardado nem devolvido. */
-const pagamentoRegistradoSchema = z.discriminatedUnion("tipo", [
-  pixSchema,
-  cartaoSchema.omit({ token: true }),
-]);
+/** Forma de pagamento registrada no pedido: o tipo e, no cartão, as parcelas. */
+const pagamentoRegistradoSchema = z.discriminatedUnion("tipo", [pixSchema, cartaoSchema]);
 
 const itemDoPedidoSchema = z.object({
   cervejaId: z.string(),
