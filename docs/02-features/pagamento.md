@@ -127,7 +127,7 @@ Funcionalidade: Pagamento só visual com Pix e cartão
 
 ## Ajustes no código já mergeado
 
-Para o Back, no item 6 ou antes, se atrapalhar: a porta `PaymentGateway` da expiração (a expiração passa a só cancelar), as tabelas de cobrança e de avisos do gateway no schema e o corpo de criar pedido com token deixam de ter uso. Os schemas de parcelas do `@leguele/shared` passam a usar o cálculo da loja.
+Para o Back, no item 6 ou antes, se atrapalhar: a porta `PaymentGateway` da expiração (a expiração passa a só cancelar), as tabelas de cobrança e de avisos do gateway no schema deixam de ter uso. No corpo de criar pedido, o `cartaoSchema` do `@leguele/shared` perde `token` e `bandeira`: a API recebe só `{ tipo: "pix" }` ou `{ tipo: "cartao", parcelas }` (1 a 12), e o pedido guarda só a forma e as parcelas; a bandeira, se o site quiser mostrá-la, fica só no site. Os schemas de parcelas do `@leguele/shared` passam a usar o cálculo da loja.
 
 ## Fora de escopo
 
