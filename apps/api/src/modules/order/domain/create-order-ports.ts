@@ -1,9 +1,4 @@
-import type {
-  AjusteDaGeladeira,
-  CotacaoDeFrete,
-  FormaDePagamento,
-  PedidoCriado,
-} from "@leguele/shared";
+import type { AjusteDaGeladeira, CotacaoDeFrete, PedidoCriado } from "@leguele/shared";
 
 /** Dados do cliente que o pedido usa: maioridade e a cópia de nome e telefone. */
 export interface OrderCustomer {
@@ -53,13 +48,17 @@ export interface FridgeSource {
   revalidated(ownerId: string): Promise<{ lines: FridgeLine[]; adjustments: AjusteDaGeladeira[] }>;
 }
 
+/** Forma de pagamento como o pedido a guarda: o token do cartão nunca é guardado. */
+export type PaymentRecord =
+  { tipo: "pix" } | { tipo: "cartao"; parcelas: number; bandeira: string };
+
 export interface NewOrder {
   id: string;
   number: string;
   ownerId: string;
   createdAt: Date;
   expiresAt: Date;
-  payment: FormaDePagamento;
+  payment: PaymentRecord;
   customer: { nome: string; telefone: string };
   shipTo: ShipTo;
   lines: FridgeLine[];
