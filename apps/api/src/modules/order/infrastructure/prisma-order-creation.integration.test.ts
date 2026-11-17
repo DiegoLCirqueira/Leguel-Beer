@@ -60,6 +60,7 @@ describe("PrismaOrderCreation (banco real)", () => {
   function build(
     customerIds: string[],
     lines: { beerId: string; name: string; priceCents: number; quantity: number }[],
+    now: () => Date = () => AGORA,
   ) {
     const customers = new FakeCustomers();
     customers.customers.clear();
@@ -78,7 +79,7 @@ describe("PrismaOrderCreation (banco real)", () => {
       shipping: new FakeShipping(customers.customers),
       fridge,
       creation: new PrismaOrderCreation(prisma),
-      now: () => AGORA,
+      now,
       newId: randomUUID,
       newNumber: () => `#LB${numbers++}`,
     });
@@ -174,6 +175,39 @@ describe("PrismaOrderCreation (banco real)", () => {
     expect(second).toEqual({ ...first, replayed: true });
     expect(await prisma.order.count()).toBe(1);
     expect(await prisma.stockReservation.count()).toBe(1);
+  });
+
+  it("chave vencida (24 h) é substituída: reusar a chave cria o pedido novo, sem erro de unicidade", async () => {
+    const beer = await addBeer("Mare Alta", 10);
+    const owner = await addCustomer();
+    let agora = AGORA;
+    const useCase = build(
+      [owner],
+      [{ beerId: beer.id, name: "Mare Alta", priceCents: 4_500, quantity: 2 }],
+      () => agora,
+    );
+    const first = await useCase.execute({
+      ownerId: owner,
+      key: key("0001"),
+      request: request(10_300),
+    });
+    agora = new Date(AGORA.getTime() + 24 * 60 * 60_000);
+
+    const second = await useCase.execute({
+      ownerId: owner,
+      key: key("0001"),
+      request: request(10_300),
+    });
+
+    expect(second.replayed).toBe(false);
+    expect(second.body.id).not.toBe(first.body.id);
+    expect(await prisma.order.count()).toBe(2);
+    const keys = await prisma.idempotencyKey.findMany({ where: { profileId: owner } });
+    expect(keys).toHaveLength(1);
+    expect(keys[0]).toMatchObject({
+      orderId: second.body.id,
+      expiresAt: new Date("2026-11-18T15:00:00.000Z"),
+    });
   });
 
   it("a mesma chave com outro corpo recusa e não cria nada", async () => {
