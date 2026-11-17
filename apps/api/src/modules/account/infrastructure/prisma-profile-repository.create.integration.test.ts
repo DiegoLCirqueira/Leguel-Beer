@@ -12,6 +12,7 @@ function perfil(overrides: Partial<Profile> = {}): Profile {
     email: `${id}@leguele.test`,
     nome: "Ana Souza",
     telefone: "82912345678",
+    dataNascimento: null,
     role: "customer",
     aceite: {
       termosVersao: "2026-10-30",

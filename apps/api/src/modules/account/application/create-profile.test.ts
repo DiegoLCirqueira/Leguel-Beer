@@ -36,6 +36,7 @@ describe("CreateProfile", () => {
         email: "ana@exemplo.com",
         nome: "Ana Souza",
         telefone: "82912345678",
+        dataNascimento: null,
         role: "customer",
         aceite: { termosVersao: "2026-10-30", privacidadeVersao: "2026-10-29", aceitoEm: AGORA },
       },

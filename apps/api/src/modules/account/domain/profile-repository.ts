@@ -7,6 +7,14 @@ export interface ProfileRecord {
   role: Role;
 }
 
+/** Os dados que o cliente edita no perfil. */
+export interface ProfileEdit {
+  nome: string;
+  telefone: string;
+  /** "AAAA-MM-DD", ou null para apagar. */
+  dataNascimento: string | null;
+}
+
 export interface ProfileRepository {
   /** Cria o perfil se faltar e grava o papel; repetir não duplica. */
   ensureRole(profile: { id: string; email: string }, role: Role): Promise<void>;
@@ -19,5 +27,10 @@ export interface ProfileRepository {
    * Se o perfil completo já existe, devolve o existente sem alterar nada (`created: false`); duas
    * chamadas simultâneas criam um só.
    */
+  /**
+   * Troca nome, telefone e data de nascimento do perfil completo da conta e devolve o perfil novo,
+   * ou null se a conta ainda não tem perfil completo. Id, e-mail, papel e aceite nunca mudam.
+   */
+  updateProfile(id: string, data: ProfileEdit): Promise<Profile | null>;
   createProfile(profile: Profile): Promise<{ profile: Profile; created: boolean }>;
 }
