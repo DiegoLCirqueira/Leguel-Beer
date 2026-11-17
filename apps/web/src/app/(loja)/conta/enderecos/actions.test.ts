@@ -7,6 +7,8 @@ vi.mock("next/headers", () => ({
       nome === "lb_acesso" && sessao.token ? { value: sessao.token } : undefined,
   }),
 }));
+const consultar = vi.hoisted(() => vi.fn());
+vi.mock("@/lib/enderecos/cep", () => ({ consultarCep: consultar }));
 const revalidar = vi.hoisted(() => vi.fn());
 vi.mock("next/cache", () => ({ revalidatePath: revalidar }));
 
@@ -202,5 +204,19 @@ describe("Server Actions dos endereços", () => {
       });
       expect(fetchFalso).not.toHaveBeenCalled();
     });
+  });
+
+  it("buscarCepAction repassa o CEP à consulta e devolve o resultado", async () => {
+    consultar.mockResolvedValue({ tipo: "nao-encontrado" });
+
+    expect(await buscarCepAction("57999-999")).toEqual({ tipo: "nao-encontrado" });
+    expect(consultar).toHaveBeenCalledWith("57999-999");
+  });
+
+  it("buscarCepAction sem sessão não consulta o serviço", async () => {
+    sessao.token = undefined;
+
+    expect(await buscarCepAction("57035-000")).toEqual({ tipo: "indisponivel" });
+    expect(consultar).not.toHaveBeenCalled();
   });
 });

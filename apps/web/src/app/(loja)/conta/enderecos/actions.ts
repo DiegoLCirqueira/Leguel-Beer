@@ -2,6 +2,7 @@
 
 import { enderecoFormSchema } from "@leguele/shared";
 import { revalidatePath } from "next/cache";
+import type { ResultadoDoCep } from "@/lib/enderecos/cep";
 import { urlDaApi } from "@/lib/auth/config";
 import { lerTokenDeAcesso } from "@/lib/auth/servidor";
 
@@ -117,4 +118,9 @@ export async function salvarEnderecoAction(
   }
   revalidatePath("/conta/enderecos");
   return { tipo: "ok" };
+}
+
+/** Busca de CEP para o formulário. Só quem tem sessão consulta (não vira buscador aberto de CEP). */
+export async function buscarCepAction(_cep: string): Promise<ResultadoDoCep> {
+  return { tipo: "invalido" };
 }
