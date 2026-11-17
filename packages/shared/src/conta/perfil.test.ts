@@ -97,7 +97,7 @@ describe("editarPerfilRequestSchema", () => {
   });
 
   it("a data é opcional: ausente, nula ou em branco guarda null", () => {
-    const { dataNascimento: _data, ...semData } = valido;
+    const semData = { nome: valido.nome, telefone: valido.telefone };
     for (const corpo of [
       semData,
       { ...semData, dataNascimento: null },
