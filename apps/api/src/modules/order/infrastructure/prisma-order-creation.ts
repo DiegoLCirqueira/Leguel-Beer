@@ -12,6 +12,13 @@ const IDEMPOTENCY_TTL_MS = 24 * 60 * 60_000;
 /** Sorteios seguidos do número do pedido antes de desistir (a colisão é de 1 em um milhão). */
 const NUMBER_ATTEMPTS = 3;
 const TRANSACTION_TIMEOUT_MS = 15_000;
+/**
+ * Criações simultâneas por instância. Cada uma segura uma conexão da transação e abre outra para a
+ * Geladeira ou para a cotação; com o pool padrão do `pg` (10), 4 criações usam no máximo 8, e as
+ * demais requisições da API ainda têm conexão. Sem o limite, 10 criações juntas poderiam prender o
+ * pool inteiro esperando uma segunda conexão.
+ */
+const MAX_CONCURRENT_CREATIONS = 4;
 
 /**
  * Criação do pedido numa transação do Postgres, serializada por cliente com uma trava consultiva
@@ -20,9 +27,42 @@ const TRANSACTION_TIMEOUT_MS = 15_000;
  * a criação nunca se cruzam. Clientes diferentes não esperam um pelo outro, só pelas cervejas.
  */
 export class PrismaOrderCreation implements OrderCreation {
-  constructor(private readonly prisma: PrismaService) {}
+  private active = 0;
+  private readonly waiting: (() => void)[] = [];
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly maxConcurrent: number = MAX_CONCURRENT_CREATIONS,
+  ) {}
 
   async run<T>(ownerId: string, work: (unit: CreateOrderUnit) => Promise<T>): Promise<T> {
+    await this.acquire();
+    try {
+      return await this.runInTransaction(ownerId, work);
+    } finally {
+      this.release();
+    }
+  }
+
+  private async acquire(): Promise<void> {
+    if (this.active < this.maxConcurrent) {
+      this.active += 1;
+      return;
+    }
+    // A vaga passa direto para quem espera há mais tempo, sem soltar e pegar de novo.
+    await new Promise<void>((resolve) => this.waiting.push(resolve));
+  }
+
+  private release(): void {
+    const next = this.waiting.shift();
+    if (next) next();
+    else this.active -= 1;
+  }
+
+  private async runInTransaction<T>(
+    ownerId: string,
+    work: (unit: CreateOrderUnit) => Promise<T>,
+  ): Promise<T> {
     for (let attempt = 1; ; attempt++) {
       try {
         return await this.prisma.$transaction(
