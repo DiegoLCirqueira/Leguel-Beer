@@ -52,7 +52,8 @@ export async function excluirEnderecoAction(id: string): Promise<ResultadoDaAcao
 }
 
 export type ResultadoDoSalvar =
-  | { tipo: "ok" | "sem-sessao" }
+  | { tipo: "ok" }
+  | { tipo: "sem-sessao" }
   | { tipo: "invalido"; erros: Record<string, string> }
   | { tipo: "erro"; mensagem: string };
 
