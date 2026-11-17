@@ -1,7 +1,8 @@
-import { LogOut } from "lucide-react";
+import { LogOut, MapPin } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { SiteFooter } from "@/components/site/site-footer";
-import { Button } from "@/components/ui";
+import { Button, buttonVariants } from "@/components/ui";
 import { sairAction } from "../../sair/actions";
 
 export const metadata: Metadata = {
@@ -15,6 +16,10 @@ export default function Conta() {
     <>
       <main className="mx-auto flex w-full flex-1 max-w-sm flex-col gap-6 px-6 pb-12 pt-14 text-texto">
         <h1 className="font-titulo text-balance text-4xl">Minha conta</h1>
+        <Link href="/conta/enderecos" className={buttonVariants({ variant: "outline" })}>
+          <MapPin aria-hidden="true" className="size-5" />
+          Meus endereços
+        </Link>
         <form action={sairAction}>
           <Button
             type="submit"

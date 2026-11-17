@@ -1,22 +1,32 @@
 import { Module } from "@nestjs/common";
+import { FridgeModule } from "../fridge/fridge.module.js";
+import { GetAccountFridge } from "../fridge/application/get-account-fridge.js";
 import { PrismaService } from "../../common/prisma/prisma.service.js";
 import { randomUUID } from "node:crypto";
 import { AddAddress } from "./application/add-address.js";
 import { DeleteAddress } from "./application/delete-address.js";
+import { QuoteShipping } from "./application/quote-shipping.js";
 import { ListAddresses } from "./application/list-addresses.js";
 import { SetDefaultAddress } from "./application/set-default-address.js";
 import { UpdateAddress } from "./application/update-address.js";
-import { ADDRESS_REPOSITORY, DELIVERY_SETTINGS_REPOSITORY } from "./delivery.tokens.js";
+import {
+  ADDRESS_REPOSITORY,
+  DELIVERY_SETTINGS_REPOSITORY,
+  FRIDGE_SUBTOTAL,
+} from "./delivery.tokens.js";
 import { GEOCODER, ROUTE_CALCULATOR } from "./delivery.tokens.js";
 import type { AddressRepository } from "./domain/address-repository.js";
 import type { Geocoder, RouteCalculator } from "./domain/maps.js";
+import type { FridgeSubtotalProvider } from "./domain/fridge-subtotal.js";
 import type { DeliverySettingsRepository } from "./domain/delivery-settings-repository.js";
+import { AccountFridgeSubtotal } from "./infrastructure/account-fridge-subtotal.js";
 import { PrismaAddressRepository } from "./infrastructure/prisma-address-repository.js";
 import { PrismaDeliverySettingsRepository } from "./infrastructure/prisma-delivery-settings-repository.js";
 import { UnconfiguredMaps } from "./infrastructure/unconfigured-maps.js";
 import { AddressController } from "./presentation/address.controller.js";
 
 @Module({
+  imports: [FridgeModule],
   controllers: [AddressController],
   providers: [
     {
@@ -61,6 +71,21 @@ import { AddressController } from "./presentation/address.controller.js";
       provide: SetDefaultAddress,
       useFactory: (addresses: AddressRepository) => new SetDefaultAddress(addresses),
       inject: [ADDRESS_REPOSITORY],
+    },
+    {
+      provide: FRIDGE_SUBTOTAL,
+      useFactory: (fridge: GetAccountFridge) => new AccountFridgeSubtotal(fridge),
+      inject: [GetAccountFridge],
+    },
+    {
+      provide: QuoteShipping,
+      useFactory: (
+        addresses: AddressRepository,
+        settings: DeliverySettingsRepository,
+        router: RouteCalculator,
+        subtotal: FridgeSubtotalProvider,
+      ) => new QuoteShipping(addresses, settings, router, subtotal),
+      inject: [ADDRESS_REPOSITORY, DELIVERY_SETTINGS_REPOSITORY, ROUTE_CALCULATOR, FRIDGE_SUBTOTAL],
     },
     {
       provide: ListAddresses,

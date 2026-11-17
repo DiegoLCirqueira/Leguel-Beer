@@ -12,6 +12,15 @@ describe("/conta", () => {
     expect(sair.closest("form")).not.toBeNull();
   });
 
+  it("tem o link Meus endereços para /conta/enderecos", () => {
+    render(<Conta />);
+
+    expect(screen.getByRole("link", { name: "Meus endereços" })).toHaveAttribute(
+      "href",
+      "/conta/enderecos",
+    );
+  });
+
   it("mantém o rodapé com os avisos e os links legais", () => {
     render(<Conta />);
 

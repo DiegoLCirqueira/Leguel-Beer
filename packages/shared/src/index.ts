@@ -63,6 +63,8 @@ export { enderecoRespostaSchema, listaDeEnderecosSchema } from "./endereco/respo
 export type { EnderecoResposta } from "./endereco/resposta.js";
 export { calcularFrete } from "./entrega/frete.js";
 export type { ConfiguracaoDeEntrega, Frete } from "./entrega/frete.js";
+export { cotacaoDeFreteSchema } from "./entrega/cotacao.js";
+export type { CotacaoDeFrete } from "./entrega/cotacao.js";
 export { STATUS_DO_PEDIDO, statusDoPedidoSchema } from "./pedido/status.js";
 export type { StatusDoPedido } from "./pedido/status.js";
 export { pedidoVencido, validoAte, VALIDADE_DO_PEDIDO_MINUTOS } from "./pedido/validade.js";
