@@ -56,7 +56,11 @@ describe("EditProfile", () => {
 
   it("data nula apaga a data guardada", async () => {
     const { edit } = await setup();
-    await edit.execute("ana-id", { nome: "Ana", telefone: "82912345678", dataNascimento: "1992-03-15" });
+    await edit.execute("ana-id", {
+      nome: "Ana",
+      telefone: "82912345678",
+      dataNascimento: "1992-03-15",
+    });
 
     const edited = await edit.execute("ana-id", {
       nome: "Ana",

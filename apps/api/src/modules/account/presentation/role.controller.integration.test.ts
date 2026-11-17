@@ -70,6 +70,7 @@ describe("GET /me/role (banco real)", () => {
       id: tokens.customerId,
       email: "cliente@leguele.test",
       nome: "Ana Souza",
+      dataNascimento: null,
       telefone: "82912345678",
       role: "customer",
       aceite: {

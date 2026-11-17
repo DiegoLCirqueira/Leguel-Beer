@@ -68,7 +68,9 @@ describe("PUT /me/profile (banco real)", () => {
       .send(body as object);
 
   const get = (token: string) =>
-    request(app.getHttpServer()).get("/me/profile").set({ Authorization: `Bearer ${token}` });
+    request(app.getHttpServer())
+      .get("/me/profile")
+      .set({ Authorization: `Bearer ${token}` });
 
   it("sem token responde 401", async () => {
     expect((await put(edicao)).status).toBe(401);

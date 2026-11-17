@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { APP_GUARD } from "@nestjs/core";
 import { PrismaService } from "../../common/prisma/prisma.service.js";
 import { CreateProfile } from "./application/create-profile.js";
+import { EditProfile } from "./application/edit-profile.js";
 import { GetProfile } from "./application/get-profile.js";
 import { LEGAL_VERSIONS } from "./domain/legal-versions.js";
 import { ProfileController } from "./presentation/profile.controller.js";
@@ -54,6 +55,11 @@ function authUrl(): string {
           adminEmail: process.env["ADMIN_EMAIL"],
         }),
       inject: [PROFILE_REPOSITORY, EMAIL_CONFIRMATION],
+    },
+    {
+      provide: EditProfile,
+      useFactory: (profiles: ProfileRepository) => new EditProfile(profiles),
+      inject: [PROFILE_REPOSITORY],
     },
     {
       provide: GetProfile,

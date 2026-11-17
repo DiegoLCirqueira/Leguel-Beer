@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../common/prisma/prisma.service.js";
 import type { Profile } from "../domain/profile.js";
-import type { ProfileRepository } from "../domain/profile-repository.js";
+import type { ProfileEdit, ProfileRepository } from "../domain/profile-repository.js";
 import type { Role } from "../domain/role.js";
 
 const CONFLICT_MESSAGE =
@@ -27,6 +27,20 @@ export class PrismaProfileRepository implements ProfileRepository {
   async findProfile(id: string): Promise<Profile | null> {
     const row = await this.prisma.profile.findUnique({ where: { id } });
     return row ? toProfile(row) : null;
+  }
+
+  async updateProfile(id: string, data: ProfileEdit): Promise<Profile | null> {
+    // Só o perfil completo é editado: o que o seed deixou só com o papel (nome nulo) não é preenchido aqui.
+    const updated = await this.prisma.profile.updateMany({
+      where: { id, nome: { not: null } },
+      data: {
+        nome: data.nome,
+        telefone: data.telefone,
+        birthDate:
+          data.dataNascimento === null ? null : new Date(`${data.dataNascimento}T00:00:00.000Z`),
+      },
+    });
+    return updated.count === 1 ? this.findProfile(id) : null;
   }
 
   async createProfile(profile: Profile): Promise<{ profile: Profile; created: boolean }> {
@@ -90,6 +104,7 @@ function toProfile(row: {
   role: keyof typeof DOMAIN_ROLE;
   nome: string | null;
   telefone: string | null;
+  birthDate: Date | null;
   termsVersion: string | null;
   privacyVersion: string | null;
   termsAcceptedAt: Date | null;
@@ -107,6 +122,7 @@ function toProfile(row: {
     email: row.email,
     nome: row.nome,
     telefone: row.telefone,
+    dataNascimento: row.birthDate ? row.birthDate.toISOString().slice(0, 10) : null,
     role: DOMAIN_ROLE[row.role],
     aceite: {
       termosVersao: row.termsVersion,

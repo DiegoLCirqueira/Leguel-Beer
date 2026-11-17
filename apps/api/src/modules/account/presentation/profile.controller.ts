@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Post, Res } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Post, Put, Res } from "@nestjs/common";
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -11,6 +11,7 @@ import {
 } from "@nestjs/swagger";
 import {
   criarPerfilRequestSchema,
+  editarPerfilRequestSchema,
   perfilResponseSchema,
   type PerfilResponse,
 } from "@leguele/shared";
@@ -18,12 +19,14 @@ import type { Response } from "express";
 import { z } from "zod";
 import { zodDto } from "../../../common/validation/zod-dto.js";
 import { CreateProfile } from "../application/create-profile.js";
+import { EditProfile } from "../application/edit-profile.js";
 import { GetProfile } from "../application/get-profile.js";
 import type { AuthorizedUser } from "../application/authorize-request.js";
 import type { Profile } from "../domain/profile.js";
 import { Authenticated, CurrentUser } from "./access.decorators.js";
 
 class CriarPerfilDto extends zodDto(criarPerfilRequestSchema) {}
+class EditarPerfilDto extends zodDto(editarPerfilRequestSchema) {}
 
 const jsonSchema = (schema: z.ZodType, io: "input" | "output"): SchemaObject =>
   z.toJSONSchema(schema, { io, unrepresentable: "any" }) as SchemaObject;
@@ -34,8 +37,7 @@ function toResponse(profile: Profile): PerfilResponse {
     email: profile.email,
     nome: profile.nome,
     telefone: profile.telefone,
-    // A data de nascimento só passa a ser gravada na fatia da API de dados pessoais.
-    dataNascimento: null,
+    dataNascimento: profile.dataNascimento,
     papel: profile.role === "admin" ? "admin" : "cliente",
     aceite: {
       termosVersao: profile.aceite.termosVersao,
@@ -52,6 +54,7 @@ export class ProfileController {
   constructor(
     private readonly createProfile: CreateProfile,
     private readonly getProfile: GetProfile,
+    private readonly editProfile: EditProfile,
   ) {}
 
   @Post()
@@ -82,6 +85,26 @@ export class ProfileController {
     });
     if (!created) res.status(200);
     return toResponse(profile);
+  }
+
+  @Put()
+  @ApiOperation({
+    summary: "Edita o perfil da conta autenticada",
+    description:
+      "Troca nome, telefone e data de nascimento (opcional; ausente ou nula apaga). O perfil é sempre o do token; e-mail, id, papel e aceite dos termos não mudam e são recusados no corpo.",
+  })
+  @ApiBody({ schema: jsonSchema(editarPerfilRequestSchema, "input") })
+  @ApiOkResponse({
+    description: "Perfil atualizado.",
+    schema: jsonSchema(perfilResponseSchema, "output"),
+  })
+  @ApiBadRequestResponse({ description: "VALIDATION_ERROR, com o campo em details." })
+  @ApiNotFoundResponse({ description: "A conta ainda não criou o perfil." })
+  async edit(
+    @CurrentUser() user: AuthorizedUser,
+    @Body() body: EditarPerfilDto,
+  ): Promise<PerfilResponse> {
+    return toResponse(await this.editProfile.execute(user.id, body));
   }
 
   @Get()

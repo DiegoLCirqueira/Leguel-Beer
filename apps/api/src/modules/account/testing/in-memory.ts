@@ -1,6 +1,10 @@
 import type { AuthAdmin, AuthUser } from "../domain/auth-admin.js";
 import type { Profile } from "../domain/profile.js";
-import type { ProfileEdit, ProfileRepository, ProfileRecord } from "../domain/profile-repository.js";
+import type {
+  ProfileEdit,
+  ProfileRepository,
+  ProfileRecord,
+} from "../domain/profile-repository.js";
 import type { Role } from "../domain/role.js";
 
 /** Fakes de teste: contas do Auth e perfis em memória. */

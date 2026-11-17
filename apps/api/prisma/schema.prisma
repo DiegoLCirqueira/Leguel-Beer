@@ -20,6 +20,8 @@ model Profile {
   /// Dados do cadastro e aceite dos termos; nulos no perfil que o seed do admin cria só com o papel.
   nome            String?
   telefone        String?
+  /// Data de nascimento (só a data, sem fuso); opcional no perfil, obrigatória para criar pedido.
+  birthDate       DateTime? @map("birth_date") @db.Date
   termsVersion    String?   @map("terms_version")
   privacyVersion  String?   @map("privacy_version")
   termsAcceptedAt DateTime? @map("terms_accepted_at") @db.Timestamptz(3)
