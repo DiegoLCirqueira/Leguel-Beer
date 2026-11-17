@@ -62,7 +62,8 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[ADR-015-ferramentas-monorepo]]: pnpm + Turborepo, `@leguele/shared` compilado com `tsc`, Vitest em todos os pacotes e dependency-cruiser no CI.
 - [[ADR-016-ciclo-continuo-da-banda]]: a ordem vira ciclo contínuo; decisão do Diego vai ao cartão de pendências e a banda segue; recomendada é aplicada e vetável.
 - [[ADR-017-fotos-com-sessao-do-admin]] (aceito pelo Diego em 13/11): fotos das cervejas enviadas pelo servidor do site com a sessão do admin e política do armazenamento pelo papel admin, sem chave de serviço.
-- [[ADR-018-pagamento-simulado]] (Diego, 15/11): pagamento só visual, sem gateway, cobrança nem webhook; substitui o ADR-004.
+- [[ADR-018-pagamento-simulado]] (substituído pelo ADR-020): pagamento só visual, sem gateway, cobrança nem webhook; substituiu o ADR-004.
+- [[ADR-020-aviso-de-portfolio-no-pagamento]] (Diego, 16/11): mantém o pagamento só visual e põe o aviso de projeto sem fins lucrativos e o botão "Voltar" em toda tela de pagamento; substitui o ADR-018.
 - [[ADR-019-criacao-do-pedido-serializada-por-cliente]] (proposto, Back, 16/11): criar pedido numa transação com trava consultiva por cliente e trava das cervejas em ordem de id.
 
 ## Arquitetura

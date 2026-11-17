@@ -102,6 +102,7 @@ Funcionalidade: Checkout
 
 - Só **Pix** e **Cartão de crédito**; Pix vem selecionado. Sem cartão de débito, boleto e cupom.
 - Cartão: campos do cartão de teste e parcelas, só visuais, como em [[pagamento]] (entram com as telas de pagamento, por último). Pix: só a escolha; o QR decorativo aparece depois de confirmar.
+- **Aviso e "Voltar" (16/11):** esta etapa, como toda tela de pagamento, mostra o aviso de projeto sem fins lucrativos e o botão "Voltar", que leva à etapa Entrega ([[pagamento]], [[ADR-020-aviso-de-portfolio-no-pagamento]]).
 
 ### Etapa Revisão (tela 07)
 
@@ -145,10 +146,10 @@ Funcionalidade: Checkout
 
 ### Dados pessoais no pedido (LGPD)
 
-> [!warning] **Pendente de confirmação do Diego** (dado pessoal, LGPD): não vale como aplicada e não vai ao site antes da resposta (cartão "Decisões pendentes").
+> [!success] **Aprovado pelo Diego** (dado pessoal, LGPD, recomendada, 16/11): vale e vai ao site junto com o checkout.
 
 - O pedido guarda a cópia do endereço, do nome e do telefone do cliente no momento da compra, e ela continua no pedido mesmo se o cliente editar ou excluir o endereço ou mudar o perfil depois (histórico e entrega).
-- A Política de Privacidade ([[termos-privacidade]]) ganha, em "Quais dados coletamos": "os pedidos que você faz, com as cervejas, os valores e uma cópia do nome, do telefone e do endereço de entrega usados na compra, que continuam no pedido mesmo se você mudar o perfil ou excluir o endereço". Sem novo aceite, como em 12/11: muda a data de "última atualização" de `/privacidade` e a versão no `LEGAL_VERSIONS` no dia em que o checkout entrar no site. Recomendação do Spec, pendente de confirmação do Diego.
+- A Política de Privacidade ([[termos-privacidade]]) ganha, em "Quais dados coletamos": "os pedidos que você faz, com as cervejas, os valores e uma cópia do nome, do telefone e do endereço de entrega usados na compra, que continuam no pedido mesmo se você mudar o perfil ou excluir o endereço". Sem novo aceite, como em 12/11: muda a data de "última atualização" de `/privacidade` e a versão no `LEGAL_VERSIONS` no dia em que o checkout entrar no site. Recomendação do Spec, aprovada pelo Diego em 16/11.
 
 ### Juros do cartão
 
@@ -216,7 +217,7 @@ Recomendações aplicadas pelo Spec em 13/11, pela regra do Diego ("sempre vá p
 - **Cópia do endereço no pedido.**
 - **Chave de idempotência** gerada ao abrir a Revisão, trocada a cada mudança e depois de toda resposta que não criou pedido; a API guarda só a do pedido criado, por 24 horas, com o hash do corpo; outro corpo com a mesma chave, 422.
 - **Um pedido "Aguardando pagamento" por cliente:** abrir o checkout ou confirmar com um pendente válido leva à tela de pagamento dele; duas abas não criam dois.
-- **Nome e telefone copiados no pedido**, junto com o endereço; texto novo da Política sobre os dados dos pedidos, sem novo aceite. **Pendente de confirmação do Diego** (LGPD, item 7): não está aplicada.
+- **Nome e telefone copiados no pedido**, junto com o endereço; texto novo da Política sobre os dados dos pedidos, sem novo aceite. **Aprovado pelo Diego** em 16/11 (LGPD, item 7).
 - **Criação do pedido sem expirar pedidos** (a reserva vencida já não conta).
 - **Avisos com os textos da revalidação da Geladeira**, sem textos novos para preço e esgotada.
 - **Reserva vencida não conta** na quantidade disponível, mesmo antes do cancelamento.

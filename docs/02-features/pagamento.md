@@ -20,7 +20,7 @@ tags:
 > Item 6 da [[sequencia-telas]], **feito por último**, depois de todo o resto do projeto. Derivada dos cards do Notion **LB-57** (#33, Pix com QR e validade de 30 minutos), **LB-58** (#34, cartão em até 12x), **LB-59** (#35, webhooks, que sai) e **LB-60** (#36, cancelar pedidos expirados, já mergeado), e das telas 17 (Pagamento com cartão), 18 (Pagamento Pix) e 30 (Pix aguardando e expirado). Segue o [[checkout]] e o [[ADR-018-pagamento-simulado]], que substitui o [[ADR-004-mercado-pago]]. A confirmação e "Meus pedidos" estão em [[pedidos-cliente]]; a ação do admin, em [[admin]]. Os termos seguem o [[GLOSSARY]].
 
 > [!important] Pagamento só visual (Diego, 15/11)
-> O Leguelé Beer é projeto de portfólio: **nenhum pagamento é real e tudo que envolve pagamento é só visual**. Não há gateway (nem real, nem simulado com lógica), cobrança, webhook, conta, chave, CPF nem dado de cartão, e nenhum valor é cobrado. Reescrita em 15/11 a partir da versão de 13/11 (Mercado Pago em modo de testes).
+> O Leguelé Beer é projeto de portfólio: **nenhum pagamento é real e tudo que envolve pagamento é só visual**. Não há gateway (nem real, nem simulado com lógica), cobrança, webhook, conta, chave, CPF nem dado de cartão, e nenhum valor é cobrado. Reescrita em 15/11 a partir da versão de 13/11 (Mercado Pago em modo de testes). Em 16/11, [[ADR-020-aviso-de-portfolio-no-pagamento]] (substitui o [[ADR-018-pagamento-simulado]]): toda tela de pagamento leva o aviso de projeto sem fins lucrativos e o botão "Voltar".
 
 ## História de usuário
 
@@ -37,7 +37,7 @@ Funcionalidade: Pagamento só visual com Pix e cartão
   Cenário: Tela do Pix
     Dado que confirmei na Revisão um pedido de R$ 162,00 com Pix
     Quando a tela de pagamento do pedido abre
-    Então vejo a imagem decorativa do QR, o código de demonstração com "Copiar código" e "Expira em 30:00" contando para trás, sem aviso de portfólio
+    Então vejo a imagem decorativa do QR, o código de demonstração com "Copiar código" e "Expira em 30:00" contando para trás
     E nada é cobrado e o pedido continua "Aguardando pagamento"
 
   Cenário: Pix expirado
@@ -74,11 +74,22 @@ Funcionalidade: Pagamento só visual com Pix e cartão
     Então o pedido fica "Pago", a reserva vira baixa no estoque físico e sai a baixa da Geladeira
     E em até 5 segundos a tela do cliente leva a "/pedido/<id>/confirmado"
 
-  Cenário: Pagamento de outro cliente
-    Dado um pedido "Aguardando pagamento" de outro cliente
-    Quando abro "/pedido/<id>/pagamento"
-    Então vejo a página "não encontrada", sem dados do pedido
+  Esquema do Cenário: Aviso e botão "Voltar" em toda tela de pagamento
+    Dado que estou em <tela>
+    Então vejo o aviso "Este é um projeto sem fins lucrativos, feito para portfólio. Nenhum pagamento é real e nada é cobrado."
+    E vejo o botão "Voltar"
+    Quando toco em "Voltar"
+    Então vou para <destino>, sem criar nem alterar pedido
+
+    Exemplos:
+      | tela                                                      | destino                                  |
+      | a etapa Pagamento do checkout, com Pix ou cartão          | a etapa Entrega do checkout              |
+      | a tela do Pix, "Aguardando pagamento"                     | "Meus pedidos", com o pedido ainda aguardando |
+      | a tela do cartão, "Pagamento em análise"                  | "Meus pedidos", com o pedido ainda aguardando |
+      | "Pix expirado" ou "Pedido cancelado"                      | "Meus pedidos"                           |
 ```
+
+> A posse da tela de pagamento (pedido de outro cliente ou inexistente dá "não encontrada", sem dados do pedido) segue nas regras abaixo e na matriz de posse de [[qualidade-compra]].
 
 ## Regras de negócio
 
@@ -86,7 +97,10 @@ Funcionalidade: Pagamento só visual com Pix e cartão
 
 - **Nenhuma lógica de pagamento:** sem gateway (nem real, nem simulado), sem cobrança, sem webhook nem aviso de pagamento, sem aprovação automática ou tardia, sem idempotência por pagamento ([[ADR-018-pagamento-simulado]]). A API não tem rota de pagamento.
 - **O pedido continua o mesmo:** criado "Aguardando pagamento" com reserva e validade de 30 minutos ([[checkout]]), expiração no uso e pelo cron (LB-60, já mergeado), status e estoque como em [[pedidos-cliente]] e [[admin]].
-- **Sem aviso de portfólio:** vale a decisão do Diego de 30/10 ([[termos-privacidade]]): nenhuma tela de pagamento diz que o site é projeto de portfólio ou que o pagamento é simulado.
+- **Aviso de projeto sem fins lucrativos e botão "Voltar" (Diego, 16/11, [[ADR-020-aviso-de-portfolio-no-pagamento]]):** substitui a decisão de 30/10 só para as telas de pagamento. Em **toda** tela de pagamento (a etapa Pagamento do checkout com Pix ou cartão, a tela do Pix, "Pagamento em análise", "Pix expirado" e "Pedido cancelado"):
+  - **Aviso**, em destaque no alto, abaixo do cabeçalho, sempre visível sem rolar e sem botão de fechar: "Este é um projeto sem fins lucrativos, feito para portfólio. Nenhum pagamento é real e nada é cobrado." (texto novo, recomendação vetável do item 2).
+  - **Botão "Voltar"** (secundário, ao lado dos botões da tela, também no celular): na etapa Pagamento leva à etapa Entrega; nas telas do pedido leva a "Meus pedidos", onde o pedido "Aguardando pagamento" segue tocável. Não cancela nem altera o pedido; quem quiser desistir cancela ou deixa expirar.
+  - O resto do site continua sem aviso de portfólio ([[termos-privacidade]]).
 - Nenhum dado pessoal ou de cartão vai à API ou a terceiros por causa do pagamento. A Política de Privacidade não muda por esta spec.
 
 ### De "Aguardando pagamento" a "Pago"
@@ -151,6 +165,7 @@ Para o Back, no item 6 ou antes, se atrapalhar: a porta `PaymentGateway` da expi
 - **Cartão de teste** (site, componente): só os dois números passam; número, nome, validade e CVV fora do armazenamento local, da URL e do corpo enviado à API.
 - **Confirmar pagamento** (API, no LB-76): caso de uso com repositório em memória e relógio fake (na validade fica "Pago" com baixa; vencido expira e 409; repetido 409); integração com banco real (confirmar × expirar × cancelar ao mesmo tempo deixa um só resultado: se confirmar vencer, uma baixa de estoque físico e uma da Geladeira; se expirar ou cancelar vencer, nenhuma baixa de estoque físico nem da Geladeira e a reserva liberada uma vez).
 - **Telas** (componente, relógio controlado): contagem a partir do vencimento da API, "Código copiado", leitura a cada 5 s e no "Já paguei", estado expirado, "Pagamento em análise", posse.
+- **Aviso e "Voltar"** (componente e E2E): o aviso e o botão aparecem em cada uma das telas da tabela do cenário, e o destino do "Voltar" confere; teste visto falhando ao tirar o aviso de uma tela. No E2E (celular, 360 × 640), o aviso aparece sem rolar na etapa Pagamento, no Pix e em "Pix expirado".
 - **E2E** (celular, 360 × 640): Pix até a tela de pagamento e, com o admin confirmando, a confirmação; Pix expirado pelo relógio da API de teste ([[qualidade-compra]]); cartão de teste até "Pagamento em análise".
 
 ## Fatias, com dono e ordem
@@ -163,7 +178,7 @@ Para o Back, no item 6 ou antes, se atrapalhar: a porta `PaymentGateway` da expi
 
 As fatias 2 e 3 são as **últimas do projeto**, depois de todo o resto pronto; até lá o checkout leva a "Meus pedidos" ([[checkout]]). O LB-60 (#36) já está mergeado; o LB-59 (#35) e o spike LB-54 (#30) saem ([[ADR-018-pagamento-simulado]]).
 
-Candidatos a ADR: nenhum (a decisão já está no [[ADR-018-pagamento-simulado]]).
+Candidatos a ADR: nenhum além do [[ADR-020-aviso-de-portfolio-no-pagamento]], escrito junto com esta mudança (substitui o [[ADR-018-pagamento-simulado]]).
 
 ## Decisões relacionadas
 
@@ -172,9 +187,14 @@ Candidatos a ADR: nenhum (a decisão já está no [[ADR-018-pagamento-simulado]]
 
 ## Decisões do Diego
 
+### 16/11
+
+- **Aviso e botão "Voltar" nas telas de pagamento:** toda tela de pagamento (Pix, cartão, aguardando, expirado) leva o aviso de que este é um projeto sem fins lucrativos (portfólio) e um botão para voltar. Substitui a decisão de 30/10 de não ter aviso, só nessas telas. Ver [[ADR-020-aviso-de-portfolio-no-pagamento]], que substitui o [[ADR-018-pagamento-simulado]].
+- **Textos e destinos (recomendada, vetável):** o texto do aviso e os destinos do "Voltar" acima são do Spec.
+
 ### 15/11
 
-- **Pagamento não é real e é só visual:** sem Mercado Pago, conta, chave, gateway (real ou simulado), cobrança, webhook, CPF ou cartão reais; QR inválido; cartão de teste só na tela; sem aviso de portfólio (mantida a decisão de 30/10); as telas de pagamento são feitas por último. Ver [[ADR-018-pagamento-simulado]].
+- **Pagamento não é real e é só visual:** sem Mercado Pago, conta, chave, gateway (real ou simulado), cobrança, webhook, CPF ou cartão reais; QR inválido; cartão de teste só na tela; sem aviso de portfólio (**mudado em 16/11**: as telas de pagamento passam a ter o aviso, ver acima); as telas de pagamento são feitas por último. Ver [[ADR-018-pagamento-simulado]].
 
 ### 13/11
 
@@ -197,7 +217,7 @@ Recomendações aplicadas pelo Spec (13/11, revistas em 15/11); qualquer uma pod
 - **Parcelas de 1x a 12x para qualquer total**, com arredondamento da parcela ao centavo e total = parcela × n.
 - **"Já paguei" só relê o status**; sem troca de forma de pagamento.
 - **Até as telas de pagamento existirem, o checkout leva a "Meus pedidos"** ([[checkout]]).
-- **Textos novos:** "Copiar código", "Código copiado", "Já paguei", "Pix expirado", "O tempo para pagamento se esgotou.", "Refazer pedido", "Pedido cancelado", "Pagamento em análise", "A loja confirma o pagamento em instantes.", "Use um dos cartões de teste.", "Cartões de teste: 4111 1111 1111 1111 ou 4000 0000 0000 0002." e "Confirmar pagamento".
+- **Textos novos:** "Copiar código", "Código copiado", "Já paguei", "Pix expirado", "O tempo para pagamento se esgotou.", "Refazer pedido", "Pedido cancelado", "Pagamento em análise", "A loja confirma o pagamento em instantes.", "Use um dos cartões de teste.", "Cartões de teste: 4111 1111 1111 1111 ou 4000 0000 0000 0002.", "Confirmar pagamento", "Voltar" e o aviso "Este é um projeto sem fins lucrativos, feito para portfólio. Nenhum pagamento é real e nada é cobrado."
 
 ## Tickets propostos
 

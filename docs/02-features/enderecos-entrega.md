@@ -142,6 +142,8 @@ Funcionalidade: Endereços e entrega
 
 ### LGPD
 
+> [!success] Aprovado pelo Diego (16/11, recomendada): o texto da Política sobre o envio do CEP e do endereço aos serviços de CEP e de mapas ([[termos-privacidade]]).
+
 - O endereço já está na Política de Privacidade; entram as coordenadas e o envio do CEP e do endereço aos serviços de CEP e de mapas ("Com quem compartilhamos"). Ver "Decisões do Diego", pergunta 3, e [[termos-privacidade]].
 - Endereços não aparecem completos em listas do admin.
 
