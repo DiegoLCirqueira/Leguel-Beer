@@ -31,5 +31,7 @@ Uma transação do Postgres por criação, que começa com `pg_advisory_xact_loc
 
 ## Consequências
 
-- A transação segura conexões por alguns milissegundos e chama, dentro dela, o recálculo de rota (raro, só quando a origem mudou) e a leitura da Geladeira. O recálculo de rota é a única chamada externa possível dentro da transação.
+- A transação segura uma conexão por alguns milissegundos, e o que roda dentro dela abre outras: a Geladeira revalidada grava os ajustes em transação própria (de propósito, para sobreviver ao rollback de `TOTAL_CHANGED` e `OUT_OF_STOCK`) e a cotação do frete pode recalcular a rota (chamada externa, rara: só quando a origem mudou) e gravar a distância em outra transação. Duas conexões por criação, com o pool padrão do `pg` (10), esgotariam o pool com 10 criações juntas, cada uma esperando a segunda conexão. Por isso `PrismaOrderCreation` deixa no máximo 4 criações simultâneas por instância (8 conexões no pior caso); as demais esperam a vaga em fila.
+- A chave de idempotência vencida (24 h) é apagada na mesma transação que grava o pedido novo, porque a restrição única (cliente, chave) continua valendo depois do vencimento.
 - O número "#LB" sorteado que colida derruba a transação, que é refeita até 3 vezes.
+- O `ORDER BY id` da trava das cervejas é defesa em profundidade: o caso de uso já passa os ids ordenados e a trava é um único comando, então remover o `ORDER BY` não muda o resultado nos testes (mutante equivalente).
