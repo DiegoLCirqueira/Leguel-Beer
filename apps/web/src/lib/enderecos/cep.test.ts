@@ -52,7 +52,7 @@ describe("consultarCep", () => {
   });
 
   it("serviço fora do ar, lento ou com corpo estranho vira indisponivel", async () => {
-    fetchFalso.mockResolvedValueOnce(json({}, 500));
+    fetchFalso.mockResolvedValueOnce(json(viacep, 500));
     expect(await consultarCep("57035-000")).toEqual({ tipo: "indisponivel" });
     fetchFalso.mockRejectedValueOnce(new Error("rede"));
     expect(await consultarCep("57035-000")).toEqual({ tipo: "indisponivel" });
