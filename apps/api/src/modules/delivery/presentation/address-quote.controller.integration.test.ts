@@ -5,6 +5,7 @@ import { Test } from "@nestjs/testing";
 import request from "supertest";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { CommonModule } from "../../../common/common.module.js";
+import { AccountRateLimiter } from "../../../common/http/account-rate-limiter.js";
 import { AllExceptionsFilter } from "../../../common/http/all-exceptions.filter.js";
 import { PrismaModule } from "../../../common/prisma/prisma.module.js";
 import { PrismaService } from "../../../common/prisma/prisma.service.js";
@@ -50,6 +51,7 @@ describe("GET /me/enderecos/:id/frete (HTTP, banco real)", () => {
   });
 
   beforeEach(async () => {
+    app.get(AccountRateLimiter, { strict: false }).reset();
     await resetDatabase(prisma);
     await prisma.profile.create({ data: { id: tokens.customerId, email: "cliente@leguele.test" } });
     await seedDeliverySettings(prisma);

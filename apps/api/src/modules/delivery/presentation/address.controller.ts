@@ -8,6 +8,7 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
 } from "@nestjs/common";
 import {
   ApiCreatedResponse,
@@ -26,6 +27,10 @@ import {
 } from "@leguele/shared";
 import type { AuthorizedUser } from "../../account/application/authorize-request.js";
 import { Authenticated, CurrentUser } from "../../account/presentation/access.decorators.js";
+import {
+  AccountRateLimit,
+  AccountRateLimitGuard,
+} from "../../../common/http/account-rate-limit.guard.js";
 import { zodDto } from "../../../common/validation/zod-dto.js";
 import { AddAddress } from "../application/add-address.js";
 import { DeleteAddress } from "../application/delete-address.js";
@@ -35,6 +40,13 @@ import { UpdateAddress } from "../application/update-address.js";
 import { ListAddresses } from "../application/list-addresses.js";
 import { withAddressErrors } from "./address-http-errors.js";
 import { toAddressInput, toEnderecoResposta } from "./address.mapper.js";
+
+/**
+ * Salvar e editar gastam a cota do serviço de geocodificação e rota: 10 gravações por conta por
+ * minuto, as duas rotas na mesma cota. Folgado para quem corrige o formulário várias vezes (5
+ * endereços de no máximo algumas tentativas cada) e curto para quem tenta esgotar a cota.
+ */
+const WRITE_LIMIT = { group: "address-write", limit: 10, windowMs: 60_000 };
 
 class EnderecoFormDto extends zodDto(enderecoFormSchema) {}
 
@@ -65,6 +77,8 @@ export class AddressController {
   }
 
   @Post()
+  @UseGuards(AccountRateLimitGuard)
+  @AccountRateLimit(WRITE_LIMIT)
   @ApiOperation({
     summary: "Salva um endereço",
     description:
@@ -97,6 +111,8 @@ export class AddressController {
   }
 
   @Put(":id")
+  @UseGuards(AccountRateLimitGuard)
+  @AccountRateLimit(WRITE_LIMIT)
   @ApiOperation({
     summary: "Edita um endereço",
     description:
