@@ -139,9 +139,36 @@ describe("PrismaOrderRepository (banco real)", () => {
       },
     });
 
-    expect(await orders.findDueOrderIds(new Date(EXPIRES_AT.getTime() - 1))).toEqual([]);
-    expect(await orders.findDueOrderIds(EXPIRES_AT)).toEqual([orderId]);
-    expect(await orders.findDueOrderIds(NOW)).not.toContain(other.id);
+    expect(await orders.findDueOrderIds(new Date(EXPIRES_AT.getTime() - 1), 100)).toEqual([]);
+    expect(await orders.findDueOrderIds(EXPIRES_AT, 100)).toEqual([orderId]);
+    expect(await orders.findDueOrderIds(NOW, 100)).not.toContain(other.id);
+  });
+
+  it("devolve no máximo o limite pedido, dos vencidos há mais tempo para os mais recentes", async () => {
+    const base = {
+      profileId,
+      paymentMethod: "PIX" as const,
+      subtotalCents: 3200,
+      shippingCents: 0,
+      totalCents: 3200,
+      customerName: "Ana Souza",
+      customerPhone: "82999990000",
+      shipZip: "57035000",
+      shipStreet: "Rua do Sol",
+      shipNumber: "100",
+      shipDistrict: "Farol",
+      shipCity: "Maceió",
+      shipState: "AL",
+    };
+    const older = await prisma.order.create({
+      data: { ...base, number: "#LB000001", expiresAt: new Date(EXPIRES_AT.getTime() - 60_000) },
+    });
+    const newer = await prisma.order.create({
+      data: { ...base, number: "#LB000002", expiresAt: new Date(EXPIRES_AT.getTime() + 60_000) },
+    });
+
+    expect(await orders.findDueOrderIds(NOW, 2)).toEqual([older.id, orderId]);
+    expect(await orders.findDueOrderIds(NOW, 3)).toEqual([older.id, orderId, newer.id]);
   });
 
   it("não grava nenhum efeito da expiração se a escrita do histórico falha", async () => {
