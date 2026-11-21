@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { AcoesDoEndereco } from "@/components/enderecos/acoes-do-endereco";
+import { AcoesDoEndereco, ID_TITULO_ENDERECOS } from "@/components/enderecos/acoes-do-endereco";
 import { CartaoDeEndereco } from "@/components/ui";
 import { lerTokenDeAcesso } from "@/lib/auth/servidor";
 import { buscarEnderecos } from "@/lib/enderecos/buscar";
@@ -23,7 +23,9 @@ export default async function MeusEnderecos() {
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 px-4 pb-6 pt-2 text-texto">
       <div>
-        <h1 className="font-titulo text-4xl">Meus endereços</h1>
+        <h1 id={ID_TITULO_ENDERECOS} tabIndex={-1} className="font-titulo text-4xl">
+          Meus endereços
+        </h1>
         <p className="text-sm text-texto-suave">Gerencie seus endereços de entrega</p>
       </div>
       {resultado.tipo === "erro" ? (

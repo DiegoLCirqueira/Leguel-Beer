@@ -81,4 +81,10 @@ describe("Server Actions dos endereços", () => {
     expect(await excluirEnderecoAction("../../x")).toEqual({ tipo: "erro" });
     expect(fetchFalso).not.toHaveBeenCalled();
   });
+
+  it("UUID com texto antes ou depois também não chega à API", async () => {
+    expect(await excluirEnderecoAction(`../x/${ID}`)).toEqual({ tipo: "erro" });
+    expect(await tornarPadraoAction(`${ID}/../x`)).toEqual({ tipo: "erro" });
+    expect(fetchFalso).not.toHaveBeenCalled();
+  });
 });
