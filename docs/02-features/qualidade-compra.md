@@ -1,5 +1,5 @@
 ---
-status: rascunho
+status: pronto
 modulo: qualidade
 card-notion: https://app.notion.com/p/3fd490a7ac7d81f5bee1ef1b4055b50d
 prioridade: P0
