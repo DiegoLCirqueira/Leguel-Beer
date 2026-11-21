@@ -14,6 +14,7 @@ import {
   gravarEstadoDoCheckout,
   lerEstadoDoCheckout,
 } from "@/lib/checkout/estado";
+import { EtapasDoCheckout } from "./etapas-do-checkout";
 import { textoDosItens } from "@/components/ui/totais-do-resumo";
 
 type Props = {
@@ -22,8 +23,6 @@ type Props = {
   /** Tela da etapa seguinte; sem ela (ainda não existe), "Continuar" fica desabilitado. */
   destinoDoPagamento?: string;
 };
-
-const ETAPAS = ["Entrega", "Pagamento", "Revisão"];
 
 /** Endereço pré-selecionado: o padrão, ou o primeiro da lista. */
 const inicial = (enderecos: EnderecoResposta[]) =>
@@ -88,17 +87,7 @@ export function EtapaEntrega({ enderecos, cotarFrete, destinoDoPagamento }: Prop
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 px-4 pb-6 pt-2 text-texto">
       <h1 className="font-titulo text-4xl">Finalizar pedido</h1>
-      <ol aria-label="Etapas do pedido" className="flex gap-2 text-sm">
-        {ETAPAS.map((etapa, i) => (
-          <li
-            key={etapa}
-            aria-current={i === 0 ? "step" : undefined}
-            className={i === 0 ? "font-semibold text-primaria" : "text-texto-suave"}
-          >
-            {i + 1}. {etapa}
-          </li>
-        ))}
-      </ol>
+      <EtapasDoCheckout atual={0} />
       <p className="flex items-center justify-between gap-2 text-sm">
         <span>{`${textoDosItens(quantidadeTotal)} na sua geladeira`}</span>
         <Link
