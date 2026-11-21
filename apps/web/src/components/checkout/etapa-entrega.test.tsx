@@ -1,6 +1,7 @@
 import type { CervejaCard, EnderecoResposta, GeladeiraResponse } from "@leguele/shared";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const trocar = vi.hoisted(() => vi.fn());
@@ -242,5 +243,20 @@ describe("EtapaEntrega", () => {
 
     expect(await screen.findByText("Grátis")).toBeInTheDocument();
     expect(screen.queryByText("R$ 3,00")).not.toBeInTheDocument();
+  });
+
+  it("o HTML do servidor não traz a contagem de itens, que só a cópia local conhece (sem divergir na hidratação)", () => {
+    localStorage.setItem(
+      CHAVE_DA_GELADEIRA,
+      JSON.stringify({ versao: 1, itens: [{ cerveja: mare, quantidade: 2 }] }),
+    );
+
+    const html = renderToString(
+      <GeladeiraProvider>
+        <EtapaEntrega enderecos={[casa]} cotarFrete={vi.fn()} destinoDoPagamento="/x" />
+      </GeladeiraProvider>,
+    );
+
+    expect(html).not.toContain("2 itens");
   });
 });
