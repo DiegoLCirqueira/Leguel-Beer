@@ -6,6 +6,9 @@ import { Public } from "../../account/presentation/access.decorators.js";
 import { ExpireDueOrders } from "../application/expire-due-orders.js";
 import { CRON_SECRET } from "../order.tokens.js";
 
+/** Tamanho mínimo recomendado do segredo (documentado no README da API). */
+const MIN_SECRET_LENGTH = 32;
+
 function sameSecret(received: string, expected: string): boolean {
   const a = Buffer.from(received);
   const b = Buffer.from(expected);
@@ -20,7 +23,15 @@ export class CronController {
     private readonly expireDueOrders: ExpireDueOrders,
     @Inject(CRON_SECRET) private readonly secret: string,
     private readonly logger: AppLogger,
-  ) {}
+  ) {
+    if (!secret && process.env.NODE_ENV === "production") {
+      logger.warn(
+        "CRON_SECRET ausente: o cron de expiração recusa todas as chamadas e os pedidos vencidos só expiram na checagem no uso.",
+      );
+    } else if (secret && secret.length < MIN_SECRET_LENGTH) {
+      logger.warn("CRON_SECRET com menos de 32 caracteres: use um segredo aleatório maior.");
+    }
+  }
 
   @Get("expirar-pedidos")
   @ApiOperation({
