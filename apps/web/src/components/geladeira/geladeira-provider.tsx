@@ -44,6 +44,8 @@ export type GeladeiraContexto = {
   pronta: boolean;
   estado: EstadoDaGeladeira;
   quantidadeTotal: number;
+  /** Sobe a cada vez que a conta passa a ter a Geladeira mostrada (busca ou envio concluídos). */
+  sincronizacoes: number;
   /** Avisos de preço e quantidade da última resposta da conta (a tela da Geladeira os mostra). */
   ajustes: AjusteDaGeladeira[];
   /** Esquece os avisos (a tela os mostra uma vez e, ao sair dela, eles somem). */
@@ -92,6 +94,7 @@ export function GeladeiraProvider({
   // Conta as mudanças locais, para descartar a resposta antiga de um buscar que ficou em voo.
   const versao = useRef(0);
   const [ajustes, setAjustes] = useState<AjusteDaGeladeira[]>([]);
+  const [sincronizacoes, setSincronizacoes] = useState(0);
   // Entrar e sair redirecionam: a mudança de página é o sinal para olhar a sessão de novo.
   const pagina = usePathname();
   // Geração da identidade/modo (convidado ou conta, página, sessão): sobe a cada mudança que torna
@@ -125,6 +128,7 @@ export function GeladeiraProvider({
       gravarMarca(CHAVE_PENDENTE, false);
       gravarMarca(CHAVE_DA_CONTA, true);
       setAjustes(resultado.resposta.ajustes);
+      setSincronizacoes((n) => n + 1);
     } else if (resultado?.tipo === "sem-sessao") {
       if (lerMarca(CHAVE_DA_CONTA)) sairDaConta();
       else gravarMarca(CHAVE_PENDENTE, false);
@@ -180,6 +184,7 @@ export function GeladeiraProvider({
       // A conta passa a mandar: qualquer validação do convidado em voo ficou para trás.
       novaGeracao();
       setAjustes(resultado.resposta.ajustes);
+      setSincronizacoes((n) => n + 1);
       const daConta = aplicarResposta(GELADEIRA_VAZIA, resultado.resposta);
       if (sincronizada) return aplicar(daConta);
       const { geladeira, enviarParaConta } = resolverAoEntrar({
@@ -202,6 +207,7 @@ export function GeladeiraProvider({
       pronta,
       estado,
       quantidadeTotal: quantidadeTotal(estado),
+      sincronizacoes,
       ajustes,
       limparAjustes,
       adicionar: (cerveja, quantidade) => {
@@ -242,7 +248,7 @@ export function GeladeiraProvider({
         }
       },
     }),
-    [pronta, estado, ajustes, limparAjustes, aplicar, sincronizar],
+    [pronta, estado, sincronizacoes, ajustes, limparAjustes, aplicar, sincronizar],
   );
 
   return <Contexto.Provider value={contexto}>{children}</Contexto.Provider>;

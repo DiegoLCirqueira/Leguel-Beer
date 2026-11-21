@@ -28,4 +28,5 @@ export { Stepper } from "./stepper";
 export { Skeleton } from "./skeleton";
 export { StyleBadge } from "./style-badge";
 export { TotaisDoResumo } from "./totais-do-resumo";
+export type { FreteEstimado } from "./totais-do-resumo";
 export { Toast } from "./toast";
