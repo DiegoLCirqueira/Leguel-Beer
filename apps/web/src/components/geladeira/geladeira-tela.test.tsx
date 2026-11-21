@@ -324,15 +324,17 @@ describe("GeladeiraTela", () => {
         () => new Promise<ResultadoDoFrete>((resolve) => respostas.push(resolve)),
       );
       abrirComFrete(cotar);
-      await waitFor(() => expect(cotar).toHaveBeenCalledTimes(1));
-      await userEvent.click(screen.getByRole("button", { name: "Aumentar quantidade" }));
+      // Uma cotação ao abrir e outra quando a conta devolve a Geladeira.
       await waitFor(() => expect(cotar).toHaveBeenCalledTimes(2));
+      await userEvent.click(screen.getByRole("button", { name: "Aumentar quantidade" }));
+      await waitFor(() => expect(cotar).toHaveBeenCalledTimes(3));
 
-      respostas[1]!({ tipo: "frete", frete: { tipo: "gratis" } });
+      respostas[2]!({ tipo: "frete", frete: { tipo: "gratis" } });
       expect(await screen.findByText("Grátis")).toBeInTheDocument();
       respostas[0]!({ tipo: "frete", frete: { tipo: "valor", centavos: 1300 } });
+      respostas[1]!({ tipo: "frete", frete: { tipo: "valor", centavos: 1300 } });
 
-      await waitFor(() => expect(cotar).toHaveBeenCalledTimes(2));
+      await new Promise((r) => setTimeout(r, 20));
       expect(screen.getByText("Grátis")).toBeInTheDocument();
       expect(screen.queryByText("R$ 13,00")).not.toBeInTheDocument();
     });
@@ -364,18 +366,6 @@ describe("GeladeiraTela", () => {
       expect(await screen.findByText("Grátis")).toBeInTheDocument();
       expect(cotar.mock.calls.length).toBeGreaterThan(chamadasAntes);
       expect(screen.queryByText("R$ 3,00")).not.toBeInTheDocument();
-    });
-
-    it("cota de novo quando o subtotal muda", async () => {
-      telaLarga();
-      guardar([{ cerveja: mare, quantidade: 2 }]);
-      const cotar = vi.fn().mockResolvedValue({ tipo: "frete", frete: { tipo: "gratis" } });
-      abrirComFrete(cotar);
-      await waitFor(() => expect(cotar).toHaveBeenCalledTimes(1));
-
-      await userEvent.click(screen.getByRole("button", { name: /Aumentar|\+/ }));
-
-      await waitFor(() => expect(cotar).toHaveBeenCalledTimes(2));
     });
   });
 });
