@@ -89,4 +89,26 @@ describe("/conta/enderecos", () => {
 
     await expect(MeusEnderecos()).rejects.toThrow("REDIRECT:/entrar?retorno=%2Fconta%2Fenderecos");
   });
+
+  it("tem o link 'Adicionar novo endereço' para o formulário", async () => {
+    render(await MeusEnderecos());
+
+    expect(screen.getByRole("link", { name: "Adicionar novo endereço" })).toHaveAttribute(
+      "href",
+      "/conta/enderecos/novo",
+    );
+  });
+
+  it("com 5 endereços, 'Adicionar novo endereço' fica desabilitado com a dica do limite", async () => {
+    buscar.mockResolvedValue({
+      tipo: "ok",
+      enderecos: ["a", "b", "c", "d", "e"].map((id) => ({ ...casa, id, padrao: id === "a" })),
+    });
+
+    render(await MeusEnderecos());
+
+    expect(screen.queryByRole("link", { name: "Adicionar novo endereço" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Adicionar novo endereço" })).toBeDisabled();
+    expect(screen.getByText("Você pode guardar até 5 endereços.")).toBeInTheDocument();
+  });
 });
