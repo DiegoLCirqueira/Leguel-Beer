@@ -159,6 +159,16 @@ Ciclo contínuo ([[ADR-016-ciclo-continuo-da-banda]]): a banda segue de uma tare
 2. Decisões tomadas sem consultar o Diego, em uma linha cada, para ele poder vetar alguma.
 3. Perguntas pendentes para o Diego, no formato acima.
 
+## Economia de contexto (ordem de tokens, 21/11)
+Mescladas as regras do `drona23/claude-token-efficient` (MIT) que não conflitam com as nossas; as demais já valem no CLAUDE.md global (ler antes de escrever, não reler o que não mudou, ignorar arquivos acima de 100 KB, raciocínio cuidadoso e resposta concisa).
+- Não chute APIs, versões, flags, SHAs de commit nem nomes de pacote: confirme lendo o código ou a documentação antes de afirmar.
+- Sem abertura bajuladora nem encerramento de enfeite. (A regra "sem emojis" do repositório de origem NÃO vale aqui: a convenção de commits usa shortcodes de emoji.)
+- Compactar a sessão entre 60% e 70% de contexto (a statusline mostra o %), e só entre tarefas. Pesquisa ampla vai para subagente, que devolve só o resumo.
+- Medição de tokens e fases: `docs/tokens/`.
+
+### Compact instructions
+Ao compactar, preserve: a tarefa atual e o critério de pronto; as decisões já tomadas (com o porquê); os arquivos tocados e o branch/PR; os testes que estão falhando (nome e erro); as regras de atribuição, autonomia e merge deste arquivo; o próximo passo. Descarte saídas longas de comandos e leituras já resumidas.
+
 ## Agent skills
 
 ### Issue tracker
