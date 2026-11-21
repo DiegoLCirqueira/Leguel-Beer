@@ -13,7 +13,7 @@ import {
   type ReactNode,
 } from "react";
 import { usePathname } from "next/navigation";
-import type { ContaDaGeladeira } from "@/lib/geladeira/conta";
+import type { ContaDaGeladeira, ResultadoDaConta } from "@/lib/geladeira/conta";
 import {
   CHAVE_DA_CONTA,
   CHAVE_PENDENTE,
@@ -78,14 +78,36 @@ export function useGeladeira(): GeladeiraContexto {
   return contexto;
 }
 
+/** Resposta da `conta` estável se a conta do layout sumir entre uma chamada e outra. */
+const SEM_CONTA = Promise.resolve<ResultadoDaConta>({ tipo: "erro" });
+
 export function GeladeiraProvider({
   children,
-  conta,
+  conta: contaDoLayout,
 }: {
   children: ReactNode;
   /** Sem `conta` (testes, telas sem sessão) a Geladeira é só local. */
   conta?: ContaDaGeladeira;
 }) {
+  // O layout é um Server Component: a cada atualização do servidor o objeto `conta` (e as referências
+  // das ações) chega novo. Se ele entrasse nas dependências dos efeitos, cada atualização repetiria a
+  // busca da conta, que atualiza de novo, num laço. A `conta` daqui é estável e chama a mais recente.
+  const contaAtual = useRef(contaDoLayout);
+  useEffect(() => {
+    contaAtual.current = contaDoLayout;
+  });
+  const temConta = contaDoLayout !== undefined;
+  const conta = useMemo<ContaDaGeladeira | undefined>(
+    () =>
+      temConta
+        ? {
+            buscar: () => contaAtual.current?.buscar() ?? SEM_CONTA,
+            enviar: (pedido) => contaAtual.current?.enviar(pedido) ?? SEM_CONTA,
+            validar: (pedido) => contaAtual.current?.validar(pedido) ?? SEM_CONTA,
+          }
+        : undefined,
+    [temConta],
+  );
   // A cópia local só existe no navegador: lida uma vez ao montar (no servidor fica vazia).
   const [estado, setEstado] = useState<EstadoDaGeladeira>(() => lerGeladeiraLocal());
   // `false` no HTML do servidor e na hidratação; `true` depois: o contador só aparece então.
@@ -215,7 +237,7 @@ export function GeladeiraProvider({
       pronta,
       estado,
       quantidadeTotal: quantidadeTotal(estado),
-      resolvida: !conta || respondeu,
+      resolvida: !temConta || respondeu,
       sincronizacoes,
       ajustes,
       limparAjustes,
@@ -260,7 +282,7 @@ export function GeladeiraProvider({
     [
       pronta,
       estado,
-      conta,
+      temConta,
       respondeu,
       sincronizacoes,
       ajustes,
