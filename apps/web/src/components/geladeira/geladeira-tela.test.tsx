@@ -337,6 +337,35 @@ describe("GeladeiraTela", () => {
       expect(screen.queryByText("R$ 13,00")).not.toBeInTheDocument();
     });
 
+    it("cota de novo quando o envio da Geladeira para a conta termina, não antes", async () => {
+      telaLarga();
+      guardar([{ cerveja: mare, quantidade: 2 }]);
+      let concluirEnvio: () => void = () => {};
+      let enviado = false;
+      const enviar: ContaDaGeladeira["enviar"] = () =>
+        new Promise((resolve) => {
+          concluirEnvio = () => {
+            enviado = true;
+            resolve({ tipo: "ok", resposta: daConta(3) });
+          };
+        });
+      // A API cota com a Geladeira da conta: só vê o subtotal novo depois do envio.
+      const cotar = vi.fn(async (): Promise<ResultadoDoFrete> => ({
+        tipo: "frete",
+        frete: enviado ? { tipo: "gratis" } : { tipo: "valor", centavos: 300 },
+      }));
+      abrirComFrete(cotar, enviar);
+      expect(await screen.findByText("R$ 3,00")).toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole("button", { name: "Aumentar quantidade" }));
+      const chamadasAntes = cotar.mock.calls.length;
+      concluirEnvio();
+
+      expect(await screen.findByText("Grátis")).toBeInTheDocument();
+      expect(cotar.mock.calls.length).toBeGreaterThan(chamadasAntes);
+      expect(screen.queryByText("R$ 3,00")).not.toBeInTheDocument();
+    });
+
     it("cota de novo quando o subtotal muda", async () => {
       telaLarga();
       guardar([{ cerveja: mare, quantidade: 2 }]);
