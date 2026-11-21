@@ -2,6 +2,8 @@ docs/.obsidian/workspace.json
 docs/.obsidian/workspace-mobile.json
 .maestri/
 .claude/settings.local.json
+.credentials.json
+.claude.json
 
 # dependências e saídas de build
 node_modules/
