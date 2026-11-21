@@ -89,14 +89,20 @@ export class PrismaOrderRepository implements OrderRepository {
 
       const deductions = await tx.fridgePendingDeduction.findMany({ where: { orderId } });
       for (const deduction of deductions) {
-        await tx.fridgeItem.updateMany({
+        const item = await tx.fridgeItem.findFirst({
           where: { beerId: deduction.beerId, fridge: { profileId: order.profileId } },
-          data: { quantity: { decrement: deduction.quantity } },
         });
+        if (!item) continue;
+        // A quantidade na Geladeira é sempre positiva: o que zera sai da Geladeira.
+        if (item.quantity <= deduction.quantity) {
+          await tx.fridgeItem.delete({ where: { id: item.id } });
+        } else {
+          await tx.fridgeItem.update({
+            where: { id: item.id },
+            data: { quantity: { decrement: deduction.quantity } },
+          });
+        }
       }
-      await tx.fridgeItem.deleteMany({
-        where: { fridge: { profileId: order.profileId }, quantity: { lte: 0 } },
-      });
       await tx.fridgePendingDeduction.deleteMany({ where: { orderId } });
 
       await tx.orderStatusHistory.create({
