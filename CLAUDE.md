@@ -162,8 +162,8 @@ Ciclo contínuo ([[ADR-016-ciclo-continuo-da-banda]]): a banda segue de uma tare
 ## Economia de contexto (ordem de tokens, 21/11)
 Mescladas as regras do `drona23/claude-token-efficient` (MIT) que não conflitam com as nossas; as demais já valem no CLAUDE.md global (ler antes de escrever, não reler o que não mudou, ignorar arquivos acima de 100 KB, raciocínio cuidadoso e resposta concisa).
 - Não chute APIs, versões, flags, SHAs de commit nem nomes de pacote: confirme lendo o código ou a documentação antes de afirmar.
-- Sem abertura bajuladora nem encerramento de enfeite. (A regra "sem emojis" do repositório de origem NÃO vale aqui: a convenção de commits usa shortcodes de emoji.)
-- Compactar a sessão entre 60% e 70% de contexto (a statusline mostra o %), e só entre tarefas. Pesquisa ampla vai para subagente, que devolve só o resumo.
+- Sem abertura bajuladora nem encerramento de enfeite. A regra do Diego de fechar a resposta com "Próximo:" e "Sua ação:" prevalece sobre isto. (A regra "sem emojis" do repositório de origem NÃO vale aqui: a convenção de commits usa shortcodes de emoji.)
+- Compactar a sessão entre 60% e 70% de contexto (a statusline mostra o %), e só entre tarefas; compactar não substitui o `/clear`, que continua só entre ordens (ver Documentação). Pesquisa ampla pode ir para subagente, que devolve só o resumo, salvo o Orchestrator, que não usa subagentes internos (papel); workflow, ultracode e `/deep-research` seguem só com autorização do Diego.
 - Medição de tokens e fases: `docs/tokens/`.
 
 ### Compact instructions
