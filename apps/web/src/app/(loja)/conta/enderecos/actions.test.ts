@@ -1,10 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const sessao = vi.hoisted(() => ({ token: "acesso-1" as string | undefined }));
+const visitante = vi.hoisted(() => ({ ip: "198.51.100.1" }));
 vi.mock("next/headers", () => ({
   cookies: async () => ({
     get: (nome: string) =>
       nome === "lb_acesso" && sessao.token ? { value: sessao.token } : undefined,
+  }),
+  headers: async () => ({
+    get: (nome: string) => (nome === "x-forwarded-for" ? visitante.ip : null),
   }),
 }));
 const consultar = vi.hoisted(() => vi.fn());
@@ -218,5 +222,18 @@ describe("Server Actions dos endereços", () => {
 
     expect(await buscarCepAction("57035-000")).toEqual({ tipo: "indisponivel" });
     expect(consultar).not.toHaveBeenCalled();
+  });
+
+  it("buscarCepAction limita a 60 consultas por minuto de cada visitante, mesmo com cookie falso", async () => {
+    sessao.token = "cookie-falso";
+    visitante.ip = "203.0.113.7";
+    consultar.mockResolvedValue({ tipo: "nao-encontrado" });
+
+    for (let i = 0; i < 60; i++) await buscarCepAction("57999-999");
+    expect(await buscarCepAction("57999-999")).toEqual({ tipo: "indisponivel" });
+
+    expect(consultar).toHaveBeenCalledTimes(60);
+    visitante.ip = "203.0.113.8";
+    expect(await buscarCepAction("57999-999")).toEqual({ tipo: "nao-encontrado" });
   });
 });
