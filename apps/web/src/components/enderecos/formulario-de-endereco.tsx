@@ -75,8 +75,16 @@ export function FormularioDeEndereco({
   // O CEP da busca mais recente: resposta de um CEP já trocado é descartada.
   const cepDaBusca = useRef("");
 
+  // Campos de endereço que o cliente digitou: a resposta do CEP não os sobrescreve.
+  const digitados = useRef(new Set<string>());
+
   const mudar = (campo: keyof Valores, valor: string) =>
     setValores((atual) => ({ ...atual, [campo]: valor }));
+  const digitar = (campo: "rua" | "bairro" | "cidade", valor: string) => {
+    if (valor) digitados.current.add(campo);
+    else digitados.current.delete(campo);
+    mudar(campo, valor);
+  };
 
   async function procurar(cep: string) {
     cepDaBusca.current = cep;
@@ -93,9 +101,9 @@ export function FormularioDeEndereco({
     if (resultado.tipo === "ok") {
       setValores((atual) => ({
         ...atual,
-        rua: resultado.rua,
-        bairro: resultado.bairro,
-        cidade: resultado.cidade,
+        rua: digitados.current.has("rua") ? atual.rua : resultado.rua,
+        bairro: digitados.current.has("bairro") ? atual.bairro : resultado.bairro,
+        cidade: digitados.current.has("cidade") ? atual.cidade : resultado.cidade,
       }));
       setErros((atual) => ({ ...atual, cep: "", rua: "", bairro: "", cidade: "" }));
       document.getElementById("numero")?.focus();
@@ -104,9 +112,15 @@ export function FormularioDeEndereco({
     }
   }
 
+  function buscarPeloBotao() {
+    if (valores.cep.length === 9) void procurar(valores.cep);
+    else setErros((atual) => ({ ...atual, cep: "Informe o CEP com 8 dígitos." }));
+  }
+
   function mudarCep(digitado: string) {
     const cep = mascararCep(digitado);
     mudar("cep", cep);
+    setErros((atual) => ({ ...atual, cep: "" }));
     setAvisoDoCep(undefined);
     if (cep.length === 9) void procurar(cep);
     else {
@@ -171,6 +185,16 @@ export function FormularioDeEndereco({
           onChange={(e) => mudarCep(e.target.value)}
           erro={erros.cep}
         />
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          className="w-auto self-start"
+          disabled={buscando}
+          onClick={buscarPeloBotao}
+        >
+          Buscar CEP
+        </Button>
         {buscando ? (
           <p role="status" className="px-2 text-sm text-texto-suave">
             Buscando o CEP...
@@ -189,7 +213,7 @@ export function FormularioDeEndereco({
         autoComplete="address-line1"
         maxLength={120}
         value={valores.rua}
-        onChange={(e) => mudar("rua", e.target.value)}
+        onChange={(e) => digitar("rua", e.target.value)}
         erro={erros.rua}
       />
       <Campo
@@ -220,7 +244,7 @@ export function FormularioDeEndereco({
         icone={Home}
         maxLength={80}
         value={valores.bairro}
-        onChange={(e) => mudar("bairro", e.target.value)}
+        onChange={(e) => digitar("bairro", e.target.value)}
         erro={erros.bairro}
       />
       <Campo
@@ -231,7 +255,7 @@ export function FormularioDeEndereco({
         autoComplete="address-level2"
         maxLength={80}
         value={valores.cidade}
-        onChange={(e) => mudar("cidade", e.target.value)}
+        onChange={(e) => digitar("cidade", e.target.value)}
         erro={erros.cidade}
       />
       <Campo id="uf" name="uf" rotulo="UF" icone={MapPin} value="AL" readOnly />
