@@ -132,7 +132,10 @@ export function GeladeiraProvider({
   const [falhouAoBuscar, setFalhouAoBuscar] = useState(false);
   const [tentativa, setTentativa] = useState(0);
   const [buscando, setBuscando] = useState(false);
-  const tentarDeNovo = useCallback(() => setTentativa((n) => n + 1), []);
+  const tentarDeNovo = useCallback(() => {
+    setBuscando(true);
+    setTentativa((n) => n + 1);
+  }, []);
   // Entrar e sair redirecionam: a mudança de página é o sinal para olhar a sessão de novo.
   const pagina = usePathname();
   // Geração da identidade/modo (convidado ou conta, página, sessão): sobe a cada mudança que torna
@@ -202,7 +205,6 @@ export function GeladeiraProvider({
     novaGeracao();
     let ativo = true;
     let falhou = false;
-    setBuscando(true);
     (async () => {
       const sincronizada = lerMarca(CHAVE_DA_CONTA);
       if (sincronizada && lerMarca(CHAVE_PENDENTE)) return enviar();
