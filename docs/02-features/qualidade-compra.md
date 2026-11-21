@@ -65,7 +65,7 @@ Funcionalidade: Qualidade da compra
 ### E2E da compra (LB-112)
 
 - **Fluxo coberto:** maioridade → catálogo → Geladeira → criar conta (com o e-mail de confirmação lido no Mailpit do ambiente de teste) → dados pessoais e endereço → checkout (Entrega, Pagamento, Revisão) → Pix → "Confirmar pagamento" do admin → "Meus pedidos" → fila do admin → "Iniciar preparo" → "Saiu para entrega" → "Marcar como entregue" → "Entregue" para o cliente ([[maioridade-entrada]], [[catalogo]], [[geladeira]], [[cadastro-login]], [[dados-pessoais]], [[enderecos-entrega]], [[checkout]], [[pagamento]], [[pedidos-cliente]], [[admin]]).
-- **Sem gateway:** o pagamento é só visual ([[ADR-018-pagamento-simulado]]); no E2E o pedido passa a "Pago" pela ação "Confirmar pagamento" do admin ([[pagamento]]). Enquanto as telas de pagamento não existem (são as últimas), o fluxo vai da Revisão a "Meus pedidos".
+- **Sem gateway:** o pagamento é só visual ([[ADR-020-aviso-de-portfolio-no-pagamento]]); no E2E o pedido passa a "Pago" pela ação "Confirmar pagamento" do admin ([[pagamento]]). Enquanto as telas de pagamento não existem (são as últimas), o fluxo vai da Revisão a "Meus pedidos".
 - **Expiração:** pelo relógio adiantado da API de teste, que só existe nos testes e só age no pedido do dono; nunca esperar 30 minutos nem usar espera de tempo fixo.
 - **Cartão no E2E:** o cartão de teste até "Pagamento em análise" está nos seams de [[pagamento]]; esta spec não o repete.
 - **Dados isolados:** cada teste cria seu cliente, seu endereço e seus pedidos e não depende da ordem dos outros; o estoque usado é de uma cerveja só daquele teste, ou o teste confere o disponível antes e depois. Esperas sempre por estado na tela (texto, status), nunca por tempo fixo.
@@ -100,7 +100,7 @@ Funcionalidade: Qualidade da compra
 
 > [!warning] **Pendente de confirmação do Diego** (custos e contas, item 4): o limite de criar e editar endereço protege a cota gratuita do serviço de mapas; o número final e o que fazer se a cota acabar ficam com o Diego (cartão "Decisões pendentes"). Até a resposta, vale o limite proposto pelo Back, dentro do plano gratuito.
 
-- **Cabeçalhos:** API com Helmet e CORS só para a origem do site (já existem; o inventário confere). No site: `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, proibição de ser aberto em frame de outro site e HSTS em produção. A política de conteúdo (CSP) não depende mais de gateway ([[ADR-018-pagamento-simulado]]).
+- **Cabeçalhos:** API com Helmet e CORS só para a origem do site (já existem; o inventário confere). No site: `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, proibição de ser aberto em frame de outro site e HSTS em produção. A política de conteúdo (CSP) não depende mais de gateway ([[ADR-020-aviso-de-portfolio-no-pagamento]]).
 - **Segredos só no servidor:** nenhum segredo em `NEXT_PUBLIC_*` nem no pacote do navegador; um teste do build procura as chaves de serviço no código entregue ao navegador e falha se achar.
 - **Dependências:** `pnpm audit` no CI, falhando em vulnerabilidade alta ou crítica de dependência de produção. Vulnerabilidade nova sem correção disponível não pode travar PR alheio: entra numa lista de exceções versionada no repositório, cada uma com o id do aviso, o motivo, quem registrou e o prazo de revisão (no máximo 30 dias); exceção vencida volta a falhar o CI. A exceção sai no PR que atualiza a dependência.
 - **Checklist OWASP:** o Reviewer passa os itens aplicáveis do OWASP Top 10 (controle de acesso, falhas de criptografia, injeção, configuração insegura, componentes vulneráveis, falhas de autenticação, falhas de log) e registra o resultado na descrição do PR da revisão, com o que ficou para o MVP+.
@@ -112,7 +112,7 @@ Funcionalidade: Qualidade da compra
 
 - Pack (Mix & Match) e Clube no E2E: Pós-MVP ([[mvp-corte]]).
 - Cupom: sem cupom no MVP ([[mvp-corte]], LB-53).
-- Gateway e pagamento real ou simulado com lógica ([[ADR-018-pagamento-simulado]]).
+- Gateway e pagamento real ou simulado com lógica ([[ADR-020-aviso-de-portfolio-no-pagamento]]).
 - Pentest externo, auditoria de acessibilidade (LB-113, fora do corte) e teste de carga.
 
 ## Seams de teste
