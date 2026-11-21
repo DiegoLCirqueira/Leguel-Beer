@@ -12,7 +12,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
-  use: { baseURL: "http://localhost:3000" },
+  // No CI grava o trace da repetição de um teste que falhou; o passo de falha do CI sobe `test-results`.
+  use: { baseURL: "http://localhost:3000", trace: process.env.CI ? "on-first-retry" : "off" },
   projects: [{ name: "mobile", use: { ...devices["Pixel 5"] } }],
   webServer: [
     {
