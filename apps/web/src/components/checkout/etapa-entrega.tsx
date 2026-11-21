@@ -3,11 +3,17 @@
 import { resumirGeladeira, type EnderecoResposta } from "@leguele/shared";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import type { ResultadoDoFrete } from "@/app/geladeira/frete";
 import { useGeladeira } from "@/components/geladeira/geladeira-provider";
 import { Button, buttonVariants, OpcaoDeEndereco, TotaisDoResumo } from "@/components/ui";
 import type { FreteEstimado } from "@/components/ui";
+import {
+  assinarEstadoDoCheckout,
+  estadoDoCheckoutBruto,
+  gravarEstadoDoCheckout,
+  lerEstadoDoCheckout,
+} from "@/lib/checkout/estado";
 import { textoDosItens } from "@/components/ui/totais-do-resumo";
 
 type Props = {
@@ -58,7 +64,12 @@ export function EtapaEntrega({ enderecos, cotarFrete, destinoDoPagamento }: Prop
   const { pronta, resolvida, falhouAoBuscar, buscando, tentarDeNovo, estado, sincronizacoes } =
     useGeladeira();
   const roteador = useRouter();
-  const [escolhido, setEscolhido] = useState(() => inicial(enderecos));
+  // O que o cliente escolheu antes (voltou de Pagamento): só lido no navegador, para o HTML não divergir.
+  const guardado = useSyncExternalStore(assinarEstadoDoCheckout, estadoDoCheckoutBruto, () => null);
+  const lembrado = guardado ? lerEstadoDoCheckout().enderecoId : undefined;
+  const [escolha, setEscolhido] = useState<string>();
+  const escolhido =
+    escolha ?? (enderecos.some((e) => e.id === lembrado) ? lembrado : inicial(enderecos));
   // Vazia só depois de a conta responder: antes, a cópia local vazia pode ser só outro aparelho.
   const decidida = pronta && resolvida;
   const vazia = decidida && estado.itens.length === 0;
@@ -150,7 +161,13 @@ export function EtapaEntrega({ enderecos, cotarFrete, destinoDoPagamento }: Prop
             </div>
           ) : null}
           {podeContinuar ? (
-            <Link href={destinoDoPagamento!} className={buttonVariants({ variant: "primary" })}>
+            <Link
+              href={destinoDoPagamento!}
+              onClick={() =>
+                gravarEstadoDoCheckout({ ...lerEstadoDoCheckout(), enderecoId: escolhido })
+              }
+              className={buttonVariants({ variant: "primary" })}
+            >
               Continuar para pagamento
             </Link>
           ) : (

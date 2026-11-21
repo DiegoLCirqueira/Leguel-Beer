@@ -1,4 +1,18 @@
 export const CHAVE_DO_CHECKOUT = "lb:checkout";
+const EVENTO_DO_CHECKOUT = "lb:checkout-mudou";
+
+/** Para `useSyncExternalStore`: o texto guardado (estável entre leituras) e o aviso de que mudou. */
+export const estadoDoCheckoutBruto = () => {
+  try {
+    return sessionStorage.getItem(CHAVE_DO_CHECKOUT);
+  } catch {
+    return null;
+  }
+};
+export const assinarEstadoDoCheckout = (aviso: () => void) => {
+  window.addEventListener(EVENTO_DO_CHECKOUT, aviso);
+  return () => window.removeEventListener(EVENTO_DO_CHECKOUT, aviso);
+};
 
 /** Só a escolha: o cartão (campos e parcelas) entra com as telas de pagamento e nunca é guardado aqui. */
 export type EstadoDoCheckout = {
@@ -44,6 +58,7 @@ export function gravarEstadoDoCheckout(estado: EstadoDoCheckout): void {
       ...(estado.pagamento ? { pagamento: { tipo: estado.pagamento.tipo } } : {}),
     };
     sessionStorage.setItem(CHAVE_DO_CHECKOUT, JSON.stringify(limpo));
+    window.dispatchEvent(new Event(EVENTO_DO_CHECKOUT));
   } catch {
     // Aba sem armazenamento: o checkout segue, só não lembra ao recarregar.
   }
