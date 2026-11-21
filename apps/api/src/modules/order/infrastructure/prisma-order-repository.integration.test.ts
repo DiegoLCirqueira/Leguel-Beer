@@ -215,5 +215,98 @@ describe("PrismaOrderRepository (banco real)", () => {
         { fromStatus: "AWAITING_PAYMENT", toStatus: "PAID", actorId: adminId, createdAt: AT },
       ]);
     });
+
+    it("não confirma a partir do instante exato do vencimento e nada muda", async () => {
+      const confirmed = await orders.confirmPaymentIfAwaiting(orderId, adminId, EXPIRES_AT);
+
+      expect(confirmed).toBe(false);
+      expect((await prisma.order.findUniqueOrThrow({ where: { id: orderId } })).status).toBe(
+        "AWAITING_PAYMENT",
+      );
+      expect((await prisma.beer.findUniqueOrThrow({ where: { id: beerId } })).stock).toBe(10);
+      expect(await prisma.stockReservation.count({ where: { orderId, consumedAt: null } })).toBe(1);
+      expect(await prisma.fridgePendingDeduction.count({ where: { orderId } })).toBe(1);
+      expect(await prisma.orderStatusHistory.count({ where: { orderId } })).toBe(0);
+    });
+
+    it("confirmações e expirações simultâneas deixam um só resultado: uma baixa de estoque e um histórico", async () => {
+      const results = await Promise.all([
+        ...Array.from({ length: 5 }, () => orders.confirmPaymentIfAwaiting(orderId, adminId, AT)),
+        ...Array.from({ length: 3 }, () =>
+          orders.cancelIfAwaitingPayment(orderId, "pagamento não concluído", AT),
+        ),
+      ]);
+
+      expect(results.filter(Boolean)).toHaveLength(1);
+      expect(await prisma.orderStatusHistory.count({ where: { orderId } })).toBe(1);
+      const order = await prisma.order.findUniqueOrThrow({ where: { id: orderId } });
+      const beer = await prisma.beer.findUniqueOrThrow({ where: { id: beerId } });
+      expect(beer.stock).toBe(order.status === "PAID" ? 8 : 10);
+      const fridge = await prisma.fridgeItem.findMany({ where: { fridge: { profileId } } });
+      expect(fridge.map((item) => item.quantity)).toEqual([order.status === "PAID" ? 1 : 3]);
+    });
+
+    it("tira da Geladeira a cerveja que chega a zero e mantém as outras", async () => {
+      await prisma.fridgeItem.updateMany({
+        where: { fridge: { profileId } },
+        data: { quantity: 2 },
+      });
+      const other = await prisma.beer.create({
+        data: {
+          slug: "ponta-verde",
+          name: "Ponta Verde",
+          style: "Pilsen",
+          categoryId: (await prisma.category.findFirstOrThrow()).id,
+          abv: 4.5,
+          ibu: 15,
+          volumeMl: 500,
+          priceCents: 2800,
+          stock: 5,
+        },
+      });
+      const fridge = await prisma.fridge.findUniqueOrThrow({ where: { profileId } });
+      await prisma.fridgeItem.create({
+        data: {
+          fridgeId: fridge.id,
+          beerId: other.id,
+          quantity: 1,
+          seenPriceCents: 2800,
+          position: 1,
+        },
+      });
+
+      await orders.confirmPaymentIfAwaiting(orderId, adminId, AT);
+
+      const items = await prisma.fridgeItem.findMany({
+        where: { fridgeId: fridge.id },
+        orderBy: { position: "asc" },
+      });
+      expect(items.map((item) => [item.beerId, item.quantity])).toEqual([[other.id, 1]]);
+    });
+
+    it("não grava nenhum efeito se a escrita do histórico falha", async () => {
+      await prisma.$executeRawUnsafe(
+        "CREATE OR REPLACE FUNCTION fail_history_insert() RETURNS trigger LANGUAGE plpgsql AS 'BEGIN RAISE EXCEPTION ''falha forçada no histórico''; END;'",
+      );
+      await prisma.$executeRawUnsafe(
+        "CREATE TRIGGER fail_history_insert BEFORE INSERT ON order_status_history FOR EACH ROW EXECUTE FUNCTION fail_history_insert()",
+      );
+      try {
+        await expect(orders.confirmPaymentIfAwaiting(orderId, adminId, AT)).rejects.toThrow();
+
+        expect((await prisma.order.findUniqueOrThrow({ where: { id: orderId } })).status).toBe(
+          "AWAITING_PAYMENT",
+        );
+        expect((await prisma.beer.findUniqueOrThrow({ where: { id: beerId } })).stock).toBe(10);
+        expect(await prisma.stockReservation.count({ where: { orderId, consumedAt: null } })).toBe(
+          1,
+        );
+        const items = await prisma.fridgeItem.findMany({ where: { fridge: { profileId } } });
+        expect(items.map((item) => item.quantity)).toEqual([3]);
+      } finally {
+        await prisma.$executeRawUnsafe("DROP TRIGGER fail_history_insert ON order_status_history");
+        await prisma.$executeRawUnsafe("DROP FUNCTION fail_history_insert()");
+      }
+    });
   });
 });
