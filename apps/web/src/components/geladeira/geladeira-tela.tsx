@@ -2,6 +2,7 @@
 
 import { resumirGeladeira } from "@leguele/shared";
 import { useEffect, useState } from "react";
+import type { ResultadoDoFrete } from "@/app/geladeira/frete";
 import {
   AvisosDaGeladeira,
   BarraDoResumo,
@@ -10,14 +11,44 @@ import {
   Skeleton,
   Toast,
 } from "@/components/ui";
+import type { FreteEstimado } from "@/components/ui";
 import type { Desfazer } from "@/lib/geladeira/estado";
 import { mensagemDoLimite } from "@/lib/geladeira/estado";
 import { useTelaLarga } from "@/lib/use-tela-larga";
 import { useGeladeira } from "./geladeira-provider";
 import { FechamentoDoResumo, LinhasDoResumo } from "./resumo-da-geladeira";
 
+/**
+ * Frete estimado pelo endereço padrão da conta (a API cota; aqui só se mostra). Sem a ação, sem
+ * sessão ou sem endereço, fica `undefined` e o resumo pede o endereço. Cota de novo a cada subtotal.
+ */
+function useFreteEstimado(
+  cotarFrete: (() => Promise<ResultadoDoFrete>) | undefined,
+  ativo: boolean,
+  subtotalCentavos: number,
+) {
+  const [frete, setFrete] = useState<FreteEstimado>();
+  useEffect(() => {
+    if (!cotarFrete || !ativo) return;
+    let vigente = true;
+    cotarFrete()
+      .then((resultado) => {
+        if (vigente) setFrete(resultado.tipo === "frete" ? resultado.frete : undefined);
+      })
+      .catch(() => {
+        if (vigente) setFrete({ tipo: "indisponivel" });
+      });
+    return () => {
+      vigente = false;
+    };
+  }, [cotarFrete, ativo, subtotalCentavos]);
+  return frete;
+}
+
+type Props = { cotarFrete?: () => Promise<ResultadoDoFrete> };
+
 /** A Geladeira em prateleiras, uma por categoria, com o resumo: barra e sheet no celular, coluna no desktop. */
-export function GeladeiraTela() {
+export function GeladeiraTela({ cotarFrete }: Props) {
   const { pronta, estado, ajustes, limparAjustes, alterarQuantidade, remover, desfazer } =
     useGeladeira();
   const larga = useTelaLarga();
@@ -28,6 +59,7 @@ export function GeladeiraTela() {
   const [toast, setToast] = useState<{ mensagem: string; desfazer?: Desfazer } | null>(null);
   const { quantidadeTotal, subtotalCentavos } = resumirGeladeira(estado.itens);
   const comResumo = pronta && estado.itens.length > 0;
+  const frete = useFreteEstimado(cotarFrete, comResumo, subtotalCentavos);
   const removerComToast = (id: string) => {
     const nome = estado.itens.find((i) => i.cerveja.id === id)?.cerveja.nome;
     const d = remover(id);
@@ -81,7 +113,7 @@ export function GeladeiraTela() {
       {comResumo && larga ? (
         <aside aria-label="Resumo da Geladeira" className="w-96 shrink-0 overflow-y-auto px-4 py-2">
           {linhas}
-          <FechamentoDoResumo itens={estado.itens} />
+          <FechamentoDoResumo itens={estado.itens} frete={frete} />
         </aside>
       ) : null}
       {comResumo && !larga ? (
@@ -95,7 +127,7 @@ export function GeladeiraTela() {
             aberto={sheetAberto}
             aoFechar={() => setSheetAberto(false)}
             titulo="Resumo da Geladeira"
-            rodape={<FechamentoDoResumo itens={estado.itens} />}
+            rodape={<FechamentoDoResumo itens={estado.itens} frete={frete} />}
           >
             {linhas}
             {avisoRapido}

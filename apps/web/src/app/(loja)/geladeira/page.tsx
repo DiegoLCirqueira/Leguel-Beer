@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cotarFreteDoPadraoAction } from "@/app/geladeira/frete";
 import { GeladeiraTela } from "@/components/geladeira/geladeira-tela";
 
 export const metadata: Metadata = {
@@ -6,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function Geladeira() {
-  return <GeladeiraTela />;
+  return <GeladeiraTela cotarFrete={cotarFreteDoPadraoAction} />;
 }
