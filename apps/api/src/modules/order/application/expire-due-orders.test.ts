@@ -18,6 +18,9 @@ function repositoryWithDueOrders(dueIds: string[]): OrderRepository & { askedAt:
     async cancelIfAwaitingPayment() {
       return false;
     },
+    async confirmPaymentIfAwaiting() {
+      return false;
+    },
   };
 }
 
