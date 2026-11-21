@@ -1,0 +1,170 @@
+## Projeto
+Leguelé Beer: e-commerce mobile-first da cervejaria artesanal Leguelé Beer (projeto de portfólio).
+Stack: Next.js (front) + NestJS (API) + Prisma; Supabase apenas para Postgres, autenticação e arquivos; deploy na Vercel. Ver docs/03-decisoes/ADR-001-stack.md.
+Hospedagem da API: docs/03-decisoes/ADR-002-hospedagem-api.md. No MVP não há processos de longa duração: sem filas (BullMQ), Redis, WebSocket ou workers. E-mail é enviado de forma síncrona pela API do provedor; tarefas agendadas, se houver, usam o cron da plataforma. Esses recursos ficam para o Pós-MVP.
+
+### Estrutura de pastas
+Monorepo pnpm + Turborepo (spec: docs/02-features/base-monorepo.md).
+- `apps/web` (`@leguele/web`): Next.js, porta 3000. E2E em `apps/web/e2e`.
+  - Componentes e cores reutilizáveis: antes de criar um componente ou uma cor, use o que já existe em `apps/web/src/components/ui` (export único em `index.ts`) e nos tokens de `apps/web/src/app/globals.css`. Se faltar, crie lá e mostre na vitrine `/dev/tokens`; nunca dentro da tela ([[identidade-visual]], "Componentes reutilizáveis").
+- `apps/api` (`@leguele/api`): NestJS, porta 3333. Código em `src/modules/<contexto>/{domain,application,infrastructure,presentation}`.
+- `apps/api/prisma` (schema, migrations, seed) e `supabase/` (config do Supabase local); ver `apps/api/README.md`.
+- `packages/shared` (`@leguele/shared`): código puro compartilhado, compilado com `tsc` (`dist/`).
+- `packages/config` (`@leguele/config`): ESLint flat, `tsconfig.base.json` e Prettier.
+- Na raiz: `turbo.json`, `pnpm-workspace.yaml`, `.dependency-cruiser.cjs` (domain não importa framework) e `.github/workflows/ci.yml`.
+
+### Comandos (dev, teste, build, lint)
+Todos na raiz, com Node do `.nvmrc` e pnpm do `packageManager`.
+- `pnpm install`: instala (o CI usa `--frozen-lockfile`).
+- `pnpm dev`: sobe web e API e compila o `@leguele/shared` em watch (turbo: `shared#build` antes; #224).
+- `pnpm test`: Vitest nos pacotes. `pnpm test:e2e`: Playwright (sobe web e API sozinho).
+- `pnpm lint`: ESLint + dependency-cruiser. `pnpm arch`: só o dependency-cruiser.
+- `pnpm format:check` / `pnpm format`: Prettier.
+- `pnpm typecheck` e `pnpm build`.
+- `pnpm db:start`/`db:stop` (Supabase local, Docker), `db:migrate`, `db:reset`, `db:seed` e `db:check` (schema sem migration).
+
+### Convenções de teste
+- Vitest para unidade e componente (Testing Library no web); Supertest para HTTP na API; Playwright para E2E (viewport de celular).
+- Arquivos `*.test.ts(x)` ao lado do código; E2E em `apps/web/e2e/*.spec.ts`.
+- No CI (`CI=1`) o E2E roda contra o build (`next start`, `node dist/main.js`); no local, em modo dev.
+- Fluxo red → green em commits separados (ver Documentação).
+
+### Variáveis de ambiente
+Na API, em `apps/api/.env` (fora do git; chaves em `apps/api/.env.example`, sem valores). No site, só as duas do Supabase Auth, em `apps/web/.env.local` (fora do git; chaves em `apps/web/.env.example`), lidas no servidor do site e nunca em `NEXT_PUBLIC_*`: `SUPABASE_URL` e `SUPABASE_ANON_KEY` (chave anon; no local: `pnpm exec supabase status -o env`), mais `SITE_URL` (endereço público do site, usado no link de confirmação do e-mail; obrigatório em produção, padrão `http://localhost:3000` no desenvolvimento) e `API_URL` (endereço da API, usado para criar o perfil; obrigatório em produção, padrão `http://localhost:3333` no desenvolvimento). No local o Supabase CLI gera as chaves de desenvolvimento.
+- `DATABASE_URL`: conexão da aplicação com o Postgres.
+- `DIRECT_URL`: conexão das migrations (no local, a mesma).
+- `WEB_ORIGIN`: origem do web liberada no CORS (padrão `http://localhost:3000`).
+- `TEST_DATABASE_URL` (opcional): banco de testes de integração; padrão `leguele_test` no mesmo Postgres local. O nome deve terminar em `_test`.
+- `ADMIN_EMAIL`: e-mail da conta que recebe o papel admin (seed de desenvolvimento e, depois, criação do perfil).
+- `ADMIN_SEED_PASSWORD`: senha da conta admin criada pelo seed no Supabase Auth local. Só no `.env` local; nunca em commit, PR, log ou nota. A única exceção é a nota local "Acesso local (admin)" do canvas do Maestri, fora do git, pedida pelo Diego (2026-10-30) e confirmada em 2026-11-02; fora dela, nunca em commit, PR, log ou outra nota.
+- `SUPABASE_URL`: URL do Supabase Auth (no local, `http://127.0.0.1:54321`).
+- `SUPABASE_SERVICE_ROLE_KEY`: chave de serviço, usada só pelo seed (no local: `pnpm exec supabase status -o env`). Nunca no site nem em variável pública.
+Detalhes e banco local: `apps/api/README.md`.
+
+### Convenção de commits
+Padrão de https://github.com/iuricode/padroes-de-commits (vale para os commits novos; o histórico antigo não é reescrito). O título do PR segue o mesmo formato, já que o squash usa o título como mensagem.
+- Formato: `:emoji: tipo(escopo opcional): descrição`. O emoji é o shortcode (`:sparkles:`), não o caractere. Use `!` depois do tipo/escopo para mudança que quebra compatibilidade (`:sparkles: feat(api)!: ...`).
+- Descrição curta, em pt-BR, no imperativo ou no infinitivo, sem ponto final. Um assunto por commit.
+- Tipos:
+
+| Emoji | Tipo | Uso |
+| --- | --- | --- |
+| `:sparkles:` | `feat` | Novo recurso |
+| `:bug:` | `fix` | Correção de bug |
+| `:books:` | `docs` | Documentação, sem alterar código |
+| `:test_tube:` | `test` | Criação, alteração ou exclusão de testes |
+| `:package:` | `build` | Arquivos de build e dependências |
+| `:zap:` | `perf` | Melhoria de performance |
+| `:ok_hand:` | `style` | Formatação, lint e ajustes visuais do código |
+| `:recycle:` | `refactor` | Refatoração sem mudar comportamento |
+| `:wrench:` | `chore` | Configuração, pacotes e administração |
+| `:bricks:` | `ci` | Integração contínua |
+| `:card_file_box:` | `raw` | Arquivos de configuração, dados, parâmetros |
+| `:broom:` | `cleanup` | Remoção de código comentado e trechos desnecessários |
+| `:wastebasket:` | `remove` | Exclusão de arquivos ou funcionalidades obsoletas |
+| `:tada:` | `init` | Commit inicial do projeto |
+| `:boom:` | `revert` | Reversão de um commit anterior |
+| `:lock:` | `security` | Correção de segurança e hardening |
+
+- Exemplos: `:sparkles: feat: adiciona página de login`, `:bug: fix: corrige loop infinito no carrinho`, `:recycle: refactor: extrai cálculo de frete`.
+- A regra de Atribuição vale em todo commit: sem `Co-Authored-By` de agente de IA (Claude, Codex ou outro).
+
+## Documentação (docs/ é um vault do Obsidian)
+- Antes de implementar uma funcionalidade, leia a spec correspondente em docs/02-features/.
+- Fluxo obrigatório (red-green-refactor): cenário Gherkin → teste falhando (red) → implementação mínima até passar (green) → refatoração.
+  - Red e green andam em fatias verticais, uma de cada vez, como na skill `/tdd`: um teste falhando, o mínimo para passar, e só então o próximo teste. Não escreva todos os testes antes.
+  - A refatoração não faz parte do loop red → green: é um passo separado, feito só com todos os testes verdes, sem mudar comportamento (se um teste precisar mudar, não é refatoração) e em commit próprio (`:recycle: refactor: ...`), separado dos commits da funcionalidade.
+- Auditoria final e refino de testes: no fim de toda ordem, depois de todos os PRs da ordem mergeados (inclusive daily e handoff), o agente Codex (papel "Testes") revisa tudo o que a ordem mudou (código, arquitetura e ADRs, testes, daily/handoff/specs e o resultado final, rodando lint, typecheck, test, build e E2E dos fluxos tocados) e dá o veredito "Ordem aprovada" ou "Ordem com achados". Achado fora de teste volta ao Orchestrator, que encaminha ao responsável. O refino de testes sai em PR próprio, revisado pelo Reviewer e mergeado pela regra de [[ADR-006-merge-por-agentes]]; todo teste novo ou alterado é visto falhando por mutação do código que ele protege, e isso é registrado no commit. Ele não muda código de produção nem docs. A ordem só fecha para o Diego depois do veredito.
+- ADR (docs/03-decisoes/, com docs/templates/adr.md, formato curto): uma decisão técnica vira ADR quando as três condições valem: (a) é difícil de reverter, (b) surpreende quem lê o código sem contexto, (c) veio de um trade-off real entre alternativas. Decisão de produto fica nas specs. Decisão pequena e reversível fica na daily note.
+  - ADR aceito não é editado. Mudar a decisão gera um ADR novo, e o antigo vira `substituído` com link para o novo.
+  - Os ADRs antigos (001 a 007) ficam no formato em que foram escritos; não precisam ser reescritos.
+  - Quem tomou a decisão escreve o rascunho do ADR no mesmo PR; toda entrega de Front, Back e Devops termina com "Candidatos a ADR: ..." ou "Candidatos a ADR: nenhum".
+- Use [[wikilinks]] entre notas; não crie notas fora das pastas existentes (na dúvida, docs/00-inbox/).
+- Daily note (docs/05-diario/, regra de 08/11 contra conflito de merge): PR de código (Front, Back, Devops) não edita a daily; o resumo, as decisões vetáveis e as lições vão na descrição do PR, e o Orchestrator passa para a daily (e as lições para [[licoes-aprendidas]]) no PR de docs dele. Spec e Orchestrator seguem escrevendo na daily nos PRs de docs.
+- Toda spec ou ADR novo é linkado em [[mapa-do-projeto]], e a daily note linka as notas criadas ou alteradas no dia.
+- Lições aprendidas: todo agente lê [[licoes-aprendidas]] (`docs/agents/licoes-aprendidas.md`) no início de cada ordem. Ao errar ou ser corrigido, a lição leva data, quem, o que aconteceu, causa e regra, e antes de encerrar a tarefa: Front, Back e Devops a registram na descrição do PR e o Orchestrator a grava em licoes-aprendidas; Spec, Reviewer, Codex e Orchestrator gravam direto, em PR de docs.
+- Handoff: ao fim de cada ordem, o Orchestrator grava o handoff em `docs/00-inbox/handoff.md` (sobrescrito a cada ordem), não no diretório temporário do sistema. A próxima conversa começa lendo o handoff, a daily note mais recente e [[licoes-aprendidas]]. O handoff entra no git junto com a daily note, no PR da ordem.
+- Memória automática do Claude Code (`~/.claude/projects/.../memory/`) é só atalho: fica fora do vault e do git. O que precisa sobreviver vai para o vault.
+- `/clear`: só entre ordens, depois de a daily note, o relatório e o handoff estarem gravados. Nunca no meio de uma ordem.
+- Não edite docs/.obsidian/.
+
+### Convenções para as skills
+Estas regras têm prioridade sobre os caminhos padrão descritos nos SKILL.md em .claude/skills/ (por exemplo, nas skills do Matt Pocock). Valem tanto para gravar quanto para ler:
+- ADRs: `docs/03-decisoes/ADR-NNN-slug.md` usando `docs/templates/adr.md` (nunca `docs/adr/`).
+- Glossário: `docs/GLOSSARY.md` (nunca na raiz).
+- Specs: `docs/02-features/<slug>.md` usando `docs/templates/feature.md`, com cenários Gherkin em português.
+- Rascunhos e arquivos temporários: `docs/00-inbox/` (nunca `.scratch/` ou pastas novas).
+- Handoff (skill `/handoff`): `docs/00-inbox/handoff.md`, nunca no diretório temporário do sistema.
+- Revisão de código contra a spec: usar `/review-spec`.
+- Revisão de UI (skill `web-design-guidelines`, da Vercel): usa a cópia local e fixada das regras em `.claude/skills/web-design-guidelines/guidelines.md` (commit de origem no SKILL.md), sem baixar da internet. Atualizar as regras só em PR próprio; não rodar `skills update` nem `skills restore` nessa skill.
+- Automação de navegador (skill `playwright-cli`, da Microsoft): o binário vem do `@playwright/cli`, devDependency fixada na raiz. Serve para explorar e depurar páginas; os testes E2E continuam em `@playwright/test`. O `@playwright/cli` fixa o `playwright` 1.64.0-alpha, que convive com o 1.64.1 do `@playwright/test`.
+  - A seção "Installation" do SKILL.md não vale: use só `pnpm exec playwright-cli`. Nunca instale globalmente, nem com `@latest`, nem com `npx playwright cli`, nem com `playwright-cli install --skills` (só num PR de atualização da skill).
+  - Defina `NO_UPDATE_NOTIFIER=1` ao rodar o CLI, para ele não consultar o npm (1x por dia). Ex.: `NO_UPDATE_NOTIFIER=1 pnpm exec playwright-cli open`.
+  - Só sessões isoladas: nada de `--cdp` ou `--extension` no navegador real do Diego.
+  - `gh pr comment --attach` só seguindo a regra de Atribuição.
+  - O `pnpm-workspace.yaml` nega as agent skills do `@playwright/cli` (`permissions`); não aprove, para não surgir cópia que se atualiza sozinha.
+- Issue tracker: GitHub Issues é o tracker do MVP.
+  - `to-spec` e `to-tickets` gravam a spec em `docs/02-features/` e só publicam issues depois que a migração do backlog tiver sido feita. Enquanto não existirem issues migradas no repositório (issues com o marcador `notion-id` no corpo), apenas listam os tickets propostos no fim da spec.
+  - O Notion guarda as ideias do Pós-MVP. Por ordem do Diego em 2026-11-10, o Orchestrator mantém o backlog do Notion (database Backlog) atualizado junto com o andamento do projeto (status dos cards: Em andamento, Em revisão, Concluído), sem apagar cards nem mudar escopo. Ele atualiza o Notion a cada PR aberto (Em andamento), em revisão (Em revisão) e mergeado (Concluído); se o Notion e o GitHub Issues divergirem, o GitHub Issues é a fonte da verdade; as ideias do Pós-MVP continuam só lá. Os demais agentes não alteram o Notion.
+  - Corte do MVP: [[mvp-corte]] (`docs/01-produto/mvp-corte.md`). A migração do backlog foi feita em 2026-10-28: 110 issues com o marcador `notion-id` (14 épicos + 96 cards) nos milestones "MVP" e "MVP+".
+- Ultracode e workflows: não use `/effort ultracode` nem execute tarefas como workflow sem autorização explícita do Diego.
+  - Uso previsto: auditorias amplas e pontuais pelo Reviewer, como a revisão de segurança antes de fechar o milestone "MVP".
+  - Front, Back, Orchestrator, Spec e Devops não usam ultracode.
+  - Pesquisas comparando várias fontes podem usar `/deep-research`, também só com autorização.
+- Modelos: cada agente usa o modelo definido em `docs/00-inbox/maestri-banda.md`. Não troque de modelo por conta própria.
+- Merge de PRs (ver [[ADR-006-merge-por-agentes]]): o Orchestrator decide o merge e o Devops executa, sem aprovação do Diego PR a PR, quando TODAS as condições valem: (1) o Reviewer deu veredito "Aprovar" para o commit atual do PR (commit novo depois da aprovação exige nova aprovação); (2) o CI está verde, quando houver CI configurado; (3) a mensagem do squash e a descrição do PR foram conferidas sem atribuição ao Claude; (4) a base é `main` e não há conflitos. Método único: `gh pr merge <n> --squash --delete-branch`. Nenhum outro agente faz merge. Se alguma condição falhar, não há merge e o Orchestrator reporta ao Diego. O Diego pode fazer merge a qualquer momento.
+- Atribuição (regra permanente para todos os agentes, nesta e em todas as ordens futuras): nenhum agente de IA (Claude, Codex ou outro) aparece como colaborador do projeto. Nenhum commit tem `Co-Authored-By` de agente (Claude, Codex ou variação), e nenhum PR, descrição, comentário ou mensagem tem "Generated with Claude Code", link de sessão ou qualquer outra atribuição ao Claude, à Anthropic, ao Codex ou à OpenAI.
+  - Antes de cada push ou PR, confira a mensagem de commit e a descrição do PR.
+  - A atribuição automática do Claude Code fica desativada em `.claude/settings.json` (chave `attribution`).
+  - Se encontrar atribuição ao Claude em commit ou PR ainda aberto, avise o Diego antes de corrigir. Não reescreva histórico já mergeado sem autorização dele.
+
+## Política de autonomia (regra permanente do Diego)
+
+Os agentes têm autonomia para decidir e executar a maior parte do trabalho sem consultar o Diego. Só o procure nos casos listados em "Decisões que são do Diego".
+
+Ciclo contínuo ([[ADR-016-ciclo-continuo-da-banda]]): a banda segue de uma tarefa para a próxima sem esperar ordem do Diego; decisão dele vai ao cartão "Decisões pendentes" do canvas e o trabalho continua em outra tarefa. A recomendada vale só para os itens 1, 2 e 9 de "Decisões que são do Diego" (produto e negócio, marca e conteúdo, dúvida real): o Orchestrator a aplica e reporta como decisão vetável. Os itens 3 a 8 da mesma lista continuam parando no Diego: vão ao cartão de pendências e a banda segue com outra tarefa. O merge segue só pelas 4 condições do [[ADR-006-merge-por-agentes]].
+
+**O agente decide sozinho** (exemplos, não é lista fechada):
+- Escolhas técnicas com resposta razoavelmente clara: estrutura de código, nomes, padrões, bibliotecas já presentes no projeto, formato de arquivos, organização de pastas.
+- Planejamento: ordem das tarefas, divisão em branches e PRs, qual especialista recebe o quê.
+- Correções de bugs, refatorações, testes, ajustes de CI, melhorias de performance e acessibilidade que não mudam o comportamento combinado.
+- Nomes de branches, commits, PRs e arquivos (ex.: nomear imagens com base no conteúdo).
+- Pequenas ambiguidades: escolha a opção mais simples e mais fácil de reverter e registre a decisão numa nota no diário. Decisão que atende aos três critérios de ADR (seção Documentação) vira ADR.
+
+**Decisões que são do Diego** (pare só esse item e pergunte):
+1. Produto e negócio: preços, catálogo, regras de venda, kits, Clube, escopo do MVP, o que entra ou sai de uma feature.
+2. Marca e conteúdo: textos do site, identidade visual, uso de imagens/logo, qualquer coisa que represente a Leguelé Beer.
+3. Mudança de decisão já tomada: contrariar algo registrado nos ADRs, no docs/01-produto/visao.md ou no backlog.
+4. Custos e contas: qualquer serviço pago, sair do plano gratuito, criar contas ou integrações externas novas (pagamento, e-mail etc.).
+5. Ações irreversíveis ou destrutivas: force push, reescrever histórico, apagar branch com trabalho não mergeado, apagar dados, migration destrutiva em produção, deploy em produção (ver o ponto em aberto do [[ADR-006-merge-por-agentes]]), descartar alterações que não sejam claramente lixo.
+6. Segredos e acessos: criar, trocar ou expor credenciais, mudar permissões do repositório ou dos serviços.
+7. Segurança e lei: dados pessoais de clientes (LGPD), pagamentos, termos de uso.
+8. Merge na main: segue a regra "Merge de PRs" acima ([[ADR-006-merge-por-agentes]]): o Orchestrator decide e o Devops executa, só com todas as condições cumpridas. Fora dessas condições, o merge é do Diego.
+9. Dúvida real: quando as opções têm consequências bem diferentes para o produto e nenhuma é claramente melhor.
+
+**Como consultar o Diego:**
+- Não trave o trabalho inteiro por uma decisão dele. Pause só o que depende dela e siga com o resto.
+- Junte as perguntas pendentes e mande tudo de uma vez, no fim da tarefa ou quando nada mais puder avançar sem ele.
+- Para cada pergunta: contexto em 1–2 frases, as opções (no máximo 3), o impacto de cada uma e a recomendação.
+- Numere as perguntas, para ele responder no formato "1: opção B, 2: sim".
+- Os especialistas mandam as dúvidas ao Orchestrator, que só encaminha ao Diego as que se encaixam em "Decisões que são do Diego".
+
+**Prioridades:**
+- As regras específicas deste CLAUDE.md e de docs/agents/ que exigem autorização explícita do Diego continuam valendo, mesmo fora das 9 categorias: criar issues; criar ou editar labels e milestones; editar issues, exceto quando a mudança só reconcilia a issue com uma spec já mergeada na `main` ou com uma decisão registrada do Diego (ADR, mvp-corte, daily note), o que tem aprovação permanente ("sempre sim", 2026-10-29) e inclui título, corpo, labels, milestone e fechar ou reabrir a issue; ultracode, workflows e /deep-research; troca de modelo dos agentes.
+- Quando uma ordem do Diego disser explicitamente "pare e me pergunte", isso vale acima desta política.
+- A regra de nenhuma atribuição ao Claude (commits, PRs, descrições) continua valendo sempre.
+
+**Relatório do Orchestrator ao fim de cada ordem:**
+1. O que foi feito (PRs, arquivos).
+2. Decisões tomadas sem consultar o Diego, em uma linha cada, para ele poder vetar alguma.
+3. Perguntas pendentes para o Diego, no formato acima.
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues em `DiegoLCirqueira/Leguel-Beer`, com milestones "MVP" e "MVP+"; specs ficam em `docs/02-features/`, não nas issues. See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context, dentro do vault: glossário em `docs/GLOSSARY.md` e ADRs em `docs/03-decisoes/ADR-NNN-slug.md`. See `docs/agents/domain.md`.
