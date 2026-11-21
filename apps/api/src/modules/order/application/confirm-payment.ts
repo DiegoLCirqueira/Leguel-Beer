@@ -29,6 +29,12 @@ export class ConfirmPayment {
       await this.expiration.execute(input.orderId);
       throw new PaymentNotConfirmableError();
     }
-    await this.orders.confirmPaymentIfAwaiting(input.orderId, input.actorId, this.now());
+    // O repositório decide a corrida: só quem ainda vê o pedido aguardando pagamento confirma.
+    const confirmed = await this.orders.confirmPaymentIfAwaiting(
+      input.orderId,
+      input.actorId,
+      this.now(),
+    );
+    if (!confirmed) throw new PaymentNotConfirmableError();
   }
 }
