@@ -34,6 +34,16 @@ describe("consultarCep", () => {
     });
   });
 
+  it("descarta qualquer campo além de rua, bairro, cidade e UF (latitude, longitude, ibge)", async () => {
+    fetchFalso.mockResolvedValue(
+      json({ ...viacep, latitude: "-9.6", longitude: "-35.7", ibge: "2704302", ddd: "82" }),
+    );
+
+    const resultado = await consultarCep("57035-000");
+
+    expect(Object.keys(resultado).sort()).toEqual(["bairro", "cidade", "rua", "tipo", "uf"]);
+  });
+
   it("CEP inexistente ({ erro: true }) vira nao-encontrado", async () => {
     fetchFalso.mockResolvedValue(json({ erro: true }));
 
