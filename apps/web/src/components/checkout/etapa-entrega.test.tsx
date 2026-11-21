@@ -338,4 +338,40 @@ describe("EtapaEntrega", () => {
     expect(buscar).toHaveBeenCalledTimes(2);
     expect(trocar).not.toHaveBeenCalled();
   });
+
+  it("busca que lança (rede) também avisa; durante o Tentar de novo o botão mostra que está tentando", async () => {
+    let responder: () => void = () => {};
+    const buscar = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("rede"))
+      .mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            responder = () => resolve({ tipo: "erro" });
+          }),
+      );
+    const conta: ContaDaGeladeira = {
+      buscar,
+      enviar: async () => ({ tipo: "erro" }),
+      validar: async () => ({ tipo: "erro" }),
+    };
+    render(
+      <GeladeiraProvider conta={conta}>
+        <EtapaEntrega
+          enderecos={[casa]}
+          cotarFrete={vi.fn()}
+          destinoDoPagamento="/checkout/pagamento"
+        />
+      </GeladeiraProvider>,
+    );
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Não foi possível carregar sua Geladeira agora.",
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "Tentar de novo" }));
+
+    expect(await screen.findByRole("button", { name: "Tentando..." })).toBeDisabled();
+    responder();
+    expect(await screen.findByRole("button", { name: "Tentar de novo" })).toBeEnabled();
+  });
 });
