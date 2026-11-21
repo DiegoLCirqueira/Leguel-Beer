@@ -1,5 +1,14 @@
-import { describe, expect, it } from "vitest";
-import { dentroDoLimiteDeCep, visitantesNoLimiteDeCep } from "./limite-de-cep";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+type Modulo = typeof import("./limite-de-cep");
+let dentroDoLimiteDeCep: Modulo["dentroDoLimiteDeCep"];
+let visitantesNoLimiteDeCep: Modulo["visitantesNoLimiteDeCep"];
+
+// Módulo novo a cada teste: o mapa de visitantes é estado do módulo e não pode vazar entre testes.
+beforeEach(async () => {
+  vi.resetModules();
+  ({ dentroDoLimiteDeCep, visitantesNoLimiteDeCep } = await import("./limite-de-cep"));
+});
 
 describe("dentroDoLimiteDeCep", () => {
   it("aceita 60 consultas por minuto de um visitante e recusa a 61ª, até a janela passar", () => {
@@ -14,10 +23,22 @@ describe("dentroDoLimiteDeCep", () => {
     const t0 = 5_000_000;
     dentroDoLimiteDeCep("antigo-1", t0);
     dentroDoLimiteDeCep("antigo-2", t0);
-    const antes = visitantesNoLimiteDeCep();
+    expect(visitantesNoLimiteDeCep()).toBe(2);
 
     dentroDoLimiteDeCep("novo", t0 + 120_000);
 
-    expect(visitantesNoLimiteDeCep()).toBe(antes - 2 + 1);
+    expect(visitantesNoLimiteDeCep()).toBe(1);
+  });
+
+  it("a varredura roda no máximo uma vez por janela, não a cada consulta", () => {
+    const t0 = 9_000_000;
+    dentroDoLimiteDeCep("a", t0);
+    dentroDoLimiteDeCep("b", t0 + 1_000);
+    dentroDoLimiteDeCep("c", t0 + 60_000); // varre: "a" sai, "b" (59 s) fica
+    expect(visitantesNoLimiteDeCep()).toBe(2);
+
+    dentroDoLimiteDeCep("d", t0 + 61_500); // "b" já venceu, mas a próxima varredura é só em t0 + 120 s
+
+    expect(visitantesNoLimiteDeCep()).toBe(3);
   });
 });

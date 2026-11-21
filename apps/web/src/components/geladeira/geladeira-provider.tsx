@@ -13,7 +13,7 @@ import {
   type ReactNode,
 } from "react";
 import { usePathname } from "next/navigation";
-import type { ContaDaGeladeira } from "@/lib/geladeira/conta";
+import type { ContaDaGeladeira, ResultadoDaConta } from "@/lib/geladeira/conta";
 import {
   CHAVE_DA_CONTA,
   CHAVE_PENDENTE,
@@ -49,6 +49,12 @@ export type GeladeiraContexto = {
    * Geladeira de verdade. Antes, uma cópia vazia pode ser só o outro aparelho ainda sem sincronizar.
    */
   resolvida: boolean;
+  /** A busca da conta falhou (erro ou tempo esgotado): não se sabe o que a conta tem. */
+  falhouAoBuscar: boolean;
+  /** A busca da conta está em andamento (para o "Tentar de novo" mostrar que está tentando). */
+  buscando: boolean;
+  /** Busca a conta outra vez depois de uma falha. */
+  tentarDeNovo: () => void;
   /** Sobe a cada vez que a conta passa a ter a Geladeira mostrada (busca ou envio concluídos). */
   sincronizacoes: number;
   /** Avisos de preço e quantidade da última resposta da conta (a tela da Geladeira os mostra). */
@@ -78,14 +84,36 @@ export function useGeladeira(): GeladeiraContexto {
   return contexto;
 }
 
+/** Resposta da `conta` estável se a conta do layout sumir entre uma chamada e outra. */
+const SEM_CONTA = Promise.resolve<ResultadoDaConta>({ tipo: "erro" });
+
 export function GeladeiraProvider({
   children,
-  conta,
+  conta: contaDoLayout,
 }: {
   children: ReactNode;
   /** Sem `conta` (testes, telas sem sessão) a Geladeira é só local. */
   conta?: ContaDaGeladeira;
 }) {
+  // O layout é um Server Component: a cada atualização do servidor o objeto `conta` (e as referências
+  // das ações) chega novo. Se ele entrasse nas dependências dos efeitos, cada atualização repetiria a
+  // busca da conta, que atualiza de novo, num laço. A `conta` daqui é estável e chama a mais recente.
+  const contaAtual = useRef(contaDoLayout);
+  useEffect(() => {
+    contaAtual.current = contaDoLayout;
+  });
+  const temConta = contaDoLayout !== undefined;
+  const conta = useMemo<ContaDaGeladeira | undefined>(
+    () =>
+      temConta
+        ? {
+            buscar: () => contaAtual.current?.buscar() ?? SEM_CONTA,
+            enviar: (pedido) => contaAtual.current?.enviar(pedido) ?? SEM_CONTA,
+            validar: (pedido) => contaAtual.current?.validar(pedido) ?? SEM_CONTA,
+          }
+        : undefined,
+    [temConta],
+  );
   // A cópia local só existe no navegador: lida uma vez ao montar (no servidor fica vazia).
   const [estado, setEstado] = useState<EstadoDaGeladeira>(() => lerGeladeiraLocal());
   // `false` no HTML do servidor e na hidratação; `true` depois: o contador só aparece então.
@@ -101,6 +129,13 @@ export function GeladeiraProvider({
   const [ajustes, setAjustes] = useState<AjusteDaGeladeira[]>([]);
   const [sincronizacoes, setSincronizacoes] = useState(0);
   const [respondeu, setRespondeu] = useState(false);
+  const [falhouAoBuscar, setFalhouAoBuscar] = useState(false);
+  const [tentativa, setTentativa] = useState(0);
+  const [buscando, setBuscando] = useState(false);
+  const tentarDeNovo = useCallback(() => {
+    setBuscando(true);
+    setTentativa((n) => n + 1);
+  }, []);
   // Entrar e sair redirecionam: a mudança de página é o sinal para olhar a sessão de novo.
   const pagina = usePathname();
   // Geração da identidade/modo (convidado ou conta, página, sessão): sobe a cada mudança que torna
@@ -169,11 +204,14 @@ export function GeladeiraProvider({
     if (!conta) return;
     novaGeracao();
     let ativo = true;
+    let falhou = false;
     (async () => {
       const sincronizada = lerMarca(CHAVE_DA_CONTA);
       if (sincronizada && lerMarca(CHAVE_PENDENTE)) return enviar();
       const antes = versao.current;
       const resultado = await conta.buscar().catch(() => undefined);
+      // Erro ou tempo esgotado: a conta não respondeu, e uma cópia vazia não prova Geladeira vazia.
+      if (!resultado || resultado.tipo === "erro") falhou = true;
       if (!ativo || !resultado) return;
       if (resultado.tipo === "sem-sessao") {
         if (sincronizada) return sairDaConta();
@@ -200,12 +238,15 @@ export function GeladeiraProvider({
       aplicar(geladeira);
       if (enviarParaConta) await enviar();
     })().finally(() => {
-      if (ativo) setRespondeu(true);
+      if (!ativo) return;
+      setBuscando(false);
+      setFalhouAoBuscar(falhou);
+      setRespondeu(!falhou);
     });
     return () => {
       ativo = false;
     };
-  }, [conta, enviar, aplicar, sairDaConta, validarConvidado, novaGeracao, pagina]);
+  }, [conta, enviar, aplicar, sairDaConta, validarConvidado, novaGeracao, pagina, tentativa]);
 
   // Estável: a tela o usa na limpeza de um efeito.
   const limparAjustes = useCallback(() => setAjustes([]), []);
@@ -215,7 +256,10 @@ export function GeladeiraProvider({
       pronta,
       estado,
       quantidadeTotal: quantidadeTotal(estado),
-      resolvida: !conta || respondeu,
+      resolvida: !temConta || respondeu,
+      falhouAoBuscar,
+      buscando,
+      tentarDeNovo,
       sincronizacoes,
       ajustes,
       limparAjustes,
@@ -260,8 +304,11 @@ export function GeladeiraProvider({
     [
       pronta,
       estado,
-      conta,
+      temConta,
       respondeu,
+      falhouAoBuscar,
+      buscando,
+      tentarDeNovo,
       sincronizacoes,
       ajustes,
       limparAjustes,

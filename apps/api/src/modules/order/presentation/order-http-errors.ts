@@ -7,6 +7,7 @@ import {
   IdempotencyKeyReusedError,
   OutOfDeliveryAreaError,
   OutOfStockError,
+  PaymentNotConfirmableError,
   PendingOrderError,
   TotalChangedError,
   UnderageError,
@@ -31,6 +32,9 @@ function toHttpError(error: unknown): unknown {
   }
   if (error instanceof IdempotencyKeyReusedError) {
     return new CodedHttpError(422, "IDEMPOTENCY_KEY_REUSED", error.message);
+  }
+  if (error instanceof PaymentNotConfirmableError) {
+    return new CodedHttpError(409, "CONFLICT", error.message);
   }
   if (error instanceof PendingOrderError) {
     return new CodedHttpError(409, "PENDING_ORDER", error.message, { pedidoId: error.orderId });

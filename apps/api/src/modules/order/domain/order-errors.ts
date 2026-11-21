@@ -65,3 +65,11 @@ export class IdempotencyKeyReusedError extends Error {
     this.name = "IdempotencyKeyReusedError";
   }
 }
+
+/** O pedido não pode ter o pagamento confirmado: já mudou de status, venceu ou foi perdido numa corrida. */
+export class PaymentNotConfirmableError extends Error {
+  constructor() {
+    super("Este pedido não está mais aguardando pagamento.");
+    this.name = "PaymentNotConfirmableError";
+  }
+}
