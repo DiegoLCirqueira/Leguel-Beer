@@ -44,7 +44,7 @@
       "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
       "### User-specific",
       "**Primary use of Claude Code**: software development",
-      "**Trusted repo**: the git repository at C:\\Users\\Arthur\\Desktop\\Programação - Copia\\.maestri\\roles\\73cf613f-143a-4f7b-b583-64c05430d22f (working directory the agent started in); no remotes configured",
+      "**Trusted repo**: the git repository at <REDIGIDO> (working directory the agent started in); no remotes configured",
       "**Org-specific CLIs**: None configured"
     ]
   },
