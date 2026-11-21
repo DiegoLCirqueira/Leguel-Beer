@@ -1,0 +1,44 @@
+"use server";
+
+import { cotacaoDeFreteSchema } from "@leguele/shared";
+import type { FreteEstimado } from "@/components/ui";
+import { urlDaApi } from "@/lib/auth/config";
+import { lerTokenDeAcesso } from "@/lib/auth/servidor";
+import { buscarEnderecos } from "@/lib/enderecos/buscar";
+
+export type ResultadoDoFrete =
+  { tipo: "frete"; frete: FreteEstimado } | { tipo: "sem-endereco" } | { tipo: "sem-sessao" };
+
+/** Uma API que não responde não pode deixar a tela esperando. */
+const TEMPO_LIMITE_MS = 8000;
+const INDISPONIVEL: ResultadoDoFrete = { tipo: "frete", frete: { tipo: "indisponivel" } };
+
+/**
+ * Frete estimado da Geladeira da conta pelo endereço padrão. Quem calcula é a API (subtotal da
+ * Geladeira dela e regra de frete); o site só mostra. Nunca lança.
+ */
+export async function cotarFreteDoPadraoAction(): Promise<ResultadoDoFrete> {
+  const token = await lerTokenDeAcesso();
+  if (!token) return { tipo: "sem-sessao" };
+  const lista = await buscarEnderecos(token);
+  if (lista.tipo === "sem-sessao") return { tipo: "sem-sessao" };
+  if (lista.tipo === "erro") return INDISPONIVEL;
+  const padrao = lista.enderecos.find((e) => e.padrao);
+  if (!padrao) return { tipo: "sem-endereco" };
+  try {
+    const resposta = await fetch(`${urlDaApi()}/me/enderecos/${padrao.id}/frete`, {
+      cache: "no-store",
+      signal: AbortSignal.timeout(TEMPO_LIMITE_MS),
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (resposta.status === 401) return { tipo: "sem-sessao" };
+    if (!resposta.ok) return INDISPONIVEL;
+    const cotacao = cotacaoDeFreteSchema.safeParse(await resposta.json());
+    if (!cotacao.success) return INDISPONIVEL;
+    if (!cotacao.data.naArea) return { tipo: "frete", frete: { tipo: "fora-da-area" } };
+    if (cotacao.data.gratis) return { tipo: "frete", frete: { tipo: "gratis" } };
+    return { tipo: "frete", frete: { tipo: "valor", centavos: cotacao.data.freteCentavos } };
+  } catch {
+    return INDISPONIVEL;
+  }
+}
