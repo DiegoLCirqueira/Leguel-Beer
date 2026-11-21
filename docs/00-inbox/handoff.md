@@ -9,7 +9,7 @@ Sobrescrito pelo Orchestrator ao fim de cada ordem. A próxima conversa começa 
 
 ## Última ordem: retomada e checkout Entrega (16/11 a 21/11)
 
-- Mergeados #293 a #335 (lista por dia em [[2026-11-17]] e [[2026-11-21]]): endereços completos no site, frete na Geladeira, dados pessoais e maioridade, criar pedido na API ([[ADR-019-criacao-do-pedido-serializada-por-cliente]]), pagamento só visual com aviso e "Voltar" ([[ADR-020-aviso-de-portfolio-no-pagamento]]), etapa Entrega do checkout, limites por conta e por visitante, spec do e-mail do pedido, tokens e Next 16.4.6.
+- Mergeados #293 a #335 (lista por dia em [[2026-11-16]], [[2026-11-17]] e [[2026-11-21]]): endereços completos no site, frete na Geladeira, dados pessoais e maioridade, criar pedido na API ([[ADR-019-criacao-do-pedido-serializada-por-cliente]]), pagamento só visual com aviso e "Voltar" ([[ADR-020-aviso-de-portfolio-no-pagamento]]), etapa Entrega do checkout, limites por conta e por visitante, spec do e-mail do pedido, tokens e Next 16.4.6.
 - Specs fechadas: [[qualidade-compra]] (pronta), [[admin]] (conferida com a API: ainda sem rota de admin), [[email-pedido]] (rascunho até o provedor).
 - Regra nova do Diego (21/11): trabalhar em ciclo, sem reportar cada evento; falar só para decisão, bloqueio ou entrega grande.
 
@@ -29,7 +29,7 @@ Sobrescrito pelo Orchestrator ao fim de cada ordem. A próxima conversa começa 
 1. Checkout: etapas Pagamento e Revisão, criar pedido no site e revalidação da Geladeira ([[checkout]], [[pagamento]]).
 2. Admin: fatias 1 a 7 de [[admin]] (nenhuma rota existe ainda). O Back decide na fatia 7 o destino das tabelas de gateway que sobraram.
 3. E-mail do pedido: fatias 1 e 2 de [[email-pedido]] com envio falso; o provedor espera o Diego.
-4. Testes instáveis: acompanhar o E2E depois do #331.
+4. Testes instáveis: o #331, o #332 (traces no CI) e o #334 já estão na `main`; se um E2E voltar a falhar, abrir o trace do CI (público e pode expor valores reais, ver o aviso do #333) antes de aceitar como instável.
 
 ## Pendências do Diego
 
