@@ -11,7 +11,11 @@ const { lerToken, buscar, redirecionar } = vi.hoisted(() => ({
 }));
 vi.mock("@/lib/auth/servidor", () => ({ lerTokenDeAcesso: lerToken }));
 vi.mock("@/lib/enderecos/buscar", () => ({ buscarEnderecos: buscar }));
-vi.mock("next/navigation", () => ({ redirect: redirecionar, usePathname: () => "/checkout" }));
+vi.mock("next/navigation", () => ({
+  redirect: redirecionar,
+  usePathname: () => "/checkout",
+  useRouter: () => ({ replace: vi.fn() }),
+}));
 vi.mock("@/app/geladeira/frete", () => ({
   cotarFreteDoEnderecoAction: vi
     .fn()
