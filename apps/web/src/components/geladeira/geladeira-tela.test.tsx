@@ -1,4 +1,4 @@
-import type { CervejaCard } from "@leguele/shared";
+import type { CervejaCard, GeladeiraResponse } from "@leguele/shared";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderToString } from "react-dom/server";
@@ -6,7 +6,7 @@ import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/geladeira" }));
-import { CHAVE_DA_GELADEIRA } from "@/lib/geladeira/armazenamento";
+import { CHAVE_DA_CONTA, CHAVE_DA_GELADEIRA } from "@/lib/geladeira/armazenamento";
 import type { ContaDaGeladeira } from "@/lib/geladeira/conta";
 import { GeladeiraProvider } from "./geladeira-provider";
 import type { ResultadoDoFrete } from "@/app/geladeira/frete";
@@ -272,12 +272,29 @@ describe("GeladeiraTela", () => {
           removeEventListener: () => {},
         }) as unknown as MediaQueryList;
     };
-    const abrirComFrete = (cotarFrete: () => Promise<ResultadoDoFrete>) =>
-      render(
-        <GeladeiraProvider>
+    const daConta = (quantidade: number): GeladeiraResponse => ({
+      itens: [{ cerveja: mare, quantidade, totalCentavos: quantidade * mare.precoCentavos }],
+      ajustes: [],
+      quantidadeTotal: quantidade,
+      subtotalCentavos: quantidade * mare.precoCentavos,
+    });
+    // O frete é da conta: a Geladeira vem dela e cada mudança local é enviada para ela.
+    const abrirComFrete = (
+      cotarFrete: () => Promise<ResultadoDoFrete>,
+      enviar: ContaDaGeladeira["enviar"] = async () => ({ tipo: "ok", resposta: daConta(3) }),
+    ) => {
+      localStorage.setItem(CHAVE_DA_CONTA, "1");
+      const conta: ContaDaGeladeira = {
+        buscar: async () => ({ tipo: "ok", resposta: daConta(2) }),
+        enviar,
+        validar: async () => ({ tipo: "erro" }),
+      };
+      return render(
+        <GeladeiraProvider conta={conta}>
           <GeladeiraTela cotarFrete={cotarFrete} />
         </GeladeiraProvider>,
       );
+    };
 
     it("com endereço padrão, mostra o frete e o total com frete", async () => {
       telaLarga();
