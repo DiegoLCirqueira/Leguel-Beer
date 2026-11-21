@@ -128,4 +128,17 @@ describe("GET /cron/expirar-pedidos (HTTP, banco real)", () => {
       await prisma.stockReservation.count({ where: { orderId: due, releasedAt: { not: null } } }),
     ).toBe(1);
   });
+
+  it("sem o segredo ou com o segredo errado responde 401 e não expira nada", async () => {
+    const due = await createOrder("#LB000001", new Date(Date.now() - 60_000));
+
+    const semSegredo = await sweep();
+    const errado = await sweep("Bearer outro-segredo-de-teste-0002");
+    const outroEsquema = await sweep(`Basic ${SECRET}`);
+
+    expect([semSegredo.status, errado.status, outroEsquema.status]).toEqual([401, 401, 401]);
+    expect((await prisma.order.findUniqueOrThrow({ where: { id: due } })).status).toBe(
+      "AWAITING_PAYMENT",
+    );
+  });
 });
