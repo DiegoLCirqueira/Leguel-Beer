@@ -146,7 +146,7 @@ Candidatos a ADR: nenhum (RLS como segunda barreira já está fora de escopo do 
 ## Decisões relacionadas
 
 - [[mvp-corte]], [[sequencia-telas]], [[guards-api]], [[testes-api]], [[api-base]]
-- [[ADR-007-banco-de-teste]], [[ADR-009-guard-global-fechado]], [[ADR-010-validacao-com-zod]], [[ADR-012-sessao-em-cookies-httponly]], [[ADR-018-pagamento-simulado]]
+- [[ADR-007-banco-de-teste]], [[ADR-009-guard-global-fechado]], [[ADR-010-validacao-com-zod]], [[ADR-012-sessao-em-cookies-httponly]], [[ADR-020-aviso-de-portfolio-no-pagamento]]
 
 ## Decisões tomadas sem consulta
 
@@ -156,7 +156,6 @@ Recomendações aplicadas pelo Spec em 14/11; qualquer uma pode ser vetada.
 - **Compra até "Entregue"** passando pelas ações do admin.
 - **"Pago" pela ação do admin** no E2E, sem gateway (15/11, substitui o aviso falso assinado).
 - **RLS negar tudo como segunda barreira**, sem virar a autorização principal, sem `FORCE` e com a função do admin `SECURITY DEFINER`.
-- **Limites próprios** em pedido, foto e endereço; números com o Back.
 - **CSP sem esperar gateway** (15/11).
 - **Limite das Server Actions por visitante no site** (sem segredo novo) e o texto "Muitas tentativas seguidas. Espere um minuto e tente de novo." para o 429.
 - **`pnpm audit`** falhando em alta ou crítica de produção, com exceção registrada e prazo de até 30 dias.
