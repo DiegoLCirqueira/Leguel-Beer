@@ -16,6 +16,24 @@ test.describe("Checkout: Entrega", () => {
     await expect(page).toHaveURL(/\/entrar\?retorno=%2Fcheckout$/);
   });
 
+  test("com a Geladeira vazia, o checkout leva à Geladeira (360x640)", async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 640 });
+    const email = emailUnico("checkout-vazio");
+    const senha = "senha-segura-123";
+    await criarContaConfirmada(email, senha);
+    await page.goto("/entrar?retorno=%2Fcheckout");
+    await page.getByLabel("E-mail").fill(email);
+    await page.getByLabel("Senha", { exact: true }).fill(senha);
+    await page.getByRole("button", { name: "Entrar", exact: true }).click();
+
+    await expect(page).toHaveURL(/\/geladeira$/);
+    await expect(page.getByRole("heading", { name: "Geladeira", level: 1 })).toBeAttached();
+    const sobra = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(sobra).toBeLessThanOrEqual(0);
+  });
+
   test("escolhe o endereço, vê o frete, e o endereço fora da área não deixa continuar", async ({
     page,
   }) => {
@@ -44,7 +62,8 @@ test.describe("Checkout: Entrega", () => {
 
     await expect(page.getByRole("radio", { name: /Casa/ })).toBeChecked();
     await expect(page.getByText("R$ 13,00")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Continuar para pagamento" })).toBeVisible();
+    // A tela de pagamento ainda não existe: o botão segue desabilitado, sem destino quebrado.
+    await expect(page.getByRole("button", { name: "Continuar para pagamento" })).toBeDisabled();
 
     await page.getByRole("radio", { name: /Trabalho/ }).check();
 
@@ -53,6 +72,6 @@ test.describe("Checkout: Entrega", () => {
     await expect(page.getByRole("button", { name: "Continuar para pagamento" })).toBeDisabled();
 
     await page.getByRole("radio", { name: /Casa/ }).check();
-    await expect(page.getByRole("link", { name: "Continuar para pagamento" })).toBeVisible();
+    await expect(page.getByText("R$ 13,00")).toBeVisible();
   });
 });
