@@ -61,4 +61,36 @@ describe("AcoesDoEndereco", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Este endereço não existe mais.");
   });
+
+  it("enquanto a ação roda, os dois botões ficam desabilitados", async () => {
+    let concluir: (r: { tipo: "ok" }) => void = () => {};
+    tornarPadrao.mockReturnValue(new Promise((resolve) => (concluir = resolve)));
+    render(<AcoesDoEndereco id="e1" nome="Trabalho" padrao={false} />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Tornar padrão: Trabalho" }));
+
+    expect(screen.getByRole("button", { name: "Tornar padrão: Trabalho" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Excluir: Trabalho" })).toBeDisabled();
+    concluir({ tipo: "ok" });
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Excluir: Trabalho" })).toBeEnabled(),
+    );
+  });
+
+  it("ao tentar de novo, o aviso anterior some", async () => {
+    excluir.mockResolvedValueOnce({ tipo: "erro" });
+    render(<AcoesDoEndereco id="e1" nome="Casa" padrao />);
+    await userEvent.click(screen.getByRole("button", { name: "Excluir: Casa" }));
+    await screen.findByRole("alert");
+
+    let concluir: (r: { tipo: "ok" }) => void = () => {};
+    excluir.mockReturnValueOnce(new Promise((resolve) => (concluir = resolve)));
+    await userEvent.click(screen.getByRole("button", { name: "Excluir: Casa" }));
+
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    concluir({ tipo: "ok" });
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Excluir: Casa" })).toBeEnabled(),
+    );
+  });
 });
