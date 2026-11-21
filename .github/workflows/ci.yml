@@ -124,3 +124,14 @@ jobs:
 
       - name: E2E
         run: pnpm test:e2e
+
+      # Só quando algum passo falha: sobe os traces do Playwright (sem segredos; as chaves e a senha do admin
+      # são descartáveis deste job). Retenção curta de 7 dias.
+      - name: Subir os traces do Playwright
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-test-results
+          path: apps/web/test-results
+          retention-days: 7
+          if-no-files-found: ignore
