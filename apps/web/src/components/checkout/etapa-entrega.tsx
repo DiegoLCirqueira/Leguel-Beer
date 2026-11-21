@@ -55,7 +55,7 @@ function useFreteDoEndereco(
 
 /** Etapa Entrega do checkout (telas 05 e 29): escolher o endereço e ver o frete antes de pagar. */
 export function EtapaEntrega({ enderecos, cotarFrete, destinoDoPagamento }: Props) {
-  const { pronta, resolvida, falhouAoBuscar, tentarDeNovo, estado, sincronizacoes } =
+  const { pronta, resolvida, falhouAoBuscar, buscando, tentarDeNovo, estado, sincronizacoes } =
     useGeladeira();
   const roteador = useRouter();
   const [escolhido, setEscolhido] = useState(() => inicial(enderecos));
@@ -101,8 +101,8 @@ export function EtapaEntrega({ enderecos, cotarFrete, destinoDoPagamento }: Prop
       {falhouAoBuscar ? (
         <div role="alert" className="flex flex-col items-start gap-3">
           <p>Não foi possível carregar sua Geladeira agora.</p>
-          <Button variant="outline" onClick={tentarDeNovo}>
-            Tentar de novo
+          <Button variant="outline" disabled={buscando} onClick={tentarDeNovo}>
+            {buscando ? "Tentando..." : "Tentar de novo"}
           </Button>
         </div>
       ) : enderecos.length === 0 ? (

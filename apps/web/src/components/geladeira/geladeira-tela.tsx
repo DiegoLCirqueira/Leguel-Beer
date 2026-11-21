@@ -7,6 +7,7 @@ import {
   AvisosDaGeladeira,
   BarraDoResumo,
   BottomSheet,
+  Button,
   MolduraDaGeladeira,
   Skeleton,
   Toast,
@@ -54,6 +55,9 @@ export function GeladeiraTela({ cotarFrete }: Props) {
     pronta,
     estado,
     sincronizacoes,
+    falhouAoBuscar,
+    buscando,
+    tentarDeNovo,
     ajustes,
     limparAjustes,
     alterarQuantidade,
@@ -105,6 +109,20 @@ export function GeladeiraTela({ cotarFrete }: Props) {
       <div className="flex min-h-0 flex-1 flex-col items-center px-4 py-2 lg:aspect-[710/1573] lg:flex-none lg:px-0">
         <h1 className="sr-only">Geladeira</h1>
         <AvisosDaGeladeira ajustes={ajustes} />
+        {falhouAoBuscar ? (
+          <div role="alert" className="flex flex-col items-center gap-2 py-2 text-center text-sm">
+            <p>Não foi possível carregar sua Geladeira agora.</p>
+            <Button
+              size="sm"
+              variant="outline"
+              className="w-auto"
+              disabled={buscando}
+              onClick={tentarDeNovo}
+            >
+              {buscando ? "Tentando..." : "Tentar de novo"}
+            </Button>
+          </div>
+        ) : null}
         {pronta ? (
           <MolduraDaGeladeira itens={estado.itens} className="min-h-0 flex-1" />
         ) : (

@@ -51,6 +51,8 @@ export type GeladeiraContexto = {
   resolvida: boolean;
   /** A busca da conta falhou (erro ou tempo esgotado): não se sabe o que a conta tem. */
   falhouAoBuscar: boolean;
+  /** A busca da conta está em andamento (para o "Tentar de novo" mostrar que está tentando). */
+  buscando: boolean;
   /** Busca a conta outra vez depois de uma falha. */
   tentarDeNovo: () => void;
   /** Sobe a cada vez que a conta passa a ter a Geladeira mostrada (busca ou envio concluídos). */
@@ -129,6 +131,7 @@ export function GeladeiraProvider({
   const [respondeu, setRespondeu] = useState(false);
   const [falhouAoBuscar, setFalhouAoBuscar] = useState(false);
   const [tentativa, setTentativa] = useState(0);
+  const [buscando, setBuscando] = useState(false);
   const tentarDeNovo = useCallback(() => setTentativa((n) => n + 1), []);
   // Entrar e sair redirecionam: a mudança de página é o sinal para olhar a sessão de novo.
   const pagina = usePathname();
@@ -199,6 +202,7 @@ export function GeladeiraProvider({
     novaGeracao();
     let ativo = true;
     let falhou = false;
+    setBuscando(true);
     (async () => {
       const sincronizada = lerMarca(CHAVE_DA_CONTA);
       if (sincronizada && lerMarca(CHAVE_PENDENTE)) return enviar();
@@ -233,6 +237,7 @@ export function GeladeiraProvider({
       if (enviarParaConta) await enviar();
     })().finally(() => {
       if (!ativo) return;
+      setBuscando(false);
       setFalhouAoBuscar(falhou);
       setRespondeu(!falhou);
     });
@@ -251,6 +256,7 @@ export function GeladeiraProvider({
       quantidadeTotal: quantidadeTotal(estado),
       resolvida: !temConta || respondeu,
       falhouAoBuscar,
+      buscando,
       tentarDeNovo,
       sincronizacoes,
       ajustes,
@@ -299,6 +305,7 @@ export function GeladeiraProvider({
       temConta,
       respondeu,
       falhouAoBuscar,
+      buscando,
       tentarDeNovo,
       sincronizacoes,
       ajustes,
