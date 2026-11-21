@@ -13,8 +13,7 @@ export class ConfirmPayment {
     private readonly now: () => Date,
   ) {}
 
-  async execute(_input: ConfirmPaymentInput): Promise<void> {
-    void this.orders;
-    void this.now;
+  async execute(input: ConfirmPaymentInput): Promise<void> {
+    await this.orders.confirmPaymentIfAwaiting(input.orderId, input.actorId, this.now());
   }
 }
