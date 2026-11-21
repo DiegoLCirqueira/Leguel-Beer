@@ -75,7 +75,9 @@ test("home com sessão renovada segue como logada", async ({ page, context }) =>
   expect(renovado).not.toBe(falso);
 });
 
-for (const caminho of ["/conta", "/checkout"]) {
+// Depois do login o checkout abre; com a Geladeira vazia (conta nova) ele leva à Geladeira.
+const DEPOIS_DO_LOGIN = { "/conta": "/conta", "/checkout": "/geladeira" } as const;
+for (const caminho of ["/conta", "/checkout"] as const) {
   test(`visitante em ${caminho} vai para entrar e volta depois do login`, async ({ page }) => {
     await page.goto(caminho);
     await expect(page).toHaveURL(new RegExp(`/entrar\\?retorno=${encodeURIComponent(caminho)}`));
@@ -86,7 +88,7 @@ for (const caminho of ["/conta", "/checkout"]) {
     await page.getByLabel("Senha", { exact: true }).fill(SENHA);
     await page.getByRole("button", { name: "Entrar" }).click();
 
-    await expect(page).toHaveURL(new RegExp(`${caminho}$`));
+    await expect(page).toHaveURL(new RegExp(`${DEPOIS_DO_LOGIN[caminho]}$`));
   });
 }
 
