@@ -1,11 +1,16 @@
-import type { CervejaCard, EnderecoResposta } from "@leguele/shared";
+import type { CervejaCard, EnderecoResposta, GeladeiraResponse } from "@leguele/shared";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/checkout" }));
+const trocar = vi.hoisted(() => vi.fn());
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/checkout",
+  useRouter: () => ({ replace: trocar }),
+}));
 import type { ResultadoDoFrete } from "@/app/geladeira/frete";
 import { CHAVE_DA_GELADEIRA } from "@/lib/geladeira/armazenamento";
+import type { ContaDaGeladeira } from "@/lib/geladeira/conta";
 import { GeladeiraProvider } from "@/components/geladeira/geladeira-provider";
 import { EtapaEntrega } from "./etapa-entrega";
 
@@ -47,7 +52,10 @@ const frete = (f: Extract<ResultadoDoFrete, { tipo: "frete" }>["frete"]): Result
   frete: f,
 });
 
-afterEach(() => localStorage.clear());
+afterEach(() => {
+  localStorage.clear();
+  trocar.mockReset();
+});
 
 const abrir = (
   enderecos: EnderecoResposta[],
@@ -59,7 +67,11 @@ const abrir = (
   );
   return render(
     <GeladeiraProvider>
-      <EtapaEntrega enderecos={enderecos} cotarFrete={cotarFrete} />
+      <EtapaEntrega
+        enderecos={enderecos}
+        cotarFrete={cotarFrete}
+        destinoDoPagamento="/checkout/pagamento"
+      />
     </GeladeiraProvider>,
   );
 };
@@ -150,5 +162,85 @@ describe("EtapaEntrega", () => {
     );
     expect(screen.getByRole("link", { name: "Ver resumo" })).toHaveAttribute("href", "/geladeira");
     expect(screen.getByText("2 itens na sua geladeira")).toBeInTheDocument();
+  });
+
+  it("sem destino de pagamento ainda, o botão fica desabilitado mesmo com frete", async () => {
+    localStorage.setItem(
+      CHAVE_DA_GELADEIRA,
+      JSON.stringify({ versao: 1, itens: [{ cerveja: mare, quantidade: 2 }] }),
+    );
+    render(
+      <GeladeiraProvider>
+        <EtapaEntrega
+          enderecos={[casa]}
+          cotarFrete={vi.fn().mockResolvedValue(frete({ tipo: "gratis" }))}
+        />
+      </GeladeiraProvider>,
+    );
+
+    await screen.findByText("Grátis");
+    expect(screen.getByRole("button", { name: "Continuar para pagamento" })).toBeDisabled();
+    expect(
+      screen.queryByRole("link", { name: "Continuar para pagamento" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("com a Geladeira vazia, leva à Geladeira e não cota nem deixa continuar", async () => {
+    const cotar = vi.fn().mockResolvedValue(frete({ tipo: "gratis" }));
+    render(
+      <GeladeiraProvider>
+        <EtapaEntrega
+          enderecos={[casa]}
+          cotarFrete={cotar}
+          destinoDoPagamento="/checkout/pagamento"
+        />
+      </GeladeiraProvider>,
+    );
+
+    await waitFor(() => expect(trocar).toHaveBeenCalledWith("/geladeira"));
+    expect(cotar).not.toHaveBeenCalled();
+    expect(
+      screen.queryByRole("link", { name: "Continuar para pagamento" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("não cota antes de a conta receber a Geladeira local; cota de novo quando recebe", async () => {
+    localStorage.setItem(
+      CHAVE_DA_GELADEIRA,
+      JSON.stringify({ versao: 1, itens: [{ cerveja: mare, quantidade: 2 }] }),
+    );
+    const resposta = (quantidade: number): GeladeiraResponse => ({
+      itens: quantidade
+        ? [{ cerveja: mare, quantidade, totalCentavos: quantidade * mare.precoCentavos }]
+        : [],
+      ajustes: [],
+      quantidadeTotal: quantidade,
+      subtotalCentavos: quantidade * mare.precoCentavos,
+    });
+    let enviado = false;
+    const conta: ContaDaGeladeira = {
+      buscar: async () => ({ tipo: "ok", resposta: resposta(0) }),
+      enviar: async () => {
+        enviado = true;
+        return { tipo: "ok", resposta: resposta(2) };
+      },
+      validar: async () => ({ tipo: "erro" }),
+    };
+    // A API cota com a Geladeira da conta: antes do envio ela está vazia.
+    const cotar = vi.fn(async () =>
+      frete(enviado ? { tipo: "gratis" } : { tipo: "valor", centavos: 300 }),
+    );
+    render(
+      <GeladeiraProvider conta={conta}>
+        <EtapaEntrega
+          enderecos={[casa]}
+          cotarFrete={cotar}
+          destinoDoPagamento="/checkout/pagamento"
+        />
+      </GeladeiraProvider>,
+    );
+
+    expect(await screen.findByText("Grátis")).toBeInTheDocument();
+    expect(screen.queryByText("R$ 3,00")).not.toBeInTheDocument();
   });
 });
