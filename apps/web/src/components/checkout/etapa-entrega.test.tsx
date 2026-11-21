@@ -259,4 +259,43 @@ describe("EtapaEntrega", () => {
 
     expect(html).not.toContain("2 itens");
   });
+
+  it("conta com itens e cópia local vazia (outro aparelho): espera a conta responder, não redireciona e cota", async () => {
+    const dela: GeladeiraResponse = {
+      itens: [{ cerveja: mare, quantidade: 2, totalCentavos: 2 * mare.precoCentavos }],
+      ajustes: [],
+      quantidadeTotal: 2,
+      subtotalCentavos: 2 * mare.precoCentavos,
+    };
+    let responder: () => void = () => {};
+    const conta: ContaDaGeladeira = {
+      buscar: () =>
+        new Promise((resolve) => {
+          responder = () => resolve({ tipo: "ok", resposta: dela });
+        }),
+      enviar: async () => ({ tipo: "ok", resposta: dela }),
+      validar: async () => ({ tipo: "erro" }),
+    };
+    const cotar = vi.fn().mockResolvedValue(frete({ tipo: "gratis" }));
+    render(
+      <GeladeiraProvider conta={conta}>
+        <EtapaEntrega
+          enderecos={[casa]}
+          cotarFrete={cotar}
+          destinoDoPagamento="/checkout/pagamento"
+        />
+      </GeladeiraProvider>,
+    );
+
+    // A cópia local está vazia e a conta ainda não respondeu: não é Geladeira vazia.
+    await new Promise((r) => setTimeout(r, 20));
+    expect(trocar).not.toHaveBeenCalled();
+    expect(cotar).not.toHaveBeenCalled();
+
+    responder();
+
+    expect(await screen.findByText("2 itens na sua geladeira")).toBeInTheDocument();
+    expect(trocar).not.toHaveBeenCalled();
+    expect(await screen.findByText("Grátis")).toBeInTheDocument();
+  });
 });
