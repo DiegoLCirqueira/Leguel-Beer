@@ -1,5 +1,5 @@
 import type { CervejaCard } from "@leguele/shared";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderToString } from "react-dom/server";
 import { useState } from "react";
@@ -9,6 +9,7 @@ vi.mock("next/navigation", () => ({ usePathname: () => "/geladeira" }));
 import { CHAVE_DA_GELADEIRA } from "@/lib/geladeira/armazenamento";
 import type { ContaDaGeladeira } from "@/lib/geladeira/conta";
 import { GeladeiraProvider } from "./geladeira-provider";
+import type { ResultadoDoFrete } from "@/app/geladeira/frete";
 import { GeladeiraTela } from "./geladeira-tela";
 
 const mare: CervejaCard = {
@@ -258,6 +259,56 @@ describe("GeladeiraTela", () => {
       await userEvent.click(screen.getByRole("button", { name: "alternar" }));
 
       expect(screen.queryByText("O preço de Maré Alta mudou")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("frete estimado (item 4)", () => {
+    const telaLarga = () => {
+      window.matchMedia = (consulta: string) =>
+        ({
+          matches: consulta === "(min-width: 1024px)",
+          media: consulta,
+          addEventListener: () => {},
+          removeEventListener: () => {},
+        }) as unknown as MediaQueryList;
+    };
+    const abrirComFrete = (cotarFrete: () => Promise<ResultadoDoFrete>) =>
+      render(
+        <GeladeiraProvider>
+          <GeladeiraTela cotarFrete={cotarFrete} />
+        </GeladeiraProvider>,
+      );
+
+    it("com endereço padrão, mostra o frete e o total com frete", async () => {
+      telaLarga();
+      guardar([{ cerveja: mare, quantidade: 2 }]);
+      abrirComFrete(async () => ({ tipo: "frete", frete: { tipo: "valor", centavos: 1300 } }));
+
+      const resumo = screen.getByRole("complementary", { name: "Resumo da Geladeira" });
+      expect(await within(resumo).findByText("R$ 13,00")).toBeInTheDocument();
+      expect(within(resumo).getByText("R$ 77,00")).toBeInTheDocument();
+    });
+
+    it("sem endereço ou sem sessão, segue pedindo o endereço", async () => {
+      telaLarga();
+      guardar([{ cerveja: mare, quantidade: 2 }]);
+      const cotar = vi.fn().mockResolvedValue({ tipo: "sem-endereco" });
+      abrirComFrete(cotar);
+
+      await waitFor(() => expect(cotar).toHaveBeenCalled());
+      expect(screen.getByText("Informe seu endereço para calcular o frete")).toBeInTheDocument();
+    });
+
+    it("cota de novo quando o subtotal muda", async () => {
+      telaLarga();
+      guardar([{ cerveja: mare, quantidade: 2 }]);
+      const cotar = vi.fn().mockResolvedValue({ tipo: "frete", frete: { tipo: "gratis" } });
+      abrirComFrete(cotar);
+      await waitFor(() => expect(cotar).toHaveBeenCalledTimes(1));
+
+      await userEvent.click(screen.getByRole("button", { name: /Aumentar|\+/ }));
+
+      await waitFor(() => expect(cotar).toHaveBeenCalledTimes(2));
     });
   });
 });
