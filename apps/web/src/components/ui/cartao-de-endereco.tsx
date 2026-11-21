@@ -1,8 +1,7 @@
 import type { EnderecoResposta } from "@leguele/shared";
 import { MapPin } from "lucide-react";
 import type { ReactNode } from "react";
-
-const comMascara = (cep: string) => `${cep.slice(0, 5)}-${cep.slice(5)}`;
+import { cepComMascara, SelosDoEndereco } from "./endereco-partes";
 
 /** Um endereço da lista de "Meus endereços", com os selos "Padrão" e "Fora da área". */
 export function CartaoDeEndereco({
@@ -19,16 +18,7 @@ export function CartaoDeEndereco({
       <div className="flex min-w-0 flex-1 flex-col gap-1 text-sm text-texto">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="text-base font-semibold">{endereco.apelido ?? "Endereço"}</h2>
-          {endereco.padrao ? (
-            <span className="rounded-full bg-primaria px-3 py-1 text-xs font-semibold text-texto-badge">
-              Padrão
-            </span>
-          ) : null}
-          {endereco.foraDaArea ? (
-            <span className="rounded-full border border-erro px-3 py-1 text-xs font-semibold text-erro">
-              Fora da área
-            </span>
-          ) : null}
+          <SelosDoEndereco endereco={endereco} />
         </div>
         <p>
           {endereco.rua}, {endereco.numero}
@@ -36,7 +26,7 @@ export function CartaoDeEndereco({
         <p>
           {endereco.bairro} — {endereco.cidade}/{endereco.uf}
         </p>
-        <p className="text-texto-suave">CEP {comMascara(endereco.cep)}</p>
+        <p className="text-texto-suave">CEP {cepComMascara(endereco.cep)}</p>
         {acoes ? <div className="mt-2">{acoes}</div> : null}
       </div>
     </li>
