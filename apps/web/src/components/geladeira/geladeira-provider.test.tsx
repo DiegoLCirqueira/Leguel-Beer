@@ -163,6 +163,26 @@ const guardarLocal = (quantidade: number) =>
   );
 
 describe("GeladeiraProvider com a conta", () => {
+  it("uma conta nova a cada render do layout (mesmas ações) não repete a busca", async () => {
+    const buscar = vi.fn().mockResolvedValue(ok([{ cerveja, quantidade: 4 }]));
+    const enviar = vi.fn().mockResolvedValue(ok([]));
+    const validar = vi.fn().mockResolvedValue({ tipo: "erro" });
+    // O layout é um Server Component: a cada atualização do servidor o objeto `conta` chega novo.
+    const arvore = () => (
+      <GeladeiraProvider conta={{ buscar, enviar, validar }}>
+        <Painel />
+      </GeladeiraProvider>
+    );
+    const { rerender } = render(arvore());
+    await screen.findByText("4");
+
+    rerender(arvore());
+    rerender(arvore());
+    await new Promise((r) => setTimeout(r, 20));
+
+    expect(buscar).toHaveBeenCalledTimes(1);
+  });
+
   it("convidado (sem sessão): nada vai para a conta, nem a cada mudança", async () => {
     const conta = contaFalsa({ tipo: "sem-sessao" });
     abrirComConta(conta);
