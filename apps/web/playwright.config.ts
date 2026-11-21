@@ -12,7 +12,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
-  use: { baseURL: "http://localhost:3000" },
+  // Trace só na repetição de um teste que falhou: dá o que olhar no flaky sem pesar no que passa.
+  use: { baseURL: "http://localhost:3000", trace: "on-first-retry" },
   projects: [{ name: "mobile", use: { ...devices["Pixel 5"] } }],
   webServer: [
     {
