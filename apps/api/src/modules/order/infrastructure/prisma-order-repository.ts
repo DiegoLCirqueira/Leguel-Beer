@@ -59,4 +59,8 @@ export class PrismaOrderRepository implements OrderRepository {
       return true;
     });
   }
+
+  async confirmPaymentIfAwaiting(_orderId: string, _actorId: string, _at: Date): Promise<boolean> {
+    throw new Error("não implementado");
+  }
 }

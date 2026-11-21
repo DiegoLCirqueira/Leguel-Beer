@@ -20,4 +20,11 @@ export interface OrderRepository {
    * Devolve se cancelou: quem perde a corrida recebe `false` e não repete nada.
    */
   cancelIfAwaitingPayment(orderId: string, reason: string, at: Date): Promise<boolean>;
+
+  /**
+   * Marca o pedido como pago só se ele ainda aguarda pagamento e a validade não passou em `at`, na
+   * mesma operação que consome a reserva, baixa o estoque físico e a Geladeira da conta e grava o
+   * histórico com `actorId`. Devolve se confirmou: quem perde a corrida recebe `false`.
+   */
+  confirmPaymentIfAwaiting(orderId: string, actorId: string, at: Date): Promise<boolean>;
 }
