@@ -170,4 +170,30 @@ describe("FormularioDeEndereco", () => {
     expect(aoCancelar).toHaveBeenCalled();
     expect(salvar).not.toHaveBeenCalled();
   });
+
+  it("a busca do CEP não sobrescreve o que o cliente já digitou", async () => {
+    abrir();
+    await userEvent.type(screen.getByLabelText("Rua"), "Rua que eu digitei");
+
+    await userEvent.type(screen.getByLabelText("CEP"), "57035000");
+
+    await waitFor(() => expect(screen.getByLabelText("Bairro")).toHaveValue("Farol"));
+    expect(screen.getByLabelText("Rua")).toHaveValue("Rua que eu digitei");
+    expect(screen.getByLabelText("Cidade")).toHaveValue("Maceió");
+  });
+
+  it("o botão 'Buscar CEP' busca o CEP completo e avisa quando falta dígito", async () => {
+    abrir();
+    await userEvent.type(screen.getByLabelText("CEP"), "5703");
+
+    await userEvent.click(screen.getByRole("button", { name: "Buscar CEP" }));
+    expect(screen.getByText("Informe o CEP com 8 dígitos.")).toBeInTheDocument();
+    expect(buscarCep).not.toHaveBeenCalled();
+
+    await userEvent.type(screen.getByLabelText("CEP"), "5000");
+    buscarCep.mockClear();
+    await userEvent.click(screen.getByRole("button", { name: "Buscar CEP" }));
+
+    expect(buscarCep).toHaveBeenCalledWith("57035-000");
+  });
 });
