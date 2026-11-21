@@ -1,7 +1,6 @@
 import { Module } from "@nestjs/common";
 import { FridgeModule } from "../fridge/fridge.module.js";
 import { GetAccountFridge } from "../fridge/application/get-account-fridge.js";
-import { AccountRateLimiter } from "../../common/http/account-rate-limiter.js";
 import { PrismaService } from "../../common/prisma/prisma.service.js";
 import { randomUUID } from "node:crypto";
 import { AddAddress } from "./application/add-address.js";
@@ -31,8 +30,6 @@ import { AddressController } from "./presentation/address.controller.js";
   controllers: [AddressController],
   exports: [QuoteShipping],
   providers: [
-    // Uma contagem por instância da API, compartilhada pelas rotas de gravação de endereço.
-    AccountRateLimiter,
     {
       provide: ADDRESS_REPOSITORY,
       useFactory: (prisma: PrismaService) => new PrismaAddressRepository(prisma),
