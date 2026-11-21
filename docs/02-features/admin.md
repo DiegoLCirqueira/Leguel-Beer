@@ -192,9 +192,9 @@ Funcionalidade: Admin
 | 2 | LB-72 (#72) | Front | Layout do admin, menu, início com os alertas (contadores vindos da API) e "não encontrada" em `/admin/*` |
 | 3 | LB-73 (#73), API | Back | Cadastro e edição com limite por categoria, mínimo e estoque inicial; bucket, política do armazenamento e conferência da foto |
 | 4 | LB-73 (#73), site | Front | Lista, formulário, envio da foto em WebP e prévia |
-| 5 | LB-75 (#75) | Back e Front | Movimentos de estoque (migration), ajuste com trava, histórico e a tela |
+| 5 | LB-75 (#75) | Back e Front | Movimentos de estoque (migration), ajuste com trava, histórico e a tela. **Retrofit:** grava os movimentos de venda (em `confirmPaymentIfAwaiting`, já na `main`), de cancelamento e de expiração do pedido, na mesma transação do status, para o histórico e a "Concorrência" (regra de efeito único) valerem para o que já existe |
 | 6 | LB-77 (#77) | Back e Front | Rotas de admin das configurações de entrega, simulador e a tela; depende das configurações do item 4 |
-| 7 | LB-76 (#76) | Back e Front | Fila, detalhe, transições e cancelamento; depende do modelo de pedido (item 5); inclui "Confirmar pagamento" ([[pagamento]]) |
+| 7 | LB-76 (#76) | Back e Front | Fila, detalhe, transições e cancelamento; depende do modelo de pedido (item 5); a rota "Confirmar pagamento" da API já está na `main` (#337, [[pagamento]]); falta o botão no detalhe do pedido e as demais transições |
 
 A 1 vem antes das 3 a 6. A 2 pode andar junto. A 7 vem por último.
 
