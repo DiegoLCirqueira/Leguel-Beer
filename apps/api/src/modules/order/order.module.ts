@@ -1,6 +1,5 @@
 import { randomInt, randomUUID } from "node:crypto";
 import { Module } from "@nestjs/common";
-import { AccountRateLimiter } from "../../common/http/account-rate-limiter.js";
 import { PrismaService } from "../../common/prisma/prisma.service.js";
 import { AccountModule } from "../account/account.module.js";
 import { PROFILE_REPOSITORY } from "../account/account.tokens.js";
@@ -25,7 +24,6 @@ function newOrderNumber(): string {
   imports: [AccountModule, DeliveryModule, FridgeModule],
   controllers: [OrderController],
   providers: [
-    AccountRateLimiter,
     {
       provide: PrismaOrderCreation,
       useFactory: (prisma: PrismaService) => new PrismaOrderCreation(prisma),

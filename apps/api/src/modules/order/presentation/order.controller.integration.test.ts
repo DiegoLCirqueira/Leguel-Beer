@@ -64,7 +64,7 @@ describe("POST /me/pedidos (HTTP, banco real)", () => {
 
   beforeEach(async () => {
     await resetDatabase(prisma);
-    app.select(OrderModule).get(AccountRateLimiter).reset();
+    app.get(AccountRateLimiter, { strict: false }).reset();
     geocoder.respondWith({ latitude: -9.66, longitude: -35.74 });
     router.respondWith(5_200);
     await seedDeliverySettings(prisma);
