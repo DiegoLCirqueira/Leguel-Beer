@@ -13,7 +13,7 @@ import {
   type ReactNode,
 } from "react";
 import { usePathname } from "next/navigation";
-import type { ContaDaGeladeira } from "@/lib/geladeira/conta";
+import type { ContaDaGeladeira, ResultadoDaConta } from "@/lib/geladeira/conta";
 import {
   CHAVE_DA_CONTA,
   CHAVE_PENDENTE,
@@ -78,6 +78,9 @@ export function useGeladeira(): GeladeiraContexto {
   return contexto;
 }
 
+/** Resposta da `conta` estável se a conta do layout sumir entre uma chamada e outra. */
+const SEM_CONTA = Promise.resolve<ResultadoDaConta>({ tipo: "erro" });
+
 export function GeladeiraProvider({
   children,
   conta: contaDoLayout,
@@ -98,9 +101,9 @@ export function GeladeiraProvider({
     () =>
       temConta
         ? {
-            buscar: () => contaAtual.current!.buscar(),
-            enviar: (pedido) => contaAtual.current!.enviar(pedido),
-            validar: (pedido) => contaAtual.current!.validar(pedido),
+            buscar: () => contaAtual.current?.buscar() ?? SEM_CONTA,
+            enviar: (pedido) => contaAtual.current?.enviar(pedido) ?? SEM_CONTA,
+            validar: (pedido) => contaAtual.current?.validar(pedido) ?? SEM_CONTA,
           }
         : undefined,
     [temConta],
@@ -234,7 +237,7 @@ export function GeladeiraProvider({
       pronta,
       estado,
       quantidadeTotal: quantidadeTotal(estado),
-      resolvida: !conta || respondeu,
+      resolvida: !temConta || respondeu,
       sincronizacoes,
       ajustes,
       limparAjustes,
@@ -279,7 +282,7 @@ export function GeladeiraProvider({
     [
       pronta,
       estado,
-      conta,
+      temConta,
       respondeu,
       sincronizacoes,
       ajustes,
