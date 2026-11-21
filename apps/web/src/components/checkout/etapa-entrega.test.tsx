@@ -10,6 +10,7 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: trocar }),
 }));
 import type { ResultadoDoFrete } from "@/app/geladeira/frete";
+import { CHAVE_DO_CHECKOUT } from "@/lib/checkout/estado";
 import { CHAVE_DA_GELADEIRA } from "@/lib/geladeira/armazenamento";
 import type { ContaDaGeladeira } from "@/lib/geladeira/conta";
 import { GeladeiraProvider } from "@/components/geladeira/geladeira-provider";
@@ -55,6 +56,7 @@ const frete = (f: Extract<ResultadoDoFrete, { tipo: "frete" }>["frete"]): Result
 
 afterEach(() => {
   localStorage.clear();
+  sessionStorage.clear();
   trocar.mockReset();
 });
 
@@ -92,6 +94,33 @@ describe("EtapaEntrega", () => {
       "href",
       "/checkout/pagamento",
     );
+  });
+
+  it("lembra o endereço escolhido ao continuar, na aba, só com o id", async () => {
+    const cotar = vi.fn().mockResolvedValue(frete({ tipo: "valor", centavos: 1300 }));
+    abrir([casa, trabalho], cotar);
+    await userEvent.click(screen.getByRole("radio", { name: /Trabalho/ }));
+    await userEvent.click(await screen.findByRole("link", { name: "Continuar para pagamento" }));
+
+    expect(JSON.parse(sessionStorage.getItem(CHAVE_DO_CHECKOUT)!)).toEqual({
+      enderecoId: "trabalho",
+    });
+  });
+
+  it("volta com o endereço que o cliente tinha escolhido, não com o padrão", async () => {
+    sessionStorage.setItem(CHAVE_DO_CHECKOUT, JSON.stringify({ enderecoId: "trabalho" }));
+    const cotar = vi.fn().mockResolvedValue(frete({ tipo: "gratis" }));
+    abrir([casa, trabalho], cotar);
+
+    expect(await screen.findByRole("radio", { name: /Trabalho/ })).toBeChecked();
+    expect(cotar).toHaveBeenLastCalledWith("trabalho");
+  });
+
+  it("endereço lembrado que não existe mais cai no padrão", async () => {
+    sessionStorage.setItem(CHAVE_DO_CHECKOUT, JSON.stringify({ enderecoId: "apagado" }));
+    abrir([casa, trabalho], vi.fn().mockResolvedValue(frete({ tipo: "gratis" })));
+
+    expect(await screen.findByRole("radio", { name: /Casa/ })).toBeChecked();
   });
 
   it("escolher outro endereço cota o frete dele, só para este pedido", async () => {
