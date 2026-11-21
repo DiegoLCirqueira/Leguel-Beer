@@ -60,7 +60,55 @@ export class PrismaOrderRepository implements OrderRepository {
     });
   }
 
-  async confirmPaymentIfAwaiting(_orderId: string, _actorId: string, _at: Date): Promise<boolean> {
-    throw new Error("não implementado");
+  async confirmPaymentIfAwaiting(orderId: string, actorId: string, at: Date): Promise<boolean> {
+    return this.prisma.$transaction(async (tx) => {
+      // A condição no próprio UPDATE decide a corrida com a expiração, o cancelamento e o repetido.
+      const { count } = await tx.order.updateMany({
+        where: { id: orderId, status: "AWAITING_PAYMENT", expiresAt: { gt: at } },
+        data: { status: "PAID" },
+      });
+      if (count === 0) return false;
+
+      const order = await tx.order.findUniqueOrThrow({
+        where: { id: orderId },
+        select: { profileId: true },
+      });
+      const reservations = await tx.stockReservation.findMany({
+        where: { orderId, releasedAt: null, consumedAt: null },
+      });
+      for (const reservation of reservations) {
+        await tx.beer.update({
+          where: { id: reservation.beerId },
+          data: { stock: { decrement: reservation.quantity } },
+        });
+      }
+      await tx.stockReservation.updateMany({
+        where: { orderId, releasedAt: null, consumedAt: null },
+        data: { consumedAt: at },
+      });
+
+      const deductions = await tx.fridgePendingDeduction.findMany({ where: { orderId } });
+      for (const deduction of deductions) {
+        await tx.fridgeItem.updateMany({
+          where: { beerId: deduction.beerId, fridge: { profileId: order.profileId } },
+          data: { quantity: { decrement: deduction.quantity } },
+        });
+      }
+      await tx.fridgeItem.deleteMany({
+        where: { fridge: { profileId: order.profileId }, quantity: { lte: 0 } },
+      });
+      await tx.fridgePendingDeduction.deleteMany({ where: { orderId } });
+
+      await tx.orderStatusHistory.create({
+        data: {
+          orderId,
+          fromStatus: "AWAITING_PAYMENT",
+          toStatus: "PAID",
+          actorId,
+          createdAt: at,
+        },
+      });
+      return true;
+    });
   }
 }
