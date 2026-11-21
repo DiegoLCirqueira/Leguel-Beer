@@ -179,4 +179,41 @@ describe("PrismaOrderRepository (banco real)", () => {
 
     expect(await orders.findForExpiration(orderId)).toMatchObject({ status });
   });
+
+  describe("confirmPaymentIfAwaiting", () => {
+    const AT = new Date("2026-11-14T10:10:00.000Z");
+    let adminId: string;
+
+    beforeEach(async () => {
+      adminId = (
+        await prisma.profile.create({
+          data: { id: crypto.randomUUID(), email: "admin@x.test", role: "ADMIN" },
+        })
+      ).id;
+      await prisma.fridge.create({
+        data: {
+          profileId,
+          items: { create: { beerId, quantity: 3, seenPriceCents: 3200, position: 0 } },
+        },
+      });
+    });
+
+    it("marca o pedido como pago, consome a reserva, baixa o estoque e a Geladeira e grava o histórico do admin", async () => {
+      const confirmed = await orders.confirmPaymentIfAwaiting(orderId, adminId, AT);
+
+      expect(confirmed).toBe(true);
+      expect((await prisma.order.findUniqueOrThrow({ where: { id: orderId } })).status).toBe(
+        "PAID",
+      );
+      const reservations = await prisma.stockReservation.findMany({ where: { orderId } });
+      expect(reservations.map((r) => [r.consumedAt, r.releasedAt])).toEqual([[AT, null]]);
+      expect((await prisma.beer.findUniqueOrThrow({ where: { id: beerId } })).stock).toBe(8);
+      expect(await prisma.fridgePendingDeduction.count({ where: { orderId } })).toBe(0);
+      const items = await prisma.fridgeItem.findMany({ where: { fridge: { profileId } } });
+      expect(items.map((item) => item.quantity)).toEqual([1]);
+      expect(await prisma.orderStatusHistory.findMany({ where: { orderId } })).toMatchObject([
+        { fromStatus: "AWAITING_PAYMENT", toStatus: "PAID", actorId: adminId, createdAt: AT },
+      ]);
+    });
+  });
 });
