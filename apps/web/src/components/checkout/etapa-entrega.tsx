@@ -55,11 +55,13 @@ function useFreteDoEndereco(
 
 /** Etapa Entrega do checkout (telas 05 e 29): escolher o endereço e ver o frete antes de pagar. */
 export function EtapaEntrega({ enderecos, cotarFrete, destinoDoPagamento }: Props) {
-  const { pronta, estado, sincronizacoes } = useGeladeira();
+  const { pronta, resolvida, estado, sincronizacoes } = useGeladeira();
   const roteador = useRouter();
   const [escolhido, setEscolhido] = useState(() => inicial(enderecos));
-  const vazia = pronta && estado.itens.length === 0;
-  const frete = useFreteDoEndereco(escolhido, cotarFrete, pronta && !vazia, sincronizacoes);
+  // Vazia só depois de a conta responder: antes, a cópia local vazia pode ser só outro aparelho.
+  const decidida = pronta && resolvida;
+  const vazia = decidida && estado.itens.length === 0;
+  const frete = useFreteDoEndereco(escolhido, cotarFrete, decidida && !vazia, sincronizacoes);
   // Antes de ler a cópia local (`pronta`) a contagem é a do servidor, vazia: o HTML não diverge na hidratação.
   const { quantidadeTotal, subtotalCentavos } = resumirGeladeira(pronta ? estado.itens : []);
   const podeContinuar =
