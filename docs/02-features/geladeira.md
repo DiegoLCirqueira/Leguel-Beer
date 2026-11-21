@@ -142,7 +142,7 @@ Funcionalidade: Geladeira em prateleiras por categoria
 - Para cada cerveja: imagem, selo da categoria, nome, "estilo • teor • volume", `Stepper`, "Remover", preço unitário ("R$ 32,00 un.") e total da linha.
 - Totais: "Subtotal (N itens)", em que N é a soma das unidades ("1 item" no singular); frete; e "Total", igual ao subtotal enquanto não houver frete.
 - **Frete:** até existir endereço e cálculo de frete (item 4 da [[sequencia-telas]]), a linha mostra "Informe seu endereço para calcular o frete" e o Total não inclui frete. Com o item 4, passa a mostrar o frete estimado pelo endereço padrão e "Grátis" a partir de R$ 150,00 ([[checkout]]). O valor final é sempre recalculado no servidor ao criar o pedido.
-- Botões: "Finalizar compra" (primário), que leva a `/checkout`, e "Continuar comprando", que leva a `/catalogo`. "Finalizar compra" fica desabilitado até o checkout existir (item 5); exigir login ao finalizar é o LB-31 (#46).
+- Botões: "Finalizar compra" (primário), que leva a `/checkout`, e "Continuar comprando", que leva a `/catalogo`. "Finalizar compra" está ativo (item 5) e leva à etapa Entrega do checkout; com a Geladeira vazia, o checkout devolve o cliente à Geladeira ([[checkout]]); exigir login ao finalizar é o LB-31 (#46).
 
 ### Revalidação no servidor (LB-52)
 
@@ -270,7 +270,7 @@ Recomendações aplicadas pelo Spec em 10/11, em modo autônomo; qualquer uma po
 - **Textos novos:** "<nome> saiu da geladeira" (toast de remoção), "A quantidade de <nome> foi ajustada para <N>" (ajuste), "Toque no + para escolher uma <categoria>" (do estúdio) e "Ver resumo" (barra).
 - **Esgotada na revalidação** é tratada como indisponível: sai da Geladeira com o mesmo aviso.
 - **Frete até o item 4:** só "Informe seu endereço para calcular o frete", com o Total sem frete.
-- **"Finalizar compra"** no lugar de "Ir para pagamento" (design), desabilitado até o checkout existir.
+- **"Finalizar compra"** no lugar de "Ir para pagamento" (design), ativo desde o checkout (item 5): leva à etapa Entrega e, com a Geladeira vazia, o cliente volta à Geladeira ([[checkout]]).
 - **Fora por ora:** "Limpar geladeira", cupom e favoritar da tela 24.
 - **Imagens:** uma imagem por cerveja para card, produto e Geladeira, em `apps/web/public/cervejas/`, WebP recortado em caixa justa, de tamanho variável, alinhado pela base, até 40 KB (o card do LB-124 previa um tipo de imagem separado em `BeerImage`, que fica para o cadastro do admin).
 - **Imagem padrão da categoria:** garrafa sem rótulo na cor do selo da categoria.
