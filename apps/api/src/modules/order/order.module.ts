@@ -8,6 +8,7 @@ import { QuoteShipping } from "../delivery/application/quote-shipping.js";
 import { DeliveryModule } from "../delivery/delivery.module.js";
 import { GetAccountFridge } from "../fridge/application/get-account-fridge.js";
 import { FridgeModule } from "../fridge/fridge.module.js";
+import { CRON_SECRET } from "./order.tokens.js";
 import { ConfirmPayment } from "./application/confirm-payment.js";
 import { CreateOrder } from "./application/create-order.js";
 import { AccountFridgeSource } from "./infrastructure/account-fridge-source.js";
@@ -27,6 +28,7 @@ function newOrderNumber(): string {
   imports: [AccountModule, DeliveryModule, FridgeModule],
   controllers: [OrderController, AdminOrderController],
   providers: [
+    { provide: CRON_SECRET, useFactory: () => process.env.CRON_SECRET ?? "" },
     {
       provide: PrismaOrderCreation,
       useFactory: (prisma: PrismaService) => new PrismaOrderCreation(prisma),
