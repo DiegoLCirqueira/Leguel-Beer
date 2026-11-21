@@ -73,7 +73,7 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 
 ## Diário
 
-- As daily notes ficam em `docs/05-diario/`, uma por dia (`AAAA-MM-DD.md`); a mais recente é a de data maior. Exemplo: [[2026-10-28]], o primeiro dia registrado.
+- As daily notes ficam em `docs/05-diario/`, uma por dia (`AAAA-MM-DD.md`); a mais recente é a de data maior. Exemplo: [[2026-10-28]], o primeiro dia registrado. Dias recentes: [[2026-11-16]], [[2026-11-17]] e [[2026-11-21]].
 
 ## Rascunhos e apoio
 
@@ -81,4 +81,5 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[backlog-snapshot]]: retrato do backlog do Notion antes da migração para o GitHub Issues.
 - [[sequencia-telas]]: ordem de implementação das telas (1 a 9) e divergências do design que seguem a spec.
 - [[maestri-banda]]: a banda de agentes do Maestri e o modelo de cada um.
+- [[handoff]]: estado e próximos passos para a próxima conversa (sobrescrito a cada ordem).
 - [[licoes-aprendidas]]: erros da banda e a regra que cada um gerou (todo agente lê no início de cada ordem).

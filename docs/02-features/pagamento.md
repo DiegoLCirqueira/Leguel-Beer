@@ -108,7 +108,7 @@ Funcionalidade: Pagamento só visual com Pix e cartão
 > [!question] Recomendação do Spec, vetável
 > Sem lógica de pagamento, o pedido passa a "Pago" por uma **ação do admin**: "Confirmar pagamento" no detalhe do pedido ([[admin]]). Alternativas: (B) o pedido nunca fica "Pago" e só expira ou é cancelado; (C) um botão do próprio cliente, que seria lógica de pagamento e o Diego excluiu.
 
-- **"Confirmar pagamento"** aparece só para pedido "Aguardando pagamento" dentro da validade. Na mesma transação e com a conferência de status do [[admin]] ("Concorrência"): o pedido fica "Pago", a reserva vira baixa no estoque físico (com o histórico do estoque), sai a baixa pendente da Geladeira ([[pedidos-cliente]]) e o status anterior vai ao histórico do pedido, com quem e quando.
+- **"Confirmar pagamento"** aparece só para pedido "Aguardando pagamento" dentro da validade. Na mesma transação e com a conferência de status do [[admin]] ("Concorrência"): o pedido fica "Pago", a reserva é consumida e vira baixa no estoque físico (o movimento "Venda" no histórico do estoque só existe depois da tabela de movimentos do LB-75, fatia 5 de [[admin]]; antes dela, a reserva consumida basta e o histórico não é exigido), sai a baixa pendente da Geladeira ([[pedidos-cliente]]) e o status anterior vai ao histórico do pedido, com quem e quando.
 - **Vencido:** se a validade já passou, a API expira o pedido (mesmo caso de uso do LB-60) e responde 409; o admin vê o pedido "Cancelado".
 - **Uma vez só:** a segunda tentativa, ou a corrida com a expiração ou o cancelamento, responde 409 e não muda nada (regra de concorrência do [[admin]]).
 - Entra com o LB-76 (#76), item 8, antes das telas de pagamento: o resto do projeto não depende delas.
