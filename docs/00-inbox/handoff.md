@@ -1,36 +1,39 @@
 ---
 tags: [handoff]
-atualizado: 2026-11-12
+atualizado: 2026-11-21
 ---
 
 # Handoff
 
-Sobrescrito pelo Orchestrator ao fim de cada ordem. A próxima conversa começa lendo este arquivo, a daily mais recente ([[2026-11-12]]) e [[licoes-aprendidas]].
+Sobrescrito pelo Orchestrator ao fim de cada ordem. A próxima conversa começa lendo este arquivo, a daily mais recente ([[2026-11-21]]) e [[licoes-aprendidas]].
 
-## Última ordem: Geladeira no site e fotos das garrafas (11/11 a 12/11)
+## Última ordem: retomada e checkout Entrega (16/11 a 21/11)
 
-- Mergeados: #243 a #246 (contrato, API e Política), #247 (Geladeira no site com contador e sincronização), #248 (data da Política 2026-11-11, sem novo aceite), #249 (9 fotos), #250 e #252 e #253 (specs), #251 (fechamento), #254 (refino de testes) e #255 (corrida do provider da Geladeira). Nada aberto ao fim da ordem.
-- Item 2 (página de produto) fechado; item 3 (Geladeira): falta a tela (fatias 6 e 7 da [[geladeira]]).
-- Fotos: 9 cervejas com foto; **faltam 7** (jaragua-hazy-ipa, umbu-gose, graviola-witbier, rapadura-brown-ale, barra-nova-porter, pajucara-amber-ale, ponta-verde-pilsen). Quando o Diego enviar: `apps/web/public/cervejas/<slug>.webp` e incluir o slug na lista do seed (`seed-catalog-data.ts`). Fontes de ~470 px: pedir maiores.
-- Regras novas do Diego (12/11): Codex revisa tudo (decisões do Orchestrator, testes, commits); decisões dele vão direto ao chat quando ele está acordado; portais sempre na tela em trabalho; Vercel opção A (prefixo `leguele-web`/`leguele-api`, Hobby, no LB-8).
-- Auditoria final do Codex dos itens 1 e 2: **Ordem aprovada** (main c249f9c: lint, typecheck, build e 878 testes verdes; E2E 57/57 em build de produção).
+- Mergeados #293 a #335 (lista por dia em [[2026-11-17]] e [[2026-11-21]]): endereços completos no site, frete na Geladeira, dados pessoais e maioridade, criar pedido na API ([[ADR-019-criacao-do-pedido-serializada-por-cliente]]), pagamento só visual com aviso e "Voltar" ([[ADR-020-aviso-de-portfolio-no-pagamento]]), etapa Entrega do checkout, limites por conta e por visitante, spec do e-mail do pedido, tokens e Next 16.4.6.
+- Specs fechadas: [[qualidade-compra]] (pronta), [[admin]] (conferida com a API: ainda sem rota de admin), [[email-pedido]] (rascunho até o provedor).
+- Regra nova do Diego (21/11): trabalhar em ciclo, sem reportar cada evento; falar só para decisão, bloqueio ou entrega grande.
 
 ## Estado
 
-- Ambiente na `main` (confira `git log -1`) com um único `pnpm dev` na raiz (site :3000, API :3333; log `%TEMP%/leguele-dev.log`). Supabase local e Mailpit no Docker. Se o Prisma Client ficar velho: `prisma generate` em `apps/api`. Seed sem conta admin: faltam `ADMIN_SEED_PASSWORD` e `SUPABASE_SERVICE_ROLE_KEY` no `.env` da main.
-- Portais "Leguelé iPhone 390" e "Leguelé Android" apontam para :3000; o :3001 serve o worktree da tarefa do Front. Portal "vercel.com" vinculado pelo Diego (conta Hobby; só ler, não alterar sem pedir).
-- O sandbox do Codex grava em `C:/Users/Arthur/Desktop/leguele`; dúvidas operacionais do Codex vão ao Orchestrator (pedidos de leitura: opção 1). No Git Bash use `MSYS_NO_PATHCONV=1` ao mandar `--raw "/clear\n"`, senão o caminho é mal interpretado.
+- Todos os papéis do Maestri rodam em `claude --continue`; o roteador 9Router/claudex foi removido. Ao reiniciar o Maestri, ler este arquivo, a daily, as lições, os ADRs e o cartão de pendências.
+- Reiniciar um terminal derruba tarefas em background; conferir o que estava rodando.
+- O checkout tem só a etapa Entrega; faltam Pagamento, Revisão, o criar pedido no site, a revalidação da Geladeira ao abrir o checkout e o desvio para o pedido pendente ([[checkout]]). A Geladeira vazia voltar à Geladeira é regra da spec, ainda fora do código.
+- Cópia de trabalho principal compartilhada: outro terminal pode trocar a branch dela. Use worktree próprio e `git push origin <branch>`, nunca `git push HEAD`.
+- Medição de tokens e fases: `docs/tokens/`; regras de contexto no CLAUDE.md.
 - O stash `obsidian` é do Diego; nunca adicionar `docs/.obsidian`.
 - O watch da API não reinicia quando muda o `.env`: reiniciar o processo.
 - O cadastro de papéis do Maestri (`maestri role show`) está defasado; os arquivos de `.maestri/roles/` são a fonte real. Não usar `maestri role edit` (lição de 04/11).
-- O papel do Orchestrator ainda diz "Merge é sempre do Diego" na seção 5 até o Diego corrigir. Vale o CLAUDE.md.
-- Não limpar o worktree `leguele-g2` (refactor/components-ui-g2, 5 arquivos não commitados) nem o `leguele-fecho2` sem conferir antes.
 
 ## Próximo
 
-1. Item 3: tela da Geladeira, começando pela fatia 6 (arrumação das prateleiras); a fatia 7 inclui acumular os ajustes do contexto até a tela dispensá-los. Depois o item 4 (Conta e entrega, ver [[sequencia-telas]]) e o item 5 (checkout, spike LB-54).
-2. Diego: enviar as 7 fotos; em 16/11 o Reviewer volta ao Opus 5.5 (decisão dele de 11/11, cartão de pendências); contas para o LB-8.
-3. Follow-ups: ver a seção "Achados para refino" da [[2026-11-12]] e a seção "Follow-ups" abaixo.
+1. Checkout: etapas Pagamento e Revisão, criar pedido no site e revalidação da Geladeira ([[checkout]], [[pagamento]]).
+2. Admin: fatias 1 a 7 de [[admin]] (nenhuma rota existe ainda). O Back decide na fatia 7 o destino das tabelas de gateway que sobraram.
+3. E-mail do pedido: fatias 1 e 2 de [[email-pedido]] com envio falso; o provedor espera o Diego.
+4. Testes instáveis: acompanhar o E2E depois do #331.
+
+## Pendências do Diego
+
+Ver o cartão "Decisões pendentes" do canvas: provedor de e-mail (itens 4, 6 e 7), Geoapify (número do limite de endereço e cota), LB-8 (nuvem), item 20 (caminho local no histórico do repositório) e item 21 (hooks do context-mode).
 
 ## Follow-ups
 
