@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AcoesDoEndereco } from "@/components/enderecos/acoes-do-endereco";
-import { CartaoDeEndereco } from "@/components/ui";
+import { Button, buttonVariants, CartaoDeEndereco } from "@/components/ui";
 import { lerTokenDeAcesso } from "@/lib/auth/servidor";
 import { buscarEnderecos } from "@/lib/enderecos/buscar";
 import { ID_TITULO_ENDERECOS } from "@/lib/enderecos/ids";
@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
+const LIMITE_DE_ENDERECOS = 5;
 const IR_ENTRAR = "/entrar?retorno=%2Fconta%2Fenderecos";
 
 /** Meus endereços (tela 20): a lista vem da API com o token da sessão; quem autoriza é a API. */
@@ -58,6 +59,18 @@ export default async function MeusEnderecos() {
           ))}
         </ul>
       )}
+      {resultado.tipo === "ok" ? (
+        resultado.enderecos.length >= LIMITE_DE_ENDERECOS ? (
+          <div className="flex flex-col gap-1">
+            <Button disabled>Adicionar novo endereço</Button>
+            <p className="text-sm text-texto-suave">Você pode guardar até 5 endereços.</p>
+          </div>
+        ) : (
+          <Link href="/conta/enderecos/novo" className={buttonVariants({ variant: "primary" })}>
+            Adicionar novo endereço
+          </Link>
+        )
+      ) : null}
     </main>
   );
 }
