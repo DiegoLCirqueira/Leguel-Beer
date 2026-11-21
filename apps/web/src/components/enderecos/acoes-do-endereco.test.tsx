@@ -8,7 +8,8 @@ vi.mock("@/app/(loja)/conta/enderecos/actions", () => ({
   excluirEnderecoAction: excluir,
 }));
 
-import { AcoesDoEndereco, ID_TITULO_ENDERECOS } from "./acoes-do-endereco";
+import { ID_TITULO_ENDERECOS } from "@/lib/enderecos/ids";
+import { AcoesDoEndereco } from "./acoes-do-endereco";
 
 describe("AcoesDoEndereco", () => {
   beforeEach(() => {

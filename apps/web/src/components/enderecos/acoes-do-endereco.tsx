@@ -5,15 +5,13 @@ import { useState, useTransition } from "react";
 import { excluirEnderecoAction, tornarPadraoAction } from "@/app/(loja)/conta/enderecos/actions";
 import type { ResultadoDaAcao } from "@/app/(loja)/conta/enderecos/actions";
 import { Button } from "@/components/ui";
+import { ID_TITULO_ENDERECOS } from "@/lib/enderecos/ids";
 
 const AVISOS: Record<Exclude<ResultadoDaAcao["tipo"], "ok">, string> = {
   erro: "Não foi possível concluir agora. Tente de novo.",
   "nao-encontrado": "Este endereço não existe mais.",
   "sem-sessao": "Sua sessão acabou. Entre de novo para continuar.",
 };
-
-/** Id do título da página: o foco vai para ele quando o botão pressionado some da lista. */
-export const ID_TITULO_ENDERECOS = "titulo-meus-enderecos";
 
 type Props = { id: string; nome: string; padrao: boolean };
 

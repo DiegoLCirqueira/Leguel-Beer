@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { AcoesDoEndereco, ID_TITULO_ENDERECOS } from "@/components/enderecos/acoes-do-endereco";
+import { AcoesDoEndereco } from "@/components/enderecos/acoes-do-endereco";
 import { CartaoDeEndereco } from "@/components/ui";
 import { lerTokenDeAcesso } from "@/lib/auth/servidor";
 import { buscarEnderecos } from "@/lib/enderecos/buscar";
+import { ID_TITULO_ENDERECOS } from "@/lib/enderecos/ids";
 
 export const metadata: Metadata = {
   title: "Meus endereços | Leguelé Beer",
