@@ -141,13 +141,13 @@ Funcionalidade: Pedido confirmado e Meus pedidos
 
 ### E-mail de confirmação (LB-81, ponto em aberto)
 
-> [!todo] Preencher: provedor de e-mail
-> O [[mvp-corte]] deixa no MVP só o e-mail de confirmação do pedido, enviado de forma síncrona pela API de um provedor com plano gratuito ([[ADR-002-hospedagem-api]]: sem fila). Criar conta num provedor é decisão do Diego (custos e contas). Quando ele escolher, o LB-81 ganha spec própria: envio ao aprovar o pagamento, falha do provedor sem afetar o pedido nem a confirmação, um e-mail só por pedido mesmo com aprovação repetida, e o texto da tela 08 pode passar a citar o e-mail.
+> [!info] O LB-81 tem spec própria: [[email-pedido]]
+> Envio ao ficar "Pago", falha do provedor sem afetar o pedido nem a confirmação e um e-mail só por pedido. O **provedor** segue pendente do Diego (custos e contas); o texto da tela 08 continua sem citar o e-mail.
 
 ## Fora de escopo
 
 - Tela 09 (Acompanhar pedido), detalhe com linha do tempo (LB-68, MVP+) e status em tempo real (LB-69, Pós-MVP).
-- E-mail de confirmação (LB-81) até a escolha do provedor; WhatsApp.
+- E-mail de confirmação (LB-81, em [[email-pedido]]); WhatsApp.
 - Filtros por status ou período, "Comprar novamente", pedidos do Clube e banner do Clube.
 - Cupom e desconto de assinante.
 - Cancelar pedido pelo cliente.
