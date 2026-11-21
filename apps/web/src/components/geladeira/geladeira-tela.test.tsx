@@ -371,4 +371,40 @@ describe("GeladeiraTela", () => {
       expect(screen.queryByText("R$ 3,00")).not.toBeInTheDocument();
     });
   });
+
+  describe("conta que não respondeu", () => {
+    it("busca que falhou avisa com Tentar de novo, em vez de mostrar a Geladeira vazia em silêncio", async () => {
+      const buscar = vi
+        .fn()
+        .mockResolvedValueOnce({ tipo: "erro" })
+        .mockResolvedValue({
+          tipo: "ok",
+          resposta: {
+            itens: [{ cerveja: mare, quantidade: 2, totalCentavos: 2 * mare.precoCentavos }],
+            ajustes: [],
+            quantidadeTotal: 2,
+            subtotalCentavos: 2 * mare.precoCentavos,
+          },
+        });
+      const conta: ContaDaGeladeira = {
+        buscar,
+        enviar: async () => ({ tipo: "erro" }),
+        validar: async () => ({ tipo: "erro" }),
+      };
+      render(
+        <GeladeiraProvider conta={conta}>
+          <GeladeiraTela />
+        </GeladeiraProvider>,
+      );
+
+      expect(await screen.findByRole("alert")).toHaveTextContent(
+        "Não foi possível carregar sua Geladeira agora.",
+      );
+
+      await userEvent.click(screen.getByRole("button", { name: "Tentar de novo" }));
+
+      await waitFor(() => expect(screen.queryByRole("alert")).not.toBeInTheDocument());
+      expect(buscar).toHaveBeenCalledTimes(2);
+    });
+  });
 });
