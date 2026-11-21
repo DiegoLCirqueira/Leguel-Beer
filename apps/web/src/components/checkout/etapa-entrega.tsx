@@ -60,7 +60,8 @@ export function EtapaEntrega({ enderecos, cotarFrete, destinoDoPagamento }: Prop
   const [escolhido, setEscolhido] = useState(() => inicial(enderecos));
   const vazia = pronta && estado.itens.length === 0;
   const frete = useFreteDoEndereco(escolhido, cotarFrete, pronta && !vazia, sincronizacoes);
-  const { quantidadeTotal, subtotalCentavos } = resumirGeladeira(estado.itens);
+  // Antes de ler a cópia local (`pronta`) a contagem é a do servidor, vazia: o HTML não diverge na hidratação.
+  const { quantidadeTotal, subtotalCentavos } = resumirGeladeira(pronta ? estado.itens : []);
   const podeContinuar =
     !vazia &&
     destinoDoPagamento !== undefined &&
