@@ -85,9 +85,18 @@ Funcionalidade: Qualidade da compra
   - **Repasse do IP real por proxy confiável:** a API só aceita o cabeçalho com o IP do visitante se reconhecer que a chamada veio do servidor do site, por um segredo compartilhado entre site e API. Esse segredo é credencial nova e depende do Diego (item 6).
   - Em qualquer delas, o 429 nunca falha em silêncio: o site mostra "Muitas tentativas seguidas. Espere um minuto e tente de novo." (texto novo desta spec, recomendação vetável do item 2) e não perde o que o cliente fez; a sincronização da Geladeira tenta de novo depois.
 
-> [!todo] Preencher (Back, técnico): os números dos limites por rota, com a justificativa na descrição do PR.
+> [!info] Limites por rota (fechado em 21/11; os dois primeiros já estão na API, o terceiro é a recomendação do Spec, vetável)
+>
+> | Rota | Limite por conta | Justificativa |
+> | --- | --- | --- |
+> | Criar pedido (POST) | 10 por minuto (`order-create`) | Um cliente real cria poucos pedidos por minuto; 10 cobre repetição por rede ruim (a chave de idempotência já devolve o mesmo pedido) e barra rajada. |
+> | Criar e editar endereço (POST e PUT) | 10 por minuto, grupo único (`address-write`) | Cada escrita gasta cota do serviço de mapas ([[enderecos-entrega]]); um cadastro normal faz 1 ou 2. |
+> | Enviar foto do admin | 30 por minuto (`admin-photo-upload`) | Só o admin envia; cobre subir as fotos de uma cerveja de uma vez sem abrir espaço para abuso do armazenamento. O Back confirma o número na fatia do upload. |
+>
+> Acima do limite a API responde 429; o texto de erro no site está nesta seção. O número do endereço segue sujeito à confirmação do Diego (aviso abaixo).
 
-> [!todo] Pendência de decisão técnica (fatia 3, Front e Devops, antes de produção): limite por visitante no site (recomendada) ou repasse do IP real com proxy confiável (este só com o segredo aprovado pelo Diego, item 6), para as chamadas das Server Actions; a escolha vai na descrição do PR e vira ADR se atender aos três critérios.
+> [!info] Limite das chamadas do servidor do site (fechado em 21/11, recomendação do Spec, vetável)
+> Vale a **limitação por visitante no próprio site** (primeira saída), porque não cria credencial nova e não depende do Diego (a segunda exigiria segredo, item 6). Contagem por visitante (IP do cabeçalho de repasse da hospedagem do site, com o cookie de sessão quando houver), **60 chamadas por minuto** por visitante, antes de chamar a API; acima disso o site responde com o texto do 429 acima. Front e Devops fazem na fatia 3, antes de produção; a escolha só vira ADR se atender aos três critérios (CLAUDE.md), e a descrição do PR registra o número final.
 
 > [!warning] **Pendente de confirmação do Diego** (custos e contas, item 4): o limite de criar e editar endereço protege a cota gratuita do serviço de mapas; o número final e o que fazer se a cota acabar ficam com o Diego (cartão "Decisões pendentes"). Até a resposta, vale o limite proposto pelo Back, dentro do plano gratuito.
 
