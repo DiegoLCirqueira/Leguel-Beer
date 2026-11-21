@@ -8,7 +8,7 @@ vi.mock("@/app/(loja)/conta/enderecos/actions", () => ({
   excluirEnderecoAction: excluir,
 }));
 
-import { AcoesDoEndereco } from "./acoes-do-endereco";
+import { AcoesDoEndereco, ID_TITULO_ENDERECOS } from "./acoes-do-endereco";
 
 describe("AcoesDoEndereco", () => {
   beforeEach(() => {
@@ -91,6 +91,23 @@ describe("AcoesDoEndereco", () => {
     concluir({ tipo: "ok" });
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Excluir: Casa" })).toBeEnabled(),
+    );
+  });
+
+  it("depois de excluir, o foco vai para o título da página", async () => {
+    render(
+      <>
+        <h1 id={ID_TITULO_ENDERECOS} tabIndex={-1}>
+          Meus endereços
+        </h1>
+        <AcoesDoEndereco id="e1" nome="Casa" padrao />
+      </>,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "Excluir: Casa" }));
+
+    await waitFor(() =>
+      expect(screen.getByRole("heading", { name: "Meus endereços" })).toHaveFocus(),
     );
   });
 });
