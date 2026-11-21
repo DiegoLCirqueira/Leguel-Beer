@@ -20,12 +20,13 @@ import { FechamentoDoResumo, LinhasDoResumo } from "./resumo-da-geladeira";
 
 /**
  * Frete estimado pelo endereço padrão da conta (a API cota; aqui só se mostra). Sem a ação, sem
- * sessão ou sem endereço, fica `undefined` e o resumo pede o endereço. Cota de novo a cada subtotal.
+ * sessão ou sem endereço, fica `undefined` e o resumo pede o endereço. A API cota com a Geladeira da
+ * conta, então só cota de novo quando a conta recebe a mudança (`sincronizacoes`), nunca antes.
  */
 function useFreteEstimado(
   cotarFrete: (() => Promise<ResultadoDoFrete>) | undefined,
   ativo: boolean,
-  subtotalCentavos: number,
+  sincronizacoes: number,
 ) {
   const [frete, setFrete] = useState<FreteEstimado>();
   useEffect(() => {
@@ -41,7 +42,7 @@ function useFreteEstimado(
     return () => {
       vigente = false;
     };
-  }, [cotarFrete, ativo, subtotalCentavos]);
+  }, [cotarFrete, ativo, sincronizacoes]);
   return frete;
 }
 
@@ -49,8 +50,16 @@ type Props = { cotarFrete?: () => Promise<ResultadoDoFrete> };
 
 /** A Geladeira em prateleiras, uma por categoria, com o resumo: barra e sheet no celular, coluna no desktop. */
 export function GeladeiraTela({ cotarFrete }: Props) {
-  const { pronta, estado, ajustes, limparAjustes, alterarQuantidade, remover, desfazer } =
-    useGeladeira();
+  const {
+    pronta,
+    estado,
+    sincronizacoes,
+    ajustes,
+    limparAjustes,
+    alterarQuantidade,
+    remover,
+    desfazer,
+  } = useGeladeira();
   const larga = useTelaLarga();
   // Os avisos valem para esta visita: ao sair da Geladeira, somem.
   useEffect(() => limparAjustes, [limparAjustes]);
@@ -59,7 +68,7 @@ export function GeladeiraTela({ cotarFrete }: Props) {
   const [toast, setToast] = useState<{ mensagem: string; desfazer?: Desfazer } | null>(null);
   const { quantidadeTotal, subtotalCentavos } = resumirGeladeira(estado.itens);
   const comResumo = pronta && estado.itens.length > 0;
-  const frete = useFreteEstimado(cotarFrete, comResumo, subtotalCentavos);
+  const frete = useFreteEstimado(cotarFrete, comResumo, sincronizacoes);
   const removerComToast = (id: string) => {
     const nome = estado.itens.find((i) => i.cerveja.id === id)?.cerveja.nome;
     const d = remover(id);
