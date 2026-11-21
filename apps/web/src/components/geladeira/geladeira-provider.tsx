@@ -75,12 +75,31 @@ export function useGeladeira(): GeladeiraContexto {
 
 export function GeladeiraProvider({
   children,
-  conta,
+  conta: contaDoLayout,
 }: {
   children: ReactNode;
   /** Sem `conta` (testes, telas sem sessão) a Geladeira é só local. */
   conta?: ContaDaGeladeira;
 }) {
+  // O layout é um Server Component: a cada atualização do servidor o objeto `conta` (e as referências
+  // das ações) chega novo. Se ele entrasse nas dependências dos efeitos, cada atualização repetiria a
+  // busca da conta, que atualiza de novo, num laço. A `conta` daqui é estável e chama a mais recente.
+  const contaAtual = useRef(contaDoLayout);
+  useEffect(() => {
+    contaAtual.current = contaDoLayout;
+  });
+  const temConta = contaDoLayout !== undefined;
+  const conta = useMemo<ContaDaGeladeira | undefined>(
+    () =>
+      temConta
+        ? {
+            buscar: () => contaAtual.current!.buscar(),
+            enviar: (pedido) => contaAtual.current!.enviar(pedido),
+            validar: (pedido) => contaAtual.current!.validar(pedido),
+          }
+        : undefined,
+    [temConta],
+  );
   // A cópia local só existe no navegador: lida uma vez ao montar (no servidor fica vazia).
   const [estado, setEstado] = useState<EstadoDaGeladeira>(() => lerGeladeiraLocal());
   // `false` no HTML do servidor e na hidratação; `true` depois: o contador só aparece então.
