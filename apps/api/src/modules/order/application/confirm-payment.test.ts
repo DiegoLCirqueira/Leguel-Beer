@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { NotFoundError } from "../../../common/errors/not-found-error.js";
 import { PaymentNotConfirmableError } from "../domain/order-errors.js";
 import type { ExpirableOrder, OrderRepository } from "../domain/order-repository.js";
 import { ConfirmPayment } from "./confirm-payment.js";
@@ -67,5 +68,16 @@ describe("ConfirmPayment", () => {
     expect(orders.cancellations).toEqual([
       { orderId: "order-1", reason: "pagamento não concluído", at: now },
     ]);
+  });
+
+  it("pedido inexistente responde não encontrado e não confirma nada", async () => {
+    const orders = new InMemoryOrderRepository([]);
+    const confirm = new ConfirmPayment(orders, () => CREATED_AT);
+
+    await expect(
+      confirm.execute({ orderId: "order-9", actorId: "admin-1" }),
+    ).rejects.toBeInstanceOf(NotFoundError);
+
+    expect(orders.confirmations).toEqual([]);
   });
 });
