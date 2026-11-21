@@ -44,6 +44,11 @@ export type GeladeiraContexto = {
   pronta: boolean;
   estado: EstadoDaGeladeira;
   quantidadeTotal: number;
+  /**
+   * `true` quando a conta já respondeu a primeira vez (ou não há conta): só então a cópia local é a
+   * Geladeira de verdade. Antes, uma cópia vazia pode ser só o outro aparelho ainda sem sincronizar.
+   */
+  resolvida: boolean;
   /** Sobe a cada vez que a conta passa a ter a Geladeira mostrada (busca ou envio concluídos). */
   sincronizacoes: number;
   /** Avisos de preço e quantidade da última resposta da conta (a tela da Geladeira os mostra). */
@@ -114,6 +119,7 @@ export function GeladeiraProvider({
   const versao = useRef(0);
   const [ajustes, setAjustes] = useState<AjusteDaGeladeira[]>([]);
   const [sincronizacoes, setSincronizacoes] = useState(0);
+  const [respondeu, setRespondeu] = useState(false);
   // Entrar e sair redirecionam: a mudança de página é o sinal para olhar a sessão de novo.
   const pagina = usePathname();
   // Geração da identidade/modo (convidado ou conta, página, sessão): sobe a cada mudança que torna
@@ -212,7 +218,9 @@ export function GeladeiraProvider({
       });
       aplicar(geladeira);
       if (enviarParaConta) await enviar();
-    })();
+    })().finally(() => {
+      if (ativo) setRespondeu(true);
+    });
     return () => {
       ativo = false;
     };
@@ -226,6 +234,7 @@ export function GeladeiraProvider({
       pronta,
       estado,
       quantidadeTotal: quantidadeTotal(estado),
+      resolvida: !conta || respondeu,
       sincronizacoes,
       ajustes,
       limparAjustes,
@@ -267,7 +276,17 @@ export function GeladeiraProvider({
         }
       },
     }),
-    [pronta, estado, sincronizacoes, ajustes, limparAjustes, aplicar, sincronizar],
+    [
+      pronta,
+      estado,
+      conta,
+      respondeu,
+      sincronizacoes,
+      ajustes,
+      limparAjustes,
+      aplicar,
+      sincronizar,
+    ],
   );
 
   return <Contexto.Provider value={contexto}>{children}</Contexto.Provider>;

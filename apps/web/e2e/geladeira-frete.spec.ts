@@ -1,23 +1,6 @@
-import { execFileSync } from "node:child_process";
 import { expect, test } from "./support/maior-de-idade";
+import { inserirEndereco } from "./support/enderecos-banco";
 import { criarContaConfirmada, emailUnico, modo } from "./support/supabase-local";
-
-/** O cadastro pela API chama o serviço de mapas; o endereço padrão entra direto no banco, com a distância dada. */
-function inserirEnderecoPadrao(email: string, distanciaMetros: number) {
-  const sql = `insert into addresses (id, profile_id, nickname, zip, street, number, district, city, state, is_default, latitude, longitude, distance_meters, route_origin_latitude, route_origin_longitude, updated_at) select gen_random_uuid(), id, 'Casa', '57035000', 'Avenida Fernandes Lima', '100', 'Farol', 'Maceió', 'AL', true, -9.64, -35.73, ${distanciaMetros}, -9.6649, -35.7313, now() from profiles where email = '${email}'`;
-  // No CI o banco da API é o service container (DATABASE_URL); no local, o Postgres do Supabase no Docker.
-  if (process.env.DATABASE_URL) execFileSync("psql", [process.env.DATABASE_URL, "-c", sql]);
-  else
-    execFileSync("docker", [
-      "exec",
-      "supabase_db_leguele-beer",
-      "psql",
-      "-U",
-      "postgres",
-      "-c",
-      sql,
-    ]);
-}
 
 const MARE_2 = [{ slug: "mare-alta", quantidade: 2 }]; // R$ 64,00
 const MARE_3_E_CARNAVAL_2 = [
@@ -59,7 +42,7 @@ test.describe("Frete no resumo da Geladeira", () => {
       data: { itens: cervejas },
     });
     expect(envio.ok()).toBe(true);
-    inserirEnderecoPadrao(email, distanciaMetros);
+    inserirEndereco(email, { distanciaMetros });
     await page.goto("/geladeira");
     await page.getByRole("button", { name: "Ver resumo" }).click();
     return page.getByRole("dialog", { name: "Resumo da Geladeira" });

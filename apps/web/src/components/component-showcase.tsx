@@ -13,6 +13,7 @@ import {
   Button,
   CardCerveja,
   CartaoDeEndereco,
+  OpcaoDeEndereco,
   Campo,
   CervejaNaoEncontrada,
   CategoryChips,
@@ -189,6 +190,22 @@ export function ComponentShowcase() {
           max={12}
           rotulo="Quantidade de exemplo"
         />
+      </Section>
+      <Section title="Entrega: opção de endereço">
+        <ul className="flex flex-col gap-3">
+          <OpcaoDeEndereco
+            endereco={enderecoExemplo}
+            grupo="vitrine-entrega"
+            selecionado
+            aoEscolher={() => {}}
+          />
+          <OpcaoDeEndereco
+            endereco={{ ...enderecoExemplo, id: "3", apelido: "Trabalho", padrao: false }}
+            grupo="vitrine-entrega"
+            selecionado={false}
+            aoEscolher={() => {}}
+          />
+        </ul>
       </Section>
       <Section title="Meus endereços: cartão de endereço">
         <ul className="flex flex-col gap-3">
