@@ -42,6 +42,14 @@ Exemplo (`modules/health`): `CheckHealth` (application) depende da porta `Databa
 
 Para validar a entrada, crie o DTO com `zodDto(schema)` (`common/validation/zod-dto.ts`) e use-o no `@Body()`; o pipe global devolve `VALIDATION_ERROR`. Marque controllers com `@ApiTags("<contexto>")` para o Swagger. Todo endpoint novo aparece no Swagger.
 
+## Cron de expiração de pedidos
+
+`GET /cron/expirar-pedidos` cancela os pedidos aguardando pagamento vencidos (até 100 por disparo; o resto sai no disparo seguinte). A rota é pública e só aceita `Authorization: Bearer <CRON_SECRET>`.
+
+- `CRON_SECRET`: segredo aleatório de **no mínimo 32 caracteres** (a chave fica em `.env.example`, sem valor). Sem ele, a rota recusa tudo (401) e, em produção, a API avisa no boot; com menos de 32 caracteres, também avisa.
+- A plataforma (Vercel) envia o segredo como Bearer no cron diário; o cadastro do cron e do segredo é do deploy (LB-8).
+- A validade de 30 minutos vale pela checagem no uso; o cron só limpa o que sobrar ([[ADR-002-hospedagem-api]]).
+
 ## Pendências conhecidas
 
 Follow-ups da revisão do #129, fora do escopo desta entrega:
