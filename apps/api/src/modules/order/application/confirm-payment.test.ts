@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { PaymentNotConfirmableError } from "../domain/order-errors.js";
 import type { ExpirableOrder, OrderRepository } from "../domain/order-repository.js";
 import { ConfirmPayment } from "./confirm-payment.js";
 
@@ -51,5 +52,20 @@ describe("ConfirmPayment", () => {
     await confirm.execute({ orderId: "order-1", actorId: "admin-1" });
 
     expect(orders.confirmations).toEqual([{ orderId: "order-1", actorId: "admin-1", at: now }]);
+  });
+
+  it("com a validade vencida há 1 minuto expira o pedido em vez de confirmar e responde conflito", async () => {
+    const now = minutesAfter(CREATED_AT, 31);
+    const orders = new InMemoryOrderRepository([awaitingOrder()]);
+    const confirm = new ConfirmPayment(orders, () => now);
+
+    await expect(
+      confirm.execute({ orderId: "order-1", actorId: "admin-1" }),
+    ).rejects.toBeInstanceOf(PaymentNotConfirmableError);
+
+    expect(orders.confirmations).toEqual([]);
+    expect(orders.cancellations).toEqual([
+      { orderId: "order-1", reason: "pagamento não concluído", at: now },
+    ]);
   });
 });
