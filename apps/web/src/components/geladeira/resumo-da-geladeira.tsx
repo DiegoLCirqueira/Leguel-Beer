@@ -1,6 +1,6 @@
 import { resumirGeladeira } from "@leguele/shared";
 import Link from "next/link";
-import { LinhaDoResumo, TotaisDoResumo, Button, buttonVariants } from "@/components/ui";
+import { LinhaDoResumo, TotaisDoResumo, buttonVariants } from "@/components/ui";
 import type { FreteEstimado } from "@/components/ui";
 import type { ItemLocal } from "@/lib/geladeira/estado";
 
@@ -26,7 +26,7 @@ export function LinhasDoResumo({ itens, aoAlterar, aoRemover }: LinhasDoResumoPr
   );
 }
 
-/** Totais e as duas saídas do resumo. "Finalizar compra" espera o checkout (item 5 da sequência). */
+/** Totais e as duas saídas do resumo. "Finalizar compra" leva ao checkout, que exige conta. */
 export function FechamentoDoResumo({
   itens,
   frete,
@@ -42,7 +42,9 @@ export function FechamentoDoResumo({
         subtotalCentavos={subtotalCentavos}
         frete={frete}
       />
-      <Button disabled>Finalizar compra</Button>
+      <Link href="/checkout" className={buttonVariants({ variant: "primary" })}>
+        Finalizar compra
+      </Link>
       <Link href="/catalogo" className={buttonVariants({ variant: "outline" })}>
         Continuar comprando
       </Link>

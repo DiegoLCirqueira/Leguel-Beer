@@ -92,7 +92,10 @@ describe("GeladeiraTela", () => {
 
       const sheet = screen.getByRole("dialog", { name: "Resumo da Geladeira" });
       expect(within(sheet).getAllByRole("listitem")).toHaveLength(2);
-      expect(within(sheet).getByRole("button", { name: "Finalizar compra" })).toBeDisabled();
+      expect(within(sheet).getByRole("link", { name: "Finalizar compra" })).toHaveAttribute(
+        "href",
+        "/checkout",
+      );
       expect(within(sheet).getByRole("link", { name: "Continuar comprando" })).toHaveAttribute(
         "href",
         "/catalogo",
