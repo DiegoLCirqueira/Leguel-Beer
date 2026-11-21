@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { excluirEnderecoAction, tornarPadraoAction } from "@/app/(loja)/conta/enderecos/actions";
 import type { ResultadoDaAcao } from "@/app/(loja)/conta/enderecos/actions";
 import { Button } from "@/components/ui";
+import { ID_TITULO_ENDERECOS } from "@/lib/enderecos/ids";
 
 const AVISOS: Record<Exclude<ResultadoDaAcao["tipo"], "ok">, string> = {
   erro: "Não foi possível concluir agora. Tente de novo.",
@@ -19,11 +20,12 @@ export function AcoesDoEndereco({ id, nome, padrao }: Props) {
   const [ocupado, iniciar] = useTransition();
   const [aviso, setAviso] = useState<string | null>(null);
 
-  const executar = (acao: (id: string) => Promise<ResultadoDaAcao>) => {
+  const executar = (acao: (id: string) => Promise<ResultadoDaAcao>, excluindo = false) => {
     setAviso(null);
     iniciar(async () => {
       const { tipo } = await acao(id);
       if (tipo !== "ok") setAviso(AVISOS[tipo]);
+      else if (excluindo) document.getElementById(ID_TITULO_ENDERECOS)?.focus();
     });
   };
 
@@ -49,7 +51,7 @@ export function AcoesDoEndereco({ id, nome, padrao }: Props) {
           disabled={ocupado}
           aria-label={`Excluir: ${nome}`}
           iconLeft={<Trash2 aria-hidden="true" className="size-4" />}
-          onClick={() => executar(excluirEnderecoAction)}
+          onClick={() => executar(excluirEnderecoAction, true)}
         >
           Excluir
         </Button>

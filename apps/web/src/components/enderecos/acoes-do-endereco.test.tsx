@@ -8,6 +8,7 @@ vi.mock("@/app/(loja)/conta/enderecos/actions", () => ({
   excluirEnderecoAction: excluir,
 }));
 
+import { ID_TITULO_ENDERECOS } from "@/lib/enderecos/ids";
 import { AcoesDoEndereco } from "./acoes-do-endereco";
 
 describe("AcoesDoEndereco", () => {
@@ -60,5 +61,54 @@ describe("AcoesDoEndereco", () => {
     await userEvent.click(screen.getByRole("button", { name: "Tornar padrão: Trabalho" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Este endereço não existe mais.");
+  });
+
+  it("enquanto a ação roda, os dois botões ficam desabilitados", async () => {
+    let concluir: (r: { tipo: "ok" }) => void = () => {};
+    tornarPadrao.mockReturnValue(new Promise((resolve) => (concluir = resolve)));
+    render(<AcoesDoEndereco id="e1" nome="Trabalho" padrao={false} />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Tornar padrão: Trabalho" }));
+
+    expect(screen.getByRole("button", { name: "Tornar padrão: Trabalho" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Excluir: Trabalho" })).toBeDisabled();
+    concluir({ tipo: "ok" });
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Excluir: Trabalho" })).toBeEnabled(),
+    );
+  });
+
+  it("ao tentar de novo, o aviso anterior some", async () => {
+    excluir.mockResolvedValueOnce({ tipo: "erro" });
+    render(<AcoesDoEndereco id="e1" nome="Casa" padrao />);
+    await userEvent.click(screen.getByRole("button", { name: "Excluir: Casa" }));
+    await screen.findByRole("alert");
+
+    let concluir: (r: { tipo: "ok" }) => void = () => {};
+    excluir.mockReturnValueOnce(new Promise((resolve) => (concluir = resolve)));
+    await userEvent.click(screen.getByRole("button", { name: "Excluir: Casa" }));
+
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    concluir({ tipo: "ok" });
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Excluir: Casa" })).toBeEnabled(),
+    );
+  });
+
+  it("depois de excluir, o foco vai para o título da página", async () => {
+    render(
+      <>
+        <h1 id={ID_TITULO_ENDERECOS} tabIndex={-1}>
+          Meus endereços
+        </h1>
+        <AcoesDoEndereco id="e1" nome="Casa" padrao />
+      </>,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "Excluir: Casa" }));
+
+    await waitFor(() =>
+      expect(screen.getByRole("heading", { name: "Meus endereços" })).toHaveFocus(),
+    );
   });
 });
