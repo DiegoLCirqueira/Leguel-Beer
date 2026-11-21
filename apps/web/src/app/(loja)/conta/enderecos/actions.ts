@@ -2,9 +2,11 @@
 
 import { enderecoFormSchema } from "@leguele/shared";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { consultarCep, type ResultadoDoCep } from "@/lib/enderecos/cep";
 import { urlDaApi } from "@/lib/auth/config";
 import { lerTokenDeAcesso } from "@/lib/auth/servidor";
+import { dentroDoLimiteDeCep } from "@/lib/enderecos/limite-de-cep";
 
 export type ResultadoDaAcao = { tipo: "ok" | "sem-sessao" | "nao-encontrado" | "erro" };
 
@@ -124,5 +126,9 @@ export async function salvarEnderecoAction(
 /** Busca de CEP para o formulário. Só quem tem sessão consulta (não vira buscador aberto de CEP). */
 export async function buscarCepAction(cep: string): Promise<ResultadoDoCep> {
   if (!(await lerTokenDeAcesso())) return { tipo: "indisponivel" };
+  // O cookie só é lido, não validado: quem limita o uso do serviço público é o limite por visitante.
+  const encaminhado = (await headers()).get("x-forwarded-for");
+  const visitante = encaminhado?.split(",")[0]?.trim() || "desconhecido";
+  if (!dentroDoLimiteDeCep(visitante)) return { tipo: "indisponivel" };
   return consultarCep(cep);
 }
