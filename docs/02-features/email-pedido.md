@@ -65,8 +65,8 @@ Funcionalidade: E-mail de confirmação do pedido
 - **Quando sai:** uma vez, quando o pedido passa a "Pago" pela ação "Confirmar pagamento" do admin ([[pagamento]], [[admin]]) (recomendação do Spec, vetável: o e-mail acompanha a tela "Pedido confirmado!"). Não sai na criação do pedido, nem na expiração, nem no cancelamento. Mudanças de status seguintes (Em preparo, Saiu para entrega, Entregue) não enviam e-mail no MVP.
 - **Síncrono e fora da transação:** a API chama o provedor depois de gravar o pedido como "Pago" e **fora** da transação do banco ([[ADR-002-hospedagem-api]]). Tempo máximo de 5 s para o provedor responder; passado isso, conta como falha.
 - **Falha não desfaz nada:** erro ou tempo esgotado do provedor não muda o pedido nem a baixa de estoque. A API registra no log o id do pedido e o código do erro (nunca o e-mail do cliente, o endereço nem o corpo) e responde o sucesso do "Confirmar pagamento" com o aviso de que o e-mail não saiu. Sem fila e sem nova tentativa automática no MVP (recomendação vetável); o admin pode avisar o cliente por fora.
-- **Um por pedido:** o pedido guarda se o e-mail foi enviado. O "Pago" acontece uma vez só (409 nas repetições, [[admin]], "Concorrência"), então não há segundo envio; se o primeiro falhou, não há reenvio automático.
-- **Conteúdo:** assunto "Pedido #LB… confirmado"; saudação com o primeiro nome da conta (ou "Olá,", sem nome); número, data e hora, itens (nome, quantidade, preço da cópia guardada no pedido), subtotal, frete, total, forma de pagamento e parcelas, endereço de entrega (a cópia guardada no pedido); link para "Meus pedidos" (`SITE_URL`); rodapé com o aviso de que o Leguelé Beer é um projeto sem fins lucrativos, feito para portfólio, e que nada é cobrado nem entregue. Texto simples e HTML mínimo, sem imagem rastreadora nem link de rastreio.
+- **Um por pedido:** o pedido guarda se o e-mail foi enviado. A marca é gravada depois da resposta de sucesso do provedor, numa escrita separada do "Pago" (nunca na mesma operação, para não dizer "enviado" antes do envio); se a falha for do provedor, o pedido fica sem a marca. O "Pago" acontece uma vez só (409 nas repetições, [[admin]], "Concorrência"), então não há segundo envio; se o primeiro falhou, não há reenvio automático.
+- **Conteúdo:** assunto "Pedido #LB… confirmado"; saudação com o primeiro nome da conta (ou "Olá,", sem nome); número, data e hora, itens (nome, quantidade, preço da cópia guardada no pedido), subtotal, frete, total, forma de pagamento e parcelas, endereço de entrega (a cópia guardada no pedido); link para "Meus pedidos" (`SITE_URL`); rodapé com o aviso de que o Leguelé Beer é um projeto sem fins lucrativos, feito para portfólio, e que nenhum pagamento é real e nada é cobrado (mesmo texto das telas de pagamento, [[pagamento]]). Texto simples e HTML mínimo, sem imagem rastreadora nem link de rastreio.
 - **Destinatário:** só o e-mail da conta dona do pedido (confirmado no cadastro). Nada de cópia oculta nem de outro endereço.
 - **Privacidade:** os dados que saem para o provedor são só os do corpo acima. A Política de Privacidade ([[termos-privacidade]]) ganha, em "Com quem compartilhamos", o provedor de e-mail, com o texto que o Diego aprovar junto com a escolha do provedor (LGPD, item 7).
 - **Segredos:** a chave do provedor só na API, em `apps/api/.env` (nome em `.env.example`, sem valor), nunca no site nem em `NEXT_PUBLIC_*`. Criar a chave é do Diego (item 6).
@@ -87,7 +87,7 @@ Funcionalidade: E-mail de confirmação do pedido
 - **Cenários 1 a 4** (caso de uso com repositório em memória e envio falso): e-mail com os dados certos; provedor que lança erro ou passa de 5 s deixa o pedido "Pago" e devolve o aviso; "Confirmar pagamento" repetido não envia segundo e-mail; expirar e cancelar não enviam.
 - **Corpo do e-mail** (unitário): contém só os campos da regra; um teste procura telefone, data de nascimento e id do cliente e falha se aparecerem.
 - **Logs** (unitário): o log da falha não traz e-mail, endereço nem corpo.
-- **Integração** (banco real): a marca "e-mail enviado" é gravada na mesma operação que o "Pago" e não duplica na corrida entre dois "Confirmar pagamento".
+- **Integração** (banco real): o "Pago" é gravado na transação e a marca "e-mail enviado" numa segunda escrita, só depois de o provedor responder com sucesso (falha ou tempo esgotado deixa o pedido sem a marca); a corrida entre dois "Confirmar pagamento" termina em um "Pago" e um 409, e só o vencedor chama o provedor.
 - **E2E:** fora de escopo até existir o provedor; em desenvolvimento, o envio falso ou um Mailpit local se o Back preferir ([[qualidade-compra]] usa o Mailpit do Supabase local para os e-mails do cadastro).
 
 ## Fatias, com dono e ordem
@@ -111,7 +111,7 @@ Recomendações aplicadas pelo Spec em 17/11; qualquer uma pode ser vetada.
 - **E-mail ao confirmar o pagamento** (pedido "Pago"), não na criação do pedido.
 - **Sem nova tentativa nem reenvio** no MVP; falha só vira aviso ao admin e log.
 - **Tempo máximo de 5 s** para o provedor.
-- **Rodapé com o aviso de projeto sem fins lucrativos**, no mesmo espírito das telas de pagamento (16/11).
+- **Rodapé com o aviso de projeto sem fins lucrativos**, com o mesmo texto das telas de pagamento (16/11); a exceção ao "sem aviso de portfólio" foi registrada em [[termos-privacidade]] (sem "nem entregue"). Vetável.
 - **Texto novo:** "Pedido #LB… confirmado", "Pedido confirmado. Não foi possível enviar o e-mail ao cliente."
 
 ## Tickets propostos
