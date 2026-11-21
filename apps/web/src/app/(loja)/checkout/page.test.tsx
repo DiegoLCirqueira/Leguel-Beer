@@ -64,6 +64,15 @@ describe("/checkout", () => {
     expect(buscar).toHaveBeenCalledWith("token-1");
   });
 
+  it("'Continuar para pagamento' leva à etapa Pagamento", async () => {
+    render(<GeladeiraProvider>{await Checkout()}</GeladeiraProvider>);
+
+    expect(await screen.findByRole("link", { name: "Continuar para pagamento" })).toHaveAttribute(
+      "href",
+      "/checkout/pagamento",
+    );
+  });
+
   it("falha ao buscar os endereços mostra o aviso com Tentar de novo", async () => {
     buscar.mockResolvedValue({ tipo: "erro" });
 
