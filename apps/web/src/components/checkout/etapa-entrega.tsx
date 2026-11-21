@@ -2,6 +2,7 @@
 
 import { resumirGeladeira, type EnderecoResposta } from "@leguele/shared";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { ResultadoDoFrete } from "@/app/geladeira/frete";
 import { useGeladeira } from "@/components/geladeira/geladeira-provider";
@@ -12,6 +13,8 @@ import { textoDosItens } from "@/components/ui/totais-do-resumo";
 type Props = {
   enderecos: EnderecoResposta[];
   cotarFrete: (enderecoId: string) => Promise<ResultadoDoFrete>;
+  /** Tela da etapa seguinte; sem ela (ainda não existe), "Continuar" fica desabilitado. */
+  destinoDoPagamento?: string;
 };
 
 const ETAPAS = ["Entrega", "Pagamento", "Revisão"];
@@ -24,10 +27,13 @@ const inicial = (enderecos: EnderecoResposta[]) =>
 function useFreteDoEndereco(
   enderecoId: string | undefined,
   cotarFrete: Props["cotarFrete"],
+  /** Só cota com a Geladeira pronta e de novo quando a conta a recebe: a API cota com a da conta. */
+  ativo: boolean,
+  sincronizacoes: number,
 ): FreteEstimado | undefined {
   const [cotado, setCotado] = useState<{ id: string; frete: FreteEstimado }>();
   useEffect(() => {
-    if (!enderecoId) return;
+    if (!enderecoId || !ativo) return;
     let vigente = true;
     cotarFrete(enderecoId)
       .then((r) => {
@@ -43,17 +49,26 @@ function useFreteDoEndereco(
     return () => {
       vigente = false;
     };
-  }, [enderecoId, cotarFrete]);
+  }, [enderecoId, cotarFrete, ativo, sincronizacoes]);
   return cotado && cotado.id === enderecoId ? cotado.frete : undefined;
 }
 
 /** Etapa Entrega do checkout (telas 05 e 29): escolher o endereço e ver o frete antes de pagar. */
-export function EtapaEntrega({ enderecos, cotarFrete }: Props) {
-  const { estado } = useGeladeira();
+export function EtapaEntrega({ enderecos, cotarFrete, destinoDoPagamento }: Props) {
+  const { pronta, estado, sincronizacoes } = useGeladeira();
+  const roteador = useRouter();
   const [escolhido, setEscolhido] = useState(() => inicial(enderecos));
-  const frete = useFreteDoEndereco(escolhido, cotarFrete);
+  const vazia = pronta && estado.itens.length === 0;
+  const frete = useFreteDoEndereco(escolhido, cotarFrete, pronta && !vazia, sincronizacoes);
   const { quantidadeTotal, subtotalCentavos } = resumirGeladeira(estado.itens);
-  const podeContinuar = frete?.tipo === "valor" || frete?.tipo === "gratis";
+  const podeContinuar =
+    !vazia &&
+    destinoDoPagamento !== undefined &&
+    (frete?.tipo === "valor" || frete?.tipo === "gratis");
+  // Geladeira vazia (ou esvaziada pelos ajustes): não há o que fechar, volta à Geladeira.
+  useEffect(() => {
+    if (vazia) roteador.replace("/geladeira");
+  }, [vazia, roteador]);
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 px-4 pb-6 pt-2 text-texto">
@@ -124,7 +139,7 @@ export function EtapaEntrega({ enderecos, cotarFrete }: Props) {
             </div>
           ) : null}
           {podeContinuar ? (
-            <Link href="/checkout/pagamento" className={buttonVariants({ variant: "primary" })}>
+            <Link href={destinoDoPagamento!} className={buttonVariants({ variant: "primary" })}>
               Continuar para pagamento
             </Link>
           ) : (
