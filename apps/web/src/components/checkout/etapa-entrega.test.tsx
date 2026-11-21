@@ -298,4 +298,44 @@ describe("EtapaEntrega", () => {
     expect(trocar).not.toHaveBeenCalled();
     expect(await screen.findByText("Grátis")).toBeInTheDocument();
   });
+
+  it("busca da conta que falhou não vira Geladeira vazia: avisa, não redireciona nem cota, e Tentar de novo busca outra vez", async () => {
+    const dela: GeladeiraResponse = {
+      itens: [{ cerveja: mare, quantidade: 2, totalCentavos: 2 * mare.precoCentavos }],
+      ajustes: [],
+      quantidadeTotal: 2,
+      subtotalCentavos: 2 * mare.precoCentavos,
+    };
+    const buscar = vi
+      .fn()
+      .mockResolvedValueOnce({ tipo: "erro" })
+      .mockResolvedValue({ tipo: "ok", resposta: dela });
+    const conta: ContaDaGeladeira = {
+      buscar,
+      enviar: async () => ({ tipo: "ok", resposta: dela }),
+      validar: async () => ({ tipo: "erro" }),
+    };
+    const cotar = vi.fn().mockResolvedValue(frete({ tipo: "gratis" }));
+    render(
+      <GeladeiraProvider conta={conta}>
+        <EtapaEntrega
+          enderecos={[casa]}
+          cotarFrete={cotar}
+          destinoDoPagamento="/checkout/pagamento"
+        />
+      </GeladeiraProvider>,
+    );
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Não foi possível carregar sua Geladeira agora.",
+    );
+    expect(trocar).not.toHaveBeenCalled();
+    expect(cotar).not.toHaveBeenCalled();
+
+    await userEvent.click(screen.getByRole("button", { name: "Tentar de novo" }));
+
+    expect(await screen.findByText("Grátis")).toBeInTheDocument();
+    expect(buscar).toHaveBeenCalledTimes(2);
+    expect(trocar).not.toHaveBeenCalled();
+  });
 });
