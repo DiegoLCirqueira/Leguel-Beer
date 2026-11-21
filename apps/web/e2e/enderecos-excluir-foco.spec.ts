@@ -1,5 +1,5 @@
-import { execFileSync } from "node:child_process";
 import { expect, test } from "./support/maior-de-idade";
+import { inserirEndereco } from "./support/enderecos-banco";
 import { criarContaConfirmada, emailUnico, modo } from "./support/supabase-local";
 
 test.describe("Meus endereços: excluir", () => {
@@ -18,20 +18,7 @@ test.describe("Meus endereços: excluir", () => {
     await page.getByRole("button", { name: "Entrar", exact: true }).click();
     await expect(page).toHaveURL(/\/conta\/enderecos$/);
 
-    // O cadastro pela API chama o serviço de mapas; o endereço entra direto no banco local.
-    const sql = `insert into addresses (id, profile_id, nickname, zip, street, number, district, city, state, is_default, latitude, longitude, route_origin_latitude, route_origin_longitude, updated_at) select gen_random_uuid(), id, 'Casa', '57035000', 'Avenida Fernandes Lima', '100', 'Farol', 'Maceió', 'AL', true, -9.64, -35.73, -9.65, -35.74, now() from profiles where email = '${email}'`;
-    // No CI o banco da API é o service container (DATABASE_URL); no local, o Postgres do Supabase no Docker.
-    if (process.env.DATABASE_URL) execFileSync("psql", [process.env.DATABASE_URL, "-c", sql]);
-    else
-      execFileSync("docker", [
-        "exec",
-        "supabase_db_leguele-beer",
-        "psql",
-        "-U",
-        "postgres",
-        "-c",
-        sql,
-      ]);
+    inserirEndereco(email);
     await page.reload();
 
     await page.getByRole("button", { name: "Excluir: Casa" }).click();
