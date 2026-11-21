@@ -299,6 +299,27 @@ describe("GeladeiraTela", () => {
       expect(screen.getByText("Informe seu endereço para calcular o frete")).toBeInTheDocument();
     });
 
+    it("a resposta atrasada de uma cotação antiga não substitui a mais nova", async () => {
+      telaLarga();
+      guardar([{ cerveja: mare, quantidade: 2 }]);
+      const respostas: ((r: ResultadoDoFrete) => void)[] = [];
+      const cotar = vi.fn(
+        () => new Promise<ResultadoDoFrete>((resolve) => respostas.push(resolve)),
+      );
+      abrirComFrete(cotar);
+      await waitFor(() => expect(cotar).toHaveBeenCalledTimes(1));
+      await userEvent.click(screen.getByRole("button", { name: "Aumentar quantidade" }));
+      await waitFor(() => expect(cotar).toHaveBeenCalledTimes(2));
+
+      respostas[1]!({ tipo: "frete", frete: { tipo: "gratis" } });
+      expect(await screen.findByText("Grátis")).toBeInTheDocument();
+      respostas[0]!({ tipo: "frete", frete: { tipo: "valor", centavos: 1300 } });
+
+      await waitFor(() => expect(cotar).toHaveBeenCalledTimes(2));
+      expect(screen.getByText("Grátis")).toBeInTheDocument();
+      expect(screen.queryByText("R$ 13,00")).not.toBeInTheDocument();
+    });
+
     it("cota de novo quando o subtotal muda", async () => {
       telaLarga();
       guardar([{ cerveja: mare, quantidade: 2 }]);
