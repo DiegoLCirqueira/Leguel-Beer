@@ -28,6 +28,10 @@ class InMemoryOrderRepository implements OrderRepository {
     this.cancellations.push({ orderId, reason, at });
     return true;
   }
+
+  async confirmPaymentIfAwaiting(): Promise<boolean> {
+    return false;
+  }
 }
 
 function awaitingOrder(overrides: Partial<ExpirableOrder> = {}): ExpirableOrder {

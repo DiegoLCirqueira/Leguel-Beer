@@ -59,4 +59,62 @@ export class PrismaOrderRepository implements OrderRepository {
       return true;
     });
   }
+
+  async confirmPaymentIfAwaiting(orderId: string, actorId: string, at: Date): Promise<boolean> {
+    return this.prisma.$transaction(async (tx) => {
+      // A condição no próprio UPDATE decide a corrida com a expiração, o cancelamento e o repetido.
+      const { count } = await tx.order.updateMany({
+        where: { id: orderId, status: "AWAITING_PAYMENT", expiresAt: { gt: at } },
+        data: { status: "PAID" },
+      });
+      if (count === 0) return false;
+
+      const order = await tx.order.findUniqueOrThrow({
+        where: { id: orderId },
+        select: { profileId: true },
+      });
+      const reservations = await tx.stockReservation.findMany({
+        where: { orderId, releasedAt: null, consumedAt: null },
+      });
+      for (const reservation of reservations) {
+        await tx.beer.update({
+          where: { id: reservation.beerId },
+          data: { stock: { decrement: reservation.quantity } },
+        });
+      }
+      await tx.stockReservation.updateMany({
+        where: { orderId, releasedAt: null, consumedAt: null },
+        data: { consumedAt: at },
+      });
+
+      const deductions = await tx.fridgePendingDeduction.findMany({ where: { orderId } });
+      for (const deduction of deductions) {
+        const item = await tx.fridgeItem.findFirst({
+          where: { beerId: deduction.beerId, fridge: { profileId: order.profileId } },
+        });
+        if (!item) continue;
+        // A quantidade na Geladeira é sempre positiva: o que zera sai da Geladeira.
+        if (item.quantity <= deduction.quantity) {
+          await tx.fridgeItem.delete({ where: { id: item.id } });
+        } else {
+          await tx.fridgeItem.update({
+            where: { id: item.id },
+            data: { quantity: { decrement: deduction.quantity } },
+          });
+        }
+      }
+      await tx.fridgePendingDeduction.deleteMany({ where: { orderId } });
+
+      await tx.orderStatusHistory.create({
+        data: {
+          orderId,
+          fromStatus: "AWAITING_PAYMENT",
+          toStatus: "PAID",
+          actorId,
+          createdAt: at,
+        },
+      });
+      return true;
+    });
+  }
 }
