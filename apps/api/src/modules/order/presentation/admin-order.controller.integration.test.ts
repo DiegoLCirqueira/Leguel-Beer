@@ -124,4 +124,52 @@ describe("POST /admin/pedidos/:id/confirmar-pagamento (HTTP, banco real)", () =>
       { toStatus: "PAID", actorId: tokens.adminId },
     ]);
   });
+
+  it("sem token responde 401 e cliente comum responde 403, sem mudar o pedido", async () => {
+    const semToken = await confirm(orderId, null);
+    const cliente = await confirm(orderId, tokens.customer());
+
+    expect(semToken.status).toBe(401);
+    expect(cliente.status).toBe(403);
+    expect((await prisma.order.findUniqueOrThrow({ where: { id: orderId } })).status).toBe(
+      "AWAITING_PAYMENT",
+    );
+  });
+
+  it("o segundo toque responde 409 e não baixa o estoque de novo", async () => {
+    await confirm(orderId);
+
+    const second = await confirm(orderId);
+
+    expect(second.status).toBe(409);
+    expect(second.body).toMatchObject({ code: "CONFLICT" });
+    expect((await prisma.beer.findUniqueOrThrow({ where: { id: beerId } })).stock).toBe(8);
+    expect(await prisma.orderStatusHistory.count({ where: { orderId } })).toBe(1);
+  });
+
+  it("pedido vencido responde 409, fica cancelado e libera a reserva", async () => {
+    await prisma.order.update({
+      where: { id: orderId },
+      data: { expiresAt: new Date(Date.now() - 60_000) },
+    });
+
+    const response = await confirm(orderId);
+
+    expect(response.status).toBe(409);
+    expect((await prisma.order.findUniqueOrThrow({ where: { id: orderId } })).status).toBe(
+      "CANCELLED",
+    );
+    expect(
+      await prisma.stockReservation.count({ where: { orderId, releasedAt: { not: null } } }),
+    ).toBe(1);
+    expect((await prisma.beer.findUniqueOrThrow({ where: { id: beerId } })).stock).toBe(10);
+  });
+
+  it("pedido inexistente ou id fora do formato responde 404", async () => {
+    const inexistente = await confirm(crypto.randomUUID());
+    const malformado = await confirm("nao-e-um-id");
+
+    expect(inexistente.status).toBe(404);
+    expect(malformado.status).toBe(404);
+  });
 });
