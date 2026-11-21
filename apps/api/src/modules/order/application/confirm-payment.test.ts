@@ -30,6 +30,8 @@ class InMemoryOrderRepository implements OrderRepository {
   }
 
   async confirmPaymentIfAwaiting(orderId: string, actorId: string, at: Date): Promise<boolean> {
+    const order = this.orders.find((candidate) => candidate.id === orderId);
+    if (order?.status !== "aguardando-pagamento") return false;
     this.confirmations.push({ orderId, actorId, at });
     return true;
   }
@@ -80,4 +82,18 @@ describe("ConfirmPayment", () => {
 
     expect(orders.confirmations).toEqual([]);
   });
+
+  it.each(["pago", "em-preparo", "cancelado"] as const)(
+    "pedido já %s responde conflito e não confirma de novo",
+    async (status) => {
+      const orders = new InMemoryOrderRepository([awaitingOrder({ status })]);
+      const confirm = new ConfirmPayment(orders, () => minutesAfter(CREATED_AT, 10));
+
+      await expect(
+        confirm.execute({ orderId: "order-1", actorId: "admin-1" }),
+      ).rejects.toBeInstanceOf(PaymentNotConfirmableError);
+
+      expect(orders.confirmations).toEqual([]);
+    },
+  );
 });
