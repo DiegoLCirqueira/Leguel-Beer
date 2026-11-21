@@ -7,15 +7,20 @@ const LIMITE = 60;
 const JANELA_MS = 60_000;
 
 const consultas = new Map<string, number[]>();
+let proximaVarredura = 0;
 
 /** Visitantes que ainda estão na memória (para os testes). */
 export const visitantesNoLimiteDeCep = () => consultas.size;
 
 /** Conta a consulta e diz se cabe no limite. Em memória: numa API serverless vale por instância. */
 export function dentroDoLimiteDeCep(visitante: string, agora = Date.now()): boolean {
-  // Quem não volta depois da janela sai do mapa, para ele não crescer sem fim.
-  for (const [chave, instantes] of consultas) {
-    if (agora - (instantes[instantes.length - 1] ?? 0) >= JANELA_MS) consultas.delete(chave);
+  // Quem não volta depois da janela sai do mapa, para ele não crescer sem fim; a varredura é O(n),
+  // então roda no máximo uma vez por janela e não a cada consulta.
+  if (agora >= proximaVarredura) {
+    for (const [chave, instantes] of consultas) {
+      if (agora - (instantes[instantes.length - 1] ?? 0) >= JANELA_MS) consultas.delete(chave);
+    }
+    proximaVarredura = agora + JANELA_MS;
   }
   const recentes = (consultas.get(visitante) ?? []).filter((t) => agora - t < JANELA_MS);
   if (recentes.length >= LIMITE) {
