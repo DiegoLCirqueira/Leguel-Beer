@@ -107,7 +107,7 @@ Funcionalidade: Dados pessoais
 
 - "Finalizar compra" na Geladeira ([[geladeira]], resumo) leva o convidado a `/entrar`, com volta automática ao checkout depois de entrar ou de criar a conta e confirmar o e-mail. Sem bottom sheet.
 - A Geladeira do convidado segue a regra "Ao entrar na conta" da [[geladeira]]: passa para a conta se a da conta estiver vazia; senão, vale a da conta.
-- "Finalizar compra" está ativo desde o checkout (item 5, #325) e leva à etapa Entrega ([[geladeira]], [[checkout]]).
+- "Finalizar compra" está ativo desde o checkout (item 5) e leva à etapa Entrega ([[geladeira]], [[checkout]]).
 
 ### LGPD
 
