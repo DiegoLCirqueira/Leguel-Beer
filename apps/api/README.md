@@ -47,7 +47,7 @@ Para validar a entrada, crie o DTO com `zodDto(schema)` (`common/validation/zod-
 O limite global é de 100 requisições por IP por minuto, contado em memória. Quem roda vários E2E ou agentes no mesmo `127.0.0.1` pode receber `429` (o site mostra erro). Para o ambiente local, defina `THROTTLE_LIMIT` no `apps/api/.env` (ex.: `10000`) e reinicie a API (o watch não relê o `.env`); o Playwright já passa `THROTTLE_LIMIT=10000` à API que ele sobe fora do CI.
 
 - Opcional; ausente ou inválido (vazio, zero, negativo, decimal, texto) vale 100. Nunca é ilimitado.
-- Em produção o valor é limitado a 1000; não defina um valor alto no deploy.
+- Produção é `NODE_ENV=production` ou qualquer `VERCEL_ENV` (preview inclusive, porque o endereço é público): lá o valor é limitado a 1000. Só o local e o E2E (sem `VERCEL_ENV`) aceitam valor maior. Não defina um valor alto no deploy.
 
 ## Pendências conhecidas
 
