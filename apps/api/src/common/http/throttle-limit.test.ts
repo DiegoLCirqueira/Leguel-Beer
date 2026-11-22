@@ -6,4 +6,8 @@ describe("parseThrottleLimit", () => {
     expect(parseThrottleLimit(undefined, false)).toBe(100);
     expect(parseThrottleLimit("", false)).toBe(100);
   });
+
+  it("fora de produção aceita um inteiro positivo, como 10000 no E2E local", () => {
+    expect(parseThrottleLimit("10000", false)).toBe(10_000);
+  });
 });
