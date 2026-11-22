@@ -17,6 +17,8 @@ describe("FaixaDeCategoriasServidor", () => {
 
     render(await FaixaDeCategoriasServidor());
 
+    // A mesma consulta padrão do catálogo: as contagens são de todas as cervejas, sem filtro.
+    expect(buscar).toHaveBeenCalledWith({ disponiveis: false, ordem: "relevancia" });
     expect(screen.getByRole("button", { name: "Todas (6)" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "IPAs (6)" })).toBeInTheDocument();
   });

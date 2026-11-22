@@ -44,6 +44,8 @@ describe("Home", () => {
     render(await Home());
 
     expect(screen.getByRole("heading", { level: 1, name: "Leguelé Beer" })).toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: "Categorias de exemplo" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Destaques de exemplo" })).toBeInTheDocument();
   });
 
   it("quem está com a sessão ativa vê a home direto, sem a boas-vindas", async () => {

@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { FaixaDeCategoriasServidor } from "@/components/home/faixa-de-categorias-servidor";
 import { DestaquesServidor } from "@/components/home/destaques-servidor";
 import { DestaquesSkeleton } from "@/components/home/destaques-skeleton";
+import { Skeleton } from "@/components/ui";
 import { COOKIE_ACESSO } from "@/lib/auth/cookies";
 import { GUEST_COOKIE } from "@/lib/guest";
 import { resolveHomeRoute } from "@/lib/home-route";
@@ -31,7 +32,7 @@ export default async function Home({ searchParams }: Props = {}) {
           </p>
         ) : null}
         <h1 className="font-titulo text-4xl text-primaria">Leguelé Beer</h1>
-        <Suspense fallback={null}>
+        <Suspense fallback={<Skeleton className="h-16 w-full rounded-campo" />}>
           <FaixaDeCategoriasServidor />
         </Suspense>
         <Suspense fallback={<DestaquesSkeleton />}>
