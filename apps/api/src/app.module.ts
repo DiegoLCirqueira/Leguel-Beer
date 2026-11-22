@@ -4,7 +4,7 @@ import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { CommonModule } from "./common/common.module.js";
 import { PrismaModule } from "./common/prisma/prisma.module.js";
 import { AllExceptionsFilter } from "./common/http/all-exceptions.filter.js";
-import { parseThrottleLimit } from "./common/http/throttle-limit.js";
+import { throttleLimitFromEnv } from "./common/http/throttle-limit.js";
 import { requestIdMiddleware } from "./common/http/request-id.middleware.js";
 import { ZodValidationPipe } from "./common/validation/zod-validation.pipe.js";
 import { AccountModule } from "./modules/account/account.module.js";
@@ -26,15 +26,7 @@ import { OrderModule } from "./modules/order/order.module.js";
     HealthModule,
     // Assíncrono para ler o ambiente depois do .env ser carregado no main.ts.
     ThrottlerModule.forRootAsync({
-      useFactory: () => [
-        {
-          ttl: 60_000,
-          limit: parseThrottleLimit(
-            process.env["THROTTLE_LIMIT"],
-            process.env["NODE_ENV"] === "production",
-          ),
-        },
-      ],
+      useFactory: () => [{ ttl: 60_000, limit: throttleLimitFromEnv(process.env) }],
     }),
   ],
   providers: [
