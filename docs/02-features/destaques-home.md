@@ -72,9 +72,11 @@ Telas em `Imagens/figma/telas/` (fora do repo), só como referência visual; reg
 | `02-inicio.png` | 30/10/2026 | Faixa de categorias, seção "Cervejas em destaque" e "Ver todas" |
 | `27-inicio-sem-destaques.png` | 08/11/2026 | Home sem destaques |
 
-**Não entra:** o banner rotativo e o texto do herói (LB-32, MVP+; texto de marca é do Diego); o banner do Clube; coração de favoritar (Pós-MVP); preço riscado (promoção ainda sem spec); "Stouts" e "23" na faixa de categorias (são 4 categorias e 16 cervejas); "Mix & Match" e "Carrinho" na barra inferior (o termo é Geladeira).
+**Não entra:** o banner rotativo (LB-32, MVP+); o banner do Clube; coração de favoritar (Pós-MVP); preço riscado (promoção ainda sem spec); "Stouts" e "23" na faixa de categorias (são 4 categorias e 16 cervejas); "Mix & Match" e "Carrinho" na barra inferior (o termo é Geladeira).
 
 **A tela 27 não vale como está:** sem destaques, a seção some e a home segue com o resto (cenário "Sem destaques"); não vira tela vazia nem mensagem.
+
+O herói, o cabeçalho com o logo e a faixa de categorias da home (ordem do Diego de 21/11) estão em [[home-topo]], que substitui o "Não entra" de 30/10 para o herói; a seção de destaques fica como está aqui.
 
 Contrato, endpoint e fatias: ver "Contrato e fatias" em [[catalogo]].
 
@@ -90,6 +92,7 @@ Contrato, endpoint e fatias: ver "Contrato e fatias" em [[catalogo]].
 
 - Personalização por cliente.
 - Banner rotativo de destaques (LB-32, #21, milestone MVP+).
+- Herói, cabeçalho e faixa de categorias: [[home-topo]].
 - Marcar cervejas como destaque no admin (cadastro de cervejas, LB-73).
 
 ## Decisões relacionadas
