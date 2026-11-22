@@ -1,4 +1,5 @@
 // Export único dos componentes reutilizáveis: as telas importam daqui, nunca copiam o código.
+export { AvisoDePortfolio } from "./aviso-de-portfolio";
 export { AvisosDaGeladeira } from "./avisos-da-geladeira";
 export { BarraDoResumo } from "./barra-do-resumo";
 export { BarraFixa, ALTURA_BARRA_FIXA_PX } from "./barra-fixa";

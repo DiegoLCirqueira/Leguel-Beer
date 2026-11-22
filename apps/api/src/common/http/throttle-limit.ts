@@ -10,9 +10,3 @@ export function parseThrottleLimit(raw: string | undefined, production: boolean)
   const value = Number(raw);
   return production ? Math.min(value, PRODUCTION_THROTTLE_CEILING) : value;
 }
-
-/** Lê o limite do ambiente do processo; produção é NODE_ENV ou VERCEL_ENV iguais a "production". */
-export function throttleLimitFromEnv(env: Record<string, string | undefined>): number {
-  const production = env["NODE_ENV"] === "production" || env["VERCEL_ENV"] === "production";
-  return parseThrottleLimit(env["THROTTLE_LIMIT"], production);
-}
