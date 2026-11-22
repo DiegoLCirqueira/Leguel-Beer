@@ -29,4 +29,18 @@ describe("throttleLimitFromEnv", () => {
   it("com NODE_ENV=production, 10000 vira o teto de 1000", () => {
     expect(throttleLimitFromEnv({ NODE_ENV: "production", THROTTLE_LIMIT: "10000" })).toBe(1000);
   });
+
+  it.each(["production", "preview", "development"])(
+    "qualquer VERCEL_ENV (%s) conta como produção: o endereço é público e o teto vale",
+    (vercelEnv) => {
+      expect(throttleLimitFromEnv({ VERCEL_ENV: vercelEnv, THROTTLE_LIMIT: "10000" })).toBe(1000);
+    },
+  );
+
+  it("sem VERCEL_ENV nem produção (local, E2E, desenvolvimento) o valor alto passa", () => {
+    expect(throttleLimitFromEnv({ NODE_ENV: "development", THROTTLE_LIMIT: "10000" })).toBe(10_000);
+    expect(throttleLimitFromEnv({ THROTTLE_LIMIT: "10000" })).toBe(10_000);
+    expect(throttleLimitFromEnv({ VERCEL_ENV: "", THROTTLE_LIMIT: "10000" })).toBe(10_000);
+    expect(throttleLimitFromEnv({})).toBe(100);
+  });
 });
