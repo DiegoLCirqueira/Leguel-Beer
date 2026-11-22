@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import { buttonVariants } from "./button";
 
 /** Herói da home (spec home-topo): chamada fixa, sem rotação, com a arte decorativa à direita. */
@@ -17,10 +18,10 @@ export function HeroiDaHome() {
         height={800}
         sizes="(min-width: 448px) 224px, 50vw"
         priority
-        className="absolute inset-y-0 right-0 -z-10 h-full w-3/5 object-cover object-center opacity-80 [mask-image:linear-gradient(to_right,transparent,black_45%)]"
+        className="absolute inset-y-0 right-0 -z-10 h-full w-1/2 object-cover object-center [mask-image:linear-gradient(to_right,transparent,black_35%)]"
       />
-      <div className="flex w-3/5 flex-col items-start gap-3 p-4">
-        <span className="whitespace-nowrap rounded-full border border-primaria px-2.5 py-1 text-[11px] font-semibold uppercase text-primaria">
+      <div className="flex w-[58%] flex-col items-start gap-3 p-4">
+        <span className="whitespace-nowrap rounded-full border border-primaria px-2.5 py-1 text-xs font-semibold uppercase text-primaria">
           Cervejas artesanais
         </span>
         <h2 id="heroi-titulo" className="font-titulo text-3xl leading-tight text-texto">
@@ -31,7 +32,7 @@ export function HeroiDaHome() {
         </p>
         <Link
           href="/catalogo"
-          className={`${buttonVariants({ variant: "primary" })} whitespace-nowrap`}
+          className={cn(buttonVariants({ variant: "primary" }), "whitespace-nowrap")}
         >
           Ver catálogo
           <ArrowRight aria-hidden="true" className="size-5" />
