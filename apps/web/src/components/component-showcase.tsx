@@ -5,6 +5,7 @@ import { ArrowRight, Link2, Lock, UserRound } from "lucide-react";
 import { useState } from "react";
 import type { ItemLocal } from "@/lib/geladeira/estado";
 import {
+  AvisoDePortfolio,
   AvisosDaGeladeira,
   BarraDoResumo,
   BarraFixa,
@@ -220,6 +221,9 @@ export function ComponentShowcase() {
             }}
           />
         </ul>
+      </Section>
+      <Section title="Pagamento: aviso de portfólio">
+        <AvisoDePortfolio />
       </Section>
       <Section title="Geladeira: moldura, prateleiras, garrafas e fantasmas">
         <MolduraDaGeladeira itens={itensDaMoldura} />

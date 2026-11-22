@@ -3,11 +3,18 @@
 import { resumirGeladeira, type EnderecoResposta } from "@leguele/shared";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import type { ResultadoDoFrete } from "@/app/geladeira/frete";
 import { useGeladeira } from "@/components/geladeira/geladeira-provider";
 import { Button, buttonVariants, OpcaoDeEndereco, TotaisDoResumo } from "@/components/ui";
 import type { FreteEstimado } from "@/components/ui";
+import {
+  assinarEstadoDoCheckout,
+  estadoDoCheckoutBruto,
+  gravarEstadoDoCheckout,
+  lerEstadoDoCheckout,
+} from "@/lib/checkout/estado";
+import { EtapasDoCheckout } from "./etapas-do-checkout";
 import { textoDosItens } from "@/components/ui/totais-do-resumo";
 
 type Props = {
@@ -16,8 +23,6 @@ type Props = {
   /** Tela da etapa seguinte; sem ela (ainda não existe), "Continuar" fica desabilitado. */
   destinoDoPagamento?: string;
 };
-
-const ETAPAS = ["Entrega", "Pagamento", "Revisão"];
 
 /** Endereço pré-selecionado: o padrão, ou o primeiro da lista. */
 const inicial = (enderecos: EnderecoResposta[]) =>
@@ -58,7 +63,12 @@ export function EtapaEntrega({ enderecos, cotarFrete, destinoDoPagamento }: Prop
   const { pronta, resolvida, falhouAoBuscar, buscando, tentarDeNovo, estado, sincronizacoes } =
     useGeladeira();
   const roteador = useRouter();
-  const [escolhido, setEscolhido] = useState(() => inicial(enderecos));
+  // O que o cliente escolheu antes (voltou de Pagamento): só lido no navegador, para o HTML não divergir.
+  const guardado = useSyncExternalStore(assinarEstadoDoCheckout, estadoDoCheckoutBruto, () => null);
+  const lembrado = guardado ? lerEstadoDoCheckout().enderecoId : undefined;
+  const [escolha, setEscolhido] = useState<string>();
+  const escolhido =
+    escolha ?? (enderecos.some((e) => e.id === lembrado) ? lembrado : inicial(enderecos));
   // Vazia só depois de a conta responder: antes, a cópia local vazia pode ser só outro aparelho.
   const decidida = pronta && resolvida;
   const vazia = decidida && estado.itens.length === 0;
@@ -77,17 +87,7 @@ export function EtapaEntrega({ enderecos, cotarFrete, destinoDoPagamento }: Prop
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 px-4 pb-6 pt-2 text-texto">
       <h1 className="font-titulo text-4xl">Finalizar pedido</h1>
-      <ol aria-label="Etapas do pedido" className="flex gap-2 text-sm">
-        {ETAPAS.map((etapa, i) => (
-          <li
-            key={etapa}
-            aria-current={i === 0 ? "step" : undefined}
-            className={i === 0 ? "font-semibold text-primaria" : "text-texto-suave"}
-          >
-            {i + 1}. {etapa}
-          </li>
-        ))}
-      </ol>
+      <EtapasDoCheckout atual={0} />
       <p className="flex items-center justify-between gap-2 text-sm">
         <span>{`${textoDosItens(quantidadeTotal)} na sua geladeira`}</span>
         <Link
@@ -150,7 +150,13 @@ export function EtapaEntrega({ enderecos, cotarFrete, destinoDoPagamento }: Prop
             </div>
           ) : null}
           {podeContinuar ? (
-            <Link href={destinoDoPagamento!} className={buttonVariants({ variant: "primary" })}>
+            <Link
+              href={destinoDoPagamento!}
+              onClick={() =>
+                gravarEstadoDoCheckout({ ...lerEstadoDoCheckout(), enderecoId: escolhido })
+              }
+              className={buttonVariants({ variant: "primary" })}
+            >
               Continuar para pagamento
             </Link>
           ) : (

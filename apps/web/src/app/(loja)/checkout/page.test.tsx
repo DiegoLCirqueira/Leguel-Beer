@@ -64,6 +64,42 @@ describe("/checkout", () => {
     expect(buscar).toHaveBeenCalledWith("token-1");
   });
 
+  it("'Continuar para pagamento' leva à etapa Pagamento", async () => {
+    localStorage.setItem(
+      "lb:geladeira",
+      JSON.stringify({
+        versao: 1,
+        itens: [
+          {
+            cerveja: {
+              id: "mare",
+              slug: "mare-alta",
+              nome: "Maré Alta",
+              estilo: "American IPA",
+              categoria: { slug: "ipa", nome: "IPAs", ordem: 1 },
+              teorAlcoolico: 6.5,
+              ibu: 65,
+              volumeMl: 330,
+              precoCentavos: 3200,
+              destaque: false,
+              quantidadeDisponivel: 9,
+              esgotada: false,
+              imagemUrl: null,
+              cadastradaEm: "2026-10-01T10:00:00.000Z",
+            },
+            quantidade: 2,
+          },
+        ],
+      }),
+    );
+    render(<GeladeiraProvider>{await Checkout()}</GeladeiraProvider>);
+
+    expect(await screen.findByRole("link", { name: "Continuar para pagamento" })).toHaveAttribute(
+      "href",
+      "/checkout/pagamento",
+    );
+  });
+
   it("falha ao buscar os endereços mostra o aviso com Tentar de novo", async () => {
     buscar.mockResolvedValue({ tipo: "erro" });
 

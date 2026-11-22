@@ -37,5 +37,11 @@ export default async function Checkout() {
     );
   }
 
-  return <EtapaEntrega enderecos={resultado.enderecos} cotarFrete={cotarFreteDoEnderecoAction} />;
+  return (
+    <EtapaEntrega
+      enderecos={resultado.enderecos}
+      cotarFrete={cotarFreteDoEnderecoAction}
+      destinoDoPagamento="/checkout/pagamento"
+    />
+  );
 }
