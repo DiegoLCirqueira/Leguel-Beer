@@ -67,7 +67,7 @@ Funcionalidade: Adicionar cerveja à Geladeira direto do card
 - "Desfazer" devolve a Geladeira ao estado de antes daquele toque, enquanto o toast estiver visível (5 segundos). Um toque novo substitui o toast anterior, e só ele pode ser desfeito.
 - O convidado pode adicionar à Geladeira; só precisa entrar na conta para finalizar a compra (decisão do Diego, 2026-10-28; ver [[visao]]). A persistência (navegador para o convidado, conta para o cliente) é a da [[geladeira]].
 - Cerveja esgotada tem o botão "Adicionar" desabilitado (ver [[catalogo]]).
-- Vale em todos os cards de cerveja: catálogo e [[destaques-home]].
+- Vale em todos os cards de cerveja: catálogo e [[destaques-home]]. A Geladeira tem um terceiro jeito de adicionar, a lista aberta pela garrafa fantasma ([[geladeira]]), que usa esta mesma operação, o mesmo limite e o mesmo toast.
 - O toast fica acima da barra inferior da loja e é anunciado ao leitor de tela (`role="status"`).
 
 ## Contrato e componentes
