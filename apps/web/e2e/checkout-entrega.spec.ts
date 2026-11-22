@@ -122,7 +122,10 @@ test.describe("Checkout: Entrega", () => {
     await expect(page.getByRole("radio", { name: /Trabalho/ })).toBeChecked();
   });
 
-  test("endereço forjado na aba não passa da Entrega", async ({ page }) => {
+  test("endereço forjado na aba não passa da Entrega (com itens na Geladeira, a validação é que barra)", async ({
+    page,
+  }) => {
+    const mare = await (await page.request.get(`${apiUrl}/catalogo/mare-alta`)).json();
     const email = emailUnico("checkout-forjado");
     const senha = "senha-segura-123";
     await criarContaConfirmada(email, senha);
@@ -131,12 +134,22 @@ test.describe("Checkout: Entrega", () => {
     await page.getByLabel("Senha", { exact: true }).fill(senha);
     await page.getByRole("button", { name: "Entrar", exact: true }).click();
     await expect(page).toHaveURL(/\/conta\/enderecos$/);
+    const token = (await page.context().cookies()).find((c) => c.name === "lb_acesso")?.value;
+    const envio = await page.request.put(`${apiUrl}/me/geladeira`, {
+      headers: { Authorization: `Bearer ${token}` },
+      data: {
+        itens: [{ cervejaId: mare.id, quantidade: 2, precoVistoCentavos: mare.precoCentavos }],
+      },
+    });
+    expect(envio.ok()).toBe(true);
+    inserirEndereco(email, { apelido: "Casa", padrao: true, distanciaMetros: 5200 });
     await page.evaluate(() =>
       sessionStorage.setItem("lb:checkout", JSON.stringify({ enderecoId: "id-de-outra-conta" })),
     );
 
     await page.goto("/checkout/pagamento");
 
-    await expect(page).not.toHaveURL(/\/checkout\/pagamento$/);
+    // Sem itens a Geladeira vazia também desviaria; com itens, só o endereço forjado leva à Entrega.
+    await expect(page).toHaveURL(/\/checkout$/);
   });
 });
