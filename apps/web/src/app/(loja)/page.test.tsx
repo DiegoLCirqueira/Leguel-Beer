@@ -22,6 +22,10 @@ vi.mock("@/components/home/destaques-servidor", () => ({
   DestaquesServidor: () => <section aria-label="Destaques de exemplo" />,
 }));
 
+vi.mock("@/components/home/faixa-de-categorias-servidor", () => ({
+  FaixaDeCategoriasServidor: () => <nav aria-label="Categorias de exemplo" />,
+}));
+
 import Home from "./page";
 
 describe("Home", () => {

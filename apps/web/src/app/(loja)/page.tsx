@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { FaixaDeCategoriasServidor } from "@/components/home/faixa-de-categorias-servidor";
 import { DestaquesServidor } from "@/components/home/destaques-servidor";
 import { DestaquesSkeleton } from "@/components/home/destaques-skeleton";
 import { COOKIE_ACESSO } from "@/lib/auth/cookies";
@@ -30,6 +31,9 @@ export default async function Home({ searchParams }: Props = {}) {
           </p>
         ) : null}
         <h1 className="font-titulo text-4xl text-primaria">Leguelé Beer</h1>
+        <Suspense fallback={null}>
+          <FaixaDeCategoriasServidor />
+        </Suspense>
         <Suspense fallback={<DestaquesSkeleton />}>
           <DestaquesServidor />
         </Suspense>

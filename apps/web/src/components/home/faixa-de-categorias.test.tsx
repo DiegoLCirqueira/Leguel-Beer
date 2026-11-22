@@ -41,7 +41,9 @@ describe("FaixaDeCategorias (home)", () => {
 
   it("categoria sem cerveja ativa não aparece, e sem nenhuma a faixa some", () => {
     const { container, rerender } = render(
-      <FaixaDeCategorias categorias={[...categorias, { slug: "stout", nome: "Stouts", quantidade: 0 }]} />,
+      <FaixaDeCategorias
+        categorias={[...categorias, { slug: "stout", nome: "Stouts", quantidade: 0 }]}
+      />,
     );
     expect(screen.queryByRole("button", { name: /Stouts/ })).not.toBeInTheDocument();
 
