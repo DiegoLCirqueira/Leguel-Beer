@@ -150,7 +150,7 @@ Só tema escuro. O verde da marca, o texto sobre ele e o texto principal são os
 ### Tipografia
 
 - **Texto:** Figtree (Google Fonts, carregada pelo `next/font`), pesos 400, 500, 600 e 700, no site inteiro: textos, botões, campos e formulários. É a fonte medida no Figma pelo Front na [[boas-vindas]] (decisão do Diego, 2026-10-30). Substitui a Outfit, que sai do site.
-- **Títulos de destaque** ("Criar sua conta", "Recuperar senha", "Sabor de verdade em cada gole!"): fonte manuscrita em pincel, com a segunda linha no verde da marca.
+- **Títulos de destaque** ("Criar sua conta", "Recuperar senha", "Sabor de verdade em cada gole!"): fonte manuscrita em pincel, com a última linha no verde da marca (em "Sabor de verdade em cada gole!", o verde é só "cada gole!").
 
 - **Fonte dos títulos:** **Kaushan Script** (Google Fonts, pelo `next/font`), escolhida pelo Front como a mais próxima do print; o Diego confere nos portais (decisão do Diego, 2026-10-29: "use a que preferir").
 

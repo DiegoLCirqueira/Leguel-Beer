@@ -32,6 +32,7 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[guards-api]]: proteção da API e do site por autenticação e papéis (LB-28).
 - [[catalogo]]: listagem, filtros, ordenação, faixa de categorias e esgotadas.
 - [[destaques-home]]: seção "Cervejas em destaque" da home.
+- [[home-topo]]: topo da home (herói, cabeçalho com logo e faixa de categorias).
 - [[produto]]: página de produto com ficha, desconto, estoque baixo e quantidade (LB-40, LB-41, LB-42).
 - [[adicionar-do-card]]: colocar uma cerveja na Geladeira direto do card (LB-35).
 - [[geladeira]]: o carrinho em prateleiras por categoria, com resumo, revalidação no servidor e persistência no navegador e na conta (LB-124, LB-47, LB-49, LB-50, LB-51, LB-52).
