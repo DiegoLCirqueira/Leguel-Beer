@@ -1,3 +1,4 @@
+import type { CervejaCard } from "@leguele/shared";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -8,19 +9,48 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: trocar }),
 }));
 import { GeladeiraProvider } from "@/components/geladeira/geladeira-provider";
+import { CHAVE_DA_GELADEIRA } from "@/lib/geladeira/armazenamento";
 import { CHAVE_DO_CHECKOUT } from "@/lib/checkout/estado";
 import { EtapaPagamento } from "./etapa-pagamento";
 
+const mare: CervejaCard = {
+  id: "mare",
+  slug: "mare-alta",
+  nome: "Maré Alta",
+  estilo: "American IPA",
+  categoria: { slug: "ipa", nome: "IPAs", ordem: 1 },
+  teorAlcoolico: 6.5,
+  ibu: 65,
+  volumeMl: 330,
+  precoCentavos: 3200,
+  destaque: false,
+  quantidadeDisponivel: 9,
+  esgotada: false,
+  imagemUrl: null,
+  cadastradaEm: "2026-10-01T10:00:00.000Z",
+};
+
 afterEach(() => {
+  localStorage.clear();
   sessionStorage.clear();
   trocar.mockReset();
 });
 
-const abrir = (destinoDaRevisao?: string, guardado: object | null = { enderecoId: "casa" }) => {
+const abrir = (
+  destinoDaRevisao?: string,
+  guardado: object | null = { enderecoId: "casa" },
+  { enderecoIds = ["casa", "trabalho"], comItens = true } = {},
+) => {
+  if (comItens) {
+    localStorage.setItem(
+      CHAVE_DA_GELADEIRA,
+      JSON.stringify({ versao: 1, itens: [{ cerveja: mare, quantidade: 2 }] }),
+    );
+  }
   if (guardado) sessionStorage.setItem(CHAVE_DO_CHECKOUT, JSON.stringify(guardado));
   return render(
     <GeladeiraProvider>
-      <EtapaPagamento destinoDaRevisao={destinoDaRevisao} />
+      <EtapaPagamento destinoDaRevisao={destinoDaRevisao} enderecoIds={enderecoIds} />
     </GeladeiraProvider>,
   );
 };
@@ -71,5 +101,18 @@ describe("EtapaPagamento", () => {
     abrir("/checkout/revisao");
 
     expect(trocar).not.toHaveBeenCalled();
+  });
+
+  it("endereço guardado que não é da conta (forjado, de outra conta ou apagado) volta à Entrega", () => {
+    abrir("/checkout/revisao", { enderecoId: "de-outra-conta" });
+
+    expect(trocar).toHaveBeenCalledWith("/checkout");
+  });
+
+  it("com a Geladeira vazia, volta à Geladeira", () => {
+    abrir("/checkout/revisao", { enderecoId: "casa" }, { comItens: false });
+
+    expect(trocar).toHaveBeenCalledWith("/geladeira");
+    expect(trocar).not.toHaveBeenCalledWith("/checkout");
   });
 });
