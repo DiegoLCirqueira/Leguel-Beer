@@ -22,6 +22,10 @@ vi.mock("@/components/home/destaques-servidor", () => ({
   DestaquesServidor: () => <section aria-label="Destaques de exemplo" />,
 }));
 
+vi.mock("@/components/home/faixa-de-categorias-servidor", () => ({
+  FaixaDeCategoriasServidor: () => <nav aria-label="Categorias de exemplo" />,
+}));
+
 import Home from "./page";
 
 describe("Home", () => {
@@ -40,6 +44,8 @@ describe("Home", () => {
     render(await Home());
 
     expect(screen.getByRole("heading", { level: 1, name: "Leguelé Beer" })).toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: "Categorias de exemplo" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Destaques de exemplo" })).toBeInTheDocument();
   });
 
   it("quem está com a sessão ativa vê a home direto, sem a boas-vindas", async () => {
