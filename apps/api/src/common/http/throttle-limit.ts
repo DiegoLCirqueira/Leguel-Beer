@@ -12,6 +12,6 @@ export function parseThrottleLimit(raw: string | undefined, production: boolean)
 }
 
 /** Lê o limite do ambiente do processo; produção é NODE_ENV ou VERCEL_ENV iguais a "production". */
-export function throttleLimitFromEnv(_env: Record<string, string | undefined>): number {
-  return DEFAULT_THROTTLE_LIMIT;
+export function throttleLimitFromEnv(env: Record<string, string | undefined>): number {
+  return parseThrottleLimit(env["THROTTLE_LIMIT"], env["NODE_ENV"] === "production");
 }
