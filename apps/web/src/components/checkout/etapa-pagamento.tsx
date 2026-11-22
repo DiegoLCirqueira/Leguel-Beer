@@ -14,21 +14,27 @@ import {
 import { EtapasDoCheckout } from "./etapas-do-checkout";
 
 type Props = {
+  /** Ids dos endereços da conta: o guardado na aba só vale se estiver aqui (a API é quem autoriza). */
+  enderecoIds: string[];
   /** Tela da etapa seguinte; sem ela (ainda não existe), "Continuar para revisão" fica desabilitado. */
   destinoDaRevisao?: string;
 };
 
 /** Etapa Pagamento do checkout (tela 06): só a escolha da forma; nada é cobrado (ADR-020). */
-export function EtapaPagamento({ destinoDaRevisao }: Props) {
-  const { pronta } = useGeladeira();
+export function EtapaPagamento({ enderecoIds, destinoDaRevisao }: Props) {
+  const { pronta, resolvida, estado } = useGeladeira();
   const roteador = useRouter();
   // Só lido no navegador: no servidor é vazio, e o HTML não diverge na hidratação.
   const guardado = useSyncExternalStore(assinarEstadoDoCheckout, estadoDoCheckoutBruto, () => null);
-  const semEndereco = pronta && !(guardado && lerEstadoDoCheckout().enderecoId);
-  // Não dá para pular etapas pela URL: sem endereço escolhido, volta à Entrega.
+  const enderecoGuardado = guardado ? lerEstadoDoCheckout().enderecoId : undefined;
+  const semEndereco = pronta && !(enderecoGuardado && enderecoIds.includes(enderecoGuardado));
+  // Vazia só depois de a conta responder: antes, a cópia local vazia pode ser só outro aparelho.
+  const vazia = pronta && resolvida && estado.itens.length === 0;
+  // Não dá para pular etapas pela URL: sem Geladeira ou sem endereço da conta, volta atrás.
   useEffect(() => {
-    if (semEndereco) roteador.replace("/checkout");
-  }, [semEndereco, roteador]);
+    if (vazia) roteador.replace("/geladeira");
+    else if (semEndereco) roteador.replace("/checkout");
+  }, [vazia, semEndereco, roteador]);
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 px-4 pb-6 pt-2 text-texto">
