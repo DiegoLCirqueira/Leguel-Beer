@@ -1,0 +1,12 @@
+/** Limite padrão de requisições por IP por minuto (o mesmo de antes de ser configurável). */
+export const DEFAULT_THROTTLE_LIMIT = 100;
+
+/** Teto em produção: valor alto é só para o ambiente local e de E2E. */
+export const PRODUCTION_THROTTLE_CEILING = 1000;
+
+/** Só inteiros positivos em dígitos: "0", "-5", "1.5", "abc" e "Infinity" caem no padrão. */
+export function parseThrottleLimit(raw: string | undefined, production: boolean): number {
+  if (!raw || !/^[1-9]\d{0,8}$/.test(raw)) return DEFAULT_THROTTLE_LIMIT;
+  const value = Number(raw);
+  return production ? Math.min(value, PRODUCTION_THROTTLE_CEILING) : value;
+}
