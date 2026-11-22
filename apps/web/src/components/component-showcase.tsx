@@ -7,6 +7,7 @@ import type { ItemLocal } from "@/lib/geladeira/estado";
 import {
   AvisoDePortfolio,
   AvisosDaGeladeira,
+  HeroiDaHome,
   BarraDoResumo,
   BarraFixa,
   BlocoDePreco,
@@ -224,6 +225,9 @@ export function ComponentShowcase() {
       </Section>
       <Section title="Pagamento: aviso de portfólio">
         <AvisoDePortfolio />
+      </Section>
+      <Section title="Home: herói">
+        <HeroiDaHome />
       </Section>
       <Section title="Geladeira: moldura, prateleiras, garrafas e fantasmas">
         <MolduraDaGeladeira itens={itensDaMoldura} />
