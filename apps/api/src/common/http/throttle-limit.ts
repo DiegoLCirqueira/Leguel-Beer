@@ -2,5 +2,5 @@
 export const DEFAULT_THROTTLE_LIMIT = 100;
 
 export function parseThrottleLimit(_raw: string | undefined, _production: boolean): number {
-  return 0;
+  return DEFAULT_THROTTLE_LIMIT;
 }
