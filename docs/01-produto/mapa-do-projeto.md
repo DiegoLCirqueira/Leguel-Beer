@@ -67,7 +67,7 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[ADR-018-pagamento-simulado]] (substituído pelo ADR-020): pagamento só visual, sem gateway, cobrança nem webhook; substituiu o ADR-004.
 - [[ADR-020-aviso-de-portfolio-no-pagamento]] (Diego, 16/11): mantém o pagamento só visual e põe o aviso de projeto sem fins lucrativos e o botão "Voltar" em toda tela de pagamento; substitui o ADR-018.
 - [[ADR-019-criacao-do-pedido-serializada-por-cliente]] (proposto, Back, 16/11): criar pedido numa transação com trava consultiva por cliente e trava das cervejas em ordem de id.
-- [[ADR-021-merge-vira-deploy-na-vercel]] (aceito pelo Diego em 26/11): merge na `main` vira deploy na Vercel (Hobby), dois projetos `leguele-web` e `leguele-api`, preview por PR; nada criado na Vercel ainda (a ligação ao GitHub e o primeiro deploy são do Diego).
+- [[ADR-021-merge-vira-deploy-na-vercel]] (aceito pelo Diego em 26/11): merge na `main` vira deploy na Vercel (Hobby), dois projetos `leguele-web` e `leguele-api`, preview por PR; o aceite autoriza os deploys por merge, inclusive o primeiro; a ligação ao GitHub, o Supabase de produção e as chaves são do Diego.
 
 ## Arquitetura
 

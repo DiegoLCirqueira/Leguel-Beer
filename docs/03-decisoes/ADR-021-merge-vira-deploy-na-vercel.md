@@ -8,7 +8,7 @@ tags:
 # ADR-021: Merge na `main` vira deploy na Vercel (Hobby, dois projetos)
 
 > [!info] Status
-> **Aceito pelo Diego em 26/11** (ordem: "faça as recomendadas"). O aceite é a autorização dos deploys por merge, como a Decisão abaixo diz, mas **não cria nada sozinho**: a **ligação da Vercel ao GitHub** (acesso dele, item 6) e o **primeiro deploy em produção** (item 5) continuam sendo ação ou acesso do Diego, feitos por ele ou com o ok dele no momento. **Ainda não existe banco de produção** (projeto Supabase na nuvem), nem o projeto Supabase de preview; sem eles, nada de produção ou de preview com dado funciona, e o deploy sobe só o que não depende deles. Nada foi criado na Vercel até aqui.
+> **Aceito pelo Diego em 26/11.** À lista de pendências que incluía o "aceite do ADR-021", o Diego respondeu "seguem em aguardo (faça as recomendadas)" e, depois, "continue no trabalho (autorizei)". A política de autonomia limita as recomendadas aos itens 1, 2 e 9, mas ele listou o aceite explicitamente, e o Orchestrator e o Reviewer o leram como autorização. O aceite é a autorização de **todos** os deploys por merge, **inclusive o primeiro** (ver a Decisão). O que continua sendo ação ou acesso **do Diego** é outra coisa: a **ligação da Vercel ao GitHub** (acesso, item 6), o **projeto Supabase de produção** e o de preview (conta e custo, itens 4 e 6) e as **chaves**. Hoje **não existe banco de produção**, nem o de preview; sem eles, o deploy sobe só o que não depende deles. Nada foi criado na Vercel pelo ADR.
 
 ## Contexto
 
