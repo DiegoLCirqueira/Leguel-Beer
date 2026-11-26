@@ -28,7 +28,7 @@ O [[ADR-002-hospedagem-api]] pôs a API como função serverless na Vercel (plan
 
 - **(a) Difícil de reverter, em parte:** desligar a integração é fácil, mas o que já foi ao ar não volta: um endereço público, um preview que expõe um valor, uma migration aplicada, um site que mostra um erro. E ligar o deploy ao merge tira o último freio humano antes de a mudança ficar pública.
 - **(b) Surpreende quem lê o código sem contexto:** quem vê um PR de docs ou um ajuste pequeno não espera que ele publique o site e a API.
-- **(c) Trade-off real:** controle de cada deploy contra manter o que está na `main` sempre no ar ([Alternativas consideradas](#alternativas-consideradas)).
+- **(c) Trade-off real:** controle de cada deploy contra manter o que está na `main` sempre no ar ([[#Alternativas consideradas]]).
 
 ## Por quê
 
