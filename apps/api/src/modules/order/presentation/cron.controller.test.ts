@@ -73,4 +73,15 @@ describe("CronController", () => {
 
     expect(controller("").warnings).toEqual([]);
   });
+
+  it("segue a regra de produção do limite: qualquer VERCEL_ENV (preview inclusive) avisa a falta do segredo", () => {
+    vi.stubEnv("NODE_ENV", "development");
+    vi.stubEnv("VERCEL_ENV", "preview");
+
+    const { warnings } = controller("");
+
+    expect(warnings).toEqual([
+      "CRON_SECRET ausente: o cron de expiração recusa todas as chamadas e os pedidos vencidos só expiram na checagem no uso.",
+    ]);
+  });
 });
