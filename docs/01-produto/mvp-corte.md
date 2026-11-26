@@ -41,6 +41,9 @@ Os 14 épicos MVP somam 98 cards (301 pontos): 64 no núcleo, 32 adiáveis e 2 q
 | **MVP+** | Os cards adiáveis (também com a label `adiavel`) | 32 |
 
 > [!important] Regra de trabalho
+> [!info] Mapas no MVP (26/11)
+> O adaptador **real** de geocodificação e rota (Geoapify ou outro, com conta e chave) é **pós-MVP**. O MVP fecha com o adaptador local de linha reta ([[enderecos-entrega]]); os cards LB-30, LB-63 e LB-64 seguem no MVP com esse adaptador.
+
 > A banda só puxa trabalho do milestone **MVP+** depois que o milestone **MVP** estiver fechado. Os cards Pós-MVP não vão para o GitHub; continuam no Notion como banco de ideias.
 
 ## Épicos
