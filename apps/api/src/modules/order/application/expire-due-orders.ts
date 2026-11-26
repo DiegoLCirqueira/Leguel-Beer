@@ -32,6 +32,8 @@ export class ExpireDueOrders {
         await this.expireOrder.execute(orderId);
       } catch (error) {
         failures.push({ orderId, error });
+        // Quem falha vai para o fim das próximas varreduras; contar a falha não pode parar a varredura.
+        await this.orders.recordExpirationFailure(orderId).catch(() => undefined);
       }
     }
     return { failures };
