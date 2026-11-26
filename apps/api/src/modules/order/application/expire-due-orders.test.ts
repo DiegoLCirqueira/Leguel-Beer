@@ -96,4 +96,27 @@ describe("ExpireDueOrders", () => {
 
     expect(orders.failed).toEqual(["order-1"]);
   });
+
+  it("segue a varredura mesmo quando contar a falha também falha", async () => {
+    const orders = repositoryWithDueOrders(["order-1", "order-2"]);
+    orders.recordExpirationFailure = async () => {
+      throw new Error("banco fora");
+    };
+    const expired: string[] = [];
+    const expire = new ExpireDueOrders(
+      orders,
+      {
+        execute: async (orderId: string) => {
+          if (orderId === "order-1") throw new Error("falha");
+          expired.push(orderId);
+        },
+      },
+      () => NOW,
+    );
+
+    const result = await expire.execute();
+
+    expect(expired).toEqual(["order-2"]);
+    expect(result.failures.map((failure) => failure.orderId)).toEqual(["order-1"]);
+  });
 });
