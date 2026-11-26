@@ -111,4 +111,11 @@ describe("LocalMaps: bairro desconhecido e outras cidades", () => {
     expect(await maps.routeDistanceMeters(ORIGEM, dentro!)).toBeLessThan(25_000);
     expect(await maps.routeDistanceMeters(ORIGEM, fora!)).toBeGreaterThan(25_000);
   });
+
+  it("CEPs vizinhos mudam a latitude, não só a longitude", async () => {
+    const a = await maps.geocode(endereco({ district: "Bairro Novo", zip: "57045123" }));
+    const b = await maps.geocode(endereco({ district: "Bairro Novo", zip: "57045124" }));
+
+    expect(a!.latitude).not.toBe(b!.latitude);
+  });
 });
