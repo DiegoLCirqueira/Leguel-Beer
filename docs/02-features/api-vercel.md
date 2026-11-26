@@ -28,29 +28,29 @@ tags:
 # language: pt
 Funcionalidade: API como função serverless na Vercel
 
-  Cenário: Primeira chamada depois de inatividade (cold start)
+  Cenário: Cold start e reaproveitamento do aplicativo
     Dado que a função da API está fria
-    Quando chega a primeira requisição "GET /health"
-    Então a API cria o aplicativo uma vez e responde 200
-    E a resposta chega em até 10 segundos
+    Quando chega a primeira requisição "GET /live"
+    Então a API cria o aplicativo uma vez e responde 200 em até 10 segundos
+    E duas requisições seguintes na mesma instância não criam o aplicativo de novo
 
-  Cenário: Chamadas seguintes reaproveitam o aplicativo
-    Dado que a função já atendeu uma requisição
-    Quando chegam mais duas requisições na mesma instância
-    Então o aplicativo não é criado de novo
-    E as duas respondem normalmente
+  Cenário: Em produção a documentação não é exposta
+    Dado o ambiente de produção
+    Quando peço "GET /docs" ou "GET /docs-json"
+    Então a API responde 404 e nenhuma rota (inclusive as de admin e de cron) é listada
+    E os cabeçalhos de segurança, com a política de conteúdo (CSP), continuam ligados
 
   Cenário: CORS só para o endereço do site
     Dado que WEB_ORIGIN é "https://leguele-web.vercel.app"
     Quando uma requisição chega com origem "https://leguele-web.vercel.app"
-    Então a resposta permite essa origem
+    Então a resposta permite essa origem, sem "Access-Control-Allow-Credentials"
     E uma requisição com origem "https://outro-site.example" não recebe permissão de CORS
 
-  Cenário: O limite de requisições enxerga o IP do visitante
+  Cenário: O limite de requisições enxerga o IP do visitante e não aceita cabeçalho forjado
     Dado que a API está atrás do proxy da Vercel
     Quando duas requisições chegam com "X-Forwarded-For" de IPs diferentes
     Então cada IP tem o seu próprio limite
-    E um IP não esgota o limite do outro
+    E uma requisição com "X-Forwarded-For: 9.9.9.9, 1.2.3.4" conta para "1.2.3.4" (o último, o que a Vercel acrescentou), nunca para "9.9.9.9"
 
   Cenário: Cron só com o segredo
     Dado que CRON_SECRET está configurado
@@ -59,7 +59,7 @@ Funcionalidade: API como função serverless na Vercel
     E com o segredo certo ela expira os pedidos vencidos e responde 200
 
   Cenário: Produção sem a configuração obrigatória falha cedo
-    Dado o ambiente de produção sem WEB_ORIGIN
+    Dado o ambiente de produção com WEB_ORIGIN ausente, com curinga, com vários endereços ou sem https
     Quando a função inicia
     Então ela recusa subir com um erro claro e não usa "http://localhost:3000"
 ```
@@ -68,11 +68,13 @@ Funcionalidade: API como função serverless na Vercel
 
 - **Entrada serverless** da API (por exemplo `apps/api/api/index.ts`, o nome é do Back): cria o aplicativo NestJS **uma vez por instância**, guarda a promessa em memória e a reaproveita; entrega a requisição ao Express do Nest. Não chama `listen` nem `process.loadEnvFile`: as variáveis vêm do ambiente da plataforma. `main.ts` continua sendo a entrada de desenvolvimento e do CI.
 - **Mesma configuração** nas duas entradas: `setupApp` (Helmet, CORS, Swagger) é a função compartilhada; a entrada serverless a chama, sem copiar. O logger e os filtros globais são os mesmos.
-- **CORS** com `WEB_ORIGIN` como origem única. Em **produção, `WEB_ORIGIN` é obrigatório** (hoje o padrão `http://localhost:3000` valeria e bloquearia o site em silêncio); em desenvolvimento o padrão continua. Previews do site têm endereços próprios: o preview da API (se ligado, [[ADR-021-merge-vira-deploy-na-vercel]]) usa o endereço do preview do site em `WEB_ORIGIN`; origem com curinga fica fora.
-- **Trust proxy:** a API fica atrás do proxy da Vercel, então ela confia no primeiro salto (`trust proxy` com 1) para que o limite global por IP e o limite por conta ([[qualidade-compra]]) usem o IP do visitante e não o do proxy. Sem isso, todos os visitantes dividiriam um só balde. Fora da Vercel (desenvolvimento, CI) o padrão não muda.
+- **CORS** com `WEB_ORIGIN` como origem única, **sem credenciais**: a API não usa cookie do navegador (a sessão do site é do servidor do site e a API recebe `Authorization: Bearer`), então o CORS não liga `credentials`. Em **produção** (`isProductionEnv`, o mesmo teste que o resto da API usa), `WEB_ORIGIN` é **obrigatório e validado**: uma única origem, com `https`, sem curinga (`*`), sem caminho e sem vírgula; se falhar, a função não sobe (hoje o padrão `http://localhost:3000` valeria e bloquearia o site em silêncio). Em desenvolvimento o padrão continua. Previews do site têm endereços próprios: o preview da API (se ligado, [[ADR-021-merge-vira-deploy-na-vercel]]) usa o endereço do preview do site em `WEB_ORIGIN`.
+- **Swagger e CSP:** o `setupApp` compartilhado monta o Swagger em `/docs` e `/docs-json` e desliga a política de conteúdo (CSP) para a interface carregar. Em **produção o Swagger fica desligado** (a API não lista as rotas de admin e de cron para quem não precisa) e a CSP do Helmet **continua ligada**; em desenvolvimento e nos testes o Swagger e a CSP desligada seguem como hoje.
+- **Rota de vida:** `GET /live` responde 200 sem tocar no banco e serve ao cold start e à fumaça do deploy. `GET /health` continua o estado da API **e do banco**: com o banco fora do ar responde 503 (comportamento atual); sem banco de produção ainda, o `/health` do primeiro deploy responde 503 e isso é esperado.
+- **Trust proxy:** a API fica atrás do proxy da Vercel, então ela confia **só no primeiro salto** (`trust proxy` com o número 1, **nunca** `true`) para que o limite global por IP use o IP do visitante e não o do proxy. A Vercel acrescenta o IP real ao fim de `X-Forwarded-For`; com 1 salto, a API usa o **último** valor, e um cabeçalho forjado pelo cliente (`9.9.9.9, 1.2.3.4`) não troca o IP contado. Com `true`, o primeiro valor, forjável, valeria e qualquer um fugiria do limite. Sem isso, todos os visitantes dividiriam um só balde. Fora da Vercel (desenvolvimento, CI) o padrão não muda. O limite por conta ([[qualidade-compra]]) não depende do IP.
 - **Cron:** o `vercel.json` do projeto `leguele-api` declara o cron diário de `GET /cron/expirar-pedidos` (já no #365); a rota exige `Authorization: Bearer <CRON_SECRET>` (segredo só como variável da plataforma) e recusa com 401 sem segredo ou com segredo errado, como já faz hoje.
 - **Contagem em memória por instância:** o limitador global e o por conta guardam a contagem na instância; com várias instâncias o limite é **aproximado** (mesma ressalva do #200). Aceito no portfólio.
-- **Prisma e banco:** `DATABASE_URL` aponta para o pooler em modo transação e `DIRECT_URL` só para migrations ([[ADR-002-hospedagem-api]]); migrations **não** rodam no deploy ([[ADR-021-merge-vira-deploy-na-vercel]]). Sem banco de produção ainda, o deploy só prova o `/health` e a rota de cron fechada.
+- **Prisma e banco:** `DATABASE_URL` aponta para o pooler em modo transação e `DIRECT_URL` só para migrations ([[ADR-002-hospedagem-api]]); migrations **não** rodam no deploy ([[ADR-021-merge-vira-deploy-na-vercel]]). Sem banco de produção ainda, o deploy só prova o `/live`, o `/docs` fechado e a rota de cron com 401.
 - **Bundle:** o build da função empacota o que a Vercel não instala sozinha (o `@leguele/shared` compilado e o Prisma Client gerado); o `postinstall` ou o passo de build roda `prisma generate`. O Back escolhe a ferramenta (webpack como no ADR-002, ou o bundler da própria Vercel) com um teste que prova que a função sobe.
 
 ## Fora de escopo
@@ -85,17 +87,18 @@ Funcionalidade: API como função serverless na Vercel
 
 > [!info] Proposta do Spec, vetável
 
-- **Cold start e reaproveitamento** (API, unitário): a função de entrada, chamada duas vezes, cria o aplicativo uma vez (contador no `create`); a primeira chamada responde o `/health` em Supertest sem `listen`.
-- **CORS e trust proxy** (Supertest sobre o app montado pela entrada serverless): origem permitida e negada; dois `X-Forwarded-For` diferentes têm limites separados; um só IP é recusado acima do limite.
+- **Cold start e reaproveitamento** (API, unitário): a função de entrada, chamada duas vezes, cria o aplicativo uma vez (contador no `create`); a primeira chamada responde o `/live` em Supertest sem `listen` e sem banco.
+- **Swagger e CSP** (Supertest, ambiente de produção simulado): `/docs` e `/docs-json` respondem 404 e o cabeçalho `Content-Security-Policy` existe; fora de produção, `/docs` responde 200.
+- **CORS e trust proxy** (Supertest sobre o app montado pela entrada serverless): origem permitida e negada, sem `Allow-Credentials`; dois `X-Forwarded-For` diferentes têm limites separados; um só IP é recusado acima do limite; `9.9.9.9, 1.2.3.4` conta para `1.2.3.4` (um teste que falha se o salto virar `true`).
 - **Cron** (Supertest): sem cabeçalho e com segredo errado, 401; com o segredo, 200 (o caso de uso já tem testes).
-- **Produção sem `WEB_ORIGIN`** (unitário): a função recusa subir; em desenvolvimento usa o padrão.
-- **Fumaça do deploy** (Devops, depois do primeiro deploy, fora do CI): `GET /health` responde 200 no endereço da Vercel e `GET /cron/expirar-pedidos` sem segredo responde 401.
+- **`WEB_ORIGIN` em produção** (unitário, com `isProductionEnv`): ausente, `*`, duas origens, `http://` ou com caminho recusam subir; uma origem `https` válida passa; em desenvolvimento usa o padrão.
+- **Fumaça do deploy** (Devops, depois do primeiro deploy, fora do CI): `GET /live` responde 200 no endereço da Vercel, `GET /docs` responde 404 e `GET /cron/expirar-pedidos` sem segredo responde 401; o `/health` só é 200 depois de existir o banco de produção.
 
 ## Fatias, com dono e ordem
 
 | # | Card | Dono | O que entrega |
 | --- | --- | --- | --- |
-| 1 | LB-122 (#8) | Back | Entrada serverless que cria o aplicativo uma vez, com `setupApp` compartilhada, `trust proxy` de 1 salto e `WEB_ORIGIN` obrigatório em produção; testes dos cenários acima |
+| 1 | LB-122 (#8) | Back | Entrada serverless que cria o aplicativo uma vez, com `setupApp` compartilhada, a rota `/live`, o Swagger desligado em produção com a CSP ligada, `trust proxy` de 1 salto e `WEB_ORIGIN` obrigatório e validado em produção; testes dos cenários acima |
 | 2 | LB-122 (#8) | Back e Devops | Bundle e build da função (`@leguele/shared`, Prisma Client), com o teste de que a função sobe; `vercel.json` do `leguele-api` com a rota da função e o cron |
 | 3 | LB-8 (#17) | Devops | Variáveis do `leguele-api` na plataforma e a fumaça do primeiro deploy, **só com a ação do Diego** (ligação ao GitHub e primeiro deploy) |
 
@@ -112,5 +115,6 @@ Candidatos a ADR: nenhum, a menos que o Back troque o webpack do [[ADR-002-hospe
 Recomendações do Spec em 26/11; qualquer uma pode ser vetada.
 
 - **`WEB_ORIGIN` obrigatório em produção**, em vez do padrão local (evita o site bloqueado em silêncio).
-- **`trust proxy` com 1 salto**, para o limite por IP funcionar atrás da Vercel.
+- **`trust proxy` com 1 salto** (nunca `true`), para o limite por IP funcionar atrás da Vercel sem aceitar cabeçalho forjado.
+- **Swagger desligado em produção** e CSP mantida; **rota `/live`** sem banco para o cold start e a fumaça.
 - **Spec própria** em vez de nota no ADR, porque ADR aceito não é editado.
