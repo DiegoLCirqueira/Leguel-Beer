@@ -74,3 +74,41 @@ describe("LocalMaps: coordenadas pelo bairro e pela cidade", () => {
     }
   });
 });
+
+describe("LocalMaps: bairro desconhecido e outras cidades", () => {
+  const maps = new LocalMaps();
+  const MACEIO = { latitude: -9.6658, longitude: -35.7353 };
+
+  it("bairro desconhecido de Maceió cai perto do centro, pelo CEP, sempre no mesmo lugar", async () => {
+    const first = await maps.geocode(endereco({ district: "Bairro Novo", zip: "57045123" }));
+    const again = await maps.geocode(endereco({ district: "Bairro Novo", zip: "57045123" }));
+    const other = await maps.geocode(endereco({ district: "Bairro Novo", zip: "57099456" }));
+
+    expect(first).toEqual(again);
+    expect(first).not.toEqual(other);
+    expect(await maps.routeDistanceMeters(MACEIO, first!)).toBeLessThan(4_000);
+  });
+
+  it("usa o centro da cidade, com o CEP, quando o município não é Maceió e o bairro não vale lá", async () => {
+    const rioLargo = await maps.geocode(
+      endereco({ city: "Rio Largo", district: "Centro", zip: "57100000" }),
+    );
+
+    expect(rioLargo).not.toEqual(MACEIO);
+    expect(
+      await maps.routeDistanceMeters({ latitude: -9.4781, longitude: -35.8528 }, rioLargo!),
+    ).toBeLessThan(4_000);
+  });
+
+  it("cidade fora da tabela não é achada (o endereço vira 'não encontrado')", async () => {
+    expect(await maps.geocode(endereco({ city: "Cidade Inventada" }))).toBeNull();
+  });
+
+  it("cidades vizinhas ficam dentro do raio e as distantes, fora de 25 km", async () => {
+    const dentro = await maps.geocode(endereco({ city: "Marechal Deodoro", district: "Centro" }));
+    const fora = await maps.geocode(endereco({ city: "Murici", district: "Centro" }));
+
+    expect(await maps.routeDistanceMeters(ORIGEM, dentro!)).toBeLessThan(25_000);
+    expect(await maps.routeDistanceMeters(ORIGEM, fora!)).toBeGreaterThan(25_000);
+  });
+});
