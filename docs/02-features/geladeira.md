@@ -47,10 +47,12 @@ Funcionalidade: Geladeira em prateleiras por categoria
       | 5 Maré Alta e depois 1 Leguelé Carnaval    | IPA        | a fila da Maré Alta com 3 garrafas desenhadas e a etiqueta "×5"                             |
       | nenhuma Lager                              | Lager      | 4 garrafas fantasma, cada uma lida como "Adicionar Lager"                                   |
 
-  Cenário: Garrafa fantasma leva ao catálogo
+  Cenário: Adicionar pela garrafa fantasma, sem sair da Geladeira
     Dado uma garrafa fantasma na prateleira Frutas
     Quando toco nela
-    Então abro o catálogo filtrado pela categoria Frutas
+    Então vejo na própria Geladeira a lista "Adicionar Frutas" com as cervejas ativas de Frutas
+    E ao tocar em "Adicionar" na Cupuaçu Ale a lista fecha e a garrafa dela cai e balança na prateleira
+    E vejo o toast "Cupuaçu Ale foi para a geladeira" com "Desfazer"
 
   Esquema do Cenário: Alterar a quantidade e remover
     Dado que a Geladeira tem 2 Maré Alta e 1 Ponta Verde Pilsen
@@ -115,7 +117,10 @@ Funcionalidade: Geladeira em prateleiras por categoria
   - 2 a 4 rótulos: cada rótulo vira uma fila (uma garrafa atrás da outra) e os rótulos ficam lado a lado, na ordem em que entraram na Geladeira.
 - Profundidade desenhada: no máximo 3 fileiras. Acima disso, as garrafas extras não são desenhadas e a etiqueta mostra o total ("×5").
 - Garrafas de trás menores, mais escuras e deslocadas para a esquerda (medidas do estúdio: escala −10% e brilho −30% por fileira, recuo de 30 px na moldura de 710 px).
-- **Garrafa fantasma** em cada posição livre: silhueta tracejada com "+", lida como "Adicionar <categoria>"; ao tocar, abre `/catalogo?categoria=<slug>`. Com 1 rótulo, as posições livres são 4 menos as unidades (mínimo 0); com 2 ou mais, 4 menos o número de rótulos.
+- **Garrafa fantasma** em cada posição livre: silhueta tracejada com "+", lida como "Adicionar <categoria>"; ao tocar, abre na própria Geladeira a lista de adicionar (abaixo), sem trocar de página. Com 1 rótulo, as posições livres são 4 menos as unidades (mínimo 0); com 2 ou mais, 4 menos o número de rótulos.
+- **Adicionar na Geladeira** (ordem do Diego, 21/11; formato escolhido pelo Spec, o mais simples, vetável): tocar numa garrafa fantasma abre o `BottomSheet` "Adicionar <categoria>" com as cervejas ativas daquela categoria, na ordem do [[catalogo]]. Cada linha tem a miniatura da garrafa, o nome, o preço e o botão "Adicionar" (esgotada: botão desabilitado e selo "Esgotado"). "Adicionar" põe 1 unidade, **fecha a lista** e deixa a animação da garrafa nova (cai com quique e balanço) acontecer na prateleira; para mais unidades, toca-se de novo numa fantasma ou no "+" do resumo. É a mesma operação "adicionar com limite" de [[adicionar-do-card]]: mesmo toast com "Desfazer", mesmo limite "Só temos N unidades" (o toast aparece acima do sheet, que continua aberto nesse caso), mesma persistência. **Geladeira cheia (50 cervejas diferentes, `ITENS_MAXIMOS_NA_GELADEIRA`):** tocar em "Adicionar" de uma cerveja que ainda não está nela mostra o toast "A Geladeira está cheia.", não adiciona e mantém a lista aberta; cerveja que já está nela continua podendo ganhar unidades. Sem posição livre (prateleira cheia), não há fantasma e se adiciona pelo "+" do resumo ou pelo catálogo. Os dados vêm da mesma API do catálogo; a lista não tem busca nem filtro. Com `prefers-reduced-motion: reduce`, a garrafa só aparece, sem cair.
+- **Acessibilidade da lista de adicionar:** é um diálogo com nome "Adicionar <categoria>" (`aria-labelledby` no título). Ao abrir, o foco vai para o título; Esc e o botão de fechar fecham; ao fechar, o foco volta para um elemento que ainda existe (o título da prateleira, já que a garrafa fantasma tocada some ao adicionar ou muda de lugar; se não adicionou, volta à própria fantasma). A miniatura da garrafa tem `alt=""` (o nome já está na linha). O toast mora numa região `aria-live="polite"` **fora** do diálogo, para ser anunciado também com o sheet aberto, e não leva o foco.
+- **Base da moldura** (a barra lisa embaixo da última prateleira): mostra o nome "Leguelé Beer", em texto da marca (fonte e verde da marca, [[identidade-visual]]), centralizado, desenhado por cima da moldura, **não** na imagem (a imagem da moldura segue sem texto, e o texto acompanha a escala dela). É texto decorativo: `aria-hidden`, não é link nem botão. Qual barra é essa foi entendida pelo Spec como a base da moldura (a mais lisa); se o Diego quis outra (a barra do subtotal ou a de navegação), é ajuste de uma linha.
 - **Faixa da prateleira** (sobre o parapeito): vazia, "Toque no + para escolher uma <categoria>"; 1 rótulo, nome e "×N"; vários rótulos, cada nome (cortado com reticências) e "×N" sobre a sua fila.
 - **Geladeira vazia:** as 4 prateleiras só com garrafas fantasma e sem a barra do resumo.
 - **Animações** só com `transform` e `opacity`: a garrafa nova cai com quique e balanço; ao aumentar a quantidade, as garrafas do rótulo balançam apoiadas na base, escalonadas; a garrafa que sai some em 300 ms. Com `prefers-reduced-motion: reduce`, nada se move: as garrafas aparecem e somem sem animação.
@@ -155,6 +160,7 @@ Funcionalidade: Geladeira em prateleiras por categoria
 
 ### Fora de escopo
 
+- Busca, filtro, escolha de quantidade e várias cervejas de uma vez na lista de adicionar da Geladeira.
 - Arrastar garrafas entre prateleiras, rolagem dentro das prateleiras e animações extras (luz piscando, balanço do ícone no header).
 - Packs do Mix & Match na Geladeira (Pós-MVP).
 - Somar a Geladeira do convidado com a da conta ao entrar (LB-48, #55, MVP+).
@@ -172,7 +178,7 @@ Fora do repo, só como referência visual; regras e textos vêm desta spec, norm
 | `Imagens/estudio-garrafas.html` | 29/10/2026 | Moldura, posições, profundidade, faixa das prateleiras, garrafa fantasma e animações. Medidas da moldura de 710 × 1573: linhas das prateleiras, início das posições (x = 134), largura da posição (121), altura da garrafa (200) e parapeitos nas constantes `LINES`, `RAIL`, `IX`, `CW`, `BH` e `RISE` do script |
 | `Imagens/figma/telas/24-resumo-da-geladeira.png` | 08/11/2026 | Resumo em bottom sheet no celular |
 
-**Do estúdio não entram:** o painel 3D, os controles de ajuste e de salvar, a lista de cervejas com "+" e "−" ao lado da geladeira (no site, o ajuste fica no resumo) e o toque no fantasma adicionando direto (no site, ele abre o catálogo filtrado). As 16 garrafas do estúdio são de uma lista antiga; vale o catálogo de [[catalogo]].
+**Do estúdio não entram:** o painel 3D, os controles de ajuste e de salvar, a lista de cervejas com "+" e "−" ao lado da geladeira (no site, o ajuste fica no resumo) e o toque no fantasma adicionando direto (no site, ele abre a lista de adicionar da categoria, na própria Geladeira). As 16 garrafas do estúdio são de uma lista antiga; vale o catálogo de [[catalogo]].
 
 **Da tela 24 não entram (vale a spec):** cupom, coração de favoritar, lupa no header, "Limpar geladeira", "Ir para pagamento" (vale "Finalizar compra", porque a primeira etapa do checkout é a Entrega), "Frete (estimado) R$ 12,90" antes do item 4, a barra de status do iPhone e o contador "2" do header (o contador soma as unidades: 3).
 
@@ -230,6 +236,7 @@ Os demais já existem: `StyleBadge`, `Stepper`, `Toast`, `BottomSheet` e `Button
 - **Revalidação na API:** caso de uso com repositório fake para preço mudou, inativa, inexistente, esgotada e quantidade reduzida, e os quatro juntos na ordem de entrada (unitário); `POST /geladeira/validar` sem token (HTTP).
 - **Geladeira da conta:** `GET`/`PUT /me/geladeira` com banco real; sem token dá 401; o `PUT` de um cliente não muda a Geladeira de outro; `PUT` repetido dá o mesmo resultado (integração e HTTP).
 - **Sincronização no site:** falha da Server Action mantém a cópia local e reenvia depois (teste de componente com a action simulada, inclusive rejeitando).
+- **Adicionar na Geladeira** (componente e E2E): a fantasma abre a lista da categoria sem mudar a URL, com o nome do diálogo, o foco dentro dela e o retorno do foco ao fechar; a miniatura com `alt` vazio; na 51ª cerveja diferente, "A Geladeira está cheia." sem adicionar e com a lista aberta; esgotada desabilitada; "Adicionar" fecha a lista, põe 1 unidade e mostra o toast com "Desfazer"; no limite, "Só temos N unidades" e nada muda; o texto "Leguelé Beer" aparece na base da moldura, sem ser lido pelo leitor de tela.
 - **Telas:** prateleira (profundidade, "×N", fantasma, rótulo acessível, imagem padrão), resumo e avisos (componente); cenários desta spec em 360 × 640 e 1280 × 800, com movimento reduzido no cenário de balanço (E2E). Medidas de layout rodam também no container Playwright Linux ([[licoes-aprendidas]], 2026-11-08).
 
 ## Fatias, com dono e ordem
@@ -257,6 +264,10 @@ Candidatos a ADR: nenhum (as escolhas seguem [[ADR-009-guard-global-fechado]], [
 - [[ADR-001-stack]], [[ADR-009-guard-global-fechado]], [[ADR-012-sessao-em-cookies-httponly]]
 
 ## Decisões tomadas sem consulta
+
+> [!info] Ordem do Diego em 21/11, aplicada como recomendação, vetável
+> - **Adicionar na própria Geladeira** pela garrafa fantasma, com lista (`BottomSheet`) da categoria, 1 unidade por toque e fechamento ao adicionar, para a animação aparecer. Alternativas descartadas: botão "+" extra em cada prateleira (repete a fantasma) e lista de todo o catálogo (mistura categorias).
+> - **"Leguelé Beer" na base da moldura**, como texto sobre ela.
 
 Recomendações aplicadas pelo Spec em 10/11, em modo autônomo; qualquer uma pode ser vetada.
 

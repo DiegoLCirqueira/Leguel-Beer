@@ -172,7 +172,7 @@ Telas do design (fora do repo, em `Imagens/figma/telas/`), só como referência 
 - [[mvp-corte]]
 - Arquitetura: [[visao-geral]]
 - [[destaques-home]] e [[adicionar-do-card]]: as outras partes do épico E3.
-- [[geladeira]]: a garrafa fantasma abre o catálogo filtrado pela categoria.
+- [[geladeira]]: a garrafa fantasma abre, na própria Geladeira, a lista de adicionar da categoria.
 
 ### Decisões do Diego (entrevista de 2026-10-28)
 

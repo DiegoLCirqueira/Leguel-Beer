@@ -82,7 +82,7 @@ Faixa da Geladeira que guarda as cervejas de uma categoria, na ordem das categor
 _Evite_: seção, linha
 
 **Garrafa fantasma**:
-Silhueta tracejada com "+" numa posição livre da prateleira; ao tocar, abre o catálogo filtrado pela categoria da prateleira. Ver [[geladeira]].
+Silhueta tracejada com "+" numa posição livre da prateleira; ao tocar, abre, na própria Geladeira, a lista de adicionar as cervejas da categoria da prateleira. Ver [[geladeira]].
 _Evite_: placeholder, slot vazio
 
 **Revalidação**:
