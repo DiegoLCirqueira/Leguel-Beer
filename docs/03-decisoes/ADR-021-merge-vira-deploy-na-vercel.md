@@ -1,5 +1,5 @@
 ---
-status: proposto
+status: aceito
 data: 2026-11-26
 tags:
   - adr
@@ -8,7 +8,7 @@ tags:
 # ADR-021: Merge na `main` vira deploy na Vercel (Hobby, dois projetos)
 
 > [!info] Status
-> **Proposto** (rascunho do Spec em 26/11, a pedido do Orchestrator). Nada foi criado na Vercel: sem conta, projeto, chave nem variável. Vira "aceito" só depois de o Diego confirmar e de o Devops executar o LB-8. Decisões de custo, conta e deploy em produção são do Diego ([[ADR-006-merge-por-agentes]], ponto em aberto sobre deploy).
+> **Aceito pelo Diego em 26/11** (ordem: "faça as recomendadas"). O aceite é a autorização dos deploys por merge, como a Decisão abaixo diz, mas **não cria nada sozinho**: a **ligação da Vercel ao GitHub** (acesso dele, item 6) e o **primeiro deploy em produção** (item 5) continuam sendo ação ou acesso do Diego, feitos por ele ou com o ok dele no momento. **Ainda não existe banco de produção** (projeto Supabase na nuvem), nem o projeto Supabase de preview; sem eles, nada de produção ou de preview com dado funciona, e o deploy sobe só o que não depende deles. Nada foi criado na Vercel até aqui.
 
 ## Contexto
 
