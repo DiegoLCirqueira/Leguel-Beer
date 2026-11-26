@@ -4,12 +4,17 @@ import { ExpireDueOrders } from "./expire-due-orders.js";
 
 const NOW = new Date("2026-11-14T10:31:00.000Z");
 
-function repositoryWithDueOrders(dueIds: string[]): OrderRepository & { askedAt: Date[] } {
+function repositoryWithDueOrders(
+  dueIds: string[],
+): OrderRepository & { askedAt: Date[]; limits: number[] } {
   const askedAt: Date[] = [];
+  const limits: number[] = [];
   return {
     askedAt,
-    async findDueOrderIds(at: Date) {
+    limits,
+    async findDueOrderIds(at: Date, limit: number) {
       askedAt.push(at);
+      limits.push(limit);
       return dueIds;
     },
     async findForExpiration() {
@@ -59,5 +64,14 @@ describe("ExpireDueOrders", () => {
 
     expect(expired).toEqual(["order-1", "order-3"]);
     expect(result).toEqual({ failures: [{ orderId: "order-2", error: boom }] });
+  });
+
+  it("pede ao repositório no máximo 100 pedidos por varredura; o resto fica para o próximo disparo", async () => {
+    const orders = repositoryWithDueOrders([]);
+    const expire = new ExpireDueOrders(orders, { execute: async () => undefined }, () => NOW);
+
+    await expire.execute();
+
+    expect(orders.limits).toEqual([100]);
   });
 });
