@@ -37,8 +37,8 @@ describe("MolduraDaGeladeira", () => {
 
     const frutas = screen.getByRole("region", { name: "Frutas" });
     expect(within(frutas).getByText(/^Cupuaçu Ale, 3 unidades/)).toBeInTheDocument();
-    expect(within(frutas).getAllByRole("link", { name: "Adicionar Frutas" })).toHaveLength(1);
+    expect(within(frutas).getAllByRole("button", { name: "Adicionar Frutas" })).toHaveLength(1);
     const lager = screen.getByRole("region", { name: "Lager" });
-    expect(within(lager).getAllByRole("link", { name: "Adicionar Lager" })).toHaveLength(4);
+    expect(within(lager).getAllByRole("button", { name: "Adicionar Lager" })).toHaveLength(4);
   });
 });

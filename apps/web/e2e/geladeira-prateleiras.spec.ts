@@ -6,7 +6,7 @@ test("em 360x640 cada garrafa fantasma tem alvo de toque de pelo menos 44 px", a
   await page.setViewportSize({ width: 360, height: 640 });
   await page.goto("/dev/tokens");
 
-  const fantasmas = page.getByRole("region", { name: "Malt" }).getByRole("link", {
+  const fantasmas = page.getByRole("region", { name: "Malt" }).getByRole("button", {
     name: "Adicionar Malt",
   });
   expect(await fantasmas.count()).toBe(4);

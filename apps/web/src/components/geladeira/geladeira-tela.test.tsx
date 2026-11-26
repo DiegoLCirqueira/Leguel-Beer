@@ -49,7 +49,7 @@ describe("GeladeiraTela", () => {
     for (const categoria of ["IPA", "Frutas", "Malt", "Lager"]) {
       const prateleira = screen.getByRole("region", { name: categoria });
       expect(
-        within(prateleira).getAllByRole("link", { name: `Adicionar ${categoria}` }),
+        within(prateleira).getAllByRole("button", { name: `Adicionar ${categoria}` }),
       ).toHaveLength(4);
     }
   });
@@ -60,7 +60,7 @@ describe("GeladeiraTela", () => {
 
     const ipa = screen.getByRole("region", { name: "IPA" });
     expect(within(ipa).getByText("Maré Alta, 2 unidades, R$ 64,00")).toBeInTheDocument();
-    expect(within(ipa).getAllByRole("link", { name: "Adicionar IPA" })).toHaveLength(2);
+    expect(within(ipa).getAllByRole("button", { name: "Adicionar IPA" })).toHaveLength(2);
   });
 
   it("antes de ler a cópia local (HTML do servidor), mostra o carregamento e não as prateleiras", () => {

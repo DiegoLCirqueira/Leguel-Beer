@@ -50,7 +50,7 @@ describe("/dev/tokens", () => {
     const frutas = screen.getByRole("region", { name: "Frutas" });
     expect(within(frutas).getByText(/^Cupuaçu Ale, 1 unidade/)).toBeInTheDocument();
     expect(
-      within(screen.getByRole("region", { name: "Malt" })).getAllByRole("link", {
+      within(screen.getByRole("region", { name: "Malt" })).getAllByRole("button", {
         name: "Adicionar Malt",
       }),
     ).toHaveLength(4);
