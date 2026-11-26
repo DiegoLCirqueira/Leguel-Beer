@@ -19,7 +19,8 @@ export class PrismaOrderRepository implements OrderRepository {
     const rows = await this.prisma.order.findMany({
       where: { status: "AWAITING_PAYMENT", expiresAt: { lte: at } },
       select: { id: true },
-      orderBy: { expiresAt: "asc" },
+      // Quem já falhou vai para o fim: um pedido que sempre falha não trava o lote.
+      orderBy: [{ expirationFailures: "asc" }, { expiresAt: "asc" }],
       take: limit,
     });
     return rows.map((row) => row.id);
@@ -119,7 +120,10 @@ export class PrismaOrderRepository implements OrderRepository {
     });
   }
 
-  async recordExpirationFailure(_orderId: string): Promise<void> {
-    throw new Error("não implementado");
+  async recordExpirationFailure(orderId: string): Promise<void> {
+    await this.prisma.order.update({
+      where: { id: orderId },
+      data: { expirationFailures: { increment: 1 } },
+    });
   }
 }
