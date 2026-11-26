@@ -75,6 +75,14 @@ export { chaveDeIdempotenciaSchema, criarPedidoRequestSchema } from "./pedido/cr
 export type { CriarPedidoRequest } from "./pedido/criar.js";
 export { CODIGOS_DE_ERRO_DO_PEDIDO, erroDoPedidoSchema } from "./pedido/erros.js";
 export type { ErroDoPedido } from "./pedido/erros.js";
+export { listaDePedidosSchema, pedidoDaListaSchema } from "./pedido/lista.js";
+export type { ListaDePedidos, PedidoDaLista } from "./pedido/lista.js";
+export {
+  dataDoPedido,
+  ROTULO_DO_STATUS,
+  textoDasCervejas,
+  textoDeItens,
+} from "./pedido/rotulos.js";
 export { pedidoCriadoSchema } from "./pedido/resposta.js";
 export type { PedidoCriado } from "./pedido/resposta.js";
 export { formaDePagamentoSchema, PARCELAS_MAXIMAS } from "./pagamento/forma.js";
