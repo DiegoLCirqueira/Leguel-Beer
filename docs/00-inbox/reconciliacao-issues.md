@@ -26,6 +26,13 @@ Auditoria das issues abertas do milestone "MVP" contra a `main` (log, specs, có
 | #7 | LB-121 hospedagem da API | ADR-002 | [[ADR-002-hospedagem-api]] |
 | #52 | LB-66 frete grátis a partir de R$ 150 | #271, #293, #320 | `packages/shared/src/entrega/frete.test.ts` |
 
+### Critérios que estavam desmarcados nas fechadas (conferido em 26/11)
+
+Das 14 fechadas, quatro tinham caixas desmarcadas no corpo: #40, #22, #24 e #27. Todas foram conferidas contra o código e comentadas nas issues; nenhuma foi reaberta.
+
+- **#22, #24 e #27:** critérios cumpridos, com os E2E e testes citados no comentário (`catalogo.spec.ts`, `home-faixa-de-categorias.spec.ts`, `adicionar-a-geladeira.spec.ts`, `catalog.controller.integration.test.ts`).
+- **#40:** "Termos abertos não apagam o formulário" cumprido (`criar-conta.spec.ts`); "Contrato quebrado aparece no typecheck" cumprido por construção (site e API importam o mesmo schema; o CI roda o typecheck; sem teste dedicado); "hook do perfil com TanStack Query" dispensado (o site não busca o perfil no navegador), registrado em [[contratos-compartilhados]] como recomendação vetável do Spec.
+
 ## Mantidas abertas, com comentário do que falta
 
 | Issue | Card | Já na `main` | Falta |
