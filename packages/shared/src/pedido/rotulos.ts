@@ -9,6 +9,6 @@ export const ROTULO_DO_STATUS: Record<StatusDoPedido, string> = {
   cancelado: "Cancelado",
 };
 
-export function textoDeItens(_quantidade: number): string {
-  return "";
+export function textoDeItens(quantidade: number): string {
+  return quantidade === 1 ? "1 item" : `${quantidade} itens`;
 }
