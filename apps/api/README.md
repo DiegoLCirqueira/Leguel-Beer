@@ -42,12 +42,20 @@ Exemplo (`modules/health`): `CheckHealth` (application) depende da porta `Databa
 
 Para validar a entrada, crie o DTO com `zodDto(schema)` (`common/validation/zod-dto.ts`) e use-o no `@Body()`; o pipe global devolve `VALIDATION_ERROR`. Marque controllers com `@ApiTags("<contexto>")` para o Swagger. Todo endpoint novo aparece no Swagger.
 
+## Cron de expiração de pedidos
+
+`GET /cron/expirar-pedidos` cancela os pedidos aguardando pagamento vencidos (até 100 por disparo; o resto sai no disparo seguinte). A rota é pública e só aceita `Authorization: Bearer <CRON_SECRET>`.
+
+- `CRON_SECRET`: segredo aleatório de **no mínimo 32 caracteres** (a chave fica em `.env.example`, sem valor). Sem ele, a rota recusa tudo (401) e, em produção, a API avisa no boot; com menos de 32 caracteres, também avisa.
+- A plataforma (Vercel) envia o segredo como Bearer no cron diário; o cadastro do cron e do segredo é do deploy (LB-8).
+- A validade de 30 minutos vale pela checagem no uso; o cron só limpa o que sobrar ([[ADR-002-hospedagem-api]]).
+
 ## Limite de requisições (THROTTLE_LIMIT)
 
 O limite global é de 100 requisições por IP por minuto, contado em memória. Quem roda vários E2E ou agentes no mesmo `127.0.0.1` pode receber `429` (o site mostra erro). Para o ambiente local, defina `THROTTLE_LIMIT` no `apps/api/.env` (ex.: `10000`) e reinicie a API (o watch não relê o `.env`); o Playwright já passa `THROTTLE_LIMIT=10000` à API que ele sobe fora do CI.
 
 - Opcional; ausente ou inválido (vazio, zero, negativo, decimal, texto) vale 100. Nunca é ilimitado.
-- Em produção o valor é limitado a 1000; não defina um valor alto no deploy.
+- Produção é `NODE_ENV=production` ou qualquer `VERCEL_ENV` (preview inclusive, porque o endereço é público): lá o valor é limitado a 1000. Só o local e o E2E (sem `VERCEL_ENV`) aceitam valor maior. Não defina um valor alto no deploy.
 
 ## Pendências conhecidas
 
