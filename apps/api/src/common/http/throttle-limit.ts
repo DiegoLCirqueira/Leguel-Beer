@@ -1,3 +1,5 @@
+import { isProductionEnv } from "../config/production-env.js";
+
 /** Limite padrão de requisições por IP por minuto (o mesmo de antes de ser configurável). */
 export const DEFAULT_THROTTLE_LIMIT = 100;
 
@@ -13,7 +15,5 @@ export function parseThrottleLimit(raw: string | undefined, production: boolean)
 
 /** Lê o limite do ambiente do processo; produção é `NODE_ENV=production` ou qualquer `VERCEL_ENV`. */
 export function throttleLimitFromEnv(env: Record<string, string | undefined>): number {
-  // Qualquer VERCEL_ENV (preview inclusive) é endereço público: vale o teto.
-  const production = env["NODE_ENV"] === "production" || !!env["VERCEL_ENV"];
-  return parseThrottleLimit(env["THROTTLE_LIMIT"], production);
+  return parseThrottleLimit(env["THROTTLE_LIMIT"], isProductionEnv(env));
 }
