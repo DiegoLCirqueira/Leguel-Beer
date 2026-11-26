@@ -17,6 +17,8 @@ tags:
 
 > [!success] Decisão de 26/11 (o Diego mandou aplicar as recomendadas): no MVP o e-mail é de **desenvolvimento**
 > A spec está **pronta** para o MVP com um adaptador de desenvolvimento atrás da porta `OrderEmailSender`: envia ao **Mailpit do Supabase local** (sem conta, sem chave) quando a variável de ambiente apontar para ele, e usa o **envio falso em memória** quando não apontar (é o padrão, inclusive em qualquer deploy do portfólio: nenhum e-mail real sai). O **provedor real** (conta, chave, domínio e o texto da Política, itens 4, 6 e 7) é **pós-MVP** e só entra depois de o Diego criar a conta; trocar o adaptador não muda os cenários, as regras nem a porta.
+>
+> **O envio falso não conta como enviado:** o adaptador falso devolve "não enviado (adaptador de desenvolvimento)"; o pedido **não** recebe a marca "e-mail enviado", guarda uma marca própria ("não enviado: desenvolvimento") e o admin vê o mesmo aviso da falha ("Não foi possível enviar o e-mail ao cliente."). A marca "enviado" só existe quando o Mailpit aceitou a mensagem (desenvolvimento) ou, depois, quando o provedor real respondeu com sucesso. **O falso não guarda nem registra o corpo:** descarta a mensagem e o log leva só o id do pedido e o nome do adaptador, nunca o e-mail do cliente, o endereço nem o texto. **Nenhum texto ao cliente promete e-mail** (tela 08, "Meus pedidos", Política) enquanto só houver adaptador de desenvolvimento; a promessa só entra com o provedor real.
 
 ## História de usuário
 
@@ -71,6 +73,7 @@ Funcionalidade: E-mail de confirmação do pedido
 - **Destinatário:** só o e-mail da conta dona do pedido (confirmado no cadastro). Nada de cópia oculta nem de outro endereço.
 - **Privacidade:** os dados que saem para o provedor são só os do corpo acima. A Política de Privacidade ([[termos-privacidade]]) ganha, em "Com quem compartilhamos", o provedor de e-mail, com o texto que o Diego aprovar junto com a escolha do provedor (LGPD, item 7).
 - **Segredos:** a chave do provedor só na API, em `apps/api/.env` (nome em `.env.example`, sem valor), nunca no site nem em `NEXT_PUBLIC_*`. Criar a chave é do Diego (item 6).
+- **Marca do adaptador falso:** o caso de uso distingue "enviado", "falhou" e "não enviado (adaptador de desenvolvimento)"; só o primeiro grava a marca "e-mail enviado". O aviso ao admin vale para os dois últimos.
 - **Tela 08:** o texto do topo ("Pagamento aprovado! Seu pedido já está com a gente. Acompanhe o status em Meus pedidos.") não promete e-mail, porque o envio pode falhar ([[pedidos-cliente]], pergunta 3).
 
 ## Fora de escopo
