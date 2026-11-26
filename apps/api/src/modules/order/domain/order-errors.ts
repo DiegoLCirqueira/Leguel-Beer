@@ -73,3 +73,11 @@ export class PaymentNotConfirmableError extends Error {
     this.name = "PaymentNotConfirmableError";
   }
 }
+
+/** A validade do pedido já passou: ao tentar confirmar o pagamento, o pedido é expirado. */
+export class OrderExpiredError extends Error {
+  constructor() {
+    super("O prazo de pagamento deste pedido terminou e ele foi cancelado.");
+    this.name = "OrderExpiredError";
+  }
+}
