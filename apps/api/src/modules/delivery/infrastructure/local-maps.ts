@@ -1,5 +1,11 @@
 import type { Coordinates } from "../domain/address.js";
 import type { GeocodeQuery, Geocoder, RouteCalculator } from "../domain/maps.js";
+import { MACEIO_DISTRICTS } from "./local-maps-data.js";
+
+/** Minúsculas, sem acento e sem espaço sobrando: a chave das tabelas. */
+function normalize(text: string): string {
+  return text.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
+}
 
 const EARTH_RADIUS_METERS = 6_371_000;
 
@@ -20,8 +26,8 @@ function straightLineMeters(a: Coordinates, b: Coordinates): number {
  * uma aproximação pelo bairro ou pela cidade; a distância é a linha reta (spec de endereços e entrega).
  */
 export class LocalMaps implements Geocoder, RouteCalculator {
-  async geocode(_query: GeocodeQuery): Promise<Coordinates | null> {
-    return null;
+  async geocode(query: GeocodeQuery): Promise<Coordinates | null> {
+    return MACEIO_DISTRICTS[normalize(query.district)] ?? null;
   }
 
   async routeDistanceMeters(origin: Coordinates, destination: Coordinates): Promise<number | null> {
