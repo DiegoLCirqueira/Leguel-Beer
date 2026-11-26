@@ -36,13 +36,8 @@ export class PrismaOrderRepository implements OrderRepository {
 
   async cancelIfAwaitingPayment(orderId: string, reason: string, at: Date): Promise<boolean> {
     return this.prisma.$transaction(async (tx) => {
-      const left = await leaveAwaitingPayment(tx, {
-        orderId,
-        to: "CANCELLED",
-        data: { cancelReason: reason },
-        reason,
-        at,
-      });
+      const change = { orderId, to: "CANCELLED" as const, reason, at };
+      const left = await leaveAwaitingPayment(tx, { ...change, data: { cancelReason: reason } });
       if (!left) return false;
 
       await tx.stockReservation.updateMany({
@@ -50,24 +45,23 @@ export class PrismaOrderRepository implements OrderRepository {
         data: { releasedAt: at },
       });
       await tx.fridgePendingDeduction.deleteMany({ where: { orderId } });
+      // O histórico é o último passo: se ele falhar, nenhum efeito acima fica gravado.
+      await recordTransition(tx, change);
       return true;
     });
   }
 
   async confirmPaymentIfAwaiting(orderId: string, actorId: string, at: Date): Promise<boolean> {
     return this.prisma.$transaction(async (tx) => {
-      const left = await leaveAwaitingPayment(tx, {
-        orderId,
-        to: "PAID",
-        // Dentro da validade: a expiração e a confirmação disputam a mesma linha.
-        where: { expiresAt: { gt: at } },
-        actorId,
-        at,
-      });
+      const change = { orderId, to: "PAID" as const, actorId, at };
+      // Dentro da validade: a expiração e a confirmação disputam a mesma linha.
+      const left = await leaveAwaitingPayment(tx, { ...change, where: { expiresAt: { gt: at } } });
       if (!left) return false;
 
       await consumeReservations(tx, orderId, at);
       await applyFridgeDeductions(tx, orderId);
+      // O histórico é o último passo: se ele falhar, nenhum efeito acima fica gravado.
+      await recordTransition(tx, change);
       return true;
     });
   }
@@ -75,28 +69,34 @@ export class PrismaOrderRepository implements OrderRepository {
 
 type Tx = Prisma.TransactionClient;
 
+type Leaving = {
+  orderId: string;
+  to: OrderStatus;
+  reason?: string;
+  actorId?: string;
+  at: Date;
+};
+
 /**
- * Tira o pedido de "aguardando pagamento" e grava o histórico, na mesma transação. A condição no
- * próprio UPDATE decide a corrida: só uma chamada vê uma linha afetada e as demais recebem `false`.
+ * Tira o pedido de "aguardando pagamento". A condição no próprio UPDATE decide a corrida: só uma
+ * chamada vê uma linha afetada e as demais recebem `false`.
  */
 async function leaveAwaitingPayment(
   tx: Tx,
-  change: {
-    orderId: string;
-    to: OrderStatus;
+  change: Leaving & {
     where?: Prisma.OrderWhereInput;
     data?: Prisma.OrderUpdateManyMutationInput;
-    reason?: string;
-    actorId?: string;
-    at: Date;
   },
 ): Promise<boolean> {
   const { count } = await tx.order.updateMany({
     where: { id: change.orderId, status: "AWAITING_PAYMENT", ...change.where },
     data: { status: change.to, ...change.data },
   });
-  if (count === 0) return false;
+  return count > 0;
+}
 
+/** Grava a transição no histórico do pedido; vai sempre por último na transação. */
+async function recordTransition(tx: Tx, change: Leaving): Promise<void> {
   await tx.orderStatusHistory.create({
     data: {
       orderId: change.orderId,
@@ -107,7 +107,6 @@ async function leaveAwaitingPayment(
       createdAt: change.at,
     },
   });
-  return true;
 }
 
 /** A reserva do pedido vira baixa no estoque físico, numa única instrução. */
