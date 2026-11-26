@@ -23,3 +23,7 @@ export const listaDePedidosSchema = z.object({
 });
 
 export type ListaDePedidos = z.infer<typeof listaDePedidosSchema>;
+
+export const PEDIDOS_POR_PAGINA = 20;
+
+export const consultaDaListaDePedidosSchema = z.any();
