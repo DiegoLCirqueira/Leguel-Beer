@@ -25,4 +25,18 @@ describe("LocalMaps: distância em linha reta", () => {
 
     expect(await maps.routeDistanceMeters(a, b)).toBe(await maps.routeDistanceMeters(b, a));
   });
+
+  it("encurta o grau de longitude com a latitude: no equador 111.195 m, a 60° a metade", async () => {
+    const noEquador = await maps.routeDistanceMeters(
+      { latitude: 0, longitude: 0 },
+      { latitude: 0, longitude: 1 },
+    );
+    const aSessentaGraus = await maps.routeDistanceMeters(
+      { latitude: 60, longitude: 0 },
+      { latitude: 60, longitude: 1 },
+    );
+
+    expect(noEquador).toBe(111_195);
+    expect(aSessentaGraus).toBe(55_597);
+  });
 });
