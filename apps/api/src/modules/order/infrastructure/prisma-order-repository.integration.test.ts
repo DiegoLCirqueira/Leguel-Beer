@@ -171,6 +171,36 @@ describe("PrismaOrderRepository (banco real)", () => {
     expect(await orders.findDueOrderIds(NOW, 3)).toEqual([older.id, orderId, newer.id]);
   });
 
+  it("o pedido que falha repetido vai para o fim da varredura e não ocupa o lote", async () => {
+    const base = {
+      profileId,
+      paymentMethod: "PIX" as const,
+      subtotalCents: 3200,
+      shippingCents: 0,
+      totalCents: 3200,
+      customerName: "Ana Souza",
+      customerPhone: "82999990000",
+      shipZip: "57035000",
+      shipStreet: "Rua do Sol",
+      shipNumber: "100",
+      shipDistrict: "Farol",
+      shipCity: "Maceió",
+      shipState: "AL",
+    };
+    const newer = await prisma.order.create({
+      data: { ...base, number: "#LB000002", expiresAt: new Date(EXPIRES_AT.getTime() + 60_000) },
+    });
+
+    await orders.recordExpirationFailure(orderId);
+    await orders.recordExpirationFailure(orderId);
+
+    expect(await orders.findDueOrderIds(NOW, 1)).toEqual([newer.id]);
+    expect(await orders.findDueOrderIds(NOW, 2)).toEqual([newer.id, orderId]);
+    expect(
+      (await prisma.order.findUniqueOrThrow({ where: { id: orderId } })).expirationFailures,
+    ).toBe(2);
+  });
+
   it("não grava nenhum efeito da expiração se a escrita do histórico falha", async () => {
     await prisma.$executeRawUnsafe(
       "CREATE OR REPLACE FUNCTION fail_history_insert() RETURNS trigger LANGUAGE plpgsql AS 'BEGIN RAISE EXCEPTION ''falha forçada no histórico''; END;'",
