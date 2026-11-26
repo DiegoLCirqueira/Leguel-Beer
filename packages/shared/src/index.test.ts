@@ -53,6 +53,19 @@ describe("API pública de @leguele/shared", () => {
     );
   });
 
+  it("exporta o contrato da lista de pedidos: schemas, rótulos e textos", () => {
+    expect(Object.keys(shared)).toEqual(
+      expect.arrayContaining([
+        "pedidoDaListaSchema",
+        "listaDePedidosSchema",
+        "ROTULO_DO_STATUS",
+        "textoDeItens",
+        "textoDasCervejas",
+        "dataDoPedido",
+      ]),
+    );
+  });
+
   it("exporta o contrato de endereços e entrega: CEP, formulário, limite e frete", () => {
     expect(Object.keys(shared)).toEqual(
       expect.arrayContaining([
