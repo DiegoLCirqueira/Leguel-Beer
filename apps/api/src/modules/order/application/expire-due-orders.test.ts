@@ -26,6 +26,7 @@ function repositoryWithDueOrders(
     async confirmPaymentIfAwaiting() {
       return false;
     },
+    async recordExpirationFailure() {},
   };
 }
 

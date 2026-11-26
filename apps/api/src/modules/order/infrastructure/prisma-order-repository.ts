@@ -118,4 +118,8 @@ export class PrismaOrderRepository implements OrderRepository {
       return true;
     });
   }
+
+  async recordExpirationFailure(_orderId: string): Promise<void> {
+    throw new Error("não implementado");
+  }
 }

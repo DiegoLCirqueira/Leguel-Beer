@@ -27,4 +27,7 @@ export interface OrderRepository {
    * histórico com `actorId`. Devolve se confirmou: quem perde a corrida recebe `false`.
    */
   confirmPaymentIfAwaiting(orderId: string, actorId: string, at: Date): Promise<boolean>;
+
+  /** Conta uma falha do cron ao expirar o pedido; quem falha mais fica por último na varredura. */
+  recordExpirationFailure(orderId: string): Promise<void>;
 }

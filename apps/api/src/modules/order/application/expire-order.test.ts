@@ -29,6 +29,8 @@ class InMemoryOrderRepository implements OrderRepository {
     return true;
   }
 
+  async recordExpirationFailure(): Promise<void> {}
+
   async confirmPaymentIfAwaiting(): Promise<boolean> {
     return false;
   }

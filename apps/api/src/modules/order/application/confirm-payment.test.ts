@@ -29,6 +29,8 @@ class InMemoryOrderRepository implements OrderRepository {
     return true;
   }
 
+  async recordExpirationFailure(): Promise<void> {}
+
   async confirmPaymentIfAwaiting(orderId: string, actorId: string, at: Date): Promise<boolean> {
     const order = this.orders.find((candidate) => candidate.id === orderId);
     if (order?.status !== "aguardando-pagamento") return false;
