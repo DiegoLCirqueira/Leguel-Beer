@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { NotFoundError } from "../../../common/errors/not-found-error.js";
-import { PaymentNotConfirmableError } from "../domain/order-errors.js";
+import { OrderExpiredError, PaymentNotConfirmableError } from "../domain/order-errors.js";
 import type { ExpirableOrder, OrderRepository } from "../domain/order-repository.js";
 import { ConfirmPayment } from "./confirm-payment.js";
+import { ExpireOrder } from "./expire-order.js";
+
+function confirmPayment(orders: OrderRepository, now: () => Date): ConfirmPayment {
+  return new ConfirmPayment(orders, new ExpireOrder(orders, now), now);
+}
 
 const CREATED_AT = new Date("2026-11-14T10:00:00.000Z");
 
@@ -52,7 +57,7 @@ describe("ConfirmPayment", () => {
   it("confirma o pagamento do pedido aguardando, 10 minutos depois de criado, em nome do admin", async () => {
     const now = minutesAfter(CREATED_AT, 10);
     const orders = new InMemoryOrderRepository([awaitingOrder()]);
-    const confirm = new ConfirmPayment(orders, () => now);
+    const confirm = confirmPayment(orders, () => now);
 
     await confirm.execute({ orderId: "order-1", actorId: "admin-1" });
 
@@ -62,11 +67,11 @@ describe("ConfirmPayment", () => {
   it("com a validade vencida há 1 minuto expira o pedido em vez de confirmar e responde conflito", async () => {
     const now = minutesAfter(CREATED_AT, 31);
     const orders = new InMemoryOrderRepository([awaitingOrder()]);
-    const confirm = new ConfirmPayment(orders, () => now);
+    const confirm = confirmPayment(orders, () => now);
 
     await expect(
       confirm.execute({ orderId: "order-1", actorId: "admin-1" }),
-    ).rejects.toBeInstanceOf(PaymentNotConfirmableError);
+    ).rejects.toBeInstanceOf(OrderExpiredError);
 
     expect(orders.confirmations).toEqual([]);
     expect(orders.cancellations).toEqual([
@@ -76,7 +81,7 @@ describe("ConfirmPayment", () => {
 
   it("pedido inexistente responde não encontrado e não confirma nada", async () => {
     const orders = new InMemoryOrderRepository([]);
-    const confirm = new ConfirmPayment(orders, () => CREATED_AT);
+    const confirm = confirmPayment(orders, () => CREATED_AT);
 
     await expect(
       confirm.execute({ orderId: "order-9", actorId: "admin-1" }),
@@ -89,7 +94,7 @@ describe("ConfirmPayment", () => {
     "pedido já %s responde conflito e não confirma de novo",
     async (status) => {
       const orders = new InMemoryOrderRepository([awaitingOrder({ status })]);
-      const confirm = new ConfirmPayment(orders, () => minutesAfter(CREATED_AT, 10));
+      const confirm = confirmPayment(orders, () => minutesAfter(CREATED_AT, 10));
 
       await expect(
         confirm.execute({ orderId: "order-1", actorId: "admin-1" }),

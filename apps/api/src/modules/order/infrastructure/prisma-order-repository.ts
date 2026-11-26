@@ -1,6 +1,6 @@
 import type { StatusDoPedido } from "@leguele/shared";
 import type { PrismaService } from "../../../common/prisma/prisma.service.js";
-import type { OrderStatus } from "../../../generated/prisma/client.js";
+import type { OrderStatus, Prisma } from "../../../generated/prisma/client.js";
 import type { ExpirableOrder, OrderRepository } from "../domain/order-repository.js";
 
 const STATUS_BY_ROW: Record<OrderStatus, StatusDoPedido> = {
@@ -37,85 +37,32 @@ export class PrismaOrderRepository implements OrderRepository {
 
   async cancelIfAwaitingPayment(orderId: string, reason: string, at: Date): Promise<boolean> {
     return this.prisma.$transaction(async (tx) => {
-      // A condição no próprio UPDATE decide a corrida: só uma chamada vê uma linha afetada.
-      const { count } = await tx.order.updateMany({
-        where: { id: orderId, status: "AWAITING_PAYMENT" },
-        data: { status: "CANCELLED", cancelReason: reason },
-      });
-      if (count === 0) return false;
+      const change = { orderId, to: "CANCELLED" as const, reason, at };
+      const left = await leaveAwaitingPayment(tx, { ...change, data: { cancelReason: reason } });
+      if (!left) return false;
 
       await tx.stockReservation.updateMany({
         where: { orderId, releasedAt: null, consumedAt: null },
         data: { releasedAt: at },
       });
       await tx.fridgePendingDeduction.deleteMany({ where: { orderId } });
-      await tx.orderStatusHistory.create({
-        data: {
-          orderId,
-          fromStatus: "AWAITING_PAYMENT",
-          toStatus: "CANCELLED",
-          reason,
-          createdAt: at,
-        },
-      });
+      // O histórico é o último passo: se ele falhar, nenhum efeito acima fica gravado.
+      await recordTransition(tx, change);
       return true;
     });
   }
 
   async confirmPaymentIfAwaiting(orderId: string, actorId: string, at: Date): Promise<boolean> {
     return this.prisma.$transaction(async (tx) => {
-      // A condição no próprio UPDATE decide a corrida com a expiração, o cancelamento e o repetido.
-      const { count } = await tx.order.updateMany({
-        where: { id: orderId, status: "AWAITING_PAYMENT", expiresAt: { gt: at } },
-        data: { status: "PAID" },
-      });
-      if (count === 0) return false;
+      const change = { orderId, to: "PAID" as const, actorId, at };
+      // Dentro da validade: a expiração e a confirmação disputam a mesma linha.
+      const left = await leaveAwaitingPayment(tx, { ...change, where: { expiresAt: { gt: at } } });
+      if (!left) return false;
 
-      const order = await tx.order.findUniqueOrThrow({
-        where: { id: orderId },
-        select: { profileId: true },
-      });
-      const reservations = await tx.stockReservation.findMany({
-        where: { orderId, releasedAt: null, consumedAt: null },
-      });
-      for (const reservation of reservations) {
-        await tx.beer.update({
-          where: { id: reservation.beerId },
-          data: { stock: { decrement: reservation.quantity } },
-        });
-      }
-      await tx.stockReservation.updateMany({
-        where: { orderId, releasedAt: null, consumedAt: null },
-        data: { consumedAt: at },
-      });
-
-      const deductions = await tx.fridgePendingDeduction.findMany({ where: { orderId } });
-      for (const deduction of deductions) {
-        const item = await tx.fridgeItem.findFirst({
-          where: { beerId: deduction.beerId, fridge: { profileId: order.profileId } },
-        });
-        if (!item) continue;
-        // A quantidade na Geladeira é sempre positiva: o que zera sai da Geladeira.
-        if (item.quantity <= deduction.quantity) {
-          await tx.fridgeItem.delete({ where: { id: item.id } });
-        } else {
-          await tx.fridgeItem.update({
-            where: { id: item.id },
-            data: { quantity: { decrement: deduction.quantity } },
-          });
-        }
-      }
-      await tx.fridgePendingDeduction.deleteMany({ where: { orderId } });
-
-      await tx.orderStatusHistory.create({
-        data: {
-          orderId,
-          fromStatus: "AWAITING_PAYMENT",
-          toStatus: "PAID",
-          actorId,
-          createdAt: at,
-        },
-      });
+      await consumeReservations(tx, orderId, at);
+      await applyFridgeDeductions(tx, orderId);
+      // O histórico é o último passo: se ele falhar, nenhum efeito acima fica gravado.
+      await recordTransition(tx, change);
       return true;
     });
   }
@@ -126,4 +73,81 @@ export class PrismaOrderRepository implements OrderRepository {
       data: { expirationFailures: { increment: 1 } },
     });
   }
+}
+
+type Tx = Prisma.TransactionClient;
+
+type Leaving = {
+  orderId: string;
+  to: OrderStatus;
+  reason?: string;
+  actorId?: string;
+  at: Date;
+};
+
+/**
+ * Tira o pedido de "aguardando pagamento". A condição no próprio UPDATE decide a corrida: só uma
+ * chamada vê uma linha afetada e as demais recebem `false`.
+ */
+async function leaveAwaitingPayment(
+  tx: Tx,
+  change: Leaving & {
+    where?: Prisma.OrderWhereInput;
+    data?: Prisma.OrderUpdateManyMutationInput;
+  },
+): Promise<boolean> {
+  const { count } = await tx.order.updateMany({
+    where: { id: change.orderId, status: "AWAITING_PAYMENT", ...change.where },
+    data: { status: change.to, ...change.data },
+  });
+  return count > 0;
+}
+
+/** Grava a transição no histórico do pedido; vai sempre por último na transação. */
+async function recordTransition(tx: Tx, change: Leaving): Promise<void> {
+  await tx.orderStatusHistory.create({
+    data: {
+      orderId: change.orderId,
+      fromStatus: "AWAITING_PAYMENT",
+      toStatus: change.to,
+      reason: change.reason,
+      actorId: change.actorId,
+      createdAt: change.at,
+    },
+  });
+}
+
+/** A reserva do pedido vira baixa no estoque físico, numa única instrução. */
+async function consumeReservations(tx: Tx, orderId: string, at: Date): Promise<void> {
+  await tx.$executeRaw`
+    UPDATE beers b
+    SET stock = b.stock - r.quantity
+    FROM stock_reservations r
+    WHERE r.order_id = ${orderId}::uuid AND r.beer_id = b.id
+      AND r.released_at IS NULL AND r.consumed_at IS NULL`;
+  await tx.stockReservation.updateMany({
+    where: { orderId, releasedAt: null, consumedAt: null },
+    data: { consumedAt: at },
+  });
+}
+
+/**
+ * Tira da Geladeira da conta as unidades do pedido que ainda estão lá, sem deixar a quantidade
+ * negativa: o que zera sai da Geladeira (a quantidade na Geladeira é sempre positiva). Duas
+ * instruções, sem uma consulta por cerveja.
+ */
+async function applyFridgeDeductions(tx: Tx, orderId: string): Promise<void> {
+  await tx.$executeRaw`
+    DELETE FROM fridge_items fi
+    USING fridge_pending_deductions d, fridges f, orders o
+    WHERE d.order_id = ${orderId}::uuid AND o.id = d.order_id
+      AND f.profile_id = o.profile_id AND fi.fridge_id = f.id AND fi.beer_id = d.beer_id
+      AND fi.quantity <= d.quantity`;
+  await tx.$executeRaw`
+    UPDATE fridge_items fi
+    SET quantity = fi.quantity - d.quantity
+    FROM fridge_pending_deductions d, fridges f, orders o
+    WHERE d.order_id = ${orderId}::uuid AND o.id = d.order_id
+      AND f.profile_id = o.profile_id AND fi.fridge_id = f.id AND fi.beer_id = d.beer_id`;
+  await tx.fridgePendingDeduction.deleteMany({ where: { orderId } });
 }

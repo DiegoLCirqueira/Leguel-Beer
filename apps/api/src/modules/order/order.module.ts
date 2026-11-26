@@ -48,8 +48,11 @@ function newOrderNumber(): string {
     },
     {
       provide: ConfirmPayment,
-      useFactory: (prisma: PrismaService) =>
-        new ConfirmPayment(new PrismaOrderRepository(prisma), () => new Date()),
+      useFactory: (prisma: PrismaService) => {
+        const orders = new PrismaOrderRepository(prisma);
+        const now = () => new Date();
+        return new ConfirmPayment(orders, new ExpireOrder(orders, now), now);
+      },
       inject: [PrismaService],
     },
     {
