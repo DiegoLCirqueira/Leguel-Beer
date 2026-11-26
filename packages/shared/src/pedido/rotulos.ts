@@ -12,3 +12,7 @@ export const ROTULO_DO_STATUS: Record<StatusDoPedido, string> = {
 export function textoDeItens(quantidade: number): string {
   return quantidade === 1 ? "1 item" : `${quantidade} itens`;
 }
+
+export function textoDasCervejas(_nomes: readonly string[]): string {
+  return "";
+}
