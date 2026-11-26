@@ -13,6 +13,8 @@ export function textoDeItens(quantidade: number): string {
   return quantidade === 1 ? "1 item" : `${quantidade} itens`;
 }
 
-export function textoDasCervejas(_nomes: readonly string[]): string {
-  return "";
+/** Os dois primeiros nomes e, se houver mais, "e mais N". */
+export function textoDasCervejas(nomes: readonly string[]): string {
+  const primeiras = nomes.slice(0, 2).join(", ");
+  return nomes.length > 2 ? `${primeiras} e mais ${nomes.length - 2}` : primeiras;
 }
