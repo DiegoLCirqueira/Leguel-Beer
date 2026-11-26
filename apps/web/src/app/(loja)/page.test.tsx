@@ -44,6 +44,7 @@ describe("Home", () => {
     render(await Home());
 
     expect(screen.getByRole("heading", { level: 1, name: "Leguelé Beer" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Ver catálogo" })).toHaveAttribute("href", "/catalogo");
     expect(screen.getByRole("navigation", { name: "Categorias de exemplo" })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Destaques de exemplo" })).toBeInTheDocument();
   });

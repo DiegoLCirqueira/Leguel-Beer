@@ -15,6 +15,7 @@ export { Campo } from "./campo";
 export { DivisorOu } from "./divisor-ou";
 export { ESTILO_BOTAO_VOLTAR } from "./estilo-botao-voltar";
 export { FaixaDaPrateleira } from "./faixa-da-prateleira";
+export { HeroiDaHome } from "./heroi-da-home";
 export { GarrafaFantasma } from "./garrafa-fantasma";
 export { ImagemDaGarrafa } from "./imagem-da-garrafa";
 export { LinhaDoResumo } from "./linha-do-resumo";

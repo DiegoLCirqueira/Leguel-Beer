@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { FaixaDeCategoriasServidor } from "@/components/home/faixa-de-categorias-servidor";
 import { DestaquesServidor } from "@/components/home/destaques-servidor";
 import { DestaquesSkeleton } from "@/components/home/destaques-skeleton";
-import { Skeleton } from "@/components/ui";
+import { HeroiDaHome, Skeleton } from "@/components/ui";
 import { COOKIE_ACESSO } from "@/lib/auth/cookies";
 import { GUEST_COOKIE } from "@/lib/guest";
 import { resolveHomeRoute } from "@/lib/home-route";
@@ -31,7 +31,8 @@ export default async function Home({ searchParams }: Props = {}) {
             Senha alterada. Você já está na sua conta.
           </p>
         ) : null}
-        <h1 className="font-titulo text-4xl text-primaria">Leguelé Beer</h1>
+        <h1 className="sr-only">Leguelé Beer</h1>
+        <HeroiDaHome />
         <Suspense fallback={<Skeleton className="h-16 w-full rounded-campo" />}>
           <FaixaDeCategoriasServidor />
         </Suspense>
