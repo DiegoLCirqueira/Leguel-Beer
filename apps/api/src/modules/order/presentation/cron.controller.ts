@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { Controller, Get, Headers, Inject, UnauthorizedException } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { isProductionEnv } from "../../../common/config/production-env.js";
 import { AppLogger } from "../../../common/logging/app-logger.js";
 import { Public } from "../../account/presentation/access.decorators.js";
 import { ExpireDueOrders } from "../application/expire-due-orders.js";
@@ -24,7 +25,7 @@ export class CronController {
     @Inject(CRON_SECRET) private readonly secret: string,
     private readonly logger: AppLogger,
   ) {
-    if (!secret && process.env.NODE_ENV === "production") {
+    if (!secret && isProductionEnv(process.env)) {
       logger.warn(
         "CRON_SECRET ausente: o cron de expiração recusa todas as chamadas e os pedidos vencidos só expiram na checagem no uso.",
       );
