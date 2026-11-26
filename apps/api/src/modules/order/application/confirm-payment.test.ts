@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { NotFoundError } from "../../../common/errors/not-found-error.js";
-import { PaymentNotConfirmableError } from "../domain/order-errors.js";
+import { OrderExpiredError, PaymentNotConfirmableError } from "../domain/order-errors.js";
 import type { ExpirableOrder, OrderRepository } from "../domain/order-repository.js";
 import { ConfirmPayment } from "./confirm-payment.js";
 
@@ -64,7 +64,7 @@ describe("ConfirmPayment", () => {
 
     await expect(
       confirm.execute({ orderId: "order-1", actorId: "admin-1" }),
-    ).rejects.toBeInstanceOf(PaymentNotConfirmableError);
+    ).rejects.toBeInstanceOf(OrderExpiredError);
 
     expect(orders.confirmations).toEqual([]);
     expect(orders.cancellations).toEqual([

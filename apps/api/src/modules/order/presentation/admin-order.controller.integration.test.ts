@@ -142,7 +142,7 @@ describe("POST /admin/pedidos/:id/confirmar-pagamento (HTTP, banco real)", () =>
     const second = await confirm(orderId);
 
     expect(second.status).toBe(409);
-    expect(second.body).toMatchObject({ code: "CONFLICT" });
+    expect(second.body).toMatchObject({ code: "PAYMENT_NOT_CONFIRMABLE" });
     expect((await prisma.beer.findUniqueOrThrow({ where: { id: beerId } })).stock).toBe(8);
     expect(await prisma.orderStatusHistory.count({ where: { orderId } })).toBe(1);
   });
@@ -156,6 +156,7 @@ describe("POST /admin/pedidos/:id/confirmar-pagamento (HTTP, banco real)", () =>
     const response = await confirm(orderId);
 
     expect(response.status).toBe(409);
+    expect(response.body).toMatchObject({ code: "ORDER_EXPIRED" });
     expect((await prisma.order.findUniqueOrThrow({ where: { id: orderId } })).status).toBe(
       "CANCELLED",
     );
