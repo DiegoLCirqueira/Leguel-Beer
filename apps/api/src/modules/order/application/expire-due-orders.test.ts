@@ -6,12 +6,14 @@ const NOW = new Date("2026-11-14T10:31:00.000Z");
 
 function repositoryWithDueOrders(
   dueIds: string[],
-): OrderRepository & { askedAt: Date[]; limits: number[] } {
+): OrderRepository & { askedAt: Date[]; limits: number[]; failed: string[] } {
   const askedAt: Date[] = [];
   const limits: number[] = [];
+  const failed: string[] = [];
   return {
     askedAt,
     limits,
+    failed,
     async findDueOrderIds(at: Date, limit: number) {
       askedAt.push(at);
       limits.push(limit);
@@ -25,6 +27,9 @@ function repositoryWithDueOrders(
     },
     async confirmPaymentIfAwaiting() {
       return false;
+    },
+    async recordExpirationFailure(orderId: string) {
+      failed.push(orderId);
     },
   };
 }
@@ -73,5 +78,45 @@ describe("ExpireDueOrders", () => {
     await expire.execute();
 
     expect(orders.limits).toEqual([100]);
+  });
+
+  it("conta a falha de cada pedido que não expirou, para ele ir para o fim da próxima varredura", async () => {
+    const orders = repositoryWithDueOrders(["order-1", "order-2"]);
+    const expire = new ExpireDueOrders(
+      orders,
+      {
+        execute: async (orderId: string) => {
+          if (orderId === "order-1") throw new Error("falha");
+        },
+      },
+      () => NOW,
+    );
+
+    await expire.execute();
+
+    expect(orders.failed).toEqual(["order-1"]);
+  });
+
+  it("segue a varredura mesmo quando contar a falha também falha", async () => {
+    const orders = repositoryWithDueOrders(["order-1", "order-2"]);
+    orders.recordExpirationFailure = async () => {
+      throw new Error("banco fora");
+    };
+    const expired: string[] = [];
+    const expire = new ExpireDueOrders(
+      orders,
+      {
+        execute: async (orderId: string) => {
+          if (orderId === "order-1") throw new Error("falha");
+          expired.push(orderId);
+        },
+      },
+      () => NOW,
+    );
+
+    const result = await expire.execute();
+
+    expect(expired).toEqual(["order-2"]);
+    expect(result.failures.map((failure) => failure.orderId)).toEqual(["order-1"]);
   });
 });
