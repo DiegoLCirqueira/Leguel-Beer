@@ -18,3 +18,7 @@ export function textoDasCervejas(nomes: readonly string[]): string {
   const primeiras = nomes.slice(0, 2).join(", ");
   return nomes.length > 2 ? `${primeiras} e mais ${nomes.length - 2}` : primeiras;
 }
+
+export function dataDoPedido(_iso: string): string {
+  return "";
+}
