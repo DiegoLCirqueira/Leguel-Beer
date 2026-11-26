@@ -165,11 +165,11 @@ describe("POST /admin/pedidos/:id/confirmar-pagamento (HTTP, banco real)", () =>
     expect((await prisma.beer.findUniqueOrThrow({ where: { id: beerId } })).stock).toBe(10);
   });
 
-  it("pedido inexistente ou id fora do formato responde 404", async () => {
+  it("pedido inexistente responde 404 e id fora do formato responde 400, como nas rotas de endereço", async () => {
     const inexistente = await confirm(crypto.randomUUID());
     const malformado = await confirm("nao-e-um-id");
 
     expect(inexistente.status).toBe(404);
-    expect(malformado.status).toBe(404);
+    expect(malformado.status).toBe(400);
   });
 });
