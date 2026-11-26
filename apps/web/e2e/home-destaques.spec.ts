@@ -38,7 +38,9 @@ test("a home mostra até 6 destaques na ordem da API, com o selo nas esgotadas e
   await expect(page.getByRole("link", { name: "Ver todas" })).toHaveAttribute("href", "/catalogo");
 });
 
-test("a hierarquia de títulos da home é h1, h2 e h3", async ({ page }) => {
+test("a hierarquia de títulos da home é h1, h2 (herói e destaques) e h3 (cards)", async ({
+  page,
+}) => {
   await page.goto("/");
   await aguardarRevelacao(page);
   await expect(page.getByRole("heading", { level: 2, name: "Cervejas em destaque" })).toBeVisible();
@@ -49,8 +51,9 @@ test("a hierarquia de títulos da home é h1, h2 e h3", async ({ page }) => {
 
   expect(niveis[0]).toBe(1);
   expect(niveis.filter((n) => n === 1)).toHaveLength(1);
-  expect(niveis[1]).toBe(2);
-  expect(niveis.slice(2).every((n) => n === 3)).toBe(true);
+  // Herói e "Cervejas em destaque" são seções (h2); os cards dos destaques vêm abaixo (h3).
+  expect(niveis.slice(1, 3)).toEqual([2, 2]);
+  expect(niveis.slice(3).every((n) => n === 3)).toBe(true);
 });
 
 test("Ver todas abre o catálogo sem filtros", async ({ page }) => {
