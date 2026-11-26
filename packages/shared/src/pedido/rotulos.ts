@@ -8,3 +8,7 @@ export const ROTULO_DO_STATUS: Record<StatusDoPedido, string> = {
   entregue: "Entregue",
   cancelado: "Cancelado",
 };
+
+export function textoDeItens(_quantidade: number): string {
+  return "";
+}
