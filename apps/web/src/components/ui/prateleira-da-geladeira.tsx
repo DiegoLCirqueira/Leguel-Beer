@@ -91,7 +91,9 @@ export function PrateleiraDaGeladeira({
         }}
       />
       <div
-        className="pointer-events-auto absolute left-[17.2%] z-40 flex h-[3.1%] w-[71%] origin-top-left flex-col justify-center rounded-t-[3px] rounded-b-lg border-t border-primaria/55 bg-gradient-to-b from-superficie to-fundo shadow-[0_4px_10px_var(--color-sombra)]"
+        tabIndex={-1}
+        data-titulo-da-prateleira={categoria.slug}
+        className="pointer-events-auto absolute left-[17.2%] z-40 flex h-[3.1%] outline-offset-2 focus-visible:outline-2 focus-visible:outline-primaria w-[71%] origin-top-left flex-col justify-center rounded-t-[3px] rounded-b-lg border-t border-primaria/55 bg-gradient-to-b from-superficie to-fundo shadow-[0_4px_10px_var(--color-sombra)]"
         style={{ bottom: `${faixa.bottom}%`, transform: `rotate(${faixa.giro}rad)` }}
       >
         <FaixaDaPrateleira

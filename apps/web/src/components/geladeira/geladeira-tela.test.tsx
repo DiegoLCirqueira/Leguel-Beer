@@ -445,7 +445,9 @@ describe("GeladeiraTela", () => {
       expect(screen.queryByRole("dialog", { name: "Adicionar Frutas" })).not.toBeInTheDocument();
       const frutas = screen.getByRole("region", { name: "Frutas" });
       expect(within(frutas).getByText("Cupuaçu Ale, 1 unidade, R$ 26,50")).toBeInTheDocument();
-      const aviso = screen.getByRole("status", { name: "" });
+      const aviso = screen
+        .getByText("Cupuaçu Ale foi para a geladeira")
+        .closest<HTMLElement>("[role=status]")!;
       expect(aviso).toHaveTextContent("Cupuaçu Ale foi para a geladeira");
       expect(within(aviso).getByRole("button", { name: "Desfazer" })).toBeInTheDocument();
     });
@@ -487,7 +489,11 @@ describe("GeladeiraTela", () => {
       await userEvent.click(screen.getByRole("button", { name: "Adicionar", exact: true }));
 
       expect(screen.getByRole("dialog", { name: "Adicionar Frutas" })).toBeInTheDocument();
-      expect(screen.getByRole("status")).toHaveTextContent("A Geladeira está cheia.");
+      const aviso = screen.getByText("A Geladeira está cheia.").closest("[role=status]");
+      expect(aviso).toBeInTheDocument();
+      expect(screen.getByRole("dialog", { name: "Adicionar Frutas" })).not.toContainElement(
+        aviso as HTMLElement,
+      );
       expect(within(frutas).queryByText(/Cupuaçu Ale, 1 unidade/)).not.toBeInTheDocument();
     });
   });

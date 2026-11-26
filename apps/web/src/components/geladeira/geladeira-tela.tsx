@@ -1,7 +1,7 @@
 "use client";
 
-import { resumirGeladeira } from "@leguele/shared";
-import { useEffect, useState } from "react";
+import { resumirGeladeira, type CervejaCard } from "@leguele/shared";
+import { useEffect, useRef, useState } from "react";
 import type { ResultadoDoFrete } from "@/app/geladeira/frete";
 import {
   AvisosDaGeladeira,
@@ -17,6 +17,8 @@ import type { Desfazer } from "@/lib/geladeira/estado";
 import { mensagemDoLimite } from "@/lib/geladeira/estado";
 import { useTelaLarga } from "@/lib/use-tela-larga";
 import { useGeladeira } from "./geladeira-provider";
+import { ListaDeAdicionar } from "./lista-de-adicionar";
+import { useAdicionarComToast } from "./use-adicionar-com-toast";
 import { FechamentoDoResumo, LinhasDoResumo } from "./resumo-da-geladeira";
 
 /**
@@ -47,10 +49,14 @@ function useFreteEstimado(
   return frete;
 }
 
-type Props = { cotarFrete?: () => Promise<ResultadoDoFrete> };
+type Props = {
+  cotarFrete?: () => Promise<ResultadoDoFrete>;
+  /** Catálogo na ordem de relevância: alimenta a lista de adicionar de cada garrafa fantasma. */
+  catalogo?: CervejaCard[];
+};
 
 /** A Geladeira em prateleiras, uma por categoria, com o resumo: barra e sheet no celular, coluna no desktop. */
-export function GeladeiraTela({ cotarFrete }: Props) {
+export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
   const {
     pronta,
     estado,
@@ -68,12 +74,31 @@ export function GeladeiraTela({ cotarFrete }: Props) {
   // Os avisos valem para esta visita: ao sair da Geladeira, somem.
   useEffect(() => limparAjustes, [limparAjustes]);
   const [sheetAberto, setSheetAberto] = useState(false);
+  // Lista de adicionar: a categoria da fantasma tocada (`null` = fechada) e a que recebe o foco ao fechar.
+  const [categoriaAberta, setCategoriaAberta] = useState<{ slug: string; nome: string } | null>(
+    null,
+  );
+  const focoDaFaixa = useRef<string | null>(null);
+  const {
+    adicionarComToast,
+    toast: toastDeAdicionar,
+    limparAviso,
+  } = useAdicionarComToast("z-[60]");
+  // O foco volta a um elemento que existe: a fantasma tocada some ao adicionar, então vai à faixa.
+  useEffect(() => {
+    if (categoriaAberta !== null || focoDaFaixa.current === null) return;
+    document
+      .querySelector<HTMLElement>(`[data-titulo-da-prateleira="${focoDaFaixa.current}"]`)
+      ?.focus();
+    focoDaFaixa.current = null;
+  }, [categoriaAberta]);
   // Só o toque mais recente tem toast (e pode ser desfeito): um toast novo substitui o anterior.
   const [toast, setToast] = useState<{ mensagem: string; desfazer?: Desfazer } | null>(null);
   const { quantidadeTotal, subtotalCentavos } = resumirGeladeira(estado.itens);
   const comResumo = pronta && estado.itens.length > 0;
   const frete = useFreteEstimado(cotarFrete, comResumo, sincronizacoes);
   const removerComToast = (id: string) => {
+    limparAviso();
     const nome = estado.itens.find((i) => i.cerveja.id === id)?.cerveja.nome;
     const d = remover(id);
     if (d) setToast({ mensagem: `${nome} saiu da geladeira`, desfazer: d });
@@ -99,7 +124,10 @@ export function GeladeiraTela({ cotarFrete }: Props) {
         // "−" com 1 unidade pede 0: a cerveja sai, como em "Remover".
         if (quantidade < 1) return removerComToast(id);
         const { limite } = alterarQuantidade(id, quantidade);
-        if (limite !== undefined) setToast({ mensagem: mensagemDoLimite(limite) });
+        if (limite !== undefined) {
+          limparAviso();
+          setToast({ mensagem: mensagemDoLimite(limite) });
+        }
       }}
       aoRemover={removerComToast}
     />
@@ -124,7 +152,11 @@ export function GeladeiraTela({ cotarFrete }: Props) {
           </div>
         ) : null}
         {pronta ? (
-          <MolduraDaGeladeira itens={estado.itens} className="min-h-0 flex-1" />
+          <MolduraDaGeladeira
+            itens={estado.itens}
+            className="min-h-0 flex-1"
+            aoAdicionar={(categoria) => setCategoriaAberta(categoria)}
+          />
         ) : (
           <>
             <p role="status" className="sr-only">
@@ -161,6 +193,19 @@ export function GeladeiraTela({ cotarFrete }: Props) {
           </BottomSheet>
         </>
       ) : null}
+      <ListaDeAdicionar
+        categoria={categoriaAberta}
+        cervejas={catalogo}
+        aoFechar={() => setCategoriaAberta(null)}
+        aoAdicionar={(cerveja) => {
+          setToast(null);
+          if (adicionarComToast(cerveja)) {
+            focoDaFaixa.current = categoriaAberta?.slug ?? null;
+            setCategoriaAberta(null);
+          }
+        }}
+      />
+      {toastDeAdicionar}
       {sheetComToast ? null : avisoRapido}
     </main>
   );
