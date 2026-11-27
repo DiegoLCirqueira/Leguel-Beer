@@ -1,8 +1,5 @@
 import "reflect-metadata";
-import { NestFactory } from "@nestjs/core";
-import { AppModule } from "./app.module.js";
-import { AppLogger } from "./common/logging/app-logger.js";
-import { setupApp } from "./setup-app.js";
+import { createApp } from "./create-app.js";
 
 const PORT = 3333;
 
@@ -14,9 +11,7 @@ try {
 }
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
-  app.useLogger(app.get(AppLogger));
-  setupApp(app, { webOrigin: process.env["WEB_ORIGIN"] ?? "http://localhost:3000" });
+  const app = await createApp(process.env);
   await app.listen(PORT);
 }
 
