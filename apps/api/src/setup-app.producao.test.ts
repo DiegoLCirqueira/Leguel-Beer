@@ -36,4 +36,17 @@ describe("configuração global em produção", () => {
 
     expect(response.headers["content-security-policy"]).toBeDefined();
   });
+
+  it("o CORS libera só a origem do site e nunca liga Allow-Credentials", async () => {
+    const allowed = await request(app.getHttpServer())
+      .get("/live")
+      .set("Origin", "https://leguele-web.vercel.app");
+    const denied = await request(app.getHttpServer())
+      .get("/live")
+      .set("Origin", "https://outro-site.example");
+
+    expect(allowed.headers["access-control-allow-origin"]).toBe("https://leguele-web.vercel.app");
+    expect(allowed.headers["access-control-allow-credentials"]).toBeUndefined();
+    expect(denied.headers["access-control-allow-origin"]).toBeUndefined();
+  });
 });
