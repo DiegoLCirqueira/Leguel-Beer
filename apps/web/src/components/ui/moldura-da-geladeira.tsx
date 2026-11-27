@@ -1,10 +1,16 @@
 import type { ItemLocal } from "@/lib/geladeira/estado";
 import { cn } from "@/lib/utils";
-import { IMAGEM_DA_MOLDURA, PrateleiraDaGeladeira } from "./prateleira-da-geladeira";
+import {
+  IMAGEM_DA_MOLDURA,
+  PrateleiraDaGeladeira,
+  type PrateleiraDaGeladeiraProps,
+} from "./prateleira-da-geladeira";
 
 export type MolduraDaGeladeiraProps = {
   itens: ItemLocal[];
   className?: string;
+  /** Toque numa garrafa fantasma (abre a lista de adicionar da categoria). */
+  aoAdicionar?: PrateleiraDaGeladeiraProps["aoAdicionar"];
 };
 
 /** As 4 prateleiras da moldura, de cima para baixo (a ordem das categorias do catálogo do MVP). */
@@ -16,7 +22,7 @@ export const PRATELEIRAS = [
 ] as const;
 
 /** A geladeira de 4 prateleiras, uma por categoria, com a proporção 710 x 1573 da imagem. */
-export function MolduraDaGeladeira({ itens, className }: MolduraDaGeladeiraProps) {
+export function MolduraDaGeladeira({ itens, className, aoAdicionar }: MolduraDaGeladeiraProps) {
   return (
     <div
       className={cn("@container relative overflow-hidden", className)}
@@ -30,10 +36,17 @@ export function MolduraDaGeladeira({ itens, className }: MolduraDaGeladeiraProps
         <PrateleiraDaGeladeira
           key={categoria.slug}
           indice={indice}
+          aoAdicionar={aoAdicionar}
           categoria={categoria}
           itens={itens.filter((i) => i.cerveja.categoria.slug === categoria.slug)}
         />
       ))}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-[88.5%] z-45 -translate-y-1/2 text-center font-titulo text-[8cqw] leading-none text-primaria"
+      >
+        Leguelé Beer
+      </span>
     </div>
   );
 }

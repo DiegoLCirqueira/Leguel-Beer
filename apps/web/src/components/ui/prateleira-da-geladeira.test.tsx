@@ -34,7 +34,7 @@ describe("PrateleiraDaGeladeira", () => {
     render(<PrateleiraDaGeladeira indice={0} categoria={IPA} itens={[]} />);
 
     const regiao = screen.getByRole("region", { name: "IPA" });
-    expect(within(regiao).getAllByRole("link", { name: "Adicionar IPA" })).toHaveLength(4);
+    expect(within(regiao).getAllByRole("button", { name: "Adicionar IPA" })).toHaveLength(4);
     expect(within(regiao).getByText("Toque no + para escolher uma IPA")).toBeInTheDocument();
   });
 
@@ -44,7 +44,7 @@ describe("PrateleiraDaGeladeira", () => {
     );
 
     expect(container.querySelectorAll("[data-garrafa]")).toHaveLength(2);
-    expect(screen.getAllByRole("link", { name: "Adicionar IPA" })).toHaveLength(2);
+    expect(screen.getAllByRole("button", { name: "Adicionar IPA" })).toHaveLength(2);
     expect(screen.getByText(/^Maré Alta, 2 unidades, R\$\s64,00$/)).toBeInTheDocument();
   });
 

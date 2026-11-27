@@ -17,15 +17,18 @@ type AvisoDeAdicionar = {
  * "Adicionar" com o aviso da ação: toast "foi para a geladeira" com "Desfazer", ou "Só temos N
  * unidades" (sem "Desfazer") quando passa do limite. Um toque novo substitui o aviso anterior.
  */
-export function useAdicionarComToast(): {
-  adicionarComToast: (cerveja: CervejaCard, quantidade?: number) => void;
+export function useAdicionarComToast(classeDoToast?: string): {
+  /** `true` se adicionou; `false` se bateu no limite (o aviso é mostrado do mesmo jeito). */
+  adicionarComToast: (cerveja: CervejaCard, quantidade?: number) => boolean;
   toast: ReactNode;
+  /** Some com o aviso de adicionar (quando outro aviso da tela toma o lugar). */
+  limparAviso: () => void;
 } {
   const { estado, adicionar, reverterAdicao } = useGeladeira();
   const [aviso, setAviso] = useState<AvisoDeAdicionar | null>(null);
   const toques = useRef(0);
 
-  const adicionarComToast = (cerveja: CervejaCard, quantidade = 1) => {
+  const adicionarComToast = (cerveja: CervejaCard, quantidade = 1): boolean => {
     const antes = estado.itens.find((i) => i.cerveja.id === cerveja.id)?.quantidade ?? 0;
     const { limite, geracao } = adicionar(cerveja, quantidade);
     const toque = ++toques.current;
@@ -38,6 +41,7 @@ export function useAdicionarComToast(): {
             desfazer: { cervejaId: cerveja.id, antes, depois: antes + quantidade, geracao },
           },
     );
+    return limite === undefined;
   };
 
   const desfazer = aviso?.desfazer;
@@ -54,8 +58,9 @@ export function useAdicionarComToast(): {
           : undefined
       }
       aoFechar={() => setAviso(null)}
+      className={classeDoToast}
     />
   ) : null;
 
-  return { adicionarComToast, toast };
+  return { adicionarComToast, toast, limparAviso: () => setAviso(null) };
 }

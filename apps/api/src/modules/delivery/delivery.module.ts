@@ -22,7 +22,7 @@ import type { DeliverySettingsRepository } from "./domain/delivery-settings-repo
 import { AccountFridgeSubtotal } from "./infrastructure/account-fridge-subtotal.js";
 import { PrismaAddressRepository } from "./infrastructure/prisma-address-repository.js";
 import { PrismaDeliverySettingsRepository } from "./infrastructure/prisma-delivery-settings-repository.js";
-import { UnconfiguredMaps } from "./infrastructure/unconfigured-maps.js";
+import { mapsAdapterFromEnv } from "./infrastructure/maps-adapter.js";
 import { AddressController } from "./presentation/address.controller.js";
 
 @Module({
@@ -40,9 +40,9 @@ import { AddressController } from "./presentation/address.controller.js";
       useFactory: (prisma: PrismaService) => new PrismaDeliverySettingsRepository(prisma),
       inject: [PrismaService],
     },
-    // Sem serviço de mapas configurado, a API responde 503 e nunca inventa coordenadas.
-    { provide: GEOCODER, useClass: UnconfiguredMaps },
-    { provide: ROUTE_CALCULATOR, useClass: UnconfiguredMaps },
+    // `MAPS_ADAPTER=local` liga os mapas locais do MVP; sem ela a API responde 503 e nunca inventa coordenadas.
+    { provide: GEOCODER, useFactory: () => mapsAdapterFromEnv(process.env) },
+    { provide: ROUTE_CALCULATOR, useFactory: () => mapsAdapterFromEnv(process.env) },
     {
       provide: AddAddress,
       useFactory: (
