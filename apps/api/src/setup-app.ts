@@ -5,15 +5,22 @@ import helmet from "helmet";
 
 export interface SetupOptions {
   webOrigin: string;
+  /** Em produção o Swagger fica desligado e a política de conteúdo (CSP) do helmet, ligada. */
+  production?: boolean;
 }
 
 /** Configuração global compartilhada entre a API real (main.ts) e os testes HTTP. */
-export function setupApp(app: INestApplication, { webOrigin }: SetupOptions): void {
+export function setupApp(
+  app: INestApplication,
+  { webOrigin, production = false }: SetupOptions,
+): void {
   (app as NestExpressApplication).disable("x-powered-by");
-  // API de JSON: sem CSP, para o Swagger UI em /docs carregar seus scripts.
-  app.use(helmet({ contentSecurityPolicy: false }));
+  // Fora de produção, sem CSP: o Swagger UI em /docs precisa carregar seus scripts.
+  app.use(helmet({ contentSecurityPolicy: production ? undefined : false }));
   app.enableCors({ origin: [webOrigin] });
   app.enableShutdownHooks();
+
+  if (production) return;
 
   const document = SwaggerModule.createDocument(
     app,
