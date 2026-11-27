@@ -46,8 +46,22 @@ export function PrateleiraDaGeladeira({
     })),
   );
   const faixa = posicaoDaFaixa(indice);
+  const base = posicaoDaGarrafa(indice, 0, 0);
   return (
     <section aria-label={categoria.nome} className="pointer-events-none absolute inset-0">
+      <div
+        aria-hidden="true"
+        data-luz=""
+        className="absolute z-10"
+        style={{
+          left: "14%",
+          width: "77%",
+          bottom: `${base.bottom}%`,
+          height: `${base.height * 0.9}%`,
+          background:
+            "radial-gradient(ellipse at 50% 100%, color-mix(in oklab, var(--color-aviso) 38%, transparent), transparent 70%)",
+        }}
+      />
       {garrafas.map((garrafa) => {
         const posicao = posicaoDaGarrafa(indice, garrafa.coluna, garrafa.fileira);
         return (
@@ -69,6 +83,11 @@ export function PrateleiraDaGeladeira({
             >
               <ImagemDaGarrafa imagemUrl={garrafa.imagemUrl} categoriaSlug={categoria.slug} />
             </div>
+            <span
+              aria-hidden="true"
+              data-sombra=""
+              className="absolute -bottom-[2%] -left-[15%] h-[7%] w-[130%] rounded-[50%] bg-sombra blur-[3px]"
+            />
           </div>
         );
       })}
