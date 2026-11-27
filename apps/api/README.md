@@ -50,6 +50,16 @@ Para validar a entrada, crie o DTO com `zodDto(schema)` (`common/validation/zod-
 - A plataforma (Vercel) envia o segredo como Bearer no cron diário; o cadastro do cron e do segredo é do deploy (LB-8).
 - A validade de 30 minutos vale pela checagem no uso; o cron só limpa o que sobrar ([[ADR-002-hospedagem-api]]).
 
+## Mapas do MVP (MAPS_ADAPTER)
+
+O MVP não usa serviço externo de mapas ([[enderecos-entrega]], decisão de 26/11): a API tem um adaptador **local**, determinístico e sem rede, atrás das portas `Geocoder` e `RouteCalculator`.
+
+- `MAPS_ADAPTER=local` liga o adaptador: as coordenadas são uma aproximação pelo bairro de Maceió (ou pelo centro da cidade, deslocado pelo CEP) e a distância é a linha reta até a origem; o raio e o frete seguem as configurações de entrega.
+- Município de Alagoas fora da tabela (a tabela traz Maceió e as cidades vizinhas) usa o ponto central do estado: a linha reta passa bem de 25 km e o endereço é salvo como **"Fora da área"**. Só outra UF não é achada (`ADDRESS_NOT_LOCATED`).
+- Ausente ou com outro valor, a API fica **não configurada** (fail-closed): salvar endereço e cotar frete respondem 503 `MAPS_UNAVAILABLE`.
+- Para o ambiente local, defina `MAPS_ADAPTER=local` no `apps/api/.env` e reinicie a API (o watch não relê o `.env`); o Playwright já passa a variável à API que ele sobe.
+- O adaptador real (Geoapify ou outro, com conta e chave) é pós-MVP.
+
 ## Limite de requisições (THROTTLE_LIMIT)
 
 O limite global é de 100 requisições por IP por minuto, contado em memória. Quem roda vários E2E ou agentes no mesmo `127.0.0.1` pode receber `429` (o site mostra erro). Para o ambiente local, defina `THROTTLE_LIMIT` no `apps/api/.env` (ex.: `10000`) e reinicie a API (o watch não relê o `.env`); o Playwright já passa `THROTTLE_LIMIT=10000` à API que ele sobe fora do CI.

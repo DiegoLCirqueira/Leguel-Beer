@@ -27,7 +27,9 @@ export default defineConfig({
     {
       command: apiCommand,
       // Local: o E2E faz muitas chamadas do mesmo IP; o CI usa o limite padrão da API.
-      env: process.env.CI ? {} : { THROTTLE_LIMIT: "10000" },
+      env: process.env.CI
+        ? { MAPS_ADAPTER: "local" }
+        : { MAPS_ADAPTER: "local", THROTTLE_LIMIT: "10000" },
       url: "http://localhost:3333/health",
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
