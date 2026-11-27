@@ -33,6 +33,8 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[catalogo]]: listagem, filtros, ordenação, faixa de categorias e esgotadas.
 - [[destaques-home]]: seção "Cervejas em destaque" da home.
 - [[home-topo]]: topo da home (herói, cabeçalho com logo e faixa de categorias).
+- [[acompanhar-pedido]]: tela 09, linha do tempo do pedido (sem tempo real).
+- [[erros-e-vazios]]: páginas 404 e de erro, falhas de carregamento e estados vazios.
 - [[api-vercel]]: a API na Vercel, com a entrada serverless, CORS, trust proxy e o cron com segredo (LB-8, LB-122).
 - [[produto]]: página de produto com ficha, desconto, estoque baixo e quantidade (LB-40, LB-41, LB-42).
 - [[adicionar-do-card]]: colocar uma cerveja na Geladeira direto do card (LB-35).
@@ -85,4 +87,5 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[sequencia-telas]]: ordem de implementação das telas (1 a 9) e divergências do design que seguem a spec.
 - [[maestri-banda]]: a banda de agentes do Maestri e o modelo de cada um.
 - [[handoff]]: estado e próximos passos para a próxima conversa (sobrescrito a cada ordem).
+- [[plano-fim-mvp]]: plano de execução do fim do MVP (telas e APIs que faltam, ordem, donos e paralelismo).
 - [[licoes-aprendidas]]: erros da banda e a regra que cada um gerou (todo agente lê no início de cada ordem).
