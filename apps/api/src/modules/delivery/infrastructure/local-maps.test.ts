@@ -100,8 +100,17 @@ describe("LocalMaps: bairro desconhecido e outras cidades", () => {
     ).toBeLessThan(4_000);
   });
 
-  it("cidade fora da tabela não é achada (o endereço vira 'não encontrado')", async () => {
-    expect(await maps.geocode(endereco({ city: "Cidade Inventada" }))).toBeNull();
+  it("município de Alagoas fora da tabela usa o ponto central do estado, bem além dos 25 km", async () => {
+    const coordinates = await maps.geocode(endereco({ city: "Delmiro Gouveia" }));
+
+    expect(coordinates).not.toBeNull();
+    expect(await maps.routeDistanceMeters(ORIGEM, coordinates!)).toBeGreaterThan(50_000);
+  });
+
+  it("fora de Alagoas não acha o endereço (a loja só entrega em Alagoas)", async () => {
+    const outraUf = { ...endereco({ city: "Maceió" }), state: "SP" } as unknown as GeocodeQuery;
+
+    expect(await maps.geocode(outraUf)).toBeNull();
   });
 
   it("cidades vizinhas ficam dentro do raio e as distantes, fora de 25 km", async () => {

@@ -110,11 +110,14 @@ describe("endereços e frete com os mapas locais do MVP (MAPS_ADAPTER=local, ban
     expect(cotacaoDeFreteSchema.parse(quoteOutside.body)).toEqual({ naArea: false });
   });
 
-  it("cidade fora da tabela responde 422 ADDRESS_NOT_LOCATED e não grava nada", async () => {
-    const response = await save({ cidade: "Cidade Inventada" });
+  it("município de Alagoas fora da tabela é salvo como fora da área, e o frete responde naArea:false", async () => {
+    const created = await save({ cidade: "Delmiro Gouveia", bairro: "Centro", cep: "57480-000" });
 
-    expect(response.status).toBe(422);
-    expect(response.body.code).toBe("ADDRESS_NOT_LOCATED");
-    expect(await prisma.address.count()).toBe(0);
+    expect(created.status).toBe(201);
+    expect(created.body).toMatchObject({ cidade: "Delmiro Gouveia", foraDaArea: true });
+    const quote = await request(app.getHttpServer())
+      .get(`/me/enderecos/${(created.body as { id: string }).id}/frete`)
+      .set(auth);
+    expect(cotacaoDeFreteSchema.parse(quote.body)).toEqual({ naArea: false });
   });
 });
