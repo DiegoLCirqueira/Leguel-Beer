@@ -60,6 +60,7 @@ describe("API pública de @leguele/shared", () => {
         "listaDePedidosSchema",
         "consultaDaListaDePedidosSchema",
         "PEDIDOS_POR_PAGINA",
+        "pedidoDoClienteSchema",
         "CODIGOS_DE_ERRO_DA_CONFIRMACAO",
         "erroDaConfirmacaoSchema",
         "ROTULO_DO_STATUS",

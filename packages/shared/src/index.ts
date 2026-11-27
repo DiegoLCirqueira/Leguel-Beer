@@ -93,6 +93,8 @@ export {
   textoDasCervejas,
   textoDeItens,
 } from "./pedido/rotulos.js";
+export { pedidoDoClienteSchema } from "./pedido/detalhe.js";
+export type { PedidoDoCliente } from "./pedido/detalhe.js";
 export { pedidoCriadoSchema } from "./pedido/resposta.js";
 export type { PedidoCriado } from "./pedido/resposta.js";
 export { formaDePagamentoSchema, PARCELAS_MAXIMAS } from "./pagamento/forma.js";
