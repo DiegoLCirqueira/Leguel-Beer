@@ -102,4 +102,17 @@ describe("PrateleiraDaGeladeira", () => {
     expect(animacoes).toEqual(["balanco", "balanco", "balanco", "queda"]);
     expect(container.querySelector("[data-garrafa] > div")).not.toBe(primeira);
   });
+
+  it("a luz dourada da prateleira e a sombra de contato de cada garrafa são decorativas (aria-hidden)", () => {
+    const { container } = render(
+      <PrateleiraDaGeladeira indice={1} categoria={IPA} itens={[mare(2)]} />,
+    );
+
+    const luz = container.querySelectorAll("[data-luz]");
+    expect(luz).toHaveLength(1);
+    expect(luz[0]).toHaveAttribute("aria-hidden", "true");
+    const sombras = container.querySelectorAll("[data-garrafa] [data-sombra]");
+    expect(sombras).toHaveLength(2);
+    sombras.forEach((sombra) => expect(sombra).toHaveAttribute("aria-hidden", "true"));
+  });
 });
