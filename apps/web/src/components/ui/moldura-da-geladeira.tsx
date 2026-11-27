@@ -41,6 +41,12 @@ export function MolduraDaGeladeira({ itens, className, aoAdicionar }: MolduraDaG
           itens={itens.filter((i) => i.cerveja.categoria.slug === categoria.slug)}
         />
       ))}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-[88.5%] z-45 -translate-y-1/2 text-center font-titulo text-[8cqw] leading-none text-primaria"
+      >
+        Leguelé Beer
+      </span>
     </div>
   );
 }
