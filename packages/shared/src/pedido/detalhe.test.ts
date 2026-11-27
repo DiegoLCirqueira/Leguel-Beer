@@ -33,7 +33,8 @@ describe("pedido do cliente (detalhe)", () => {
   });
 
   it("recusa o pedido sem histórico, com status desconhecido no histórico ou com data inválida", () => {
-    const { historico: _semHistorico, ...semHistorico } = pedido;
+    const semHistorico: Partial<typeof pedido> = { ...pedido };
+    delete semHistorico.historico;
 
     expect(pedidoDoClienteSchema.safeParse(semHistorico).success).toBe(false);
     expect(
@@ -59,7 +60,8 @@ describe("pedido do cliente (detalhe)", () => {
   });
 
   it("exige o endereço de entrega com rua, número, bairro, cidade, UF e CEP", () => {
-    const { rua: _rua, ...semRua } = pedido.enderecoDeEntrega;
+    const semRua: Partial<typeof pedido.enderecoDeEntrega> = { ...pedido.enderecoDeEntrega };
+    delete semRua.rua;
 
     expect(pedidoDoClienteSchema.safeParse({ ...pedido, enderecoDeEntrega: semRua }).success).toBe(
       false,
