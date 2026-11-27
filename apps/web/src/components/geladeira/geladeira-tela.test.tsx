@@ -440,7 +440,7 @@ describe("GeladeiraTela", () => {
       abrir([cupuacu]);
       await tocarFantasmaDeFrutas();
 
-      await userEvent.click(screen.getByRole("button", { name: "Adicionar", exact: true }));
+      await userEvent.click(screen.getByRole("button", { name: /^Adicionar$/ }));
 
       expect(screen.queryByRole("dialog", { name: "Adicionar Frutas" })).not.toBeInTheDocument();
       const frutas = screen.getByRole("region", { name: "Frutas" });
@@ -456,7 +456,7 @@ describe("GeladeiraTela", () => {
       abrir([cupuacu]);
       await tocarFantasmaDeFrutas();
 
-      await userEvent.click(screen.getByRole("button", { name: "Adicionar", exact: true }));
+      await userEvent.click(screen.getByRole("button", { name: /^Adicionar$/ }));
 
       await waitFor(() =>
         expect(document.activeElement).toHaveAttribute("data-titulo-da-prateleira", "frutas"),
@@ -486,7 +486,7 @@ describe("GeladeiraTela", () => {
         within(frutas).getAllByRole("button", { name: "Adicionar Frutas" })[0]!,
       );
 
-      await userEvent.click(screen.getByRole("button", { name: "Adicionar", exact: true }));
+      await userEvent.click(screen.getByRole("button", { name: /^Adicionar$/ }));
 
       expect(screen.getByRole("dialog", { name: "Adicionar Frutas" })).toBeInTheDocument();
       const aviso = screen.getByText("A Geladeira está cheia.").closest("[role=status]");
