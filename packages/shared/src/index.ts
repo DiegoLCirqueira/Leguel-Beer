@@ -75,8 +75,13 @@ export { chaveDeIdempotenciaSchema, criarPedidoRequestSchema } from "./pedido/cr
 export type { CriarPedidoRequest } from "./pedido/criar.js";
 export { CODIGOS_DE_ERRO_DO_PEDIDO, erroDoPedidoSchema } from "./pedido/erros.js";
 export type { ErroDoPedido } from "./pedido/erros.js";
-export { listaDePedidosSchema, pedidoDaListaSchema } from "./pedido/lista.js";
-export type { ListaDePedidos, PedidoDaLista } from "./pedido/lista.js";
+export {
+  consultaDaListaDePedidosSchema,
+  listaDePedidosSchema,
+  PEDIDOS_POR_PAGINA,
+  pedidoDaListaSchema,
+} from "./pedido/lista.js";
+export type { ConsultaDaListaDePedidos, ListaDePedidos, PedidoDaLista } from "./pedido/lista.js";
 export {
   dataDoPedido,
   ROTULO_DO_STATUS,

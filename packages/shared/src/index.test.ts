@@ -58,6 +58,8 @@ describe("API pública de @leguele/shared", () => {
       expect.arrayContaining([
         "pedidoDaListaSchema",
         "listaDePedidosSchema",
+        "consultaDaListaDePedidosSchema",
+        "PEDIDOS_POR_PAGINA",
         "ROTULO_DO_STATUS",
         "textoDeItens",
         "textoDasCervejas",
