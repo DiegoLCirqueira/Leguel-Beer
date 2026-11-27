@@ -1,6 +1,6 @@
 import type { Coordinates } from "../domain/address.js";
 import type { GeocodeQuery, Geocoder, RouteCalculator } from "../domain/maps.js";
-import { CITIES, MACEIO_DISTRICTS } from "./local-maps-data.js";
+import { ALAGOAS_CENTER, CITIES, MACEIO_DISTRICTS } from "./local-maps-data.js";
 
 /** Minúsculas, sem acento e sem espaço sobrando: a chave das tabelas. */
 function normalize(text: string): string {
@@ -38,9 +38,11 @@ function nearby(center: Coordinates, zip: string): Coordinates {
  */
 export class LocalMaps implements Geocoder, RouteCalculator {
   async geocode(query: GeocodeQuery): Promise<Coordinates | null> {
+    // A loja só entrega em Alagoas (decisão 8 da spec): outra UF não é achada.
+    if (query.state !== "AL") return null;
     const city = normalize(query.city);
-    const center = CITIES[city];
-    if (!center) return null;
+    // Município de Alagoas fora da tabela: ponto central do estado, longe do raio (nunca "não achado").
+    const center = CITIES[city] ?? ALAGOAS_CENTER;
     // O bairro só vale em Maceió; nas outras cidades (e em bairro desconhecido) o CEP desloca o ponto.
     if (city === "maceio") {
       const district = MACEIO_DISTRICTS[normalize(query.district)];

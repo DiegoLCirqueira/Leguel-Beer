@@ -51,3 +51,9 @@ export const CITIES: Record<string, Coordinates> = {
   murici: { latitude: -9.3067, longitude: -35.9444 },
   arapiraca: { latitude: -9.7525, longitude: -36.6611 },
 };
+
+/**
+ * Ponto central aproximado de Alagoas: o que os municípios fora da tabela usam. A linha reta até a
+ * cervejaria passa bem de 25 km, então o endereço é salvo como "Fora da área" (o endereço existe).
+ */
+export const ALAGOAS_CENTER: Coordinates = { latitude: -9.62, longitude: -36.78 };
