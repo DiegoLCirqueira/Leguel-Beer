@@ -19,7 +19,20 @@ export type PedidoDaLista = z.infer<typeof pedidoDaListaSchema>;
 /** Página da lista, do mais recente ao mais antigo; `proximoCursor` é nulo na última página. */
 export const listaDePedidosSchema = z.object({
   pedidos: z.array(pedidoDaListaSchema),
-  proximoCursor: z.string().min(1).nullable(),
+  proximoCursor: z.string().min(1).max(200).nullable(),
 });
 
 export type ListaDePedidos = z.infer<typeof listaDePedidosSchema>;
+
+/** Pedidos por página na lista "Meus pedidos" (também o máximo que a consulta aceita). */
+export const PEDIDOS_POR_PAGINA = 20;
+
+const CURSOR_MAXIMO = 200;
+
+/** Consulta da lista: `cursor` da página anterior (opcional) e `limite` (padrão e máximo de 20). */
+export const consultaDaListaDePedidosSchema = z.object({
+  cursor: z.string().min(1).max(CURSOR_MAXIMO).optional(),
+  limite: z.coerce.number().int().min(1).max(PEDIDOS_POR_PAGINA).default(PEDIDOS_POR_PAGINA),
+});
+
+export type ConsultaDaListaDePedidos = z.infer<typeof consultaDaListaDePedidosSchema>;

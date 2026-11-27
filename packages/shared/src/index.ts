@@ -74,15 +74,27 @@ export type { TotaisDoPedido } from "./pedido/totais.js";
 export { chaveDeIdempotenciaSchema, criarPedidoRequestSchema } from "./pedido/criar.js";
 export type { CriarPedidoRequest } from "./pedido/criar.js";
 export { CODIGOS_DE_ERRO_DO_PEDIDO, erroDoPedidoSchema } from "./pedido/erros.js";
+export {
+  CODIGOS_DE_ERRO_DA_CONFIRMACAO,
+  erroDaConfirmacaoSchema,
+} from "./pedido/erros-confirmacao.js";
+export type { ErroDaConfirmacao } from "./pedido/erros-confirmacao.js";
 export type { ErroDoPedido } from "./pedido/erros.js";
-export { listaDePedidosSchema, pedidoDaListaSchema } from "./pedido/lista.js";
-export type { ListaDePedidos, PedidoDaLista } from "./pedido/lista.js";
+export {
+  consultaDaListaDePedidosSchema,
+  listaDePedidosSchema,
+  PEDIDOS_POR_PAGINA,
+  pedidoDaListaSchema,
+} from "./pedido/lista.js";
+export type { ConsultaDaListaDePedidos, ListaDePedidos, PedidoDaLista } from "./pedido/lista.js";
 export {
   dataDoPedido,
   ROTULO_DO_STATUS,
   textoDasCervejas,
   textoDeItens,
 } from "./pedido/rotulos.js";
+export { pedidoDoClienteSchema } from "./pedido/detalhe.js";
+export type { PedidoDoCliente } from "./pedido/detalhe.js";
 export { pedidoCriadoSchema } from "./pedido/resposta.js";
 export type { PedidoCriado } from "./pedido/resposta.js";
 export { formaDePagamentoSchema, PARCELAS_MAXIMAS } from "./pagamento/forma.js";
