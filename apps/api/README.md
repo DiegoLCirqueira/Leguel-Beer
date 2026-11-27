@@ -50,6 +50,16 @@ Para validar a entrada, crie o DTO com `zodDto(schema)` (`common/validation/zod-
 - A plataforma (Vercel) envia o segredo como Bearer no cron diário; o cadastro do cron e do segredo é do deploy (LB-8).
 - A validade de 30 minutos vale pela checagem no uso; o cron só limpa o que sobrar ([[ADR-002-hospedagem-api]]).
 
+## Entrada serverless (Vercel)
+
+`api/index.ts` é a entrada da função: cria o aplicativo uma vez por instância (`createApp`, a mesma configuração do `main.ts`) e o reaproveita entre invocações; não chama `listen` nem lê `.env` ([[api-vercel]]).
+
+- `GET /live` responde 200 sem tocar no banco (cold start e fumaça do deploy); `GET /health` continua o estado da API e do banco.
+- Em produção (`NODE_ENV=production` ou qualquer `VERCEL_ENV`): o Swagger fica desligado (`/docs` e `/docs-json` dão 404) e a CSP do helmet fica ligada; `WEB_ORIGIN` é **obrigatório** (uma única origem `https`, sem curinga, caminho, barra final nem vírgula) e, se faltar ou for inválido, a função não sobe.
+- O CORS libera só `WEB_ORIGIN` e nunca liga `Allow-Credentials` (a API recebe `Authorization: Bearer`, sem cookie).
+- `trust proxy` de 1 salto (nunca `true`): o limite por IP conta o último valor do `X-Forwarded-For`, o que a Vercel acrescentou, e não o forjado pelo cliente.
+- Bundle e `vercel.json` da função (rota e cron) são a fatia 2 de [[api-vercel]].
+
 ## Mapas do MVP (MAPS_ADAPTER)
 
 O MVP não usa serviço externo de mapas ([[enderecos-entrega]], decisão de 26/11): a API tem um adaptador **local**, determinístico e sem rede, atrás das portas `Geocoder` e `RouteCalculator`.
