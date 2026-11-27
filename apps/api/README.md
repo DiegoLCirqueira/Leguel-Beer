@@ -55,6 +55,7 @@ Para validar a entrada, crie o DTO com `zodDto(schema)` (`common/validation/zod-
 O MVP não usa serviço externo de mapas ([[enderecos-entrega]], decisão de 26/11): a API tem um adaptador **local**, determinístico e sem rede, atrás das portas `Geocoder` e `RouteCalculator`.
 
 - `MAPS_ADAPTER=local` liga o adaptador: as coordenadas são uma aproximação pelo bairro de Maceió (ou pelo centro da cidade, deslocado pelo CEP) e a distância é a linha reta até a origem; o raio e o frete seguem as configurações de entrega.
+- Município de Alagoas fora da tabela (a tabela traz Maceió e as cidades vizinhas) usa o ponto central do estado: a linha reta passa bem de 25 km e o endereço é salvo como **"Fora da área"**. Só outra UF não é achada (`ADDRESS_NOT_LOCATED`).
 - Ausente ou com outro valor, a API fica **não configurada** (fail-closed): salvar endereço e cotar frete respondem 503 `MAPS_UNAVAILABLE`.
 - Para o ambiente local, defina `MAPS_ADAPTER=local` no `apps/api/.env` e reinicie a API (o watch não relê o `.env`); o Playwright já passa a variável à API que ele sobe.
 - O adaptador real (Geoapify ou outro, com conta e chave) é pós-MVP.
