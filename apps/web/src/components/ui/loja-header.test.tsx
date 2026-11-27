@@ -20,4 +20,15 @@ describe("LojaHeader", () => {
 
     expect(screen.getByRole("link", { name: "Geladeira, 1 unidade" })).toBeInTheDocument();
   });
+
+  it("com `grande` (home) o logo é maior que o das outras telas da loja", () => {
+    const { container, rerender } = render(<LojaHeader count={0} />);
+    const normal = container.querySelector("img")!;
+    expect(normal).toHaveClass("w-16");
+
+    rerender(<LojaHeader count={0} grande />);
+
+    expect(container.querySelector("img")).toHaveClass("w-28");
+    expect(screen.getByRole("link", { name: "Leguelé Beer, início" })).toHaveAttribute("href", "/");
+  });
 });
