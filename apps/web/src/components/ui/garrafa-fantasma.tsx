@@ -30,11 +30,18 @@ export function GarrafaFantasma({ categoria, aoTocar }: GarrafaFantasmaProps) {
           strokeDasharray="4 3"
           className="fill-fantasma group-hover:stroke-primaria"
         />
-        <circle cx="16.5" cy="62" r="8" fill="var(--color-superficie-elevada)" />
-        <path
-          d="M16.5 57.5v9M12 62h9"
+        <circle
+          cx="16.5"
+          cy="62"
+          r="9"
+          fill="var(--color-fundo)"
           stroke="var(--color-primaria)"
-          strokeWidth="2"
+          strokeWidth="1.2"
+        />
+        <path
+          d="M16.5 56.5v11M11 62h11"
+          stroke="var(--color-primaria)"
+          strokeWidth="2.6"
           strokeLinecap="round"
         />
       </svg>
