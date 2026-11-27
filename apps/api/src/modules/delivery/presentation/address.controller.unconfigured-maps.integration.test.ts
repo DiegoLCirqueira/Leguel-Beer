@@ -2,7 +2,7 @@ import type { INestApplication } from "@nestjs/common";
 import { APP_FILTER, APP_PIPE } from "@nestjs/core";
 import { Test } from "@nestjs/testing";
 import request from "supertest";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { CommonModule } from "../../../common/common.module.js";
 import { AccountRateLimiter } from "../../../common/http/account-rate-limiter.js";
 import { AllExceptionsFilter } from "../../../common/http/all-exceptions.filter.js";
@@ -23,6 +23,8 @@ describe("endereços sem serviço de mapas configurado (banco real)", () => {
   let prisma: PrismaService;
 
   beforeAll(async () => {
+    // Hermético: o `.env` local pode ter MAPS_ADAPTER=local; aqui o adaptador tem de estar ausente.
+    vi.stubEnv("MAPS_ADAPTER", "");
     const verifier = new JwksTokenVerifier("http://jwks.test", tokens.issuer, (() =>
       Promise.resolve(new Response(JSON.stringify(tokens.jwks)))) as typeof fetch);
     const moduleRef = await Test.createTestingModule({
@@ -47,7 +49,10 @@ describe("endereços sem serviço de mapas configurado (banco real)", () => {
     await seedDeliverySettings(prisma);
   });
 
-  afterAll(() => app.close());
+  afterAll(async () => {
+    await app.close();
+    vi.unstubAllEnvs();
+  });
 
   it("o padrão da API é 503 MAPS_UNAVAILABLE e nada é gravado: nunca inventa coordenadas", async () => {
     const response = await request(app.getHttpServer())
