@@ -74,6 +74,11 @@ export type { TotaisDoPedido } from "./pedido/totais.js";
 export { chaveDeIdempotenciaSchema, criarPedidoRequestSchema } from "./pedido/criar.js";
 export type { CriarPedidoRequest } from "./pedido/criar.js";
 export { CODIGOS_DE_ERRO_DO_PEDIDO, erroDoPedidoSchema } from "./pedido/erros.js";
+export {
+  CODIGOS_DE_ERRO_DA_CONFIRMACAO,
+  erroDaConfirmacaoSchema,
+} from "./pedido/erros-confirmacao.js";
+export type { ErroDaConfirmacao } from "./pedido/erros-confirmacao.js";
 export type { ErroDoPedido } from "./pedido/erros.js";
 export {
   consultaDaListaDePedidosSchema,
