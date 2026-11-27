@@ -10,6 +10,8 @@ export type BottomSheetProps = {
   children: ReactNode;
   /** Fica fixo embaixo do painel; o conteúdo rola por dentro quando a tela é baixa. */
   rodape?: ReactNode;
+  /** Onde o foco entra ao abrir: no primeiro item (padrão) ou no título do diálogo. */
+  focoInicial?: "primeiro" | "titulo";
 };
 
 const FOCAVEIS =
@@ -19,7 +21,14 @@ const focaveis = (raiz: HTMLElement | null) =>
   Array.from(raiz?.querySelectorAll<HTMLElement>(FOCAVEIS) ?? []);
 
 /** Painel que sobe da base da tela: diálogo modal que fecha com Esc e ao tocar no fundo. */
-export function BottomSheet({ aberto, aoFechar, titulo, children, rodape }: BottomSheetProps) {
+export function BottomSheet({
+  aberto,
+  aoFechar,
+  titulo,
+  children,
+  rodape,
+  focoInicial = "primeiro",
+}: BottomSheetProps) {
   const idTitulo = useId();
   const fechar = useRef(aoFechar);
   useEffect(() => {
@@ -27,6 +36,7 @@ export function BottomSheet({ aberto, aoFechar, titulo, children, rodape }: Bott
   });
 
   const painel = useRef<HTMLDivElement>(null);
+  const tituloRef = useRef<HTMLHeadingElement>(null);
   const comecouNoFundo = useRef(false);
 
   // Ao abrir: trava a rolagem da página e leva o foco para dentro; ao fechar, devolve os dois.
@@ -35,12 +45,13 @@ export function BottomSheet({ aberto, aoFechar, titulo, children, rodape }: Bott
     const anterior = document.activeElement as HTMLElement | null;
     const overflowAnterior = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    (focaveis(painel.current)[0] ?? painel.current)?.focus();
+    const inicial = focoInicial === "titulo" ? tituloRef.current : focaveis(painel.current)[0];
+    (inicial ?? painel.current)?.focus();
     return () => {
       document.body.style.overflow = overflowAnterior;
       anterior?.focus();
     };
-  }, [aberto]);
+  }, [aberto, focoInicial]);
 
   useEffect(() => {
     if (!aberto) return;
@@ -90,7 +101,12 @@ export function BottomSheet({ aberto, aoFechar, titulo, children, rodape }: Bott
         className="flex max-h-[calc(100dvh-0.5rem)] outline-none w-full max-w-md flex-col rounded-t-3xl border border-b-0 border-primaria/60 bg-fundo text-texto"
       >
         <div aria-hidden="true" className="mx-auto mt-2 h-1 w-12 rounded-full bg-texto/70" />
-        <h2 id={idTitulo} className="px-5 pb-3 pt-3 text-xl font-semibold">
+        <h2
+          id={idTitulo}
+          ref={tituloRef}
+          tabIndex={-1}
+          className="px-5 pb-3 pt-3 text-xl font-semibold outline-none"
+        >
           {titulo}
         </h2>
         <div className="min-h-0 flex-1 overflow-y-auto px-5">{children}</div>

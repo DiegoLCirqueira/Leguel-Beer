@@ -34,12 +34,22 @@ afterEach(() => localStorage.clear());
 const guardar = (itens: { cerveja: CervejaCard; quantidade: number }[]) =>
   localStorage.setItem(CHAVE_DA_GELADEIRA, JSON.stringify({ versao: 1, itens }));
 
-const abrir = () =>
+const abrir = (catalogo: CervejaCard[] = []) =>
   render(
     <GeladeiraProvider>
-      <GeladeiraTela />
+      <GeladeiraTela catalogo={catalogo} />
     </GeladeiraProvider>,
   );
+
+const cupuacu: CervejaCard = {
+  ...mare,
+  id: "cupuacu",
+  slug: "cupuacu-ale",
+  nome: "Cupuaçu Ale",
+  estilo: "Fruit Ale",
+  categoria: { slug: "frutas", nome: "Frutas", ordem: 2 },
+  precoCentavos: 2650,
+};
 
 describe("GeladeiraTela", () => {
   it("vazia, mostra as 4 prateleiras só com garrafas fantasma", () => {
@@ -49,7 +59,7 @@ describe("GeladeiraTela", () => {
     for (const categoria of ["IPA", "Frutas", "Malt", "Lager"]) {
       const prateleira = screen.getByRole("region", { name: categoria });
       expect(
-        within(prateleira).getAllByRole("link", { name: `Adicionar ${categoria}` }),
+        within(prateleira).getAllByRole("button", { name: `Adicionar ${categoria}` }),
       ).toHaveLength(4);
     }
   });
@@ -60,7 +70,7 @@ describe("GeladeiraTela", () => {
 
     const ipa = screen.getByRole("region", { name: "IPA" });
     expect(within(ipa).getByText("Maré Alta, 2 unidades, R$ 64,00")).toBeInTheDocument();
-    expect(within(ipa).getAllByRole("link", { name: "Adicionar IPA" })).toHaveLength(2);
+    expect(within(ipa).getAllByRole("button", { name: "Adicionar IPA" })).toHaveLength(2);
   });
 
   it("antes de ler a cópia local (HTML do servidor), mostra o carregamento e não as prateleiras", () => {
@@ -405,6 +415,86 @@ describe("GeladeiraTela", () => {
 
       await waitFor(() => expect(screen.queryByRole("alert")).not.toBeInTheDocument());
       expect(buscar).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe("adicionar pela garrafa fantasma, sem sair da Geladeira", () => {
+    const tocarFantasmaDeFrutas = async () => {
+      const frutas = screen.getByRole("region", { name: "Frutas" });
+      const fantasma = within(frutas).getAllByRole("button", { name: "Adicionar Frutas" })[0]!;
+      await userEvent.click(fantasma);
+      return fantasma;
+    };
+
+    it("a fantasma abre o diálogo 'Adicionar <categoria>' com as cervejas dela", async () => {
+      abrir([cupuacu, mare]);
+
+      await tocarFantasmaDeFrutas();
+
+      const dialogo = screen.getByRole("dialog", { name: "Adicionar Frutas" });
+      expect(within(dialogo).getByText("Cupuaçu Ale")).toBeInTheDocument();
+      expect(within(dialogo).queryByText("Maré Alta")).not.toBeInTheDocument();
+    });
+
+    it("Adicionar fecha a lista, põe 1 unidade na prateleira e mostra o toast com Desfazer fora do diálogo", async () => {
+      abrir([cupuacu]);
+      await tocarFantasmaDeFrutas();
+
+      await userEvent.click(screen.getByRole("button", { name: /^Adicionar$/ }));
+
+      expect(screen.queryByRole("dialog", { name: "Adicionar Frutas" })).not.toBeInTheDocument();
+      const frutas = screen.getByRole("region", { name: "Frutas" });
+      expect(within(frutas).getByText("Cupuaçu Ale, 1 unidade, R$ 26,50")).toBeInTheDocument();
+      const aviso = screen
+        .getByText("Cupuaçu Ale foi para a geladeira")
+        .closest<HTMLElement>("[role=status]")!;
+      expect(aviso).toHaveTextContent("Cupuaçu Ale foi para a geladeira");
+      expect(within(aviso).getByRole("button", { name: "Desfazer" })).toBeInTheDocument();
+    });
+
+    it("ao adicionar, o foco vai para a faixa da prateleira (a fantasma tocada some)", async () => {
+      abrir([cupuacu]);
+      await tocarFantasmaDeFrutas();
+
+      await userEvent.click(screen.getByRole("button", { name: /^Adicionar$/ }));
+
+      await waitFor(() =>
+        expect(document.activeElement).toHaveAttribute("data-titulo-da-prateleira", "frutas"),
+      );
+    });
+
+    it("fechar sem adicionar devolve o foco à fantasma tocada", async () => {
+      abrir([cupuacu]);
+      const fantasma = await tocarFantasmaDeFrutas();
+
+      await userEvent.keyboard("{Escape}");
+
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      expect(fantasma).toHaveFocus();
+    });
+
+    it("com 50 cervejas diferentes, a 51ª não entra: avisa 'A Geladeira está cheia.' e a lista continua aberta", async () => {
+      guardar(
+        Array.from({ length: 50 }, (_, i) => ({
+          cerveja: { ...mare, id: `c${i}`, slug: `c${i}`, nome: `Cerveja ${i}` },
+          quantidade: 1,
+        })),
+      );
+      abrir([cupuacu]);
+      const frutas = screen.getByRole("region", { name: "Frutas" });
+      await userEvent.click(
+        within(frutas).getAllByRole("button", { name: "Adicionar Frutas" })[0]!,
+      );
+
+      await userEvent.click(screen.getByRole("button", { name: /^Adicionar$/ }));
+
+      expect(screen.getByRole("dialog", { name: "Adicionar Frutas" })).toBeInTheDocument();
+      const aviso = screen.getByText("A Geladeira está cheia.").closest("[role=status]");
+      expect(aviso).toBeInTheDocument();
+      expect(screen.getByRole("dialog", { name: "Adicionar Frutas" })).not.toContainElement(
+        aviso as HTMLElement,
+      );
+      expect(within(frutas).queryByText(/Cupuaçu Ale, 1 unidade/)).not.toBeInTheDocument();
     });
   });
 });

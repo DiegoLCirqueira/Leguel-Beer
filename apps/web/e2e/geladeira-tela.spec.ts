@@ -43,7 +43,7 @@ test("em 360x640, com a moldura encolhida, cada garrafa fantasma da Geladeira te
   await page.goto("/geladeira");
 
   for (const categoria of ["IPA", "Frutas", "Malt", "Lager"]) {
-    const fantasmas = page.getByRole("link", { name: `Adicionar ${categoria}` });
+    const fantasmas = page.getByRole("button", { name: `Adicionar ${categoria}` });
     await expect(fantasmas).toHaveCount(4);
     for (const fantasma of await fantasmas.all()) {
       const caixa = (await fantasma.boundingBox())!;

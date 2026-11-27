@@ -6,7 +6,7 @@ import { arrumarPrateleira } from "@/lib/geladeira/arrumar-prateleira";
 import type { ItemLocal } from "@/lib/geladeira/estado";
 import { posicaoDaFaixa, posicaoDaGarrafa } from "@/lib/geladeira/geometria";
 import { FaixaDaPrateleira } from "./faixa-da-prateleira";
-import { GarrafaFantasma } from "./garrafa-fantasma";
+import { GarrafaFantasma, type GarrafaFantasmaProps } from "./garrafa-fantasma";
 import { ImagemDaGarrafa } from "./imagem-da-garrafa";
 
 export const IMAGEM_DA_MOLDURA = "/geladeira/moldura.webp";
@@ -17,6 +17,8 @@ export type PrateleiraDaGeladeiraProps = {
   categoria: { slug: string; nome: string };
   /** Só os itens desta categoria, na ordem de entrada. */
   itens: ItemLocal[];
+  /** Toque numa garrafa fantasma: abre a lista de adicionar desta categoria. */
+  aoAdicionar?: GarrafaFantasmaProps["aoTocar"];
 };
 
 const emPercentual = (p: ReturnType<typeof posicaoDaGarrafa>): CSSProperties => ({
@@ -27,7 +29,12 @@ const emPercentual = (p: ReturnType<typeof posicaoDaGarrafa>): CSSProperties => 
 });
 
 /** Uma prateleira da moldura: garrafas, garrafas fantasma e a faixa sobre o parapeito. */
-export function PrateleiraDaGeladeira({ indice, categoria, itens }: PrateleiraDaGeladeiraProps) {
+export function PrateleiraDaGeladeira({
+  indice,
+  categoria,
+  itens,
+  aoAdicionar,
+}: PrateleiraDaGeladeiraProps) {
   const arrumacao = arrumarPrateleira(
     itens.map((i) => ({ cervejaId: i.cerveja.id, nome: i.cerveja.nome, quantidade: i.quantidade })),
   );
@@ -71,7 +78,7 @@ export function PrateleiraDaGeladeira({ indice, categoria, itens }: PrateleiraDa
           className="pointer-events-auto absolute z-25"
           style={emPercentual(posicaoDaGarrafa(indice, coluna, 0))}
         >
-          <GarrafaFantasma categoria={categoria} />
+          <GarrafaFantasma categoria={categoria} aoTocar={aoAdicionar} />
         </div>
       ))}
       <div
@@ -84,7 +91,9 @@ export function PrateleiraDaGeladeira({ indice, categoria, itens }: PrateleiraDa
         }}
       />
       <div
-        className="pointer-events-auto absolute left-[17.2%] z-40 flex h-[3.1%] w-[71%] origin-top-left flex-col justify-center rounded-t-[3px] rounded-b-lg border-t border-primaria/55 bg-gradient-to-b from-superficie to-fundo shadow-[0_4px_10px_var(--color-sombra)]"
+        tabIndex={-1}
+        data-titulo-da-prateleira={categoria.slug}
+        className="pointer-events-auto absolute left-[17.2%] z-40 flex h-[3.1%] outline-offset-2 focus-visible:outline-2 focus-visible:outline-primaria w-[71%] origin-top-left flex-col justify-center rounded-t-[3px] rounded-b-lg border-t border-primaria/55 bg-gradient-to-b from-superficie to-fundo shadow-[0_4px_10px_var(--color-sombra)]"
         style={{ bottom: `${faixa.bottom}%`, transform: `rotate(${faixa.giro}rad)` }}
       >
         <FaixaDaPrateleira
