@@ -24,6 +24,7 @@ export function ListaDeAdicionar({
     <BottomSheet
       aberto={categoria !== null}
       aoFechar={aoFechar}
+      focoInicial="titulo"
       titulo={`Adicionar ${categoria?.nome ?? ""}`}
     >
       {daCategoria.length === 0 ? (
