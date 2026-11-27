@@ -41,4 +41,12 @@ describe("MolduraDaGeladeira", () => {
     const lager = screen.getByRole("region", { name: "Lager" });
     expect(within(lager).getAllByRole("button", { name: "Adicionar Lager" })).toHaveLength(4);
   });
+
+  it("mostra 'Leguelé Beer' na base da moldura, como texto decorativo que o leitor de tela ignora", () => {
+    render(<MolduraDaGeladeira itens={[]} />);
+
+    const nome = screen.getByText("Leguelé Beer");
+    expect(nome).toHaveAttribute("aria-hidden", "true");
+    expect(screen.queryByRole("link", { name: /Leguelé Beer/ })).not.toBeInTheDocument();
+  });
 });
