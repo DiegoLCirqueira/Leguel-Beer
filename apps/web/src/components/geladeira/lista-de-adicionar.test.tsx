@@ -55,6 +55,12 @@ describe("ListaDeAdicionar", () => {
     expect(within(dialogo).queryByText("Maré Alta IPA")).not.toBeInTheDocument();
   });
 
+  it("ao abrir, o foco vai para o título do diálogo (não para o primeiro Adicionar)", () => {
+    abrir();
+
+    expect(screen.getByRole("heading", { name: "Adicionar Frutas" })).toHaveFocus();
+  });
+
   it("a miniatura da garrafa é decorativa (alt vazio)", () => {
     abrir();
 
