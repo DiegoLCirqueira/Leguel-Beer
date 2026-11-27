@@ -1,5 +1,5 @@
 ---
-status: rascunho
+status: pronto
 modulo: catalogo
 card-notion:
 prioridade: P1
