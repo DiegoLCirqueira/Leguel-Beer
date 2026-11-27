@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { LojaHeader, ProdutoHeader } from "@/components/ui";
 import { useGeladeira } from "./geladeira-provider";
 
@@ -10,7 +11,9 @@ function useContador(): number | undefined {
 }
 
 export function LojaHeaderComContador() {
-  return <LojaHeader count={useContador()} />;
+  const contador = useContador();
+  // Só a home tem o logo maior (spec home-topo).
+  return <LojaHeader count={contador} grande={usePathname() === "/"} />;
 }
 
 export function ProdutoHeaderComContador() {
