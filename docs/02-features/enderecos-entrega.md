@@ -19,6 +19,9 @@ tags:
 > [!info] Origem
 > Item 4 da [[sequencia-telas]] (grupos E e F, parte da entrega). Derivada dos cards do Notion **LB-30** (#45, endereços com busca por CEP), **LB-62** (#48, spike de geocodificação e rota), **LB-63** (#49, frete por distância), **LB-64** (#50, área de entrega) e **LB-66** (#52, frete grátis), e das telas 20 (Meus endereços) e 29 (Endereço fora da área). Dados pessoais e maioridade ficam em [[dados-pessoais]]. As perguntas de produto foram ao Diego em 12/11 pelo Orchestrator; as respostas estão em "Decisões do Diego". Os termos seguem o [[GLOSSARY]].
 
+> [!info] Decisão de 26/11 (o Diego mandou aplicar as recomendadas): no MVP de portfólio os mapas são **locais**
+> O MVP não usa serviço externo de geocodificação nem de rota: sem Geoapify, sem conta, sem chave. A API usa um **adaptador local, determinístico e sem rede**, atrás das mesmas portas (`Geocoder` e `RouteCalculator`): as coordenadas vêm de uma aproximação pelo CEP e pelo bairro de Maceió e a distância é a **linha reta** até a origem (opção C da pergunta 5, com o mesmo raio de 25 km e o mesmo cálculo de frete). O "não configurado" (503 `MAPS_UNAVAILABLE`, fail-closed) continua para quando a variável do adaptador faltar. O adaptador real (Geoapify ou outro, com conta e chave do Diego) é **pós-MVP**: troca só o adaptador. Efeitos nesta spec: a pergunta 11 (conta em serviço de mapas) fica sem efeito no MVP; o limite de criar e editar endereço continua, como proteção contra abuso; o texto da Política sobre "serviços de mapas" só passa a valer quando o adaptador real entrar (o ViaCEP, que recebe o CEP, continua sendo um serviço real). **Endereços de Alagoas fora de Maceió:** o adaptador tem uma tabela pequena com o ponto central das cidades vizinhas (por exemplo Rio Largo, Satuba, Marechal Deodoro e Paripueira), que entram na área se a linha reta der até 25 km; qualquer outra cidade de Alagoas usa o ponto central do estado, a distância dá bem acima de 25 km e o endereço é **salvo com o selo "Fora da área"** (nunca "não encontramos este endereço", porque o endereço existe). Fora de Alagoas vale a regra desta spec (decisão 8: só Alagoas). A distância em linha reta é **aproximada**: o frete do portfólio não é o de uma rota real. Vetável pelo Diego.
+
 ## História de usuário
 
 - **Como** cliente
@@ -181,6 +184,7 @@ Funcionalidade: Endereços e entrega
 | 2 | Contrato (LB-30, LB-63, LB-64, LB-66) | Back | PR só em `@leguele/shared`: schema de endereço e a função pura de frete e área, com a tabela de testes |
 | 3 | LB-63, LB-64, LB-66 (#49, #50, #52), API | Back | Configurações de entrega (migration, seed e repositório) |
 | 4 | LB-30 (#45), API | Back | Modelo de endereço (migration), CRUD do cliente da sessão, padrão, limite, CEP e geocodificação ao salvar, e cotação de frete; 503 `DELIVERY_SETTINGS_MISSING`, sem stack, se a configuração de entrega faltar |
+| 4b | LB-30, LB-63 e LB-64 (#45, #49, #50) | Back | **Adaptador local de mapas** (decisão de 26/11): `Geocoder` e `RouteCalculator` determinísticos e sem rede (CEP e bairro de Maceió para as coordenadas, linha reta para a distância), escolhido por variável de ambiente no lugar do `UnconfiguredMaps`; testes de unidade e a distância dentro e fora dos 25 km. O adaptador real fica pós-MVP |
 | 5 | LB-30 (#45), site | Front | `/conta/enderecos` com busca por CEP, lista, selos, padrão e exclusão |
 | 6 | LB-63, LB-64 no site | Front | Frete e "fora da área" no resumo da Geladeira; a tela 29 entra com o checkout (item 5) |
 

@@ -33,6 +33,9 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[catalogo]]: listagem, filtros, ordenação, faixa de categorias e esgotadas.
 - [[destaques-home]]: seção "Cervejas em destaque" da home.
 - [[home-topo]]: topo da home (herói, cabeçalho com logo e faixa de categorias).
+- [[acompanhar-pedido]]: tela 09, linha do tempo do pedido (sem tempo real).
+- [[erros-e-vazios]]: páginas 404 e de erro, falhas de carregamento e estados vazios.
+- [[api-vercel]]: a API na Vercel, com a entrada serverless, CORS, trust proxy e o cron com segredo (LB-8, LB-122).
 - [[produto]]: página de produto com ficha, desconto, estoque baixo e quantidade (LB-40, LB-41, LB-42).
 - [[adicionar-do-card]]: colocar uma cerveja na Geladeira direto do card (LB-35).
 - [[geladeira]]: o carrinho em prateleiras por categoria, com resumo, revalidação no servidor e persistência no navegador e na conta (LB-124, LB-47, LB-49, LB-50, LB-51, LB-52).
@@ -67,7 +70,7 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[ADR-018-pagamento-simulado]] (substituído pelo ADR-020): pagamento só visual, sem gateway, cobrança nem webhook; substituiu o ADR-004.
 - [[ADR-020-aviso-de-portfolio-no-pagamento]] (Diego, 16/11): mantém o pagamento só visual e põe o aviso de projeto sem fins lucrativos e o botão "Voltar" em toda tela de pagamento; substitui o ADR-018.
 - [[ADR-019-criacao-do-pedido-serializada-por-cliente]] (proposto, Back, 16/11): criar pedido numa transação com trava consultiva por cliente e trava das cervejas em ordem de id.
-- [[ADR-021-merge-vira-deploy-na-vercel]] (proposto, Spec, 26/11): merge na `main` vira deploy na Vercel (Hobby), dois projetos `leguele-web` e `leguele-api`, preview por PR; nada criado na Vercel.
+- [[ADR-021-merge-vira-deploy-na-vercel]] (aceito pelo Diego em 26/11): merge na `main` vira deploy na Vercel (Hobby), dois projetos `leguele-web` e `leguele-api`, preview por PR; o aceite autoriza os deploys por merge, inclusive o primeiro; a ligação ao GitHub, o Supabase de produção e as chaves são do Diego.
 
 ## Arquitetura
 
@@ -84,4 +87,5 @@ Nota de entrada do vault da Leguelé Beer: por onde começar e onde está cada c
 - [[sequencia-telas]]: ordem de implementação das telas (1 a 9) e divergências do design que seguem a spec.
 - [[maestri-banda]]: a banda de agentes do Maestri e o modelo de cada um.
 - [[handoff]]: estado e próximos passos para a próxima conversa (sobrescrito a cada ordem).
+- [[plano-fim-mvp]]: plano de execução do fim do MVP (telas e APIs que faltam, ordem, donos e paralelismo).
 - [[licoes-aprendidas]]: erros da banda e a regra que cada um gerou (todo agente lê no início de cada ordem).

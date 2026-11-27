@@ -1,0 +1,3 @@
+{
+  "crons": [{ "path": "/cron/expirar-pedidos", "schedule": "0 7 * * *" }]
+}
