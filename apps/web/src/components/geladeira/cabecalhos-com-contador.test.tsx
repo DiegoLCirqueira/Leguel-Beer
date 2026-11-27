@@ -1,7 +1,10 @@
 import type { CervejaCard } from "@leguele/shared";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+const caminho = vi.hoisted(() => ({ atual: "/" }));
+vi.mock("next/navigation", () => ({ usePathname: () => caminho.atual }));
 import { LojaHeaderComContador, ProdutoHeaderComContador } from "./cabecalhos-com-contador";
 import { GeladeiraProvider, useGeladeira } from "./geladeira-provider";
 
@@ -59,5 +62,25 @@ describe("cabeçalhos com o contador real da Geladeira", () => {
     await userEvent.click(await screen.findByRole("button", { name: "adicionar duas" }));
 
     expect(screen.getByRole("link", { name: "Geladeira, 2 unidades" })).toBeInTheDocument();
+  });
+
+  it("só na home o logo do cabeçalho da loja é maior", () => {
+    caminho.atual = "/";
+    const { container, unmount } = render(
+      <GeladeiraProvider>
+        <LojaHeaderComContador />
+      </GeladeiraProvider>,
+    );
+    expect(container.querySelector("img")).toHaveClass("w-28");
+    unmount();
+
+    caminho.atual = "/catalogo";
+    const outra = render(
+      <GeladeiraProvider>
+        <LojaHeaderComContador />
+      </GeladeiraProvider>,
+    );
+
+    expect(outra.container.querySelector("img")).toHaveClass("w-16");
   });
 });
