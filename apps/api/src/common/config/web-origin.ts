@@ -16,6 +16,7 @@ export function resolveWebOrigin(env: Record<string, string | undefined>): strin
       `WEB_ORIGIN inválido em produção: ${reason}. Use uma única origem https, ex.: https://leguele-web.vercel.app.`,
     );
   if (!raw) throw invalid("ausente");
+  if (raw.includes("*")) throw invalid("curinga não vale");
   let url: URL;
   try {
     url = new URL(raw);
