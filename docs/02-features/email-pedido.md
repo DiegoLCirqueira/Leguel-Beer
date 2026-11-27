@@ -1,5 +1,5 @@
 ---
-status: rascunho
+status: pronto
 modulo: pedidos
 card-notion: https://app.notion.com/p/3fd490a7ac7d810c89bce27827e3afa7
 prioridade: P0
@@ -15,7 +15,10 @@ tags:
 > [!info] Origem
 > Card do Notion **LB-81** (#103, e-mails transacionais do pedido), no escopo reduzido do [[mvp-corte]]: só o e-mail de confirmação do pedido, enviado de forma síncrona pela API de um provedor com plano gratuito ([[ADR-002-hospedagem-api]]: sem fila). Complementa [[pedidos-cliente]] (ponto em aberto "E-mail de confirmação") e o "Confirmar pagamento" do [[admin]] e de [[pagamento]]. Termos como no [[GLOSSARY]].
 
-> [!warning] **Pendente de confirmação do Diego** (custos e contas, item 4): o **provedor de e-mail** e a criação da conta nele. Até a resposta, esta spec fica em rascunho e a API só tem a porta de envio, com um envio falso nos testes e no desenvolvimento. Nenhuma conta, chave ou domínio é criado antes do ok (cartão "Decisões pendentes").
+> [!success] Decisão de 26/11 (o Diego mandou aplicar as recomendadas): no MVP o e-mail é de **desenvolvimento**
+> A spec está **pronta** para o MVP com um adaptador de desenvolvimento atrás da porta `OrderEmailSender`: envia ao **Mailpit do Supabase local** (sem conta, sem chave) quando a variável de ambiente apontar para ele, e usa o **envio falso em memória** quando não apontar (é o padrão, inclusive em qualquer deploy do portfólio: nenhum e-mail real sai). O **provedor real** (conta, chave, domínio e o texto da Política, itens 4, 6 e 7) é **pós-MVP** e só entra depois de o Diego criar a conta; trocar o adaptador não muda os cenários, as regras nem a porta.
+>
+> **O envio falso não conta como enviado:** o adaptador falso devolve "não enviado (adaptador de desenvolvimento)"; o pedido **não** recebe a marca "e-mail enviado", guarda uma marca própria ("não enviado: desenvolvimento") e o admin vê o mesmo aviso da falha ("Não foi possível enviar o e-mail ao cliente."). A marca "enviado" só existe quando o Mailpit aceitou a mensagem (desenvolvimento) ou, depois, quando o provedor real respondeu com sucesso. **O falso não guarda nem registra o corpo:** descarta a mensagem e o log leva só o id do pedido e o nome do adaptador, nunca o e-mail do cliente, o endereço nem o texto. **Nenhum texto ao cliente promete e-mail** (tela 08, "Meus pedidos", Política) enquanto só houver adaptador de desenvolvimento; a promessa só entra com o provedor real.
 
 ## História de usuário
 
@@ -70,6 +73,7 @@ Funcionalidade: E-mail de confirmação do pedido
 - **Destinatário:** só o e-mail da conta dona do pedido (confirmado no cadastro). Nada de cópia oculta nem de outro endereço.
 - **Privacidade:** os dados que saem para o provedor são só os do corpo acima. A Política de Privacidade ([[termos-privacidade]]) ganha, em "Com quem compartilhamos", o provedor de e-mail, com o texto que o Diego aprovar junto com a escolha do provedor (LGPD, item 7).
 - **Segredos:** a chave do provedor só na API, em `apps/api/.env` (nome em `.env.example`, sem valor), nunca no site nem em `NEXT_PUBLIC_*`. Criar a chave é do Diego (item 6).
+- **Marca do adaptador falso:** o caso de uso distingue "enviado", "falhou" e "não enviado (adaptador de desenvolvimento)"; só o primeiro grava a marca "e-mail enviado". O aviso ao admin vale para os dois últimos.
 - **Tela 08:** o texto do topo ("Pagamento aprovado! Seu pedido já está com a gente. Acompanhe o status em Meus pedidos.") não promete e-mail, porque o envio pode falhar ([[pedidos-cliente]], pergunta 3).
 
 ## Fora de escopo
@@ -83,7 +87,7 @@ Funcionalidade: E-mail de confirmação do pedido
 
 > [!info] Proposta do Spec, vetável
 
-- **Porta de envio** (API, unitário): o caso de uso de confirmar pagamento recebe uma porta `OrderEmailSender` com uma implementação falsa em memória; a implementação do provedor entra só depois da escolha do Diego.
+- **Porta de envio** (API, unitário): o caso de uso de confirmar pagamento recebe uma porta `OrderEmailSender` com uma implementação falsa em memória; o adaptador de desenvolvimento (Mailpit local ou o falso) entra no MVP; o do provedor real, só depois de o Diego criar a conta (pós-MVP).
 - **Cenários 1 a 4** (caso de uso com repositório em memória e envio falso): e-mail com os dados certos; provedor que lança erro ou passa de 5 s deixa o pedido "Pago" e devolve o aviso; "Confirmar pagamento" repetido não envia segundo e-mail; expirar e cancelar não enviam.
 - **Corpo do e-mail** (unitário): contém só os campos da regra; um teste procura telefone, data de nascimento e id do cliente e falha se aparecerem.
 - **Logs** (unitário): o log da falha não traz e-mail, endereço nem corpo.
@@ -94,9 +98,9 @@ Funcionalidade: E-mail de confirmação do pedido
 
 | # | Card | Dono | O que entrega |
 | --- | --- | --- | --- |
-| 1 | LB-81 (#103) | Back | Porta `OrderEmailSender`, montagem do e-mail, marca de envio no pedido, aviso na resposta de "Confirmar pagamento" (junto do LB-76) |
+| 1 | LB-81 (#103) | Back | Porta `OrderEmailSender`, montagem do e-mail, marca de envio no pedido, aviso na resposta de "Confirmar pagamento" (junto do LB-76) e o **adaptador de desenvolvimento** (Mailpit local ou envio falso), escolhido por variável de ambiente |
 | 2 | LB-81 (#103) | Front | Aviso "Não foi possível enviar o e-mail ao cliente." no detalhe do pedido do admin |
-| 3 | LB-81 (#103) | Back e Devops | Implementação do provedor e a chave no `.env`, **só depois do ok do Diego** (itens 4 e 6) |
+| 3 | LB-81 (#103), **pós-MVP** | Back e Devops | Adaptador do provedor real e a chave no `.env`, **só depois de o Diego criar a conta** (itens 4 e 6) |
 
 Candidatos a ADR: nenhum até a escolha do provedor (se ele surpreender quem lê o código, o Back escreve o ADR no PR da fatia 3).
 
@@ -107,6 +111,8 @@ Candidatos a ADR: nenhum até a escolha do provedor (se ele surpreender quem lê
 ## Decisões tomadas sem consulta
 
 Recomendações aplicadas pelo Spec em 17/11; qualquer uma pode ser vetada.
+
+- **MVP com adaptador de desenvolvimento** (26/11): Mailpit local ou envio falso, sem conta; o provedor real é pós-MVP. Vetável.
 
 - **E-mail ao confirmar o pagamento** (pedido "Pago"), não na criação do pedido.
 - **Sem nova tentativa nem reenvio** no MVP; falha só vira aviso ao admin e log.

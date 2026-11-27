@@ -18,6 +18,9 @@ tags:
 
 As perguntas de produto foram ao Diego em 13/11 pelo Orchestrator; as respostas estão em "Decisões do Diego (13/11)".
 
+> [!info] Mudança de 27/11 (ordem do Diego: completar todas as telas)
+> A tela 09 entrou no MVP, em [[acompanhar-pedido]]: em "Meus pedidos", os pedidos que não estão "Aguardando pagamento" passam a ser tocáveis e levam a ela. O que esta spec diz de "só o Aguardando pagamento é tocável", de "sem Acompanhar pedido" e de "Fora de escopo: tela 09" vale **só até essa spec**; o resto desta spec segue como está.
+
 ## História de usuário
 
 - **Como** cliente
