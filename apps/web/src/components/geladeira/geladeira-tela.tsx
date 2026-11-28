@@ -188,7 +188,7 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
             </p>
             <Skeleton
               data-testid="esqueleto-da-geladeira"
-              className="aspect-[710/1573] min-h-0 flex-1 rounded-2xl"
+              className="aspect-[710/1573] w-[89vw] max-w-[26rem] flex-none rounded-2xl lg:min-h-0 lg:w-auto lg:max-w-none lg:flex-1"
             />
           </>
         )}
