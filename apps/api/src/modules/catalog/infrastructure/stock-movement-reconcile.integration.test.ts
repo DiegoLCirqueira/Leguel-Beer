@@ -95,7 +95,7 @@ describe("saldo do histórico de estoque nas cervejas existentes (banco real)", 
   it("com vários movimentos, a abertura é o estoque menos a soma de todos e fica antes do primeiro", async () => {
     const many = await beer("varios", 20);
     const first = new Date("2026-11-20T10:00:00.000Z");
-    for (const [i, quantity] of [-3, 5, -2].entries()) {
+    for (const [i, quantity] of [-3, 5, -1].entries()) {
       await prisma.stockMovement.create({
         data: {
           beerId: many.id,
@@ -113,9 +113,9 @@ describe("saldo do histórico de estoque nas cervejas existentes (banco real)", 
     const opening = await prisma.stockMovement.findFirstOrThrow({
       where: { beerId: many.id, reason: "Saldo inicial" },
     });
-    expect(opening.quantity).toBe(20); // 20 - (-3 + 5 - 2) = 20
+    expect(opening.quantity).toBe(19); // 20 - (-3 + 5 - 1) = 19
     expect(opening.createdAt.getTime()).toBeLessThan(first.getTime());
-    expect((await sums()).find((r) => r.slug === "varios")?.total).toBe(20);
+    expect((await sums()).find((r) => r.slug === "varios")?.total).toBe(20); // 19 + 1
   });
 
   it("se os movimentos somam mais que o estoque, a migration não inventa saída e a conferência acusa a cerveja", async () => {
