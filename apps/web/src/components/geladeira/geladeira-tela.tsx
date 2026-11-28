@@ -79,6 +79,14 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
     null,
   );
   const focoDaFaixa = useRef<string | null>(null);
+  // Depois de "Tentar de novo" que acerta, o botão some: o foco vai à primeira prateleira.
+  const refazendo = useRef(false);
+  useEffect(() => {
+    if (buscando || !refazendo.current) return;
+    refazendo.current = false;
+    if (falhouAoBuscar) return;
+    document.querySelector<HTMLElement>('[data-titulo-da-prateleira="ipa"]')?.focus();
+  }, [falhouAoBuscar, buscando]);
   const {
     adicionarComToast,
     toast: toastDeAdicionar,
@@ -148,7 +156,10 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
               variant="outline"
               className="w-auto"
               disabled={buscando}
-              onClick={tentarDeNovo}
+              onClick={() => {
+                refazendo.current = true;
+                tentarDeNovo();
+              }}
             >
               {buscando ? "Tentando..." : "Tentar de novo"}
             </Button>
