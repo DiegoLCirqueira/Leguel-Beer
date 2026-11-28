@@ -419,6 +419,22 @@ describe("GeladeiraTela", () => {
     });
   });
 
+  describe("acabamento visual", () => {
+    it("o fundo da tela é um degradê verde-floresta (fundo → superfície → fundo)", async () => {
+      render(
+        <GeladeiraProvider>
+          <GeladeiraTela />
+        </GeladeiraProvider>,
+      );
+
+      const principal = await screen.findByRole("main");
+      expect(principal.className).toMatch(/bg-gradient-to-b/);
+      expect(principal.className).toMatch(/from-fundo/);
+      expect(principal.className).toMatch(/via-superficie/);
+      expect(principal.className).toMatch(/to-fundo/);
+    });
+  });
+
   describe("conta que não respondeu", () => {
     it("busca que falhou avisa com Tentar de novo, em vez de mostrar a Geladeira vazia em silêncio", async () => {
       const buscar = vi
