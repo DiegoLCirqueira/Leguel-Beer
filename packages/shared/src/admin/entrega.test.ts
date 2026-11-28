@@ -57,4 +57,17 @@ describe("configuracoesDeEntregaSchema", () => {
     expect(ok({ origem: { ...VALIDA.origem, rua: "" } })).toBe(false);
     expect(ok({ origem: { ...VALIDA.origem, cidade: "" } })).toBe(false);
   });
+
+  it("campo a mais é recusado na configuração e na origem", () => {
+    expect(ok({ latitude: 1 })).toBe(false);
+    expect(ok({ origem: { ...VALIDA.origem, latitude: 1 } })).toBe(false);
+  });
+
+  it("rua, número, bairro e cidade têm tamanho máximo", () => {
+    expect(ok({ origem: { ...VALIDA.origem, rua: "a".repeat(121) } })).toBe(false);
+    expect(ok({ origem: { ...VALIDA.origem, numero: "1".repeat(21) } })).toBe(false);
+    expect(ok({ origem: { ...VALIDA.origem, bairro: "a".repeat(81) } })).toBe(false);
+    expect(ok({ origem: { ...VALIDA.origem, cidade: "a".repeat(81) } })).toBe(false);
+    expect(ok({ origem: { ...VALIDA.origem, rua: "a".repeat(120) } })).toBe(true);
+  });
 });

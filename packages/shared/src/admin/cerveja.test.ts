@@ -94,3 +94,52 @@ describe("editarCervejaSchema", () => {
     );
   });
 });
+
+describe("tetos e rigor dos schemas da cerveja", () => {
+  it("o preço vai até R$ 10.000,00 (1.000.000 centavos); acima falha", () => {
+    expect(criarCervejaSchema.safeParse({ ...VALIDA, precoCentavos: 1_000_000 }).success).toBe(
+      true,
+    );
+    expect(criarCervejaSchema.safeParse({ ...VALIDA, precoCentavos: 1_000_001 }).success).toBe(
+      false,
+    );
+  });
+
+  it("o preço anterior também respeita o teto", () => {
+    const base = { ...VALIDA, precoCentavos: 999_999 };
+    expect(
+      criarCervejaSchema.safeParse({ ...base, precoAnteriorCentavos: 1_000_000 }).success,
+    ).toBe(true);
+    expect(
+      criarCervejaSchema.safeParse({ ...base, precoAnteriorCentavos: 1_000_001 }).success,
+    ).toBe(false);
+  });
+
+  it("estoque inicial e mínimo vão até 100.000; acima falha", () => {
+    for (const campo of ["estoqueInicial", "estoqueMinimo"]) {
+      expect(criarCervejaSchema.safeParse({ ...VALIDA, [campo]: 100_000 }).success).toBe(true);
+      expect(criarCervejaSchema.safeParse({ ...VALIDA, [campo]: 100_001 }).success).toBe(false);
+    }
+  });
+
+  it("a edição respeita os mesmos tetos", () => {
+    const { estoqueInicial: _x, ...base } = VALIDA;
+    void _x;
+    expect(editarCervejaSchema.safeParse({ ...base, precoCentavos: 1_000_001 }).success).toBe(
+      false,
+    );
+    expect(editarCervejaSchema.safeParse({ ...base, estoqueMinimo: 100_001 }).success).toBe(false);
+  });
+
+  it("o cadastro recusa campo a mais, e a categoria tem tamanho máximo", () => {
+    expect(criarCervejaSchema.safeParse({ ...VALIDA, slug: "x" }).success).toBe(false);
+    expect(criarCervejaSchema.safeParse({ ...VALIDA, categoriaSlug: "a".repeat(61) }).success).toBe(
+      false,
+    );
+  });
+
+  it("descrição vazia ou só com espaços vira ausente", () => {
+    expect(criarCervejaSchema.parse({ ...VALIDA, descricao: "   " }).descricao).toBeUndefined();
+    expect(criarCervejaSchema.parse({ ...VALIDA, descricao: " Boa " }).descricao).toBe("Boa");
+  });
+});

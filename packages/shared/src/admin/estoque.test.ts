@@ -58,4 +58,32 @@ describe("ajusteDeEstoqueSchema", () => {
     ).toBe(false);
     expect(ajusteDeEstoqueSchema.safeParse({ tipo: "venda", quantidade: 1 }).success).toBe(false);
   });
+
+  it("a quantidade vai até 100.000 (em módulo); acima falha", () => {
+    expect(ajusteDeEstoqueSchema.safeParse({ tipo: "entrada", quantidade: 100_000 }).success).toBe(
+      true,
+    );
+    expect(ajusteDeEstoqueSchema.safeParse({ tipo: "entrada", quantidade: 100_001 }).success).toBe(
+      false,
+    );
+    expect(
+      ajusteDeEstoqueSchema.safeParse({ tipo: "perda", quantidade: 100_001, motivo: "x" }).success,
+    ).toBe(false);
+    for (const quantidade of [100_000, -100_000]) {
+      expect(
+        ajusteDeEstoqueSchema.safeParse({ tipo: "correcao", quantidade, motivo: "x" }).success,
+      ).toBe(true);
+    }
+    for (const quantidade of [100_001, -100_001]) {
+      expect(
+        ajusteDeEstoqueSchema.safeParse({ tipo: "correcao", quantidade, motivo: "x" }).success,
+      ).toBe(false);
+    }
+  });
+
+  it("campo a mais no ajuste é recusado", () => {
+    expect(
+      ajusteDeEstoqueSchema.safeParse({ tipo: "entrada", quantidade: 1, cervejaId: "x" }).success,
+    ).toBe(false);
+  });
 });
