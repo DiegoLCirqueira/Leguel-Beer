@@ -57,4 +57,13 @@ describe("FaixaDaPrateleira", () => {
     expect(screen.queryByText("Leguelé Carnaval", { selector: "[aria-hidden]" })).toBeNull();
     expect(screen.getByText("Carnaval").className).not.toMatch(/truncate/);
   });
+
+  it("o convite da prateleira vazia é uma pílula centralizada", () => {
+    const { container } = render(<FaixaDaPrateleira categoriaNome="Malt" rotulos={[]} />);
+
+    const placa = container.querySelector("[data-placa]");
+    expect(placa).toHaveTextContent("Toque no + para escolher uma Malt");
+    expect(placa?.className).toMatch(/rounded-full/);
+    expect(placa?.className).toMatch(/justify-self-center/);
+  });
 });
