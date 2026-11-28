@@ -65,7 +65,8 @@ for (const tamanho of TAMANHOS) {
     expect(await area.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0);
 
     // A área não tem barra que roube largura, e a moldura fica centrada nela.
-    const geometria = await area.evaluate((el) => {
+    const geometria = await area.evaluate((alvo) => {
+      const el = alvo as HTMLElement;
       const moldura = el.querySelector("[data-moldura]")!.getBoundingClientRect();
       const caixa = el.getBoundingClientRect();
       return {
