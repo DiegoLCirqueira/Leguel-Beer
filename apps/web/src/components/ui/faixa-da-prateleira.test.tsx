@@ -141,4 +141,41 @@ describe("FaixaDaPrateleira", () => {
 
     expect(screen.getByText("Maré Alta")).toBeInTheDocument();
   });
+
+  it("apelidos que se repetem na prateleira ganham mais uma palavra, para cada placa ser única", () => {
+    render(
+      <FaixaDaPrateleira
+        categoriaNome="Lager"
+        rotulos={[
+          {
+            cervejaId: "a",
+            nome: "Jaraguá Premium",
+            quantidade: 1,
+            totalCentavos: 3200,
+            coluna: 0,
+          },
+          { cervejaId: "b", nome: "Jaraguá Extra", quantidade: 1, totalCentavos: 3200, coluna: 1 },
+          { cervejaId: "c", nome: "Carnaval", quantidade: 1, totalCentavos: 3200, coluna: 2 },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Jaraguá Premium")).toBeInTheDocument();
+    expect(screen.getByText("Jaraguá Extra")).toBeInTheDocument();
+    expect(screen.getByText("Carnaval")).toBeInTheDocument();
+  });
+
+  it("nome só de sigla (Ale, Lager) cai no nome inteiro, nunca numa placa vazia", () => {
+    render(
+      <FaixaDaPrateleira
+        categoriaNome="Lager"
+        rotulos={[
+          { cervejaId: "a", nome: "Lager", quantidade: 1, totalCentavos: 3200, coluna: 0 },
+          { cervejaId: "b", nome: "Carnaval", quantidade: 1, totalCentavos: 3200, coluna: 1 },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Lager")).toBeInTheDocument();
+  });
 });
