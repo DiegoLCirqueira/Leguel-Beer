@@ -64,6 +64,9 @@ describe("FaixaDaPrateleira", () => {
     expect(placa).toHaveTextContent("Toque no + para escolher uma Malt");
     expect(placa?.className).toMatch(/rounded-full/);
     expect(placa?.className).toMatch(/justify-self-center/);
+    // Legível sobre a faixa escura: texto pleno (não o suave) e borda um pouco mais viva.
+    expect(placa?.className).toMatch(/text-texto(?!-)/);
+    expect(placa?.className).toMatch(/border-primaria\/60/);
   });
 
   it("nome longo ou sem espaço fica dentro da coluna: só o nome trunca e o ×N segue visível", () => {
