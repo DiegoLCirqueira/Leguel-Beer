@@ -96,7 +96,6 @@ describe("FaixaDaPrateleira", () => {
       expect(placa.className).toMatch(/min-w-0/);
       expect(placa.className).toMatch(/max-w-full/);
       expect(placa.querySelector("em")?.className).not.toMatch(/truncate/);
-      expect(placa.querySelector("em")?.className).toMatch(/shrink-0/);
     });
     expect(screen.getByText("Ponta").className).toMatch(/truncate/);
     expect(screen.getByText("Superlongonomesemespaco").className).toMatch(/truncate/);

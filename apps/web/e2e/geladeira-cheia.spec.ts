@@ -59,10 +59,13 @@ for (const tamanho of TAMANHOS) {
     expect(await area.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0);
 
     // O nome de cada placa aparece inteiro (sem reticências).
-    for (const nome of await page.locator("[data-placa] > span[aria-hidden]").all()) {
-      const truncado = await nome.evaluate((el) => el.scrollWidth > el.clientWidth);
-      expect(truncado, `placa truncada: ${await nome.textContent()}`).toBe(false);
-    }
+    const nomes = await page
+      .locator("[data-placa] > span[aria-hidden]")
+      .evaluateAll((els) =>
+        els.map((el) => ({ texto: el.textContent, truncado: el.scrollWidth > el.clientWidth })),
+      );
+    expect(nomes.length).toBeGreaterThan(0);
+    expect(nomes.filter((n) => n.truncado)).toEqual([]);
 
     // No fim da rolagem, o letreiro aparece inteiro dentro da área.
     await area.evaluate((el) => el.scrollTo(0, el.scrollHeight));
@@ -70,5 +73,11 @@ for (const tamanho of TAMANHOS) {
     const caixa = (await area.boundingBox())!;
     expect(letreiro.y).toBeGreaterThanOrEqual(caixa.y);
     expect(letreiro.y + letreiro.height).toBeLessThanOrEqual(caixa.y + caixa.height);
+    // E a moldura inteira tem folga embaixo no fim da rolagem (padding inferior), sem encostar na barra.
+    const moldura = (await page
+      .getByRole("region", { name: "IPA" })
+      .locator("xpath=..")
+      .boundingBox())!;
+    expect(caixa.y + caixa.height - (moldura.y + moldura.height)).toBeGreaterThanOrEqual(16);
   });
 }
