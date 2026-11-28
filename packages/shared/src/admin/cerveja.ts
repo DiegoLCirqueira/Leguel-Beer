@@ -2,14 +2,24 @@ import { z } from "zod";
 
 const umaCasaDecimal = (valor: number) => Math.abs(valor * 10 - Math.round(valor * 10)) < 1e-9;
 
+/** Tetos do contrato: cabem no Int de 32 bits do banco e não estouram o subtotal do pedido. */
+export const PRECO_MAXIMO_CENTAVOS = 1_000_000;
+export const ESTOQUE_MAXIMO = 100_000;
+
 const campos = {
   nome: z.string().trim().min(1).max(80),
   /** Slug de uma das categorias do cadastro; a API confere que existe. */
-  categoriaSlug: z.string().min(1),
+  categoriaSlug: z.string().min(1).max(60),
   estilo: z.string().trim().min(1).max(40),
-  descricao: z.string().trim().max(200).optional(),
-  precoCentavos: z.int().positive(),
-  precoAnteriorCentavos: z.int().positive().optional(),
+  // Vazio ou só espaços vira ausente.
+  descricao: z
+    .string()
+    .trim()
+    .max(200)
+    .transform((texto) => (texto === "" ? undefined : texto))
+    .optional(),
+  precoCentavos: z.int().positive().max(PRECO_MAXIMO_CENTAVOS),
+  precoAnteriorCentavos: z.int().positive().max(PRECO_MAXIMO_CENTAVOS).optional(),
   volumeMl: z.int().min(100).max(2000),
   teorAlcoolico: z
     .number()
@@ -17,7 +27,7 @@ const campos = {
     .max(20)
     .refine(umaCasaDecimal, { message: "Use no máximo uma casa decimal." }),
   ibu: z.int().min(0).max(150),
-  estoqueMinimo: z.int().min(0).default(6),
+  estoqueMinimo: z.int().min(0).max(ESTOQUE_MAXIMO).default(6),
   destaque: z.boolean(),
   /** Disponível no catálogo; cerveja inativa some do catálogo mas fica nos pedidos antigos. */
   ativa: z.boolean(),
@@ -35,7 +45,7 @@ const anteriorMaiorQueAtual = (v: ComPrecos) =>
 
 /** Cadastro: leva o estoque inicial, que depois só muda pela tela de Estoque. */
 export const criarCervejaSchema = z
-  .object({ ...campos, estoqueInicial: z.int().min(0) })
+  .strictObject({ ...campos, estoqueInicial: z.int().min(0).max(ESTOQUE_MAXIMO) })
   .refine(anteriorMaiorQueAtual, precoAnteriorMaior);
 
 /** Edição: sem estoque inicial e sem slug (fixo depois de criado); campo a mais é recusado. */
