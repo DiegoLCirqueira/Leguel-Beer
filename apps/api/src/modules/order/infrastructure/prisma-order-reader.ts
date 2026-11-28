@@ -100,8 +100,10 @@ export class PrismaOrderReader implements OrderReader {
   }
 
   async findDueOwnedIds(ownerId: string, at: Date): Promise<string[]> {
-    void ownerId;
-    void at;
-    return [];
+    const rows = await this.prisma.order.findMany({
+      where: { profileId: ownerId, status: "AWAITING_PAYMENT", expiresAt: { lte: at } },
+      select: { id: true },
+    });
+    return rows.map((row) => row.id);
   }
 }
