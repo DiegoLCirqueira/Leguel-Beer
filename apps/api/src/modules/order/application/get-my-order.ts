@@ -1,4 +1,4 @@
-import type { PedidoDoCliente } from "@leguele/shared";
+import { pedidoVencido, type PedidoDoCliente } from "@leguele/shared";
 import { NotFoundError } from "../../../common/errors/not-found-error.js";
 import type { OrderReader } from "../domain/order-reader.js";
 import type { OrderExpirer } from "./expire-due-orders.js";
@@ -17,10 +17,14 @@ export class GetMyOrder {
   ) {}
 
   async execute(input: GetMyOrderInput): Promise<PedidoDoCliente> {
-    const order = await this.reader.findOwned(input.ownerId, input.orderId);
+    const found = await this.reader.findOwned(input.ownerId, input.orderId);
+    if (!found) throw new NotFoundError();
+    // Vencido, o pedido cancela na própria requisição, sem esperar o cron diário.
+    const expired =
+      found.status === "aguardando-pagamento" && pedidoVencido(found.expiresAt, this.now());
+    if (expired) await this.expiration.execute(found.id);
+    const order = expired ? await this.reader.findOwned(input.ownerId, input.orderId) : found;
     if (!order) throw new NotFoundError();
-    void this.expiration;
-    void this.now;
     return {
       id: order.id,
       numero: order.number,
