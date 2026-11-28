@@ -49,7 +49,7 @@ export class PrismaAdminBeerRepository implements AdminBeerRepository {
       where: {
         ...(filter.estado === "ativas" ? { active: true } : {}),
         ...(filter.estado === "inativas" ? { active: false } : {}),
-        ...(busca ? { name: { contains: busca, mode: "insensitive" } } : {}),
+        ...(busca ? { name: { contains: escapeLike(busca), mode: "insensitive" } } : {}),
       },
       include: WITH_CATEGORY,
       orderBy: [{ name: "asc" }, { id: "asc" }],
@@ -133,6 +133,11 @@ export class PrismaAdminBeerRepository implements AdminBeerRepository {
       return toAdminBeer(row);
     });
   }
+}
+
+/** `%`, `_` e `\` da busca valem como texto, não como curinga do LIKE. */
+function escapeLike(text: string): string {
+  return text.replace(/[\\%_]/g, "\\$&");
 }
 
 /**

@@ -1,6 +1,7 @@
 import { Module, type MiddlewareConsumer, type NestModule } from "@nestjs/common";
 import { APP_FILTER, APP_GUARD, APP_PIPE } from "@nestjs/core";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
+import { noStoreMiddleware } from "./common/http/no-store.middleware.js";
 import { CommonModule } from "./common/common.module.js";
 import { PrismaModule } from "./common/prisma/prisma.module.js";
 import { AllExceptionsFilter } from "./common/http/all-exceptions.filter.js";
@@ -40,5 +41,6 @@ import { OrderModule } from "./modules/order/order.module.js";
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer.apply(requestIdMiddleware).forRoutes("*path");
+    consumer.apply(noStoreMiddleware).forRoutes("admin", "admin/*path");
   }
 }
