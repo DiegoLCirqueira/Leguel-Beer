@@ -278,10 +278,39 @@ describe("PrismaStockRepository (banco real)", () => {
         NOW,
       );
 
-      const movements = await repository.movements(a.id);
+      const movements = await repository.movements(a.id, { after: null, limit: 20 });
 
       expect(movements?.map((m) => m.kind)).toEqual(["perda", "entrada"]);
-      expect(await repository.movements(crypto.randomUUID())).toBeNull();
+      expect(
+        await repository.movements(crypto.randomUUID(), { after: null, limit: 20 }),
+      ).toBeNull();
+    });
+
+    it("pagina por cursor, mesmo com movimentos no mesmo instante, sem buraco nem repetição", async () => {
+      const a = await beer("Alfa", 0);
+      for (let i = 0; i < 5; i += 1) {
+        // Dois pares no mesmo instante: só o id desempata.
+        await repository.adjust(
+          a.id,
+          adminId,
+          { tipo: "entrada", quantidade: 1, motivo: "Produção" },
+          new Date(NOW.getTime() + Math.floor(i / 2) * 1000),
+        );
+      }
+      const all = await prisma.stockMovement.findMany({ where: { beerId: a.id } });
+
+      const seen: string[] = [];
+      let after: { createdAt: Date; id: string } | null = null;
+      for (;;) {
+        const page = (await repository.movements(a.id, { after, limit: 2 })) ?? [];
+        seen.push(...page.map((m) => m.id));
+        const last = page[page.length - 1];
+        if (page.length < 2 || !last) break;
+        after = { createdAt: last.createdAt, id: last.id };
+      }
+
+      expect(seen).toHaveLength(5);
+      expect([...seen].sort()).toEqual(all.map((m) => m.id).sort());
     });
   });
 });
