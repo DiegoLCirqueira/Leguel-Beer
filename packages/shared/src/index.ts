@@ -115,3 +115,13 @@ export { ajusteDeEstoqueSchema, variacaoDoAjuste } from "./admin/estoque.js";
 export type { AjusteDeEstoque } from "./admin/estoque.js";
 export { configuracoesDeEntregaSchema } from "./admin/entrega.js";
 export type { ConfiguracoesDeEntrega } from "./admin/entrega.js";
+export {
+  cervejaDoAdminSchema,
+  consultaDeCervejasDoAdminSchema,
+  listaDeCervejasDoAdminSchema,
+} from "./admin/cerveja-do-admin.js";
+export type {
+  CervejaDoAdmin,
+  ConsultaDeCervejasDoAdmin,
+  ListaDeCervejasDoAdmin,
+} from "./admin/cerveja-do-admin.js";
