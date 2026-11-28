@@ -189,4 +189,26 @@ describe("/admin/estoque (HTTP, banco real)", () => {
       ).status,
     ).toBe(404);
   });
+
+  it("pagina o histórico: 20 por padrão, cursor para a próxima, sem repetir; cursor inventado e limite acima de 50 respondem 400", async () => {
+    for (let i = 0; i < 21; i += 1) {
+      await send("post", `/admin/estoque/${beerId}/ajustes`, {
+        body: { tipo: "entrada", quantidade: 1 },
+      });
+    }
+
+    const first = historicoDoEstoqueSchema.parse(
+      (await send("get", `/admin/estoque/${beerId}/movimentos`)).body,
+    );
+    expect(first.movimentos).toHaveLength(20);
+    expect(first.proximoCursor).not.toBeNull();
+    const second = historicoDoEstoqueSchema.parse(
+      (await send("get", `/admin/estoque/${beerId}/movimentos?cursor=${first.proximoCursor}`)).body,
+    );
+    expect(second.movimentos).toHaveLength(1);
+    expect(second.proximoCursor).toBeNull();
+    expect(new Set([...first.movimentos, ...second.movimentos].map((m) => m.id)).size).toBe(21);
+    expect((await send("get", `/admin/estoque/${beerId}/movimentos?cursor=lixo`)).status).toBe(400);
+    expect((await send("get", `/admin/estoque/${beerId}/movimentos?limite=51`)).status).toBe(400);
+  });
 });

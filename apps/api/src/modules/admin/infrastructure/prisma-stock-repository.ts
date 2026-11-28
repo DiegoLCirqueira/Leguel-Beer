@@ -1,6 +1,7 @@
 import { estoqueBaixoNoAdmin, variacaoDoAjuste, type AjusteDeEstoque } from "@leguele/shared";
 import type { PrismaService } from "../../../common/prisma/prisma.service.js";
 import type { Prisma, StockMovementType } from "../../../generated/prisma/client.js";
+import type { StockCursor } from "../domain/stock-cursor.js";
 import {
   StockBelowReservedError,
   StockNegativeError,
@@ -72,11 +73,25 @@ export class PrismaStockRepository implements StockRepository {
       .sort((a, b) => Number(b.low) - Number(a.low) || a.name.localeCompare(b.name, "pt-BR"));
   }
 
-  async movements(beerId: string): Promise<StockMovement[] | null> {
+  async movements(
+    beerId: string,
+    page: { after: StockCursor | null; limit: number },
+  ): Promise<StockMovement[] | null> {
     const beer = await this.prisma.beer.findUnique({ where: { id: beerId }, select: { id: true } });
     if (!beer) return null;
     const rows = await this.prisma.stockMovement.findMany({
-      where: { beerId },
+      where: {
+        beerId,
+        ...(page.after
+          ? {
+              OR: [
+                { createdAt: { lt: page.after.createdAt } },
+                { createdAt: page.after.createdAt, id: { lt: page.after.id } },
+              ],
+            }
+          : {}),
+      },
+      take: page.limit,
       include: { order: { select: { number: true } } },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     });

@@ -1,5 +1,7 @@
 import type { AjusteDeEstoque, StatusDoPedido } from "@leguele/shared";
 
+import type { StockCursor } from "./stock-cursor.js";
+
 export interface StockItem {
   beerId: string;
   name: string;
@@ -43,8 +45,11 @@ export type { StatusDoPedido };
 export interface StockRepository {
   /** Cervejas ativas com físico, reservado (só reservas válidas em `at`) e o selo Baixo; Baixo primeiro, depois por nome. */
   list(at: Date): Promise<StockItem[]>;
-  /** Histórico do mais recente ao mais antigo; `null` se a cerveja não existe. */
-  movements(beerId: string): Promise<StockMovement[] | null>;
+  /** Até `limit` movimentos, do mais recente ao mais antigo, depois do cursor; `null` se a cerveja não existe. */
+  movements(
+    beerId: string,
+    page: { after: StockCursor | null; limit: number },
+  ): Promise<StockMovement[] | null>;
   /**
    * Aplica o ajuste sob a trava da cerveja (a mesma da criação do pedido) e grava o movimento.
    * `null` se a cerveja não existe; lança `StockNegativeError` ou `StockBelowReservedError`.

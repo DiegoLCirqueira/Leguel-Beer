@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, ParseUUIDPipe, Post } from "@nestjs/common";
+import { Body, Controller, Get, Inject, Param, ParseUUIDPipe, Post, Query } from "@nestjs/common";
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -10,6 +10,7 @@ import {
 } from "@nestjs/swagger";
 import {
   ajusteDeEstoqueSchema,
+  consultaDoHistoricoSchema,
   historicoDoEstoqueSchema,
   listaDoEstoqueSchema,
   movimentoDeEstoqueSchema,
@@ -19,13 +20,18 @@ import {
   type MovimentoDeEstoque,
 } from "@leguele/shared";
 import { NotFoundError } from "../../../common/errors/not-found-error.js";
+import { ValidationError } from "../../../common/errors/validation-error.js";
+import { zodDto } from "../../../common/validation/zod-dto.js";
 import type { AuthorizedUser } from "../../account/application/authorize-request.js";
 import { CurrentUser, Roles } from "../../account/presentation/access.decorators.js";
 import { STOCK_REPOSITORY } from "../admin.tokens.js";
 import type { StockMovement, StockRepository } from "../domain/stock.js";
+import { decodeStockCursor, encodeStockCursor } from "../domain/stock-cursor.js";
 import { withStockErrors } from "./admin-stock-http-errors.js";
 
 /** Classe só para o `ZodValidationPipe` global: a união do ajuste não pode ser estendida por `zodDto`. */
+class ConsultaDoHistoricoDto extends zodDto(consultaDoHistoricoSchema) {}
+
 class AjusteDto {
   static readonly schema = ajusteDeEstoqueSchema;
 }
@@ -74,10 +80,26 @@ export class AdminStockController {
   @ApiOperation({ summary: "Histórico de movimentos da cerveja, do mais recente ao mais antigo" })
   @ApiOkResponse({ description: "Formato `historicoDoEstoqueSchema`." })
   @ApiNotFoundResponse({ description: "Cerveja inexistente." })
-  async movements(@Param("cervejaId", ParseUUIDPipe) beerId: string): Promise<HistoricoDoEstoque> {
-    const movements = await this.stock.movements(beerId);
-    if (!movements) throw new NotFoundError();
-    return historicoDoEstoqueSchema.parse({ movimentos: movements.map(toResponse) });
+  async movements(
+    @Param("cervejaId", ParseUUIDPipe) beerId: string,
+    @Query() query: ConsultaDoHistoricoDto,
+  ): Promise<HistoricoDoEstoque> {
+    const after = query.cursor ? decodeStockCursor(query.cursor) : null;
+    if (query.cursor && !after) {
+      throw new ValidationError([{ field: "cursor", message: "Cursor inválido." }]);
+    }
+    // Uma a mais que a página: se ela vier, existe próxima página.
+    const rows = await this.stock.movements(beerId, { after, limit: query.limite + 1 });
+    if (!rows) throw new NotFoundError();
+    const page = rows.slice(0, query.limite);
+    const last = page[page.length - 1];
+    return historicoDoEstoqueSchema.parse({
+      movimentos: page.map(toResponse),
+      proximoCursor:
+        rows.length > query.limite && last
+          ? encodeStockCursor({ createdAt: last.createdAt, id: last.id })
+          : null,
+    });
   }
 
   @Post(":cervejaId/ajustes")

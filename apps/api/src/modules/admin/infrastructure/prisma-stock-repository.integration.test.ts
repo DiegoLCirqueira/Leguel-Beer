@@ -2,7 +2,11 @@ import { itemDoEstoqueSchema } from "@leguele/shared";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { PrismaService } from "../../../common/prisma/prisma.service.js";
 import { resetDatabase } from "../../../common/testing/database.js";
-import { StockBelowReservedError, StockNegativeError } from "../domain/stock.js";
+import {
+  StockBelowReservedError,
+  StockNegativeError,
+  type StockMovement,
+} from "../domain/stock.js";
 import { PrismaStockRepository } from "./prisma-stock-repository.js";
 
 const NOW = new Date("2026-11-28T15:00:00.000Z");
@@ -302,7 +306,7 @@ describe("PrismaStockRepository (banco real)", () => {
       const seen: string[] = [];
       let after: { createdAt: Date; id: string } | null = null;
       for (;;) {
-        const page = (await repository.movements(a.id, { after, limit: 2 })) ?? [];
+        const page: StockMovement[] = (await repository.movements(a.id, { after, limit: 2 })) ?? [];
         seen.push(...page.map((m) => m.id));
         const last = page[page.length - 1];
         if (page.length < 2 || !last) break;
