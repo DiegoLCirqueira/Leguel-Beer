@@ -13,14 +13,18 @@ import { ExpireDueOrders } from "./application/expire-due-orders.js";
 import { ExpireOrder } from "./application/expire-order.js";
 import { ConfirmPayment } from "./application/confirm-payment.js";
 import { CreateOrder } from "./application/create-order.js";
+import { GetMyOrder } from "./application/get-my-order.js";
+import { ListMyOrders } from "./application/list-my-orders.js";
 import { AccountFridgeSource } from "./infrastructure/account-fridge-source.js";
 import { DeliveryShippingQuoter } from "./infrastructure/delivery-shipping-quoter.js";
+import { PrismaOrderReader } from "./infrastructure/prisma-order-reader.js";
 import { PrismaOrderCreation } from "./infrastructure/prisma-order-creation.js";
 import { PrismaOrderRepository } from "./infrastructure/prisma-order-repository.js";
 import { ProfileCustomerSource } from "./infrastructure/profile-customer-source.js";
 import { AdminOrderController } from "./presentation/admin-order.controller.js";
 import { CronController } from "./presentation/cron.controller.js";
 import { OrderController } from "./presentation/order.controller.js";
+import { OrderReadController } from "./presentation/order-read.controller.js";
 
 /** "#LB" e 6 dígitos sorteados; a unicidade é do banco (a criação refaz o sorteio se colidir). */
 function newOrderNumber(): string {
@@ -29,7 +33,7 @@ function newOrderNumber(): string {
 
 @Module({
   imports: [AccountModule, DeliveryModule, FridgeModule],
-  controllers: [OrderController, AdminOrderController, CronController],
+  controllers: [OrderController, OrderReadController, AdminOrderController, CronController],
   providers: [
     { provide: CRON_SECRET, useFactory: () => process.env.CRON_SECRET ?? "" },
     {
@@ -43,6 +47,30 @@ function newOrderNumber(): string {
         const orders = new PrismaOrderRepository(prisma);
         const now = () => new Date();
         return new ExpireDueOrders(orders, new ExpireOrder(orders, now), now);
+      },
+      inject: [PrismaService],
+    },
+    {
+      provide: ListMyOrders,
+      useFactory: (prisma: PrismaService) => {
+        const now = () => new Date();
+        return new ListMyOrders(
+          new PrismaOrderReader(prisma),
+          new ExpireOrder(new PrismaOrderRepository(prisma), now),
+          now,
+        );
+      },
+      inject: [PrismaService],
+    },
+    {
+      provide: GetMyOrder,
+      useFactory: (prisma: PrismaService) => {
+        const now = () => new Date();
+        return new GetMyOrder(
+          new PrismaOrderReader(prisma),
+          new ExpireOrder(new PrismaOrderRepository(prisma), now),
+          now,
+        );
       },
       inject: [PrismaService],
     },
