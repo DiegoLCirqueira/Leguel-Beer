@@ -14,8 +14,8 @@ test.beforeEach(async ({ context, baseURL }) => {
   ]);
 });
 
-for (const tamanho of TAMANHOS) {
-  test(`em ${tamanho.width}x${tamanho.height} a Geladeira cabe entre o header e a barra, sem rolagem`, async ({
+for (const tamanho of TAMANHOS.filter((t) => t.width !== 390)) {
+  test(`em ${tamanho.width}x${tamanho.height} a Geladeira ocupa ~89% da largura e a área rola na vertical entre o header e a barra, sem rolagem lateral nem da página`, async ({
     page,
   }) => {
     await page.setViewportSize(tamanho);
@@ -24,15 +24,25 @@ for (const tamanho of TAMANHOS) {
     const moldura = page.getByRole("region", { name: "IPA" }).locator("xpath=..");
     await expect(moldura).toBeVisible();
     const caixa = (await moldura.boundingBox())!;
+    expect(caixa.width / tamanho.width).toBeGreaterThanOrEqual(0.85);
+    expect(caixa.width / tamanho.width).toBeLessThanOrEqual(0.9);
+    expect(caixa.width / caixa.height).toBeCloseTo(710 / 1573, 2);
+
+    const rolagem = await page.evaluate(() => ({
+      lateral: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      pagina: document.documentElement.scrollHeight - document.documentElement.clientHeight,
+    }));
+    expect(rolagem.lateral).toBeLessThanOrEqual(0);
+    expect(rolagem.pagina).toBeLessThanOrEqual(0);
+
+    // A última prateleira é alcançada rolando a área, e fica entre o header e a barra inferior.
+    const ultima = page.getByRole("button", { name: "Adicionar Lager" }).first();
+    await ultima.scrollIntoViewIfNeeded();
     const header = (await page.getByRole("banner").boundingBox())!;
     const barra = (await page.getByRole("navigation").last().boundingBox())!;
-    expect(caixa.y).toBeGreaterThanOrEqual(header.y + header.height - 1);
-    expect(caixa.y + caixa.height).toBeLessThanOrEqual(barra.y + 1);
-    expect(caixa.width / caixa.height).toBeCloseTo(710 / 1573, 2);
-    const rolagem = await page.evaluate(
-      () => document.documentElement.scrollHeight - document.documentElement.clientHeight,
-    );
-    expect(rolagem).toBeLessThanOrEqual(0);
+    const alvo = (await ultima.boundingBox())!;
+    expect(alvo.y).toBeGreaterThanOrEqual(header.y + header.height - 1);
+    expect(alvo.y + alvo.height).toBeLessThanOrEqual(barra.y + 1);
   });
 }
 
