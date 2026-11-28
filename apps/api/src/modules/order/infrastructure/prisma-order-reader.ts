@@ -54,9 +54,49 @@ export class PrismaOrderReader implements OrderReader {
   }
 
   async findOwned(ownerId: string, orderId: string): Promise<OrderDetailRow | null> {
-    void ownerId;
-    void orderId;
-    return null;
+    // A posse vai no próprio filtro: pedido de outro cliente é igual a pedido que não existe.
+    const row = await this.prisma.order.findFirst({
+      where: { id: orderId, profileId: ownerId },
+      include: {
+        items: { orderBy: [{ name: "asc" }, { id: "asc" }] },
+        statusHistory: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
+      },
+    });
+    if (!row) return null;
+    return {
+      id: row.id,
+      number: row.number,
+      status: STATUS_BY_ROW[row.status],
+      createdAt: row.createdAt,
+      expiresAt: row.expiresAt,
+      payment:
+        row.paymentMethod === "CARD"
+          ? { tipo: "cartao", parcelas: row.installments ?? 1 }
+          : { tipo: "pix" },
+      items: row.items.map((item) => ({
+        beerId: item.beerId,
+        name: item.name,
+        priceCents: item.unitPriceCents,
+        quantity: item.quantity,
+      })),
+      subtotalCents: row.subtotalCents,
+      shippingCents: row.shippingCents,
+      totalCents: row.totalCents,
+      shipTo: {
+        zip: row.shipZip,
+        street: row.shipStreet,
+        number: row.shipNumber,
+        complement: row.shipComplement,
+        district: row.shipDistrict,
+        city: row.shipCity,
+        state: row.shipState,
+      },
+      // Só o status e a data: o motivo e quem mudou são internos.
+      history: row.statusHistory.map((change) => ({
+        status: STATUS_BY_ROW[change.toStatus],
+        at: change.createdAt,
+      })),
+    };
   }
 
   async findDueOwnedIds(ownerId: string, at: Date): Promise<string[]> {
