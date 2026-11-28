@@ -76,13 +76,6 @@ export function PrateleiraDaGeladeira({
               filter: `brightness(${posicao.brilho})`,
             }}
           >
-            <div
-              key={garrafa.rodada}
-              className="relative size-full origin-bottom"
-              style={{ animationDelay: `${garrafa.atraso}ms` }}
-            >
-              <ImagemDaGarrafa imagemUrl={garrafa.imagemUrl} categoriaSlug={categoria.slug} />
-            </div>
             <span
               aria-hidden="true"
               data-reflexo=""
@@ -92,6 +85,14 @@ export function PrateleiraDaGeladeira({
                   "radial-gradient(ellipse at 50% 40%, color-mix(in oklab, var(--color-aviso) 28%, transparent), transparent 70%)",
               }}
             />
+            <div
+              data-imagem=""
+              key={garrafa.rodada}
+              className="relative size-full origin-bottom"
+              style={{ animationDelay: `${garrafa.atraso}ms` }}
+            >
+              <ImagemDaGarrafa imagemUrl={garrafa.imagemUrl} categoriaSlug={categoria.slug} />
+            </div>
             <span
               aria-hidden="true"
               data-sombra=""

@@ -134,17 +134,19 @@ for (const [movimento, esperado] of [
     await expect(garrafa).toBeAttached();
     const animacoes = await garrafa.evaluate((e) => {
       e.setAttribute("data-animacao", "queda");
-      return (e.firstElementChild as HTMLElement).getAnimations().map((a) => ({
-        nome: (a as CSSAnimation).animationName,
-        propriedades: [
-          ...new Set(
-            (a.effect as KeyframeEffect)
-              .getKeyframes()
-              .flatMap((k) => Object.keys(k))
-              .filter((p) => !["offset", "easing", "composite", "computedOffset"].includes(p)),
-          ),
-        ].sort(),
-      }));
+      return (e.querySelector(":scope > [data-imagem]") as HTMLElement)
+        .getAnimations()
+        .map((a) => ({
+          nome: (a as CSSAnimation).animationName,
+          propriedades: [
+            ...new Set(
+              (a.effect as KeyframeEffect)
+                .getKeyframes()
+                .flatMap((k) => Object.keys(k))
+                .filter((p) => !["offset", "easing", "composite", "computedOffset"].includes(p)),
+            ),
+          ].sort(),
+        }));
     });
 
     expect(animacoes.map((a) => a.nome)).toEqual(esperado);
