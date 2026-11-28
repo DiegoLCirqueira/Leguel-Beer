@@ -41,7 +41,10 @@ export function apelidosDaPrateleira(nomes: string[]): string[] {
     if (crescem.length === 0) break;
     crescem.forEach((i) => (tamanhos[i] = tamanhos[i]! + 1));
   }
-  return nomes.map((_, i) => apelido(i));
+  // Ainda repetidos (só diferem pela sigla): o nome inteiro, que a placa trunca se não couber.
+  return nomes.map((nome, i) =>
+    nomes.some((_, j) => j !== i && apelido(j) === apelido(i)) ? nome : apelido(i),
+  );
 }
 
 /** Faixa sobre o parapeito: o que há na prateleira ou o convite para escolher uma cerveja. */
@@ -53,7 +56,7 @@ export function FaixaDaPrateleira({ categoriaNome, rotulos }: FaixaDaPrateleiraP
       {rotulos.length === 0 ? (
         <span
           data-placa=""
-          className="col-span-4 justify-self-center whitespace-nowrap rounded-full border border-primaria/40 bg-superficie px-2 text-texto-suave"
+          className="col-span-4 justify-self-center whitespace-nowrap rounded-full border border-primaria/60 bg-superficie px-2 text-texto"
         >{`Toque no + para escolher uma ${categoriaNome}`}</span>
       ) : (
         rotulos.map((rotulo, i) => (
@@ -61,7 +64,7 @@ export function FaixaDaPrateleira({ categoriaNome, rotulos }: FaixaDaPrateleiraP
             key={rotulo.cervejaId}
             data-placa=""
             className={`flex min-w-0 max-w-full items-center justify-center gap-1 whitespace-nowrap rounded-full border border-primaria/40 bg-superficie px-1.5 ${
-              unico ? "col-span-4 justify-self-center" : "justify-self-start"
+              unico ? "col-span-4 justify-self-center" : "justify-self-center"
             }`}
             style={unico ? undefined : { gridColumn: rotulo.coluna + 1 }}
           >

@@ -13,4 +13,14 @@ describe("BarraDoResumo", () => {
     await userEvent.click(screen.getByRole("button", { name: "Ver resumo" }));
     expect(aoVerResumo).toHaveBeenCalledTimes(1);
   });
+
+  it("separa-se da Geladeira com borda viva e uma sombra suave para cima", () => {
+    const { container } = render(
+      <BarraDoResumo quantidadeTotal={3} subtotalCentavos={9600} aoVerResumo={() => {}} />,
+    );
+
+    const barra = container.firstElementChild!;
+    expect(barra.className).toMatch(/border-primaria\/30/);
+    expect(barra.className).toMatch(/shadow-\[0_-8px_16px/);
+  });
 });

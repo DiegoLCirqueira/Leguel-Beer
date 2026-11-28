@@ -73,7 +73,7 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
     desfazer,
   } = useGeladeira();
   const larga = useTelaLarga();
-  const [areaRef, areaRolavel] = useRolavel<HTMLDivElement>();
+  const [areaRef, areaRolavel] = useRolavel<HTMLDivElement>(`${pronta}-${falhouAoBuscar}`);
   // Os avisos valem para esta visita: ao sair da Geladeira, somem.
   useEffect(() => limparAjustes, [limparAjustes]);
   const [sheetAberto, setSheetAberto] = useState(false);
@@ -146,13 +146,13 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
     />
   );
   return (
-    <main className="flex h-[calc(100dvh-var(--altura-header-loja)-var(--altura-barra-loja)-env(safe-area-inset-bottom,0px))] flex-col lg:flex-row lg:justify-center lg:gap-8">
+    <main className="flex bg-gradient-to-b from-fundo via-superficie to-fundo h-[calc(100dvh-var(--altura-header-loja)-var(--altura-barra-loja)-env(safe-area-inset-bottom,0px))] flex-col lg:flex-row lg:justify-center lg:gap-8">
       <div
         role="region"
         aria-label="Prateleiras da Geladeira"
         ref={areaRef}
         tabIndex={areaRolavel ? 0 : undefined}
-        className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-4 py-2 outline-offset-[-2px] focus-visible:outline-2 focus-visible:outline-primaria lg:aspect-[710/1573] lg:flex-none lg:overflow-visible lg:px-0"
+        className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-4 pb-3 pt-4 outline-offset-[-2px] focus-visible:outline-2 focus-visible:outline-primaria lg:aspect-[710/1573] lg:flex-none lg:overflow-visible lg:px-0"
       >
         <h1 className="sr-only">Geladeira</h1>
         <AvisosDaGeladeira ajustes={ajustes} />

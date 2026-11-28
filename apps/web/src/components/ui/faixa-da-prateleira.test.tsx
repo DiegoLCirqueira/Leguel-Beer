@@ -64,6 +64,9 @@ describe("FaixaDaPrateleira", () => {
     expect(placa).toHaveTextContent("Toque no + para escolher uma Malt");
     expect(placa?.className).toMatch(/rounded-full/);
     expect(placa?.className).toMatch(/justify-self-center/);
+    // Legível sobre a faixa escura: texto pleno (não o suave) e borda um pouco mais viva.
+    expect(placa?.className).toMatch(/text-texto(?!-)/);
+    expect(placa?.className).toMatch(/border-primaria\/60/);
   });
 
   it("nome longo ou sem espaço fica dentro da coluna: só o nome trunca e o ×N segue visível", () => {
@@ -177,5 +180,36 @@ describe("FaixaDaPrateleira", () => {
     );
 
     expect(screen.getByText("Lager")).toBeInTheDocument();
+  });
+
+  it("nomes que só diferem pela sigla (IPA, Lager) mostram o nome inteiro, para não ficarem iguais", () => {
+    render(
+      <FaixaDaPrateleira
+        categoriaNome="IPA"
+        rotulos={[
+          { cervejaId: "a", nome: "Maré IPA", quantidade: 1, totalCentavos: 3200, coluna: 0 },
+          { cervejaId: "b", nome: "Maré Lager", quantidade: 1, totalCentavos: 3200, coluna: 1 },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Maré IPA")).toBeInTheDocument();
+    expect(screen.getByText("Maré Lager")).toBeInTheDocument();
+  });
+
+  it("com várias cervejas, cada placa fica centralizada na coluna da própria garrafa", () => {
+    const { container } = render(
+      <FaixaDaPrateleira
+        categoriaNome="IPA"
+        rotulos={[
+          { cervejaId: "a", nome: "Maré", quantidade: 1, totalCentavos: 3200, coluna: 0 },
+          { cervejaId: "b", nome: "Jaraguá", quantidade: 1, totalCentavos: 3200, coluna: 1 },
+        ]}
+      />,
+    );
+
+    container
+      .querySelectorAll("[data-placa]")
+      .forEach((placa) => expect(placa.className).toMatch(/justify-self-center/));
   });
 });

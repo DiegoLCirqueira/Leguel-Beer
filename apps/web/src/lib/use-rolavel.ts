@@ -2,8 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 
-/** Diz se o conteúdo do elemento passa da altura visível (e acompanha mudanças de tamanho). */
-export function useRolavel<T extends HTMLElement>() {
+/**
+ * Diz se o conteúdo do elemento passa da altura visível. Mede de novo quando a caixa muda de tamanho
+ * e quando `chave` muda (o conteúdo pode mudar sem mudar a caixa: esqueleto → moldura).
+ */
+export function useRolavel<T extends HTMLElement>(chave?: unknown) {
   const ref = useRef<T>(null);
   const [rolavel, setRolavel] = useState(false);
   useEffect(() => {
@@ -14,6 +17,6 @@ export function useRolavel<T extends HTMLElement>() {
     const observador = new ResizeObserver(medir);
     observador.observe(elemento);
     return () => observador.disconnect();
-  }, []);
+  }, [chave]);
   return [ref, rolavel] as const;
 }
