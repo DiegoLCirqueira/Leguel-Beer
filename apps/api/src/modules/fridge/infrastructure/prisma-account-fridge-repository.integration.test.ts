@@ -182,4 +182,77 @@ describe("PrismaAccountFridgeRepository (banco real)", () => {
 
     expect(await repository.find(profileId)).toEqual([stored(2, 9)]);
   });
+
+  describe("baixa pendente do pedido aguardando pagamento", () => {
+    let seq = 0;
+
+    async function awaitingOrder(pending: number, minutesAgo = 5) {
+      seq += 1;
+      const createdAt = new Date(Date.now() - minutesAgo * 60_000);
+      const order = await prisma.order.create({
+        data: {
+          number: `#LB${String(seq).padStart(6, "0")}`,
+          profileId,
+          paymentMethod: "PIX",
+          subtotalCents: 6400,
+          shippingCents: 0,
+          totalCents: 6400,
+          createdAt,
+          expiresAt: new Date(createdAt.getTime() + 30 * 60_000),
+          customerName: "Ana",
+          customerPhone: "82999990000",
+          shipZip: "57035000",
+          shipStreet: "Rua do Sol",
+          shipNumber: "100",
+          shipDistrict: "Farol",
+          shipCity: "Maceió",
+          shipState: "AL",
+          pendingDeductions: { create: { beerId: beerIds[0] as string, quantity: pending } },
+        },
+      });
+      return order.id;
+    }
+
+    const pendingOf = async (orderId: string) =>
+      (await prisma.fridgePendingDeduction.findFirst({ where: { orderId } }))?.quantity ?? 0;
+
+    it("diminuir a Geladeira abaixo da baixa pendente diminui a baixa na mesma medida", async () => {
+      const orderId = await awaitingOrder(2);
+      await repository.replace(profileId, [stored(0, 2)]);
+
+      await repository.replace(profileId, [stored(0, 1)]);
+
+      expect(await pendingOf(orderId)).toBe(1);
+    });
+
+    it("remover a cerveja zera a baixa pendente e recolocar depois não a devolve", async () => {
+      const orderId = await awaitingOrder(2);
+      await repository.replace(profileId, [stored(0, 2)]);
+
+      await repository.replace(profileId, []);
+      await repository.replace(profileId, [stored(0, 1)]);
+
+      expect(await pendingOf(orderId)).toBe(0);
+    });
+
+    it("adicionar mais unidades, ou mexer em outra cerveja, não muda a baixa pendente", async () => {
+      const orderId = await awaitingOrder(2);
+      await repository.replace(profileId, [stored(0, 2), stored(1, 5)]);
+
+      await repository.replace(profileId, [stored(0, 3), stored(1, 1)]);
+
+      expect(await pendingOf(orderId)).toBe(2);
+    });
+
+    it("com dois pedidos aguardando, o desconto sai primeiro do mais antigo", async () => {
+      const older = await awaitingOrder(2, 20);
+      const newer = await awaitingOrder(2, 5);
+      await repository.replace(profileId, [stored(0, 4)]);
+
+      await repository.replace(profileId, [stored(0, 3)]);
+
+      expect(await pendingOf(older)).toBe(1);
+      expect(await pendingOf(newer)).toBe(2);
+    });
+  });
 });
