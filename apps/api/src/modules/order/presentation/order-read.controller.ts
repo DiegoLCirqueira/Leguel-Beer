@@ -9,7 +9,9 @@ import {
 import {
   consultaDaListaDePedidosSchema,
   listaDePedidosSchema,
+  pedidoDoClienteSchema,
   type ListaDePedidos,
+  type PedidoDoCliente,
 } from "@leguele/shared";
 import { zodDto } from "../../../common/validation/zod-dto.js";
 import type { AuthorizedUser } from "../../account/application/authorize-request.js";
