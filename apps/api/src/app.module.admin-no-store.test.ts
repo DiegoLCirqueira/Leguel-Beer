@@ -37,4 +37,10 @@ describe("AppModule: rotas de admin nunca vão para o cache do navegador", () =>
 
     expect(response.headers["cache-control"]).not.toBe("no-store");
   });
+
+  it("o catálogo público segue cacheável: GET /catalogo não ganha no-store", async () => {
+    const response = await request(app.getHttpServer()).get("/catalogo");
+
+    expect(response.headers["cache-control"]).not.toBe("no-store");
+  });
 });
