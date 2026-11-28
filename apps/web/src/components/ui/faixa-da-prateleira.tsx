@@ -25,7 +25,10 @@ export function FaixaDaPrateleira({ categoriaNome, rotulos }: FaixaDaPrateleiraP
   return (
     <div className="grid grid-cols-4 items-center px-1.5 text-[clamp(7px,3.2cqw,13px)] text-texto">
       {rotulos.length === 0 ? (
-        <span className="col-span-4 text-texto-suave">{`Toque no + para escolher uma ${categoriaNome}`}</span>
+        <span
+          data-placa=""
+          className="col-span-4 justify-self-center whitespace-nowrap rounded-full border border-primaria/40 bg-superficie px-2 text-texto-suave"
+        >{`Toque no + para escolher uma ${categoriaNome}`}</span>
       ) : (
         rotulos.map((rotulo) => (
           <span
