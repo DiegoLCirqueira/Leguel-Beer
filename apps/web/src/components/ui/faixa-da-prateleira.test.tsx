@@ -98,4 +98,47 @@ describe("FaixaDaPrateleira", () => {
     expect(screen.getByText("Ponta Verde Pilsen").className).toMatch(/truncate/);
     expect(screen.getByText("Superlongonomesemespaco").className).toMatch(/truncate/);
   });
+
+  it("com várias cervejas na prateleira, a placa mostra o apelido (1ª palavra), reconhecível sem truncar", () => {
+    render(
+      <FaixaDaPrateleira
+        categoriaNome="IPA"
+        rotulos={[
+          { cervejaId: "a", nome: "Maré Alta IPA", quantidade: 2, totalCentavos: 6400, coluna: 0 },
+          {
+            cervejaId: "b",
+            nome: "Jaraguá Premium",
+            quantidade: 1,
+            totalCentavos: 3200,
+            coluna: 1,
+          },
+          {
+            cervejaId: "c",
+            nome: "Leguelé Carnaval",
+            quantidade: 4,
+            totalCentavos: 12800,
+            coluna: 2,
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Maré")).toBeInTheDocument();
+    expect(screen.getByText("Jaraguá")).toBeInTheDocument();
+    expect(screen.getByText("Carnaval")).toBeInTheDocument();
+    expect(screen.getByText(/^Maré Alta IPA, 2 unidades/)).toBeInTheDocument();
+  });
+
+  it("com uma cerveja só, a placa mostra até duas palavras do nome", () => {
+    render(
+      <FaixaDaPrateleira
+        categoriaNome="IPA"
+        rotulos={[
+          { cervejaId: "a", nome: "Maré Alta IPA", quantidade: 2, totalCentavos: 6400, coluna: 0 },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Maré Alta")).toBeInTheDocument();
+  });
 });
