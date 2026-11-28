@@ -95,6 +95,19 @@ const cervejaEsgotada: CervejaCard = {
 const itensDaMoldura: ItemLocal[] = [
   { cerveja: cervejaExemplo, quantidade: 6 },
   { cerveja: cervejaEsgotada, quantidade: 1 },
+  // Prateleira cheia (4 cervejas de 1 unidade, nomes longos): confere que cada placa cabe na coluna.
+  ...["Ponta Verde Pilsen", "Jaraguá Premium Lager", "Pajuçara Extra Lager", "Maceió Clássica"].map(
+    (nome, i): ItemLocal => ({
+      cerveja: {
+        ...cervejaExemplo,
+        id: `lager-${i}`,
+        slug: `lager-${i}`,
+        nome,
+        categoria: { slug: "lager", nome: "Lager", ordem: 4 },
+      },
+      quantidade: 1,
+    }),
+  ),
 ];
 
 const categories = [
