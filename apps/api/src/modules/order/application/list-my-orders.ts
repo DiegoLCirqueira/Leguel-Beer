@@ -15,12 +15,13 @@ export class ListMyOrders {
     private readonly reader: OrderReader,
     private readonly expiration: OrderExpirer,
     private readonly now: () => Date,
-  ) {
-    void this.expiration;
-    void this.now;
-  }
+  ) {}
 
   async execute(input: ListMyOrdersInput): Promise<ListaDePedidos> {
+    // Vencido, o pedido cancela na própria requisição, sem esperar o cron diário.
+    for (const id of await this.reader.findDueOwnedIds(input.ownerId, this.now())) {
+      await this.expiration.execute(id);
+    }
     const after = input.cursor ? decodeOrderCursor(input.cursor) : null;
     // Uma a mais que a página: se ela vier, existe próxima página.
     const rows = await this.reader.listOwned(input.ownerId, { after, limit: input.limit + 1 });
