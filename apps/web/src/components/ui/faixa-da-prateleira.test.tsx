@@ -233,14 +233,19 @@ describe("FaixaDaPrateleira", () => {
     expect(selo.className).toMatch(/text-\[max\(8px,0\.85em\)\]/);
   });
 
-  it("com uma cerveja só, o ×N segue na linha, ao lado do nome", () => {
-    render(
+  it("com uma cerveja só, o ×N também é o selo do canto e a placa fica centralizada (mesmo padrão das outras)", () => {
+    const { container } = render(
       <FaixaDaPrateleira
-        categoriaNome="IPA"
-        rotulos={[{ cervejaId: "a", nome: "Maré", quantidade: 2, totalCentavos: 6400, coluna: 0 }]}
+        categoriaNome="Frutas"
+        rotulos={[
+          { cervejaId: "a", nome: "Cajupá Sour", quantidade: 1, totalCentavos: 3200, coluna: 0 },
+        ]}
       />,
     );
 
-    expect(screen.getByText("×2").className).not.toMatch(/absolute/);
+    const selo = screen.getByText("×1");
+    expect(selo.className).toMatch(/absolute/);
+    expect(selo.className).toMatch(/bg-primaria/);
+    expect(container.querySelector("[data-placa]")?.className).toMatch(/justify-self-center/);
   });
 });
