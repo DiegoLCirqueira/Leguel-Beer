@@ -19,7 +19,7 @@ const ok = (extra: object) =>
   configuracoesDeEntregaSchema.safeParse({ ...VALIDA, ...extra }).success;
 
 describe("configuracoesDeEntregaSchema", () => {
-  it("aceita as configurações e traz o raio em metros para o cálculo do frete", () => {
+  it("aceita as configurações e a origem como endereço", () => {
     const config = configuracoesDeEntregaSchema.parse(VALIDA);
 
     expect(config.raioMaximoKm).toBe(15);
