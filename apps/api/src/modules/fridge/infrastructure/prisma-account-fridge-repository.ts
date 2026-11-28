@@ -75,7 +75,7 @@ async function writeItems(
  * cliente tirou depois de criar o pedido não sai de novo na aprovação. O que passa é descontado
  * primeiro do pedido mais antigo. Aumentar a Geladeira não devolve a baixa.
  */
-async function capPendingDeductions(
+export async function capPendingDeductions(
   tx: Prisma.TransactionClient,
   profileId: string,
   items: readonly StoredFridgeItem[],

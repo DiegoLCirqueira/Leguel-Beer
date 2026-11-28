@@ -1,8 +1,11 @@
-import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { PrismaService } from "../../../common/prisma/prisma.service.js";
 import { resetDatabase } from "../../../common/testing/database.js";
 import { FridgeOwnerNotFoundError } from "../domain/account-fridge-repository.js";
-import { PrismaAccountFridgeRepository } from "./prisma-account-fridge-repository.js";
+import {
+  capPendingDeductions,
+  PrismaAccountFridgeRepository,
+} from "./prisma-account-fridge-repository.js";
 
 describe("PrismaAccountFridgeRepository (banco real)", () => {
   const prisma = new PrismaService();
@@ -254,5 +257,28 @@ describe("PrismaAccountFridgeRepository (banco real)", () => {
       expect(await pendingOf(older)).toBe(1);
       expect(await pendingOf(newer)).toBe(2);
     });
+
+    it.each([
+      ["zerar", 0],
+      ["diminuir", 1],
+    ])(
+      "se o pedido expira entre a leitura e o corte, a gravação da Geladeira não falha (%s)",
+      async (_name, kept) => {
+        const items = kept === 0 ? [] : [stored(0, kept)];
+        // A linha que a leitura devolveu já foi apagada pela expiração: `delete`/`update` por id lançariam P2025.
+        const vanished = {
+          id: crypto.randomUUID(),
+          beerId: beerIds[0] as string,
+          quantity: 2,
+        };
+        const spy = vi
+          .spyOn(prisma.fridgePendingDeduction, "findMany")
+          .mockResolvedValueOnce([vanished] as never);
+
+        await expect(capPendingDeductions(prisma, profileId, items)).resolves.toBeUndefined();
+
+        spy.mockRestore();
+      },
+    );
   });
 });
