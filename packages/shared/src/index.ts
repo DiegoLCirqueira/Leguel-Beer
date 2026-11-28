@@ -128,14 +128,18 @@ export type {
 export { resumoDoAdminSchema } from "./admin/resumo.js";
 export type { ResumoDoAdmin } from "./admin/resumo.js";
 export {
+  consultaDoHistoricoSchema,
   estoqueBaixoNoAdmin,
   historicoDoEstoqueSchema,
+  MOVIMENTOS_POR_PAGINA,
+  MOVIMENTOS_POR_PAGINA_MAXIMO,
   itemDoEstoqueSchema,
   listaDoEstoqueSchema,
   movimentoDeEstoqueSchema,
   TIPOS_DE_MOVIMENTO,
 } from "./admin/estoque-lista.js";
 export type {
+  ConsultaDoHistorico,
   HistoricoDoEstoque,
   ItemDoEstoque,
   ListaDoEstoque,

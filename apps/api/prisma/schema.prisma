@@ -32,6 +32,7 @@ model Profile {
   orders          Order[]
   idempotencyKeys IdempotencyKey[]
   statusChanges   OrderStatusHistory[] @relation("OrderStatusChangedBy")
+  stockMovements  StockMovement[]    @relation("StockMovementBy")
   addresses       Address[]
 
   @@map("profiles")
@@ -79,6 +80,7 @@ model Beer {
   orderItems         OrderItem[]
   reservations       StockReservation[]
   pendingDeductions  FridgePendingDeduction[]
+  stockMovements     StockMovement[]
 
   @@index([categoryId])
   @@index([active, featured])
@@ -173,6 +175,7 @@ model Order {
   payments          Payment[]
   paymentEvents     PaymentEvent[]
   paymentMarks      PaymentMark[]
+  stockMovements    StockMovement[]
 
   @@index([profileId, createdAt(sort: Desc)])
   @@index([status, expiresAt])
@@ -246,6 +249,37 @@ model FridgePendingDeduction {
   @@unique([orderId, beerId])
   @@index([beerId])
   @@map("fridge_pending_deductions")
+}
+
+enum StockMovementType {
+  ENTRY
+  LOSS
+  CORRECTION
+  SALE
+  CANCELLATION
+}
+
+/// Movimento do estoque físico de uma cerveja: entrada, perda, correção do admin, venda (pedido pago) e cancelamento de pedido pago ou em preparo. `quantity` tem sinal; `balanceAfter` é o físico depois do movimento.
+model StockMovement {
+  id           String            @id @default(uuid()) @db.Uuid
+  beerId       String            @map("beer_id") @db.Uuid
+  beer         Beer              @relation(fields: [beerId], references: [id], onDelete: Restrict)
+  type         StockMovementType
+  quantity     Int
+  reason       String?
+  balanceAfter Int               @map("balance_after")
+  /// Só nas vendas e nos cancelamentos.
+  orderId      String?           @map("order_id") @db.Uuid
+  order        Order?            @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  /// Quem fez o ajuste; nulo nas vendas e cancelamentos do sistema.
+  actorId      String?           @map("actor_id") @db.Uuid
+  actor        Profile?          @relation("StockMovementBy", fields: [actorId], references: [id], onDelete: SetNull)
+  createdAt    DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([beerId, createdAt(sort: Desc)])
+  @@index([orderId])
+  @@index([actorId])
+  @@map("stock_movements")
 }
 
 /// Chave de idempotência da criação do pedido, guardada só quando o pedido é criado (24 h). Guarda o hash do corpo (sem o token do cartão) e a resposta; nunca o token.

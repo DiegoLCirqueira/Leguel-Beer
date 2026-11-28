@@ -71,6 +71,32 @@ describe("PrismaAdminBeerRepository (banco real)", () => {
       });
     });
 
+    it("grava o movimento 'Entrada inicial' com o estoque inicial, na mesma transação, e o saldo bate com a soma", async () => {
+      const admin = await prisma.profile.create({
+        data: { id: crypto.randomUUID(), email: "adm@x.test", role: "ADMIN" },
+      });
+
+      const beer = await repository.create(input({ estoqueInicial: 24 }), admin.id);
+
+      const movements = await prisma.stockMovement.findMany({ where: { beerId: beer.id } });
+      expect(movements).toMatchObject([
+        {
+          type: "ENTRY",
+          quantity: 24,
+          reason: "Entrada inicial",
+          balanceAfter: 24,
+          actorId: admin.id,
+        },
+      ]);
+      expect(movements.reduce((sum, m) => sum + m.quantity, 0)).toBe(beer.stock);
+    });
+
+    it("sem estoque inicial não grava movimento", async () => {
+      const beer = await repository.create(input({ estoqueInicial: 0 }));
+
+      expect(await prisma.stockMovement.count({ where: { beerId: beer.id } })).toBe(0);
+    });
+
     it("nome que gera o mesmo slug ganha -2", async () => {
       await repository.create(input({ nome: "Maré Alta" }));
 

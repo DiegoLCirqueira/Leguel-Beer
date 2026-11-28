@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { numeroDoPedidoSchema } from "../pedido/numero.js";
 import { ESTOQUE_MAXIMO } from "./cerveja.js";
 
 /** Teto dos inteiros de saída: o Int de 32 bits do banco. */
@@ -51,7 +52,6 @@ const base = {
 };
 
 const motivo = z.string().trim().min(1).max(80);
-const numeroDoPedido = z.string().regex(/^#LB\d{6}$/);
 const positiva = z.int().positive().max(ESTOQUE_MAXIMO);
 const negativa = z.int().negative().min(-ESTOQUE_MAXIMO);
 const comSinal = z
@@ -90,20 +90,37 @@ export const movimentoDeEstoqueSchema = z.discriminatedUnion("tipo", [
     tipo: z.literal("venda"),
     quantidade: negativa,
     motivo: z.null(),
-    numeroDoPedido,
+    numeroDoPedido: numeroDoPedidoSchema,
   }),
   z.strictObject({
     ...base,
     tipo: z.literal("cancelamento"),
     quantidade: positiva,
     motivo: z.null(),
-    numeroDoPedido,
+    numeroDoPedido: numeroDoPedidoSchema,
   }),
 ]);
 
 export type MovimentoDeEstoque = z.infer<typeof movimentoDeEstoqueSchema>;
 
+/** Página do histórico, do mais recente ao mais antigo; `proximoCursor` é nulo na última. */
 export const historicoDoEstoqueSchema = z.strictObject({
   movimentos: z.array(movimentoDeEstoqueSchema),
+  proximoCursor: z.string().min(1).max(200).nullable(),
 });
 export type HistoricoDoEstoque = z.infer<typeof historicoDoEstoqueSchema>;
+
+export const MOVIMENTOS_POR_PAGINA = 20;
+export const MOVIMENTOS_POR_PAGINA_MAXIMO = 50;
+
+/** Consulta do histórico: `cursor` da página anterior (opcional) e `limite` (padrão 20, de 1 a 50). */
+export const consultaDoHistoricoSchema = z.strictObject({
+  cursor: z.string().min(1).max(200).optional(),
+  limite: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(MOVIMENTOS_POR_PAGINA_MAXIMO)
+    .default(MOVIMENTOS_POR_PAGINA),
+});
+export type ConsultaDoHistorico = z.infer<typeof consultaDoHistoricoSchema>;

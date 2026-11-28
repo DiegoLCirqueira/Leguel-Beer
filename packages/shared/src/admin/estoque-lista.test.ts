@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  consultaDoHistoricoSchema,
   estoqueBaixoNoAdmin,
   historicoDoEstoqueSchema,
   itemDoEstoqueSchema,
@@ -159,10 +160,41 @@ describe("movimentoDeEstoqueSchema: tipo, sinal, motivo e pedido", () => {
   });
 
   it("o histórico traz a lista de movimentos coerentes", () => {
-    expect(historicoDoEstoqueSchema.safeParse({ movimentos: [entrada, venda] }).success).toBe(true);
     expect(
-      historicoDoEstoqueSchema.safeParse({ movimentos: [{ ...venda, numeroDoPedido: null }] })
+      historicoDoEstoqueSchema.safeParse({ movimentos: [entrada, venda], proximoCursor: null })
         .success,
+    ).toBe(true);
+    expect(
+      historicoDoEstoqueSchema.safeParse({
+        movimentos: [{ ...venda, numeroDoPedido: null }],
+        proximoCursor: null,
+      }).success,
     ).toBe(false);
+  });
+});
+
+describe("histórico paginado", () => {
+  it("a página traz o cursor da próxima, ou nulo na última, e recusa o histórico sem ele", () => {
+    expect(
+      historicoDoEstoqueSchema.safeParse({ movimentos: [], proximoCursor: "abc" }).success,
+    ).toBe(true);
+    expect(historicoDoEstoqueSchema.safeParse({ movimentos: [] }).success).toBe(false);
+    expect(historicoDoEstoqueSchema.safeParse({ movimentos: [], proximoCursor: "" }).success).toBe(
+      false,
+    );
+  });
+
+  it("a consulta usa 20 por página por padrão, aceita de 1 a 50 e limita o cursor a 200 caracteres", () => {
+    expect(consultaDoHistoricoSchema.parse({}).limite).toBe(20);
+    expect(consultaDoHistoricoSchema.parse({ limite: "50" }).limite).toBe(50);
+    for (const ruim of [
+      { limite: 0 },
+      { limite: 51 },
+      { cursor: "a".repeat(201) },
+      { cursor: "" },
+      { x: 1 },
+    ]) {
+      expect(consultaDoHistoricoSchema.safeParse(ruim).success).toBe(false);
+    }
   });
 });

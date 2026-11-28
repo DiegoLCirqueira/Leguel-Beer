@@ -1,21 +1,20 @@
 import type { PrismaService } from "../../../common/prisma/prisma.service.js";
 import type { AdminSummary, AdminSummaryReader } from "../domain/admin-summary-reader.js";
+import type { StockRepository } from "../domain/stock.js";
 
 export class PrismaAdminSummaryReader implements AdminSummaryReader {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    /** A mesma consulta e a mesma regra do selo Baixo da tela de Estoque. */
+    private readonly stock: StockRepository,
+  ) {}
 
   async read(at: Date): Promise<AdminSummary> {
-    // Disponível = físico menos as reservas válidas (não liberadas, não consumidas, dentro da validade).
-    const [low] = await this.prisma.$queryRaw<{ total: number }[]>`
-      SELECT count(*)::int AS total
-      FROM beers b
-      WHERE b.active
-        AND b.stock - COALESCE((
-          SELECT SUM(r.quantity) FROM stock_reservations r
-          WHERE r.beer_id = b.id AND r.released_at IS NULL AND r.consumed_at IS NULL
-            AND r.expires_at > ${at}
-        ), 0) <= b.min_stock`;
+    const items = await this.stock.list(at);
     const paid = await this.prisma.order.count({ where: { status: "PAID" } });
-    return { lowStockBeers: low?.total ?? 0, paidOrdersAwaitingPreparation: paid };
+    return {
+      lowStockBeers: items.filter((item) => item.low).length,
+      paidOrdersAwaitingPreparation: paid,
+    };
   }
 }

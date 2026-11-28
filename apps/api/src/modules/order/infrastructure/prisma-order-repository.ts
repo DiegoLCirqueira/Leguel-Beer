@@ -61,7 +61,7 @@ export class PrismaOrderRepository implements OrderRepository {
       const left = await leaveAwaitingPayment(tx, { ...change, where: { expiresAt: { gt: at } } });
       if (!left) return false;
 
-      await consumeReservations(tx, orderId, at);
+      await consumeReservations(tx, orderId, actorId, at);
       await applyFridgeDeductions(tx, orderId);
       // O histórico é o último passo: se ele falhar, nenhum efeito acima fica gravado.
       await recordTransition(tx, change);
@@ -130,14 +130,28 @@ async function recordTransition(tx: Tx, change: Leaving): Promise<void> {
   });
 }
 
-/** A reserva do pedido vira baixa no estoque físico, numa única instrução. */
-async function consumeReservations(tx: Tx, orderId: string, at: Date): Promise<void> {
+/**
+ * A reserva do pedido vira baixa no estoque físico e entra no histórico do estoque como "venda"
+ * (quantidade negativa e saldo depois), numa única instrução.
+ */
+async function consumeReservations(
+  tx: Tx,
+  orderId: string,
+  actorId: string,
+  at: Date,
+): Promise<void> {
   await tx.$executeRaw`
-    UPDATE beers b
-    SET stock = b.stock - r.quantity
-    FROM stock_reservations r
-    WHERE r.order_id = ${orderId}::uuid AND r.beer_id = b.id
-      AND r.released_at IS NULL AND r.consumed_at IS NULL`;
+    WITH consumed AS (
+      UPDATE beers b
+      SET stock = b.stock - r.quantity
+      FROM stock_reservations r
+      WHERE r.order_id = ${orderId}::uuid AND r.beer_id = b.id
+        AND r.released_at IS NULL AND r.consumed_at IS NULL
+      RETURNING b.id AS beer_id, r.quantity AS quantity, b.stock AS balance
+    )
+    INSERT INTO stock_movements (id, beer_id, type, quantity, balance_after, order_id, actor_id, created_at)
+    SELECT gen_random_uuid(), beer_id, 'SALE', -quantity, balance, ${orderId}::uuid, ${actorId}::uuid, ${at}
+    FROM consumed`;
   await tx.stockReservation.updateMany({
     where: { orderId, releasedAt: null, consumedAt: null },
     data: { consumedAt: at },

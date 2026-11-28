@@ -273,6 +273,22 @@ describe("PrismaOrderRepository (banco real)", () => {
       ]);
     });
 
+    it("grava o movimento de venda no histórico do estoque, com saldo, pedido e autor, na mesma transação", async () => {
+      await orders.confirmPaymentIfAwaiting(orderId, adminId, AT);
+
+      expect(await prisma.stockMovement.findMany({ where: { beerId } })).toMatchObject([
+        { type: "SALE", quantity: -2, balanceAfter: 8, orderId, actorId: adminId, createdAt: AT },
+      ]);
+    });
+
+    it("quem não confirma (vencido ou repetido) não grava movimento", async () => {
+      await orders.confirmPaymentIfAwaiting(orderId, adminId, EXPIRES_AT);
+      await orders.confirmPaymentIfAwaiting(orderId, adminId, AT);
+      await orders.confirmPaymentIfAwaiting(orderId, adminId, AT);
+
+      expect(await prisma.stockMovement.count()).toBe(1);
+    });
+
     it("não confirma a partir do instante exato do vencimento e nada muda", async () => {
       const confirmed = await orders.confirmPaymentIfAwaiting(orderId, adminId, EXPIRES_AT);
 

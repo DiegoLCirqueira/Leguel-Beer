@@ -62,7 +62,7 @@ export class PrismaAdminBeerRepository implements AdminBeerRepository {
     return row ? toAdminBeer(row) : null;
   }
 
-  async create(input: CriarCerveja): Promise<AdminBeer> {
+  async create(input: CriarCerveja, actorId?: string): Promise<AdminBeer> {
     return this.prisma.$transaction(async (tx) => {
       await lockWrites(tx);
       const category = await lockCategory(tx, input.categoriaSlug);
@@ -96,6 +96,18 @@ export class PrismaAdminBeerRepository implements AdminBeerRepository {
         },
         include: WITH_CATEGORY,
       });
+      if (input.estoqueInicial > 0) {
+        await tx.stockMovement.create({
+          data: {
+            beerId: row.id,
+            type: "ENTRY",
+            quantity: input.estoqueInicial,
+            reason: "Entrada inicial",
+            balanceAfter: input.estoqueInicial,
+            actorId: actorId ?? null,
+          },
+        });
+      }
       return toAdminBeer(row);
     });
   }

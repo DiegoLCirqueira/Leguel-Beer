@@ -20,7 +20,8 @@ import {
 } from "@leguele/shared";
 import { NotFoundError } from "../../../common/errors/not-found-error.js";
 import { zodDto } from "../../../common/validation/zod-dto.js";
-import { Roles } from "../../account/presentation/access.decorators.js";
+import type { AuthorizedUser } from "../../account/application/authorize-request.js";
+import { CurrentUser, Roles } from "../../account/presentation/access.decorators.js";
 import type { AdminBeer, AdminBeerRepository } from "../domain/admin-beer.js";
 import { Inject } from "@nestjs/common";
 import { ADMIN_BEER_REPOSITORY } from "../catalog.tokens.js";
@@ -86,8 +87,11 @@ export class AdminBeerController {
   @ApiBadRequestResponse({ description: "Corpo fora do contrato." })
   @ApiConflictResponse({ description: "CATEGORY_FULL ou BEER_NAME_TAKEN." })
   @ApiUnprocessableEntityResponse({ description: "CATEGORY_NOT_FOUND." })
-  async create(@Body() body: CriarCervejaDto): Promise<CervejaDoAdmin> {
-    return toResponse(await withAdminBeerErrors(() => this.beers.create(body)));
+  async create(
+    @CurrentUser() user: AuthorizedUser,
+    @Body() body: CriarCervejaDto,
+  ): Promise<CervejaDoAdmin> {
+    return toResponse(await withAdminBeerErrors(() => this.beers.create(body, user.id)));
   }
 
   @Put(":id")

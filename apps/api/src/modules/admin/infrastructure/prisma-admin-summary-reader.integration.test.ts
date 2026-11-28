@@ -3,12 +3,14 @@ import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { PrismaService } from "../../../common/prisma/prisma.service.js";
 import { resetDatabase } from "../../../common/testing/database.js";
 import { PrismaAdminSummaryReader } from "./prisma-admin-summary-reader.js";
+import { PrismaStockRepository } from "./prisma-stock-repository.js";
 
 const NOW = new Date("2026-11-28T15:00:00.000Z");
 
 describe("PrismaAdminSummaryReader (banco real)", () => {
   const prisma = new PrismaService();
-  const reader = new PrismaAdminSummaryReader(prisma);
+  const stock = new PrismaStockRepository(prisma);
+  const reader = new PrismaAdminSummaryReader(prisma, stock);
   let profileId: string;
   let categoryId: string;
   let seq = 0;
@@ -132,5 +134,25 @@ describe("PrismaAdminSummaryReader (banco real)", () => {
 
     expect((await reader.read(NOW)).lowStockBeers).toBe(expected);
     expect(expected).toBe(4);
+  });
+
+  it("o resumo conta exatamente as cervejas que a lista do Estoque marca como Baixo", async () => {
+    const cases: [number, number, number][] = [
+      [7, 6, 0],
+      [6, 6, 0],
+      [5, 6, 0],
+      [0, 0, 0],
+      [10, 6, 4],
+      [10, 6, 3],
+    ];
+    for (const [stockUnits, minStock, reserved] of cases) {
+      const b = await beer(stockUnits, minStock);
+      if (reserved > 0) await order("AWAITING_PAYMENT", b.id, reserved);
+    }
+
+    const lowInList = (await stock.list(NOW)).filter((item) => item.low).length;
+
+    expect((await reader.read(NOW)).lowStockBeers).toBe(lowInList);
+    expect(lowInList).toBe(4);
   });
 });
