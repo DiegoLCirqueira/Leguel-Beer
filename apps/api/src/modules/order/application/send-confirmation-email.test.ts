@@ -113,4 +113,17 @@ describe("SendConfirmationEmail", () => {
     expect(source.marked).toEqual([]);
     expect(failures).toEqual([]);
   });
+
+  it("se o provedor enviou mas a marca não gravou, o e-mail saiu: não pede o aviso ao admin, só registra a falha", async () => {
+    const source = new FakeSource();
+    const dbDown = new Error("banco fora");
+    source.markSent = async () => {
+      throw dbDown;
+    };
+    const { useCase } = build(new FakeSender(), source);
+
+    expect(await useCase.execute("order-1")).toBe(true);
+
+    expect(failures).toEqual([{ orderId: "order-1", error: dbDown }]);
+  });
 });
