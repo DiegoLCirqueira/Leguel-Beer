@@ -1,5 +1,6 @@
 import { pedidoDoClienteSchema } from "@leguele/shared";
 import { describe, expect, it } from "vitest";
+import { NotFoundError } from "../../../common/errors/not-found-error.js";
 import type { OrderDetailRow } from "../domain/order-reader.js";
 import { InMemoryOrderReader } from "../testing/in-memory-order-reader.js";
 import { GetMyOrder } from "./get-my-order.js";
@@ -91,5 +92,26 @@ describe("GetMyOrder", () => {
         { status: "em-preparo", em: "2026-11-27T14:55:00.000Z" },
       ],
     });
+  });
+
+  it("um pedido aguardando pagamento com o Pix vencido volta como cancelado, sem esperar o cron", async () => {
+    const waiting = detail({
+      status: "aguardando-pagamento",
+      createdAt: new Date(NOW.getTime() - 31 * 60_000),
+      expiresAt: new Date(NOW.getTime() - 60_000),
+    });
+    const reader = readerWith(waiting);
+
+    const order = await useCase(reader).execute({ ownerId: ANA, orderId: ORDER_ID });
+
+    expect(order.status).toBe("cancelado");
+  });
+
+  it("o pedido de outro cliente é não encontrado", async () => {
+    const reader = readerWith(detail(), "outro-id");
+
+    await expect(
+      useCase(reader).execute({ ownerId: ANA, orderId: ORDER_ID }),
+    ).rejects.toBeInstanceOf(NotFoundError);
   });
 });
