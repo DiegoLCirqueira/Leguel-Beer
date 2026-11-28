@@ -13,11 +13,14 @@ import { CRON_SECRET } from "./order.tokens.js";
 import { ExpireDueOrders } from "./application/expire-due-orders.js";
 import { ExpireOrder } from "./application/expire-order.js";
 import { ConfirmPayment } from "./application/confirm-payment.js";
+import { SendConfirmationEmail } from "./application/send-confirmation-email.js";
 import { CreateOrder } from "./application/create-order.js";
 import { GetMyOrder } from "./application/get-my-order.js";
 import { ListMyOrders } from "./application/list-my-orders.js";
 import { AccountFridgeSource } from "./infrastructure/account-fridge-source.js";
 import { DeliveryShippingQuoter } from "./infrastructure/delivery-shipping-quoter.js";
+import { DevOrderEmailSender } from "./infrastructure/dev-order-email-sender.js";
+import { PrismaConfirmationEmailSource } from "./infrastructure/prisma-confirmation-email-source.js";
 import { PrismaOrderReader } from "./infrastructure/prisma-order-reader.js";
 import { PrismaOrderCreation } from "./infrastructure/prisma-order-creation.js";
 import { PrismaOrderRepository } from "./infrastructure/prisma-order-repository.js";
@@ -33,6 +36,18 @@ function logExpirationFailure(
   { orderId, error }: { orderId: string; error: unknown },
 ): void {
   logger.error("Falha ao expirar pedido na leitura", {
+    orderId,
+    erro: error instanceof Error ? error.name : typeof error,
+    codigo: (error as { code?: unknown } | null)?.code,
+  });
+}
+
+/** Só o id do pedido e o tipo do erro: a mensagem pode carregar e-mail ou endereço do cliente. */
+function logEmailFailure(
+  logger: AppLogger,
+  { orderId, error }: { orderId: string; error: unknown },
+): void {
+  logger.error("Falha ao enviar o e-mail de confirmação", {
     orderId,
     erro: error instanceof Error ? error.name : typeof error,
     codigo: (error as { code?: unknown } | null)?.code,
@@ -91,12 +106,20 @@ function newOrderNumber(): string {
     },
     {
       provide: ConfirmPayment,
-      useFactory: (prisma: PrismaService) => {
+      useFactory: (prisma: PrismaService, logger: AppLogger) => {
         const orders = new PrismaOrderRepository(prisma);
         const now = () => new Date();
-        return new ConfirmPayment(orders, new ExpireOrder(orders, now), now);
+        const confirmationEmail = new SendConfirmationEmail({
+          source: new PrismaConfirmationEmailSource(prisma),
+          // O provedor real é pós-MVP: até lá, o adaptador de desenvolvimento não envia nada.
+          sender: new DevOrderEmailSender(logger),
+          siteUrl: process.env.SITE_URL ?? "http://localhost:3000",
+          now,
+          onFailure: (failure) => logEmailFailure(logger, failure),
+        });
+        return new ConfirmPayment(orders, new ExpireOrder(orders, now), now, confirmationEmail);
       },
-      inject: [PrismaService],
+      inject: [PrismaService, AppLogger],
     },
     {
       provide: CreateOrder,

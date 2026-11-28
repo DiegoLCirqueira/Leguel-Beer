@@ -1,12 +1,23 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { NotFoundError } from "../../../common/errors/not-found-error.js";
 import { OrderExpiredError, PaymentNotConfirmableError } from "../domain/order-errors.js";
 import type { ExpirableOrder, OrderRepository } from "../domain/order-repository.js";
 import { ConfirmPayment } from "./confirm-payment.js";
 import { ExpireOrder } from "./expire-order.js";
 
-function confirmPayment(orders: OrderRepository, now: () => Date): ConfirmPayment {
-  return new ConfirmPayment(orders, new ExpireOrder(orders, now), now);
+const emailsFor: string[] = [];
+
+function confirmPayment(
+  orders: OrderRepository,
+  now: () => Date,
+  emailSent = true,
+): ConfirmPayment {
+  return new ConfirmPayment(orders, new ExpireOrder(orders, now), now, {
+    execute: async (orderId) => {
+      emailsFor.push(orderId);
+      return emailSent;
+    },
+  });
 }
 
 const CREATED_AT = new Date("2026-11-14T10:00:00.000Z");
@@ -54,6 +65,10 @@ function awaitingOrder(overrides: Partial<ExpirableOrder> = {}): ExpirableOrder 
 }
 
 describe("ConfirmPayment", () => {
+  beforeEach(() => {
+    emailsFor.length = 0;
+  });
+
   it("confirma o pagamento do pedido aguardando, 10 minutos depois de criado, em nome do admin", async () => {
     const now = minutesAfter(CREATED_AT, 10);
     const orders = new InMemoryOrderRepository([awaitingOrder()]);
@@ -103,4 +118,28 @@ describe("ConfirmPayment", () => {
       expect(orders.confirmations).toEqual([]);
     },
   );
+
+  it.each([true, false])(
+    "depois de confirmar, pede o e-mail e devolve se ele saiu (%s)",
+    async (sent) => {
+      const orders = new InMemoryOrderRepository([awaitingOrder()]);
+      const confirm = confirmPayment(orders, () => minutesAfter(CREATED_AT, 10), sent);
+
+      const result = await confirm.execute({ orderId: "order-1", actorId: "admin-1" });
+
+      expect(result).toEqual({ emailEnviado: sent });
+      expect(emailsFor).toEqual(["order-1"]);
+    },
+  );
+
+  it("quem perde a corrida (409) não dispara e-mail", async () => {
+    const orders = new InMemoryOrderRepository([awaitingOrder({ status: "pago" })]);
+    const confirm = confirmPayment(orders, () => minutesAfter(CREATED_AT, 10));
+
+    await expect(
+      confirm.execute({ orderId: "order-1", actorId: "admin-1" }),
+    ).rejects.toBeInstanceOf(PaymentNotConfirmableError);
+
+    expect(emailsFor).toEqual([]);
+  });
 });

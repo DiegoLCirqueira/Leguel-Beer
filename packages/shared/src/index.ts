@@ -106,3 +106,5 @@ export {
 } from "./pagamento/parcelas.js";
 export type { OpcaoDeParcela, TabelaDeParcelas } from "./pagamento/parcelas.js";
 export { MENSAGENS_DE_PAGAMENTO } from "./pagamento/mensagens.js";
+export { confirmacaoDoPagamentoSchema } from "./pedido/confirmacao.js";
+export type { ConfirmacaoDoPagamento } from "./pedido/confirmacao.js";
