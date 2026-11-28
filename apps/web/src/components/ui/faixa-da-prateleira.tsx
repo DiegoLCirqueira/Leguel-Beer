@@ -64,7 +64,7 @@ export function FaixaDaPrateleira({ categoriaNome, rotulos }: FaixaDaPrateleiraP
             key={rotulo.cervejaId}
             data-placa=""
             className={`flex min-w-0 max-w-full items-center justify-center gap-1 whitespace-nowrap rounded-full border border-primaria/40 bg-superficie px-1.5 ${
-              unico ? "col-span-4 justify-self-center" : "justify-self-start"
+              unico ? "col-span-4 justify-self-center" : "justify-self-center"
             }`}
             style={unico ? undefined : { gridColumn: rotulo.coluna + 1 }}
           >
