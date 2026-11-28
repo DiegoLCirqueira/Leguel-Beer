@@ -249,6 +249,18 @@ describe("PrismaAdminBeerRepository (banco real)", () => {
       expect((await repository.list({ busca: "ALV" })).map((b) => b.name)).toEqual(["Alvorada"]);
     });
 
+    it("a busca trata % e _ como texto, não como curinga", async () => {
+      await repository.create(input({ nome: "100% Malte" }));
+      await repository.create(input({ nome: "Alvorada", categoriaSlug: "lager" }));
+      await repository.create(input({ nome: "Sol_Nascente", categoriaSlug: "lager" }));
+
+      expect((await repository.list({ busca: "%" })).map((b) => b.name)).toEqual(["100% Malte"]);
+      expect((await repository.list({ busca: "l_N" })).map((b) => b.name)).toEqual([
+        "Sol_Nascente",
+      ]);
+      expect((await repository.list({ busca: "A_v" })).map((b) => b.name)).toEqual([]);
+    });
+
     it("lê uma cerveja pelo id e devolve null se não existe", async () => {
       const created = await repository.create(input());
 
