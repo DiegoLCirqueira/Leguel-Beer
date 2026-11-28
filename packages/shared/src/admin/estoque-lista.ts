@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { numeroDoPedidoSchema } from "../pedido/numero.js";
 import { ESTOQUE_MAXIMO } from "./cerveja.js";
 
 /** Teto dos inteiros de saída: o Int de 32 bits do banco. */
@@ -51,7 +52,6 @@ const base = {
 };
 
 const motivo = z.string().trim().min(1).max(80);
-const numeroDoPedido = z.string().regex(/^#LB\d{6}$/);
 const positiva = z.int().positive().max(ESTOQUE_MAXIMO);
 const negativa = z.int().negative().min(-ESTOQUE_MAXIMO);
 const comSinal = z
@@ -90,14 +90,14 @@ export const movimentoDeEstoqueSchema = z.discriminatedUnion("tipo", [
     tipo: z.literal("venda"),
     quantidade: negativa,
     motivo: z.null(),
-    numeroDoPedido,
+    numeroDoPedido: numeroDoPedidoSchema,
   }),
   z.strictObject({
     ...base,
     tipo: z.literal("cancelamento"),
     quantidade: positiva,
     motivo: z.null(),
-    numeroDoPedido,
+    numeroDoPedido: numeroDoPedidoSchema,
   }),
 ]);
 
