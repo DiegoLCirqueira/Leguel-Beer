@@ -42,7 +42,7 @@ export class SupabasePhotoStorage implements PhotoStorage {
         method: "POST",
         // Nunca sobrescreve: o nome é novo a cada publicação.
         headers: { ...this.headers(token), "Content-Type": "image/webp", "x-upsert": "false" },
-        body: bytes as BodyInit,
+        body: Buffer.from(bytes),
       },
     );
     if (!response.ok) throw new Error(`STORAGE_PUBLISH_${response.status}`);
