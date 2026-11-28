@@ -46,7 +46,7 @@ export class InMemoryOrderReader implements OrderReader {
     return order?.detail ?? null;
   }
 
-  async findDueOwnedIds(ownerId: string, at: Date): Promise<string[]> {
+  async findDueOwnedIds(ownerId: string, at: Date, limit: number): Promise<string[]> {
     return this.orders
       .filter(
         (o) =>
@@ -54,7 +54,8 @@ export class InMemoryOrderReader implements OrderReader {
           o.list.status === "aguardando-pagamento" &&
           o.expiresAt.getTime() <= at.getTime(),
       )
-      .map((o) => o.list.id);
+      .map((o) => o.list.id)
+      .slice(0, limit);
   }
 
   /** O que a expiração faz no banco: o pedido vencido passa a cancelado. */

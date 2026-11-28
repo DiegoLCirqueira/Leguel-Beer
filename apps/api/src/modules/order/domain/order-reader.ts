@@ -52,6 +52,6 @@ export interface OrderReader {
   /** Um pedido do cliente; `null` se não existe ou é de outro. */
   findOwned(ownerId: string, orderId: string): Promise<OrderDetailRow | null>;
 
-  /** Ids dos pedidos do cliente aguardando pagamento cuja validade já passou em `at`. */
-  findDueOwnedIds(ownerId: string, at: Date): Promise<string[]>;
+  /** Até `limit` ids (os mais antigos primeiro) dos pedidos do cliente aguardando pagamento cuja validade já passou em `at`. */
+  findDueOwnedIds(ownerId: string, at: Date, limit: number): Promise<string[]>;
 }

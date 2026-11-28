@@ -1,5 +1,6 @@
 import { randomInt, randomUUID } from "node:crypto";
 import { Module } from "@nestjs/common";
+import { AppLogger } from "../../common/logging/app-logger.js";
 import { PrismaService } from "../../common/prisma/prisma.service.js";
 import { AccountModule } from "../account/account.module.js";
 import { PROFILE_REPOSITORY } from "../account/account.tokens.js";
@@ -25,6 +26,18 @@ import { AdminOrderController } from "./presentation/admin-order.controller.js";
 import { CronController } from "./presentation/cron.controller.js";
 import { OrderController } from "./presentation/order.controller.js";
 import { OrderReadController } from "./presentation/order-read.controller.js";
+
+/** Só o id do pedido e o tipo do erro: a mensagem pode carregar dado do cliente. */
+function logExpirationFailure(
+  logger: AppLogger,
+  { orderId, error }: { orderId: string; error: unknown },
+): void {
+  logger.error("Falha ao expirar pedido na leitura", {
+    orderId,
+    erro: error instanceof Error ? error.name : typeof error,
+    codigo: (error as { code?: unknown } | null)?.code,
+  });
+}
 
 /** "#LB" e 6 dígitos sorteados; a unicidade é do banco (a criação refaz o sorteio se colidir). */
 function newOrderNumber(): string {
@@ -52,27 +65,29 @@ function newOrderNumber(): string {
     },
     {
       provide: ListMyOrders,
-      useFactory: (prisma: PrismaService) => {
+      useFactory: (prisma: PrismaService, logger: AppLogger) => {
         const now = () => new Date();
         return new ListMyOrders(
           new PrismaOrderReader(prisma),
           new ExpireOrder(new PrismaOrderRepository(prisma), now),
           now,
+          (failure) => logExpirationFailure(logger, failure),
         );
       },
-      inject: [PrismaService],
+      inject: [PrismaService, AppLogger],
     },
     {
       provide: GetMyOrder,
-      useFactory: (prisma: PrismaService) => {
+      useFactory: (prisma: PrismaService, logger: AppLogger) => {
         const now = () => new Date();
         return new GetMyOrder(
           new PrismaOrderReader(prisma),
           new ExpireOrder(new PrismaOrderRepository(prisma), now),
           now,
+          (failure) => logExpirationFailure(logger, failure),
         );
       },
-      inject: [PrismaService],
+      inject: [PrismaService, AppLogger],
     },
     {
       provide: ConfirmPayment,

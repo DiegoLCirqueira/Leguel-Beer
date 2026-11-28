@@ -14,6 +14,8 @@ export class GetMyOrder {
     private readonly reader: OrderReader,
     private readonly expiration: OrderExpirer,
     private readonly now: () => Date,
+    /** Falha ao expirar o pedido: ele é devolvido como está. */
+    private readonly onExpirationFailure: (failure: { orderId: string; error: unknown }) => void,
   ) {}
 
   async execute(input: GetMyOrderInput): Promise<PedidoDoCliente> {
@@ -22,7 +24,13 @@ export class GetMyOrder {
     // Vencido, o pedido cancela na própria requisição, sem esperar o cron diário.
     const expired =
       found.status === "aguardando-pagamento" && pedidoVencido(found.expiresAt, this.now());
-    if (expired) await this.expiration.execute(found.id);
+    if (expired) {
+      try {
+        await this.expiration.execute(found.id);
+      } catch (error) {
+        this.onExpirationFailure({ orderId: found.id, error });
+      }
+    }
     const order = expired ? await this.reader.findOwned(input.ownerId, input.orderId) : found;
     if (!order) throw new NotFoundError();
     return {
