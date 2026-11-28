@@ -4,6 +4,7 @@ import {
   CategoryFullError,
   CategoryNotFoundError,
 } from "../domain/admin-beer.js";
+import { InvalidPhotoError, PhotoPathInvalidError } from "../domain/beer-photo.js";
 
 /** Traduz os erros do cadastro de cervejas para status e códigos; as mensagens são as do admin. */
 function toHttpError(error: unknown): unknown {
@@ -15,6 +16,12 @@ function toHttpError(error: unknown): unknown {
   }
   if (error instanceof CategoryNotFoundError) {
     return new CodedHttpError(422, "CATEGORY_NOT_FOUND", error.message);
+  }
+  if (error instanceof PhotoPathInvalidError) {
+    return new CodedHttpError(422, "PHOTO_PATH_INVALID", error.message);
+  }
+  if (error instanceof InvalidPhotoError) {
+    return new CodedHttpError(422, "INVALID_PHOTO", error.message);
   }
   return error;
 }

@@ -145,3 +145,12 @@ export type {
   ListaDoEstoque,
   MovimentoDeEstoque,
 } from "./admin/estoque-lista.js";
+export {
+  caminhoDeEnvioRespostaSchema,
+  caminhoDeEnvioSchema,
+  ehWebp,
+  FOTO_TAMANHO_MAXIMO_BYTES,
+  FOTO_VALIDADE_MINUTOS,
+  publicarFotoSchema,
+} from "./admin/foto.js";
+export type { CaminhoDeEnvioResposta, PublicarFoto } from "./admin/foto.js";

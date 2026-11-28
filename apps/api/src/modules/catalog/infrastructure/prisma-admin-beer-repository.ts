@@ -112,6 +112,11 @@ export class PrismaAdminBeerRepository implements AdminBeerRepository {
     });
   }
 
+  async setImage(id: string, imageUrl: string): Promise<AdminBeer | null> {
+    const { count } = await this.prisma.beer.updateMany({ where: { id }, data: { imageUrl } });
+    return count === 0 ? null : this.find(id);
+  }
+
   async update(id: string, input: EditarCerveja): Promise<AdminBeer | null> {
     return this.prisma.$transaction(async (tx) => {
       await lockWrites(tx);
