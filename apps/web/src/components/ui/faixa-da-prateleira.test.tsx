@@ -55,7 +55,6 @@ describe("FaixaDaPrateleira", () => {
     placas.forEach((placa) => expect(placa.className).toMatch(/rounded-full/));
     expect(screen.getByText("Carnaval")).toBeInTheDocument();
     expect(screen.queryByText("Leguelé Carnaval", { selector: "[aria-hidden]" })).toBeNull();
-    expect(screen.getByText("Carnaval").className).not.toMatch(/truncate/);
   });
 
   it("o convite da prateleira vazia é uma pílula centralizada", () => {
@@ -65,5 +64,38 @@ describe("FaixaDaPrateleira", () => {
     expect(placa).toHaveTextContent("Toque no + para escolher uma Malt");
     expect(placa?.className).toMatch(/rounded-full/);
     expect(placa?.className).toMatch(/justify-self-center/);
+  });
+
+  it("nome longo ou sem espaço fica dentro da coluna: só o nome trunca e o ×N segue visível", () => {
+    const { container } = render(
+      <FaixaDaPrateleira
+        categoriaNome="Lager"
+        rotulos={[
+          {
+            cervejaId: "a",
+            nome: "Ponta Verde Pilsen",
+            quantidade: 1,
+            totalCentavos: 3200,
+            coluna: 0,
+          },
+          {
+            cervejaId: "b",
+            nome: "Superlongonomesemespaco",
+            quantidade: 1,
+            totalCentavos: 3200,
+            coluna: 1,
+          },
+        ]}
+      />,
+    );
+
+    container.querySelectorAll("[data-placa]").forEach((placa) => {
+      expect(placa.className).toMatch(/min-w-0/);
+      expect(placa.className).toMatch(/max-w-full/);
+      expect(placa.querySelector("em")?.className).not.toMatch(/truncate/);
+      expect(placa.querySelector("em")?.className).toMatch(/shrink-0/);
+    });
+    expect(screen.getByText("Ponta Verde Pilsen").className).toMatch(/truncate/);
+    expect(screen.getByText("Superlongonomesemespaco").className).toMatch(/truncate/);
   });
 });
