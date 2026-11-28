@@ -454,7 +454,10 @@ describe("GeladeiraTela", () => {
       );
 
       await screen.findByRole("alert");
-      expect(container.querySelector("[data-desatualizada]")).toBeInTheDocument();
+      const moldura = container.querySelector("[data-desatualizada]");
+      expect(moldura).toBeInTheDocument();
+      // Esmaece pouco: as placas e os "+" seguem legíveis (contraste AA) e não parecem desabilitados.
+      expect(moldura?.className).toMatch(/opacity-80/);
 
       await userEvent.click(screen.getByRole("button", { name: "Tentar de novo" }));
 
