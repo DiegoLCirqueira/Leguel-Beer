@@ -155,8 +155,9 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
               size="sm"
               variant="outline"
               className="w-auto"
-              disabled={buscando}
+              aria-disabled={buscando}
               onClick={() => {
+                if (buscando) return;
                 refazendo.current = true;
                 tentarDeNovo();
               }}
