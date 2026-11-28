@@ -10,6 +10,8 @@ const ascii = (texto: string) => [...texto].map((c) => c.charCodeAt(0));
 
 const webp = (extra = 0) => {
   const bytes = new Uint8Array(12 + extra);
+  // Tamanho do bloco RIFF: o arquivo inteiro menos os 8 bytes do cabeçalho (little-endian).
+  new DataView(bytes.buffer).setUint32(4, 4 + extra, true);
   bytes.set(ascii("RIFF"), 0);
   bytes.set(ascii("WEBP"), 8);
   return bytes;
@@ -27,6 +29,15 @@ describe("ehWebp", () => {
     const wave = webp();
     wave.set(ascii("WAVE"), 8);
     expect(ehWebp(wave)).toBe(false);
+  });
+
+  it("recusa o arquivo cortado ou com sobra: o tamanho do RIFF (bytes 4 a 8) tem de bater com o arquivo", () => {
+    const cortado = webp(100).slice(0, 60);
+    const comSobra = new Uint8Array(webp(100).length + 10);
+    comSobra.set(webp(100), 0);
+
+    expect(ehWebp(cortado)).toBe(false);
+    expect(ehWebp(comSobra)).toBe(false);
   });
 
   it("o teto é de 40 KB", () => {
