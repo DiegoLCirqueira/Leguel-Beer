@@ -416,6 +416,51 @@ describe("GeladeiraTela", () => {
       await waitFor(() => expect(screen.queryByRole("alert")).not.toBeInTheDocument());
       expect(buscar).toHaveBeenCalledTimes(2);
     });
+
+    it("o aviso de falha é uma linha compacta (não uma coluna alta) para não encolher a Geladeira", async () => {
+      const conta: ContaDaGeladeira = {
+        buscar: async () => ({ tipo: "erro" }),
+        enviar: async () => ({ tipo: "erro" }),
+        validar: async () => ({ tipo: "erro" }),
+      };
+      render(
+        <GeladeiraProvider conta={conta}>
+          <GeladeiraTela />
+        </GeladeiraProvider>,
+      );
+
+      const aviso = await screen.findByRole("alert");
+      expect(aviso.className).toMatch(/flex-row/);
+      expect(aviso.className).not.toMatch(/flex-col/);
+    });
+
+    it("com a busca falha, a moldura aparece esmaecida como não atualizada, e volta ao normal ao acertar", async () => {
+      const buscar = vi
+        .fn()
+        .mockResolvedValueOnce({ tipo: "erro" })
+        .mockResolvedValue({
+          tipo: "ok",
+          resposta: { itens: [], ajustes: [], quantidadeTotal: 0, subtotalCentavos: 0 },
+        });
+      const conta: ContaDaGeladeira = {
+        buscar,
+        enviar: async () => ({ tipo: "erro" }),
+        validar: async () => ({ tipo: "erro" }),
+      };
+      const { container } = render(
+        <GeladeiraProvider conta={conta}>
+          <GeladeiraTela />
+        </GeladeiraProvider>,
+      );
+
+      await screen.findByRole("alert");
+      expect(container.querySelector("[data-desatualizada]")).toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole("button", { name: "Tentar de novo" }));
+
+      await waitFor(() => expect(screen.queryByRole("alert")).not.toBeInTheDocument());
+      expect(container.querySelector("[data-desatualizada]")).not.toBeInTheDocument();
+    });
   });
 
   describe("adicionar pela garrafa fantasma, sem sair da Geladeira", () => {

@@ -9,6 +9,8 @@ import {
 export type MolduraDaGeladeiraProps = {
   itens: ItemLocal[];
   className?: string;
+  /** A conta não respondeu: o que se vê pode estar velho, então aparece esmaecido. */
+  desatualizada?: boolean;
   /** Toque numa garrafa fantasma (abre a lista de adicionar da categoria). */
   aoAdicionar?: PrateleiraDaGeladeiraProps["aoAdicionar"];
 };
@@ -22,10 +24,20 @@ export const PRATELEIRAS = [
 ] as const;
 
 /** A geladeira de 4 prateleiras, uma por categoria, com a proporção 710 x 1573 da imagem. */
-export function MolduraDaGeladeira({ itens, className, aoAdicionar }: MolduraDaGeladeiraProps) {
+export function MolduraDaGeladeira({
+  itens,
+  className,
+  desatualizada,
+  aoAdicionar,
+}: MolduraDaGeladeiraProps) {
   return (
     <div
-      className={cn("@container relative overflow-hidden", className)}
+      data-desatualizada={desatualizada ? "" : undefined}
+      className={cn(
+        "@container relative overflow-hidden",
+        desatualizada && "opacity-60",
+        className,
+      )}
       style={{
         aspectRatio: "710 / 1573",
         backgroundImage: `url(${IMAGEM_DA_MOLDURA})`,

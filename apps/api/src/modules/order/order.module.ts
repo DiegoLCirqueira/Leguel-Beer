@@ -15,16 +15,32 @@ import { ExpireOrder } from "./application/expire-order.js";
 import { ConfirmPayment } from "./application/confirm-payment.js";
 import { SendConfirmationEmail } from "./application/send-confirmation-email.js";
 import { CreateOrder } from "./application/create-order.js";
+import { GetMyOrder } from "./application/get-my-order.js";
+import { ListMyOrders } from "./application/list-my-orders.js";
 import { AccountFridgeSource } from "./infrastructure/account-fridge-source.js";
 import { DeliveryShippingQuoter } from "./infrastructure/delivery-shipping-quoter.js";
 import { DevOrderEmailSender } from "./infrastructure/dev-order-email-sender.js";
 import { PrismaConfirmationEmailSource } from "./infrastructure/prisma-confirmation-email-source.js";
+import { PrismaOrderReader } from "./infrastructure/prisma-order-reader.js";
 import { PrismaOrderCreation } from "./infrastructure/prisma-order-creation.js";
 import { PrismaOrderRepository } from "./infrastructure/prisma-order-repository.js";
 import { ProfileCustomerSource } from "./infrastructure/profile-customer-source.js";
 import { AdminOrderController } from "./presentation/admin-order.controller.js";
 import { CronController } from "./presentation/cron.controller.js";
 import { OrderController } from "./presentation/order.controller.js";
+import { OrderReadController } from "./presentation/order-read.controller.js";
+
+/** Só o id do pedido e o tipo do erro: a mensagem pode carregar dado do cliente. */
+function logExpirationFailure(
+  logger: AppLogger,
+  { orderId, error }: { orderId: string; error: unknown },
+): void {
+  logger.error("Falha ao expirar pedido na leitura", {
+    orderId,
+    erro: error instanceof Error ? error.name : typeof error,
+    codigo: (error as { code?: unknown } | null)?.code,
+  });
+}
 
 /** Só o id do pedido e o tipo do erro: a mensagem pode carregar e-mail ou endereço do cliente. */
 function logEmailFailure(
@@ -45,7 +61,7 @@ function newOrderNumber(): string {
 
 @Module({
   imports: [AccountModule, DeliveryModule, FridgeModule],
-  controllers: [OrderController, AdminOrderController, CronController],
+  controllers: [OrderController, OrderReadController, AdminOrderController, CronController],
   providers: [
     { provide: CRON_SECRET, useFactory: () => process.env.CRON_SECRET ?? "" },
     {
@@ -61,6 +77,32 @@ function newOrderNumber(): string {
         return new ExpireDueOrders(orders, new ExpireOrder(orders, now), now);
       },
       inject: [PrismaService],
+    },
+    {
+      provide: ListMyOrders,
+      useFactory: (prisma: PrismaService, logger: AppLogger) => {
+        const now = () => new Date();
+        return new ListMyOrders(
+          new PrismaOrderReader(prisma),
+          new ExpireOrder(new PrismaOrderRepository(prisma), now),
+          now,
+          (failure) => logExpirationFailure(logger, failure),
+        );
+      },
+      inject: [PrismaService, AppLogger],
+    },
+    {
+      provide: GetMyOrder,
+      useFactory: (prisma: PrismaService, logger: AppLogger) => {
+        const now = () => new Date();
+        return new GetMyOrder(
+          new PrismaOrderReader(prisma),
+          new ExpireOrder(new PrismaOrderRepository(prisma), now),
+          now,
+          (failure) => logExpirationFailure(logger, failure),
+        );
+      },
+      inject: [PrismaService, AppLogger],
     },
     {
       provide: ConfirmPayment,
