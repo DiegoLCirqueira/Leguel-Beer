@@ -193,4 +193,20 @@ describe("FaixaDaPrateleira", () => {
     expect(screen.getByText("Maré IPA")).toBeInTheDocument();
     expect(screen.getByText("Maré Lager")).toBeInTheDocument();
   });
+
+  it("com várias cervejas, cada placa fica centralizada na coluna da própria garrafa", () => {
+    const { container } = render(
+      <FaixaDaPrateleira
+        categoriaNome="IPA"
+        rotulos={[
+          { cervejaId: "a", nome: "Maré", quantidade: 1, totalCentavos: 3200, coluna: 0 },
+          { cervejaId: "b", nome: "Jaraguá", quantidade: 1, totalCentavos: 3200, coluna: 1 },
+        ]}
+      />,
+    );
+
+    container
+      .querySelectorAll("[data-placa]")
+      .forEach((placa) => expect(placa.className).toMatch(/justify-self-center/));
+  });
 });
