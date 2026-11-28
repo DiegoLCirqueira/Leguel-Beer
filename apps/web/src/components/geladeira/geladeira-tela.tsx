@@ -152,7 +152,7 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
         aria-label="Prateleiras da Geladeira"
         ref={areaRef}
         tabIndex={areaRolavel ? 0 : undefined}
-        className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-4 py-2 outline-offset-[-2px] focus-visible:outline-2 focus-visible:outline-primaria lg:aspect-[710/1573] lg:flex-none lg:overflow-visible lg:px-0"
+        className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-4 pb-3 pt-4 outline-offset-[-2px] focus-visible:outline-2 focus-visible:outline-primaria lg:aspect-[710/1573] lg:flex-none lg:overflow-visible lg:px-0"
       >
         <h1 className="sr-only">Geladeira</h1>
         <AvisosDaGeladeira ajustes={ajustes} />
