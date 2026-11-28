@@ -1,5 +1,6 @@
 import { PEDIDOS_POR_PAGINA } from "@leguele/shared";
 import { describe, expect, it } from "vitest";
+import { ValidationError } from "../../../common/errors/validation-error.js";
 import type { OrderListRow } from "../domain/order-reader.js";
 import { InMemoryOrderReader } from "../testing/in-memory-order-reader.js";
 import { ListMyOrders } from "./list-my-orders.js";
@@ -68,5 +69,17 @@ describe("ListMyOrders", () => {
       [waiting.number]: "cancelado",
       [fresh.number]: "aguardando-pagamento",
     });
+  });
+
+  it.each([
+    "não-é-cursor",
+    Buffer.from("2026-11-27|x").toString("base64url"),
+    Buffer.from("lixo|00000000-0000-4000-8000-000000000001").toString("base64url"),
+  ])("recusa o cursor inventado %s como dado inválido", async (cursor) => {
+    const list = useCase(readerWith([listRow(1)]));
+
+    await expect(
+      list.execute({ ownerId: ANA, cursor, limit: PEDIDOS_POR_PAGINA }),
+    ).rejects.toBeInstanceOf(ValidationError);
   });
 });
