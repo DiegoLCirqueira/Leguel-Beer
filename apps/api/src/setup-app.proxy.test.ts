@@ -16,7 +16,7 @@ describe("limite por IP atrás do proxy da Vercel", () => {
       .useValue({ isUp: () => Promise.resolve(true) })
       .compile();
     app = moduleRef.createNestApplication();
-    setupApp(app, { webOrigin: "http://localhost:3000" });
+    setupApp(app, { webOrigin: "http://localhost:3000", production: true });
     await app.init();
   });
 
@@ -39,5 +39,37 @@ describe("limite por IP atrás do proxy da Vercel", () => {
     const other = await live("9.9.9.9, 5.6.7.8");
 
     expect(other.status).toBe(200);
+  });
+});
+
+describe("limite por IP fora de produção (sem proxy)", () => {
+  let app: INestApplication;
+
+  beforeAll(async () => {
+    vi.stubEnv("THROTTLE_LIMIT", "3");
+    const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
+      .overrideProvider(DATABASE_HEALTH)
+      .useValue({ isUp: () => Promise.resolve(true) })
+      .compile();
+    app = moduleRef.createNestApplication();
+    setupApp(app, { webOrigin: "http://localhost:3000" });
+    await app.init();
+  });
+
+  afterAll(async () => {
+    await app.close();
+    vi.unstubAllEnvs();
+  });
+
+  it("ignora o X-Forwarded-For: variar o cabeçalho não escapa do limite", async () => {
+    const statuses: number[] = [];
+    for (let i = 0; i < 4; i += 1) {
+      const response = await request(app.getHttpServer())
+        .get("/live")
+        .set("X-Forwarded-For", `9.9.9.${i}, 1.2.3.${i}`);
+      statuses.push(response.status);
+    }
+
+    expect(statuses).toEqual([200, 200, 200, 429]);
   });
 });

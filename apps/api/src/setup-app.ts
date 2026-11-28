@@ -15,9 +15,10 @@ export function setupApp(
   { webOrigin, production = false }: SetupOptions,
 ): void {
   (app as NestExpressApplication).disable("x-powered-by");
-  // Atrás do proxy da Vercel: confia só no primeiro salto (nunca `true`), então o IP contado no
-  // limite é o último do X-Forwarded-For, o que a Vercel acrescentou, e não o forjado pelo cliente.
-  (app as NestExpressApplication).set("trust proxy", 1);
+  // Em produção, atrás do proxy da Vercel: confia só no primeiro salto (nunca `true`), então o IP
+  // contado no limite é o último do X-Forwarded-For, o que a Vercel acrescentou, e não o forjado
+  // pelo cliente. Fora de produção não há proxy: o cabeçalho é do cliente e não vale.
+  if (production) (app as NestExpressApplication).set("trust proxy", 1);
   // Fora de produção, sem CSP: o Swagger UI em /docs precisa carregar seus scripts.
   app.use(helmet({ contentSecurityPolicy: production ? undefined : false }));
   app.enableCors({ origin: [webOrigin] });
