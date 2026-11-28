@@ -21,6 +21,8 @@ describe("BarraDoResumo", () => {
 
     const barra = container.firstElementChild!;
     expect(barra.className).toMatch(/border-primaria\/30/);
-    expect(barra.className).toMatch(/shadow-\[0_-8px_16px/);
+    expect(barra.className).toMatch(/shadow-\[0_-4px_8px/);
+    // Mais baixa: não sobrepõe a base da geladeira (botão de 44 px + 4 px de cada lado).
+    expect(barra.className).toMatch(/py-1(?!\d)/);
   });
 });

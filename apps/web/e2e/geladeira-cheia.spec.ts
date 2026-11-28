@@ -90,11 +90,13 @@ for (const tamanho of TAMANHOS) {
     const caixa = (await area.boundingBox())!;
     expect(letreiro.y).toBeGreaterThanOrEqual(caixa.y);
     expect(letreiro.y + letreiro.height).toBeLessThanOrEqual(caixa.y + caixa.height);
-    // E a moldura inteira tem folga embaixo no fim da rolagem (padding inferior), sem encostar na barra.
+    // E a moldura inteira tem folga embaixo no fim da rolagem (padding inferior de 8 a 12 px), sem encostar na barra.
     const moldura = (await page
       .getByRole("region", { name: "IPA" })
       .locator("xpath=..")
       .boundingBox())!;
-    expect(caixa.y + caixa.height - (moldura.y + moldura.height)).toBeGreaterThanOrEqual(16);
+    const folga = caixa.y + caixa.height - (moldura.y + moldura.height);
+    expect(folga).toBeGreaterThanOrEqual(8);
+    expect(folga).toBeLessThanOrEqual(12);
   });
 }
