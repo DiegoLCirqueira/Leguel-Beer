@@ -32,4 +32,29 @@ describe("FaixaDaPrateleira", () => {
     expect(screen.getByText(/^Leguelé Carnaval, 1 unidade, R\$\s32,00$/)).toBeInTheDocument();
     expect(screen.queryByText(/Toque no \+/)).not.toBeInTheDocument();
   });
+
+  it("cada cerveja ganha a própria placa em pílula, com o nome curto (sem o prefixo da marca) inteiro", () => {
+    const { container } = render(
+      <FaixaDaPrateleira
+        categoriaNome="IPA"
+        rotulos={[
+          { cervejaId: "a", nome: "Maré Alta", quantidade: 2, totalCentavos: 6400, coluna: 0 },
+          {
+            cervejaId: "b",
+            nome: "Leguelé Carnaval",
+            quantidade: 4,
+            totalCentavos: 12800,
+            coluna: 2,
+          },
+        ]}
+      />,
+    );
+
+    const placas = container.querySelectorAll("[data-placa]");
+    expect(placas).toHaveLength(2);
+    placas.forEach((placa) => expect(placa.className).toMatch(/rounded-full/));
+    expect(screen.getByText("Carnaval")).toBeInTheDocument();
+    expect(screen.queryByText("Leguelé Carnaval", { selector: "[aria-hidden]" })).toBeNull();
+    expect(screen.getByText("Carnaval").className).not.toMatch(/truncate/);
+  });
 });
