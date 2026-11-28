@@ -1,4 +1,8 @@
-import type { ConfirmationEmailSource, OrderEmailSender } from "../domain/order-email.js";
+import {
+  buildConfirmationEmail,
+  type ConfirmationEmailSource,
+  type OrderEmailSender,
+} from "../domain/order-email.js";
 
 export interface SendConfirmationEmailOptions {
   source: ConfirmationEmailSource;
@@ -19,8 +23,38 @@ export class SendConfirmationEmail {
 
   /** `true` só quando o provedor confirmou o envio e a marca foi gravada. */
   async execute(orderId: string): Promise<boolean> {
-    void this.options;
-    void orderId;
-    return false;
+    const { source, sender, siteUrl, now, onFailure } = this.options;
+    try {
+      const data = await source.find(orderId);
+      if (!data) return false;
+      const result = await withTimeout(
+        sender.send(buildConfirmationEmail(data, siteUrl)),
+        this.options.timeoutMs ?? EMAIL_TIMEOUT_MS,
+      );
+      // Adaptador de desenvolvimento: nada saiu de verdade, então não há marca de enviado.
+      if (result !== "sent") return false;
+      // A marca vem depois do sucesso do provedor, numa escrita separada do "Pago".
+      await source.markSent(orderId, now());
+      return true;
+    } catch (error) {
+      onFailure({ orderId, error });
+      return false;
+    }
   }
+}
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error("EMAIL_TIMEOUT")), ms);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error: unknown) => {
+        clearTimeout(timer);
+        reject(error instanceof Error ? error : new Error(String(error)));
+      },
+    );
+  });
 }
