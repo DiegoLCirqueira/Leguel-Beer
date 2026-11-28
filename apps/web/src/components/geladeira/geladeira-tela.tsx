@@ -138,7 +138,10 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
         <h1 className="sr-only">Geladeira</h1>
         <AvisosDaGeladeira ajustes={ajustes} />
         {falhouAoBuscar ? (
-          <div role="alert" className="flex flex-col items-center gap-2 py-2 text-center text-sm">
+          <div
+            role="alert"
+            className="flex flex-row flex-wrap items-center justify-center gap-x-3 gap-y-1 py-1 text-center text-sm"
+          >
             <p>Não foi possível carregar sua Geladeira agora.</p>
             <Button
               size="sm"
