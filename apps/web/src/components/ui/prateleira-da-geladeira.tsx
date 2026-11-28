@@ -85,6 +85,15 @@ export function PrateleiraDaGeladeira({
             </div>
             <span
               aria-hidden="true"
+              data-reflexo=""
+              className="absolute -bottom-[1%] -left-[30%] h-[10%] w-[160%] rounded-[50%]"
+              style={{
+                background:
+                  "radial-gradient(ellipse at 50% 40%, color-mix(in oklab, var(--color-aviso) 28%, transparent), transparent 70%)",
+              }}
+            />
+            <span
+              aria-hidden="true"
               data-sombra=""
               className="absolute -bottom-[2%] -left-[15%] h-[7%] w-[130%] rounded-[50%]"
               style={{
