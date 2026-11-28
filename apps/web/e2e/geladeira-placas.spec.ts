@@ -16,10 +16,12 @@ test("em 360x640, 4 cervejas de 1 unidade na mesma prateleira ficam em placas de
   const caixas = [];
   for (const placa of await placas.all()) {
     caixas.push((await placa.boundingBox())!);
-    // O ×N continua inteiro dentro da própria placa.
+    // O ×N segue inteiro e junto da própria placa.
     const em = (await placa.locator("em").boundingBox())!;
     const caixa = caixas[caixas.length - 1]!;
-    expect(em.x + em.width).toBeLessThanOrEqual(caixa.x + caixa.width + 0.5);
+    // O ×N é um selo no canto da placa: passa só alguns px da borda (-right-1), nunca da moldura.
+    expect(em.x + em.width).toBeLessThanOrEqual(caixa.x + caixa.width + 6);
+    expect(em.x).toBeGreaterThanOrEqual(caixa.x);
   }
   for (let i = 1; i < caixas.length; i++) {
     expect(caixas[i]!.x).toBeGreaterThanOrEqual(caixas[i - 1]!.x + caixas[i - 1]!.width - 0.5);
