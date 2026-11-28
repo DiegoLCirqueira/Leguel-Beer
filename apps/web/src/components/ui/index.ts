@@ -33,3 +33,4 @@ export { StyleBadge } from "./style-badge";
 export { TotaisDoResumo } from "./totais-do-resumo";
 export type { FreteEstimado } from "./totais-do-resumo";
 export { Toast } from "./toast";
+export { IconeDaCategoria } from "./icone-da-categoria";
