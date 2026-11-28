@@ -56,7 +56,7 @@ export function FaixaDaPrateleira({ categoriaNome, rotulos }: FaixaDaPrateleiraP
       {rotulos.length === 0 ? (
         <span
           data-placa=""
-          className="col-span-4 justify-self-center whitespace-nowrap rounded-full border border-primaria/40 bg-superficie px-2 text-texto-suave"
+          className="col-span-4 justify-self-center whitespace-nowrap rounded-full border border-primaria/60 bg-superficie px-2 text-texto"
         >{`Toque no + para escolher uma ${categoriaNome}`}</span>
       ) : (
         rotulos.map((rotulo, i) => (
