@@ -42,6 +42,7 @@ for (const tamanho of TAMANHOS) {
       visivel: el.clientHeight,
     }));
     expect(medidas.rolagem).toBeGreaterThan(medidas.visivel);
+    await expect(area).toHaveAttribute("tabindex", "0");
 
     // A última prateleira é alcançada rolando a área, e fica entre o header e a barra inferior.
     const ultima = page.getByRole("button", { name: "Adicionar Lager" }).first();

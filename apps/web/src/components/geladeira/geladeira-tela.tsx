@@ -16,6 +16,7 @@ import {
 import type { FreteEstimado } from "@/components/ui";
 import type { Desfazer } from "@/lib/geladeira/estado";
 import { mensagemDoLimite } from "@/lib/geladeira/estado";
+import { useRolavel } from "@/lib/use-rolavel";
 import { useTelaLarga } from "@/lib/use-tela-larga";
 import { useGeladeira } from "./geladeira-provider";
 import { ListaDeAdicionar } from "./lista-de-adicionar";
@@ -72,6 +73,7 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
     desfazer,
   } = useGeladeira();
   const larga = useTelaLarga();
+  const [areaRef, areaRolavel] = useRolavel<HTMLDivElement>();
   // Os avisos valem para esta visita: ao sair da Geladeira, somem.
   useEffect(() => limparAjustes, [limparAjustes]);
   const [sheetAberto, setSheetAberto] = useState(false);
@@ -148,7 +150,8 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
       <div
         role="region"
         aria-label="Prateleiras da Geladeira"
-        tabIndex={0}
+        ref={areaRef}
+        tabIndex={areaRolavel ? 0 : undefined}
         className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-4 py-2 outline-offset-[-2px] focus-visible:outline-2 focus-visible:outline-primaria lg:aspect-[710/1573] lg:flex-none lg:overflow-visible lg:px-0"
       >
         <h1 className="sr-only">Geladeira</h1>
