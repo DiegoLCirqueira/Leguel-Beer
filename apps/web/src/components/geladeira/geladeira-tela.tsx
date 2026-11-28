@@ -151,8 +151,9 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
         role="region"
         aria-label="Prateleiras da Geladeira"
         ref={areaRef}
+        data-area-rolavel=""
         tabIndex={areaRolavel ? 0 : undefined}
-        className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto overflow-x-hidden px-4 pb-5 pt-4 outline-offset-[-2px] focus-visible:outline-2 focus-visible:outline-primaria lg:aspect-[710/1573] lg:flex-none lg:overflow-visible lg:px-0"
+        className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto overflow-x-hidden px-[5.5%] pb-5 pt-4 outline-offset-[-2px] focus-visible:outline-2 focus-visible:outline-primaria lg:aspect-[710/1573] lg:flex-none lg:overflow-visible lg:px-0"
       >
         <h1 className="sr-only">Geladeira</h1>
         <AvisosDaGeladeira ajustes={ajustes} />
@@ -181,7 +182,7 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
           <MolduraDaGeladeira
             itens={estado.itens}
             desatualizada={falhouAoBuscar}
-            className="w-[89vw] max-w-[26rem] flex-none lg:min-h-0 lg:w-auto lg:max-w-none lg:flex-1"
+            className="w-full max-w-[26rem] flex-none lg:min-h-0 lg:w-auto lg:max-w-none lg:flex-1"
             aoAdicionar={(categoria) => setCategoriaAberta(categoria)}
           />
         ) : (
@@ -191,7 +192,7 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
             </p>
             <Skeleton
               data-testid="esqueleto-da-geladeira"
-              className="aspect-[710/1573] w-[89vw] max-w-[26rem] flex-none rounded-2xl lg:min-h-0 lg:w-auto lg:max-w-none lg:flex-1"
+              className="aspect-[710/1573] w-full max-w-[26rem] flex-none rounded-2xl lg:min-h-0 lg:w-auto lg:max-w-none lg:flex-1"
             />
           </>
         )}

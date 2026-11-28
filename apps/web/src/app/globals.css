@@ -76,6 +76,13 @@
   html::-webkit-scrollbar {
     display: none;
   }
+  /* O mesmo nas áreas roláveis internas (a propriedade não herda de html). */
+  [data-area-rolavel] {
+    scrollbar-width: none;
+  }
+  [data-area-rolavel]::-webkit-scrollbar {
+    display: none;
+  }
   body {
     @apply bg-fundo font-texto text-texto;
     -webkit-tap-highlight-color: transparent;
