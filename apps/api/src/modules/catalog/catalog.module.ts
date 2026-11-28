@@ -4,20 +4,27 @@ import { PrismaService } from "../../common/prisma/prisma.service.js";
 import { GetBeer } from "./application/get-beer.js";
 import { ListBeers } from "./application/list-beers.js";
 import { ListFeaturedBeers } from "./application/list-featured-beers.js";
-import { BEER_REPOSITORY } from "./catalog.tokens.js";
+import { ADMIN_BEER_REPOSITORY, BEER_REPOSITORY } from "./catalog.tokens.js";
 import type { BeerRepository } from "./domain/beer-repository.js";
+import { PrismaAdminBeerRepository } from "./infrastructure/prisma-admin-beer-repository.js";
 import { PrismaBeerRepository } from "./infrastructure/prisma-beer-repository.js";
+import { AdminBeerController } from "./presentation/admin-beer.controller.js";
 import { CatalogController } from "./presentation/catalog.controller.js";
 
 @Module({
   exports: [BEER_REPOSITORY],
-  controllers: [CatalogController],
+  controllers: [CatalogController, AdminBeerController],
   providers: [
     {
       provide: BEER_REPOSITORY,
       useFactory: (prisma: PrismaService, logger: AppLogger) =>
         new PrismaBeerRepository(prisma, logger),
       inject: [PrismaService, AppLogger],
+    },
+    {
+      provide: ADMIN_BEER_REPOSITORY,
+      useFactory: (prisma: PrismaService) => new PrismaAdminBeerRepository(prisma),
+      inject: [PrismaService],
     },
     {
       provide: GetBeer,
