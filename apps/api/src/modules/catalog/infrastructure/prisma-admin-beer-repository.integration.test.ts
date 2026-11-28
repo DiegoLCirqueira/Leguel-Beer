@@ -117,6 +117,55 @@ describe("PrismaAdminBeerRepository (banco real)", () => {
     });
   });
 
+  describe("travas", () => {
+    /** Segura uma trava (SQL dado) numa transação aberta até `release()`. */
+    async function hold(
+      lock: (tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0]) => Promise<unknown>,
+    ) {
+      let release!: () => void;
+      const released = new Promise<void>((resolve) => (release = resolve));
+      let acquired!: () => void;
+      const locked = new Promise<void>((resolve) => (acquired = resolve));
+      const transaction = prisma.$transaction(
+        async (tx) => {
+          await lock(tx);
+          acquired();
+          await released;
+        },
+        { timeout: 15_000 },
+      );
+      await locked;
+      return async () => {
+        release();
+        await transaction;
+      };
+    }
+
+    const pause = () => new Promise<"waiting">((resolve) => setTimeout(resolve, 300, "waiting"));
+
+    it.each([
+      [
+        "da categoria",
+        (tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0]) =>
+          tx.$queryRaw`SELECT id FROM categories WHERE slug = 'ipa' FOR UPDATE`,
+      ],
+      [
+        "de escrita do admin",
+        (tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0]) =>
+          tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('admin-beers'))`,
+      ],
+    ])("cadastrar espera a trava %s e passa depois que ela é solta", async (_name, lock) => {
+      const release = await hold(lock);
+      const creating = repository.create(input());
+
+      const early = await Promise.race([creating.then(() => "done" as const), pause()]);
+      expect(early).toBe("waiting");
+
+      await release();
+      await expect(creating).resolves.toMatchObject({ name: "Maré Alta" });
+    });
+  });
+
   describe("update", () => {
     it("edita sem mexer no slug nem no estoque físico", async () => {
       const created = await repository.create(input());
