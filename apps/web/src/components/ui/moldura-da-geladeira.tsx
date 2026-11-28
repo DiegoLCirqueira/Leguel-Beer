@@ -44,6 +44,10 @@ export function MolduraDaGeladeira({ itens, className, aoAdicionar }: MolduraDaG
       <span
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-[88.5%] z-45 -translate-y-1/2 text-center font-titulo text-[8cqw] leading-none text-primaria"
+        style={{
+          textShadow:
+            "0 0 0.15em color-mix(in oklab, var(--color-primaria) 80%, transparent), 0 0 0.5em color-mix(in oklab, var(--color-primaria) 45%, transparent)",
+        }}
       >
         Leguelé Beer
       </span>
