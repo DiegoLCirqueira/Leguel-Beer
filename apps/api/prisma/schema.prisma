@@ -64,6 +64,8 @@ model Beer {
   featured           Boolean                  @default(false)
   active             Boolean                  @default(true)
   stock              Int                      @default(0)
+  /// Estoque mínimo: com o disponível igual ou abaixo dele, o admin vê o selo "Baixo".
+  minStock           Int                      @default(6) @map("min_stock")
   /// Texto curto da página de produto; nulo some a seção.
   description        String?
   /// Preço anterior em centavos, opcional: só vale como desconto se for maior que o atual.
