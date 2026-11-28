@@ -41,7 +41,10 @@ export function apelidosDaPrateleira(nomes: string[]): string[] {
     if (crescem.length === 0) break;
     crescem.forEach((i) => (tamanhos[i] = tamanhos[i]! + 1));
   }
-  return nomes.map((_, i) => apelido(i));
+  // Ainda repetidos (só diferem pela sigla): o nome inteiro, que a placa trunca se não couber.
+  return nomes.map((nome, i) =>
+    nomes.some((_, j) => j !== i && apelido(j) === apelido(i)) ? nome : apelido(i),
+  );
 }
 
 /** Faixa sobre o parapeito: o que há na prateleira ou o convite para escolher uma cerveja. */
