@@ -145,7 +145,7 @@ describe("FaixaDaPrateleira", () => {
     expect(screen.getByText("Maré Alta")).toBeInTheDocument();
   });
 
-  it("apelidos que se repetem na prateleira ganham mais uma palavra, para cada placa ser única", () => {
+  it("quando a 1ª palavra se repete, a placa mostra o que distingue (sem o prefixo comum), curto e único", () => {
     render(
       <FaixaDaPrateleira
         categoriaNome="Lager"
@@ -163,9 +163,11 @@ describe("FaixaDaPrateleira", () => {
       />,
     );
 
-    expect(screen.getByText("Jaraguá Premium")).toBeInTheDocument();
-    expect(screen.getByText("Jaraguá Extra")).toBeInTheDocument();
+    expect(screen.getByText("Premium")).toBeInTheDocument();
+    expect(screen.getByText("Extra")).toBeInTheDocument();
     expect(screen.getByText("Carnaval")).toBeInTheDocument();
+    // O leitor de tela segue lendo o nome completo.
+    expect(screen.getByText(/^Jaraguá Premium, 1 unidade/)).toBeInTheDocument();
   });
 
   it("nome só de sigla (Ale, Lager) cai no nome inteiro, nunca numa placa vazia", () => {
