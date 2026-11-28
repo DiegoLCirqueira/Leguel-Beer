@@ -149,6 +149,8 @@ model Order {
   cancelReason       String?       @map("cancel_reason")
   /// Quantas varreduras do cron falharam ao expirar este pedido; os que falham mais ficam por último no lote.
   expirationFailures Int           @default(0) @map("expiration_failures")
+  /// Quando o provedor confirmou o envio do e-mail de "pedido pago"; nulo se não saiu (falha ou adaptador de desenvolvimento).
+  confirmationEmailSentAt DateTime? @map("confirmation_email_sent_at") @db.Timestamptz(3)
   customerName       String        @map("customer_name")
   customerPhone      String        @map("customer_phone")
   shipZip            String        @map("ship_zip")

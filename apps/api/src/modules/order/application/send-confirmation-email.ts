@@ -34,7 +34,12 @@ export class SendConfirmationEmail {
       // Adaptador de desenvolvimento: nada saiu de verdade, então não há marca de enviado.
       if (result !== "sent") return false;
       // A marca vem depois do sucesso do provedor, numa escrita separada do "Pago".
-      await source.markSent(orderId, now());
+      try {
+        await source.markSent(orderId, now());
+      } catch (error) {
+        // O e-mail saiu: a falha é só da marca, então vai ao log e não vira aviso ao admin.
+        onFailure({ orderId, error });
+      }
       return true;
     } catch (error) {
       onFailure({ orderId, error });
