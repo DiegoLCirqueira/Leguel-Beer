@@ -34,13 +34,15 @@ export function FaixaDaPrateleira({ categoriaNome, rotulos }: FaixaDaPrateleiraP
           <span
             key={rotulo.cervejaId}
             data-placa=""
-            className={`flex items-center justify-center gap-1 whitespace-nowrap rounded-full border border-primaria/40 bg-superficie px-1.5 ${
+            className={`flex min-w-0 max-w-full items-center justify-center gap-1 whitespace-nowrap rounded-full border border-primaria/40 bg-superficie px-1.5 ${
               unico ? "col-span-4 justify-self-center" : "justify-self-start"
             }`}
             style={unico ? undefined : { gridColumn: rotulo.coluna + 1 }}
           >
-            <span aria-hidden="true">{nomeCurto(rotulo.nome)}</span>
-            <em aria-hidden="true" className="font-semibold not-italic text-primaria">
+            <span aria-hidden="true" className="min-w-0 truncate">
+              {nomeCurto(rotulo.nome)}
+            </span>
+            <em aria-hidden="true" className="shrink-0 font-semibold not-italic text-primaria">
               {`×${rotulo.quantidade}`}
             </em>
             <span className="sr-only">{leitura(rotulo)}</span>
