@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { PrismaService } from "../../common/prisma/prisma.service.js";
 import { GetAdminSummary } from "./application/get-admin-summary.js";
+import { PrismaStockRepository } from "./infrastructure/prisma-stock-repository.js";
 import { PrismaAdminSummaryReader } from "./infrastructure/prisma-admin-summary-reader.js";
 import { AdminSummaryController } from "./presentation/admin-summary.controller.js";
 
@@ -10,7 +11,10 @@ import { AdminSummaryController } from "./presentation/admin-summary.controller.
     {
       provide: GetAdminSummary,
       useFactory: (prisma: PrismaService) =>
-        new GetAdminSummary(new PrismaAdminSummaryReader(prisma), () => new Date()),
+        new GetAdminSummary(
+          new PrismaAdminSummaryReader(prisma, new PrismaStockRepository(prisma)),
+          () => new Date(),
+        ),
       inject: [PrismaService],
     },
   ],
