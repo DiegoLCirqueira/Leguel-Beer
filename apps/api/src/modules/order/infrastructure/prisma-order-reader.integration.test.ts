@@ -80,8 +80,8 @@ describe("PrismaOrderReader (banco real)", () => {
         createdAt,
         items: {
           create: [
-            { beerId: beerB, name: "Brisa Leve", unitPriceCents: 2000, quantity: 1 },
             { beerId: beerA, name: "Maré Alta", unitPriceCents: 2000, quantity: 2 },
+            { beerId: beerB, name: "Brisa Leve", unitPriceCents: 2000, quantity: 1 },
           ],
         },
         statusHistory: {
@@ -132,5 +132,53 @@ describe("PrismaOrderReader (banco real)", () => {
 
     expect(seen).toHaveLength(5);
     expect([...seen].sort()).toEqual([...mine].sort());
+  });
+
+  it("lê um pedido do cliente com itens, valores, endereço de entrega e o histórico do mais antigo ao mais recente", async () => {
+    const paidAt = new Date(T0.getTime() + 120_000);
+    // O histórico entra fora de ordem: quem ordena é o leitor.
+    const order = await createOrder(ana, T0, {
+      history: [
+        { to: "PAID", at: paidAt },
+        { to: "AWAITING_PAYMENT", at: T0 },
+      ],
+    });
+
+    const detail = await reader.findOwned(ana, order.id);
+
+    expect(detail).toMatchObject({
+      id: order.id,
+      status: "pago",
+      createdAt: T0,
+      expiresAt: new Date(T0.getTime() + 30 * 60_000),
+      payment: { tipo: "pix" },
+      subtotalCents: 6000,
+      shippingCents: 1290,
+      totalCents: 7290,
+      shipTo: {
+        zip: "57035000",
+        street: "Rua do Sol",
+        number: "100",
+        complement: null,
+        district: "Farol",
+        city: "Maceió",
+        state: "AL",
+      },
+      history: [
+        { status: "aguardando-pagamento", at: T0 },
+        { status: "pago", at: paidAt },
+      ],
+    });
+    expect(detail?.items).toEqual([
+      { beerId: beerB, name: "Brisa Leve", priceCents: 2000, quantity: 1 },
+      { beerId: beerA, name: "Maré Alta", priceCents: 2000, quantity: 2 },
+    ]);
+  });
+
+  it("não devolve o pedido de outro cliente nem um id que não existe", async () => {
+    const others = await createOrder(bruno, T0);
+
+    expect(await reader.findOwned(ana, others.id)).toBeNull();
+    expect(await reader.findOwned(ana, crypto.randomUUID())).toBeNull();
   });
 });
