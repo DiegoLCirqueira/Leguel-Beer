@@ -434,6 +434,32 @@ describe("GeladeiraTela", () => {
       expect(aviso.className).not.toMatch(/flex-col/);
     });
 
+    it("durante o retry o botão vira 'Tentando...' e fica desabilitado", async () => {
+      let responder!: (r: { tipo: "erro" }) => void;
+      const buscar = vi
+        .fn()
+        .mockResolvedValueOnce({ tipo: "erro" })
+        .mockReturnValueOnce(new Promise((resolve) => (responder = resolve)));
+      const conta: ContaDaGeladeira = {
+        buscar,
+        enviar: async () => ({ tipo: "erro" }),
+        validar: async () => ({ tipo: "erro" }),
+      };
+      render(
+        <GeladeiraProvider conta={conta}>
+          <GeladeiraTela />
+        </GeladeiraProvider>,
+      );
+      await screen.findByRole("alert");
+
+      await userEvent.click(screen.getByRole("button", { name: "Tentar de novo" }));
+
+      const botao = await screen.findByRole("button", { name: "Tentando..." });
+      expect(botao).toBeDisabled();
+      responder({ tipo: "erro" });
+      expect(await screen.findByRole("button", { name: "Tentar de novo" })).toBeEnabled();
+    });
+
     it("com a busca falha, a moldura aparece esmaecida como não atualizada, e volta ao normal ao acertar", async () => {
       const buscar = vi
         .fn()
