@@ -383,17 +383,39 @@ describe("GeladeiraTela", () => {
   });
 
   describe("área rolável das prateleiras", () => {
-    it("é uma região nomeada e focável, para rolar com o teclado, e a moldura tem teto de largura (tablet)", async () => {
+    const tela = () =>
       render(
         <GeladeiraProvider>
           <GeladeiraTela />
         </GeladeiraProvider>,
       );
 
+    it("é uma região nomeada, e a moldura tem teto de largura (tablet)", async () => {
+      tela();
+
       const area = await screen.findByRole("region", { name: "Prateleiras da Geladeira" });
-      expect(area).toHaveAttribute("tabindex", "0");
-      const moldura = area.querySelector("[data-moldura]");
-      expect(moldura?.className).toMatch(/max-w-/);
+      expect(area.querySelector("[data-moldura]")?.className).toMatch(/max-w-/);
+    });
+
+    it("sem rolagem (tudo cabe), a região não entra na ordem do Tab", async () => {
+      tela();
+
+      const area = await screen.findByRole("region", { name: "Prateleiras da Geladeira" });
+      expect(area).not.toHaveAttribute("tabindex");
+    });
+
+    it("com rolagem, a região é focável para rolar com o teclado", async () => {
+      const alturas = vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(900);
+      const visivel = vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(400);
+      try {
+        tela();
+
+        const area = await screen.findByRole("region", { name: "Prateleiras da Geladeira" });
+        await waitFor(() => expect(area).toHaveAttribute("tabindex", "0"));
+      } finally {
+        alturas.mockRestore();
+        visivel.mockRestore();
+      }
     });
   });
 
