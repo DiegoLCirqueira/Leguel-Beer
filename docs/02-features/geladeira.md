@@ -125,7 +125,7 @@ Funcionalidade: Geladeira em prateleiras por categoria
 - **Geladeira vazia:** as 4 prateleiras só com garrafas fantasma e sem a barra do resumo.
 - **Animações** só com `transform` e `opacity`: a garrafa nova cai com quique e balanço; ao aumentar a quantidade, as garrafas do rótulo balançam apoiadas na base, escalonadas; a garrafa que sai some em 300 ms. Com `prefers-reduced-motion: reduce`, nada se move: as garrafas aparecem e somem sem animação.
 - **Leitor de tela:** cada prateleira é uma região com o nome da categoria; cada rótulo é lido como "<nome>, <N> unidades, <total>" (ex.: "Maré Alta, 2 unidades, R$ 64,00"; singular "1 unidade").
-- **Tamanho:** no celular a Geladeira cabe na altura livre entre o header, a barra do resumo e a barra inferior, sem rolagem dentro das prateleiras nem da página, de 360 × 640 a 430 × 932. A moldura mantém a proporção 710 × 1573 e encolhe pela altura. A partir de 1024 px, duas colunas: Geladeira à esquerda e resumo fixo à direita.
+- **Tamanho** (ordem do Diego via mockup, 28/11, substitui "caber na altura livre, sem rolagem"): no celular a moldura ocupa cerca de **89% da largura** da tela (centralizada, garrafas maiores) e mantém a proporção 710 × 1573. Como isso passa da altura livre, **a área da Geladeira rola na vertical**, entre o header e a barra inferior da loja; a **barra do resumo** (subtotal e "Ver resumo") e a **barra inferior** ficam fixas e a rolagem acontece por trás delas, sem cobrir a última prateleira (a área tem folga embaixo igual à altura das duas barras). A página não rola por inteiro: só a área. Sem rolagem **horizontal** de 360 × 640 a 430 × 932. Não há rolagem *dentro* das prateleiras (cada uma mostra suas garrafas inteiras; ver Fora de escopo). A partir de 1024 px, duas colunas: Geladeira à esquerda e resumo fixo à direita.
 
 ### Imagens das garrafas (LB-124)
 
@@ -236,6 +236,7 @@ Os demais já existem: `StyleBadge`, `Stepper`, `Toast`, `BottomSheet` e `Button
 - **Revalidação na API:** caso de uso com repositório fake para preço mudou, inativa, inexistente, esgotada e quantidade reduzida, e os quatro juntos na ordem de entrada (unitário); `POST /geladeira/validar` sem token (HTTP).
 - **Geladeira da conta:** `GET`/`PUT /me/geladeira` com banco real; sem token dá 401; o `PUT` de um cliente não muda a Geladeira de outro; `PUT` repetido dá o mesmo resultado (integração e HTTP).
 - **Sincronização no site:** falha da Server Action mantém a cópia local e reenvia depois (teste de componente com a action simulada, inclusive rejeitando).
+- **Tamanho no celular** (E2E, 360 × 640 e 430 × 932): a largura da moldura fica entre 85% e 92% da tela; a página não tem rolagem horizontal; a área rola na vertical até a última prateleira ficar inteira e visível acima da barra do resumo; a barra do resumo e a barra inferior continuam na mesma posição da tela depois de rolar. Não há cenário Gherkin próprio: a spec já está nos 6 cenários.
 - **Adicionar na Geladeira** (componente e E2E): a fantasma abre a lista da categoria sem mudar a URL, com o nome do diálogo, o foco dentro dela e o retorno do foco ao fechar; a miniatura com `alt` vazio; na 51ª cerveja diferente, "A Geladeira está cheia." sem adicionar e com a lista aberta; esgotada desabilitada; "Adicionar" fecha a lista, põe 1 unidade e mostra o toast com "Desfazer"; no limite, "Só temos N unidades" e nada muda; o texto "Leguelé Beer" aparece na base da moldura, sem ser lido pelo leitor de tela.
 - **Telas:** prateleira (profundidade, "×N", fantasma, rótulo acessível, imagem padrão), resumo e avisos (componente); cenários desta spec em 360 × 640 e 1280 × 800, com movimento reduzido no cenário de balanço (E2E). Medidas de layout rodam também no container Playwright Linux ([[licoes-aprendidas]], 2026-11-08).
 
@@ -248,7 +249,7 @@ Os demais já existem: `StyleBadge`, `Stepper`, `Toast`, `BottomSheet` e `Button
 | 3 | LB-47 (#54), API | Back | Modelos e migration da Geladeira da conta; `GET` e `PUT /me/geladeira`, reusando a revalidação da fatia 2 |
 | 4 | LB-47 (#54), site | Front | Estado da Geladeira (operações puras, armazenamento local versionado, sincronização com a conta pelo servidor do site, regra ao entrar e ao sair) e contador real no header; destrava [[adicionar-do-card]] e a fatia 4 de [[produto]] |
 | 5 | LB-124 (#61) | Front | Moldura, garrafa fantasma em SVG, imagem padrão por categoria, as 9 fotos de garrafa em WebP (PR #249) e o `imageUrl` delas no seed (o seed é ajuste pequeno do Front com revisão do Back) |
-| 6 | LB-49 (#56) | Front | `/geladeira` com as prateleiras, arrumação, faixas, fantasmas, animações, acessibilidade e tamanho sem rolagem |
+| 6 | LB-49 (#56) | Front | `/geladeira` com as prateleiras, arrumação, faixas, fantasmas, animações, acessibilidade e tamanho (~89% da largura, área rolável) |
 | 7 | LB-51 (#58), LB-50 (#57) e LB-52 no site | Front | Resumo (barra e sheet no celular, coluna no desktop), alterar e remover com "Desfazer", e a lista de avisos da revalidação |
 
 Depois do contrato (fatia 1), o Back faz as fatias 2 e 3 e o Front a 4 em paralelo (a 4 usa a API a partir das fatias 2 e 3). A 5 pode andar junto com a 4. A 6 depende da 4 e da 5; a 7, da 6. O LB-35 ([[adicionar-do-card]]) e o LB-42 ([[produto]], fatia 4) entram logo depois da fatia 4.
@@ -286,7 +287,7 @@ Recomendações aplicadas pelo Spec em 10/11, em modo autônomo; qualquer uma po
 - **Imagens:** uma imagem por cerveja para card, produto e Geladeira, em `apps/web/public/cervejas/`, WebP recortado em caixa justa, de tamanho variável, alinhado pela base, até 40 KB (o card do LB-124 previa um tipo de imagem separado em `BeerImage`, que fica para o cadastro do admin).
 - **Imagem padrão da categoria:** garrafa sem rótulo na cor do selo da categoria.
 - **Garrafas que entram agora:** substituída pela decisão do Diego de 2026-11-12 (fotos dele autorizadas, mesmo com marca de terceiros): as 9 com foto (PR #249); as outras 7 com a imagem padrão até o Diego enviar as fotos.
-- **Tamanho no celular:** sem rolagem da página de 360 × 640 a 430 × 932, com a moldura encolhendo pela altura e a barra inferior da loja mantida.
+- **Tamanho no celular (mudou em 28/11):** a moldura ocupa ~89% da largura e a área rola na vertical, com a barra do resumo e a barra inferior fixas; sem rolagem horizontal de 360 × 640 a 430 × 932. Substitui a decisão de 08/11 de caber sem rolagem (mudar de ideia não pede ADR: é produto e reversível). Origem: mockup do GPT em `docs/00-inbox/melhorias-visuais-gpt-2711.md` (nota local do Orchestrator, ainda fora do git); o Diego pode vetar e voltar ao encolhimento pela altura.
 - **Avisos da revalidação** numa lista no topo da Geladeira, que some ao sair da página.
 
 ## Pendências para o Diego

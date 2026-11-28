@@ -35,7 +35,7 @@ export function MolduraDaGeladeira({
       data-desatualizada={desatualizada ? "" : undefined}
       className={cn(
         "@container relative overflow-hidden",
-        desatualizada && "opacity-60",
+        desatualizada && "opacity-80",
         className,
       )}
       style={{

@@ -33,7 +33,7 @@ const semRolagem = (page: import("@playwright/test").Page) =>
     () => document.documentElement.scrollHeight - document.documentElement.clientHeight,
   );
 
-test("em 360x640 a barra do resumo fica entre a moldura e a barra inferior, sem rolagem", async ({
+test("em 360x640 a barra do resumo fica entre a área da Geladeira e a barra inferior, sem rolagem da página", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 360, height: 640 });
@@ -42,12 +42,13 @@ test("em 360x640 a barra do resumo fica entre a moldura e a barra inferior, sem 
   const verResumo = page.getByRole("button", { name: "Ver resumo" });
   await expect(verResumo).toBeVisible();
   const barra = (await verResumo.locator("xpath=..").boundingBox())!;
-  const moldura = (await page
+  // A moldura rola dentro da área da Geladeira (o pai dela): é a área que termina na barra do resumo.
+  const area = (await page
     .getByRole("region", { name: "IPA" })
-    .locator("xpath=..")
+    .locator("xpath=../..")
     .boundingBox())!;
   const navegacao = (await page.getByRole("navigation").last().boundingBox())!;
-  expect(moldura.y + moldura.height).toBeLessThanOrEqual(barra.y + 1);
+  expect(area.y + area.height).toBeLessThanOrEqual(barra.y + 1);
   expect(barra.y + barra.height).toBeLessThanOrEqual(navegacao.y + 1);
   expect((await verResumo.boundingBox())!.height).toBeGreaterThanOrEqual(44);
   expect(await semRolagem(page)).toBeLessThanOrEqual(0);

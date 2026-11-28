@@ -19,6 +19,7 @@ import {
   Campo,
   CervejaNaoEncontrada,
   CategoryChips,
+  IconeDaCategoria,
   DivisorOu,
   LinhaDoResumo,
   LojaHeader,
@@ -111,9 +112,11 @@ const itensDaMoldura: ItemLocal[] = [
 ];
 
 const categories = [
-  { id: "todas", label: "Todas", count: 16 },
-  { id: "ipas", label: "IPAs", count: 4 },
-  { id: "frutas", label: "Frutas", count: 4 },
+  { id: "todas", label: "Todas", count: 16, icon: <IconeDaCategoria slug="todas" /> },
+  { id: "ipas", label: "IPAs", count: 4, icon: <IconeDaCategoria slug="ipa" /> },
+  { id: "frutas", label: "Frutas", count: 4, icon: <IconeDaCategoria slug="frutas" /> },
+  { id: "malt", label: "Malt", count: 4, icon: <IconeDaCategoria slug="malt" /> },
+  { id: "lager", label: "Lager", count: 4, icon: <IconeDaCategoria slug="lager" /> },
 ];
 
 const badges = [

@@ -79,6 +79,14 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
     null,
   );
   const focoDaFaixa = useRef<string | null>(null);
+  // Depois de "Tentar de novo" que acerta, o botão some: o foco vai à primeira prateleira.
+  const refazendo = useRef(false);
+  useEffect(() => {
+    if (buscando || !refazendo.current) return;
+    refazendo.current = false;
+    if (falhouAoBuscar) return;
+    document.querySelector<HTMLElement>('[data-titulo-da-prateleira="ipa"]')?.focus();
+  }, [falhouAoBuscar, buscando]);
   const {
     adicionarComToast,
     toast: toastDeAdicionar,
@@ -134,7 +142,7 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
   );
   return (
     <main className="flex h-[calc(100dvh-var(--altura-header-loja)-var(--altura-barra-loja)-env(safe-area-inset-bottom,0px))] flex-col lg:flex-row lg:justify-center lg:gap-8">
-      <div className="flex min-h-0 flex-1 flex-col items-center px-4 py-2 lg:aspect-[710/1573] lg:flex-none lg:px-0">
+      <div className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-4 py-2 lg:aspect-[710/1573] lg:flex-none lg:overflow-visible lg:px-0">
         <h1 className="sr-only">Geladeira</h1>
         <AvisosDaGeladeira ajustes={ajustes} />
         {falhouAoBuscar ? (
@@ -148,7 +156,10 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
               variant="outline"
               className="w-auto"
               disabled={buscando}
-              onClick={tentarDeNovo}
+              onClick={() => {
+                refazendo.current = true;
+                tentarDeNovo();
+              }}
             >
               {buscando ? "Tentando..." : "Tentar de novo"}
             </Button>
@@ -158,7 +169,7 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
           <MolduraDaGeladeira
             itens={estado.itens}
             desatualizada={falhouAoBuscar}
-            className="min-h-0 flex-1"
+            className="w-[89vw] max-w-none flex-none lg:min-h-0 lg:w-auto lg:flex-1"
             aoAdicionar={(categoria) => setCategoriaAberta(categoria)}
           />
         ) : (

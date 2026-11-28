@@ -4,6 +4,10 @@ import { describe, expect, it, vi } from "vitest";
 import type { ResultadoCriarConta } from "@/lib/auth/criar-conta";
 import { CriarContaForm } from "./criar-conta-form";
 
+// Digitar com userEvent é lento: sob carga (suíte inteira em paralelo) estes testes passavam de 5 s
+// sem haver falha real. O teto maior vale só neste arquivo.
+vi.setConfig({ testTimeout: 20_000 });
+
 const renderizar = (
   resultado: ResultadoCriarConta = { tipo: "enviado", email: "ana@exemplo.com" },
 ) => {

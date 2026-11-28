@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { CategoryChips } from "@/components/ui";
+import { CategoryChips, IconeDaCategoria } from "@/components/ui";
 
 const TODAS = "todas";
 
@@ -14,8 +14,13 @@ export function FaixaDeCategorias({ categorias }: Props) {
   if (comCerveja.length === 0) return null;
   const total = comCerveja.reduce((soma, c) => soma + c.quantidade, 0);
   const chips = [
-    { id: TODAS, label: "Todas", count: total },
-    ...comCerveja.map((c) => ({ id: c.slug, label: c.nome, count: c.quantidade })),
+    { id: TODAS, label: "Todas", count: total, icon: <IconeDaCategoria slug={TODAS} /> },
+    ...comCerveja.map((c) => ({
+      id: c.slug,
+      label: c.nome,
+      count: c.quantidade,
+      icon: <IconeDaCategoria slug={c.slug} />,
+    })),
   ];
 
   return (
