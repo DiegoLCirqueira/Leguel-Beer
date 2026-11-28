@@ -1,3 +1,4 @@
+import { estoqueBaixoNoAdmin } from "@leguele/shared";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { PrismaService } from "../../../common/prisma/prisma.service.js";
 import { resetDatabase } from "../../../common/testing/database.js";
@@ -100,5 +101,36 @@ describe("PrismaAdminSummaryReader (banco real)", () => {
     await order("AWAITING_PAYMENT");
 
     expect((await reader.read(NOW)).paidOrdersAwaitingPreparation).toBe(2);
+  });
+
+  it("concorda com a regra única do selo Baixo da tela de Estoque, nas bordas e com reserva válida ou vencida", async () => {
+    // [físico, mínimo, reservado válido, reservado vencido]
+    const cases: [number, number, number, number][] = [
+      [7, 6, 0, 0],
+      [6, 6, 0, 0],
+      [5, 6, 0, 0],
+      [0, 0, 0, 0],
+      [10, 6, 4, 0],
+      [10, 6, 3, 0],
+      [10, 6, 0, 8],
+    ];
+    for (const [stock, minStock, valid, expired] of cases) {
+      const b = await beer(stock, minStock);
+      if (valid > 0) await order("AWAITING_PAYMENT", b.id, valid);
+      if (expired > 0) {
+        const old = await order("AWAITING_PAYMENT", b.id, expired);
+        await prisma.stockReservation.updateMany({
+          where: { orderId: old.id },
+          data: { expiresAt: new Date(NOW.getTime() - 60_000) },
+        });
+      }
+    }
+
+    const expected = cases.filter(([stock, minStock, valid]) =>
+      estoqueBaixoNoAdmin(stock - valid, minStock),
+    ).length;
+
+    expect((await reader.read(NOW)).lowStockBeers).toBe(expected);
+    expect(expected).toBe(4);
   });
 });

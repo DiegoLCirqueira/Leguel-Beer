@@ -127,3 +127,17 @@ export type {
 } from "./admin/cerveja-do-admin.js";
 export { resumoDoAdminSchema } from "./admin/resumo.js";
 export type { ResumoDoAdmin } from "./admin/resumo.js";
+export {
+  estoqueBaixoNoAdmin,
+  historicoDoEstoqueSchema,
+  itemDoEstoqueSchema,
+  listaDoEstoqueSchema,
+  movimentoDeEstoqueSchema,
+  TIPOS_DE_MOVIMENTO,
+} from "./admin/estoque-lista.js";
+export type {
+  HistoricoDoEstoque,
+  ItemDoEstoque,
+  ListaDoEstoque,
+  MovimentoDeEstoque,
+} from "./admin/estoque-lista.js";
