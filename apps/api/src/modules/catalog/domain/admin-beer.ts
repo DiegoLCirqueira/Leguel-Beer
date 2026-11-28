@@ -61,4 +61,6 @@ export interface AdminBeerRepository {
   create(input: CriarCerveja, actorId?: string): Promise<AdminBeer>;
   /** `null` se a cerveja não existe; os mesmos erros do cadastro. O slug nunca muda. */
   update(id: string, input: EditarCerveja): Promise<AdminBeer | null>;
+  /** Grava o endereço da foto; `null` se a cerveja não existe. */
+  setImage(id: string, imageUrl: string): Promise<AdminBeer | null>;
 }
