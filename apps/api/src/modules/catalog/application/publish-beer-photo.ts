@@ -1,5 +1,11 @@
+import { ehWebp, FOTO_TAMANHO_MAXIMO_BYTES } from "@leguele/shared";
 import type { AdminBeer, AdminBeerRepository } from "../domain/admin-beer.js";
-import type { PhotoStorage, PhotoUploadRepository } from "../domain/beer-photo.js";
+import {
+  InvalidPhotoError,
+  PhotoPathInvalidError,
+  type PhotoStorage,
+  type PhotoUploadRepository,
+} from "../domain/beer-photo.js";
 
 export interface PublishBeerPhotoInput {
   beerId: string;
@@ -19,13 +25,24 @@ export class PublishBeerPhoto {
     private readonly newName: () => string,
   ) {}
 
+  /** `null` se a cerveja não existe (o caminho não é gasto). */
   async execute(input: PublishBeerPhotoInput): Promise<AdminBeer | null> {
-    void this.beers;
-    void this.uploads;
-    void this.storage;
-    void this.now;
-    void this.newName;
-    void input;
-    return null;
+    if (!(await this.beers.find(input.beerId))) return null;
+    // Um caminho vale uma vez, para o admin que o recebeu, dentro dos 10 minutos.
+    if (!(await this.uploads.consume(input.path, input.adminId, this.now()))) {
+      throw new PhotoPathInvalidError();
+    }
+
+    const bytes = await this.storage.readUpload(input.path, input.token);
+    if (!bytes) throw new InvalidPhotoError();
+    // Os bytes decidem, não o tipo nem a extensão declarados.
+    if (bytes.length > FOTO_TAMANHO_MAXIMO_BYTES || !ehWebp(bytes)) {
+      await this.storage.deleteUpload(input.path, input.token);
+      throw new InvalidPhotoError();
+    }
+
+    const url = await this.storage.publish(`${this.newName()}.webp`, bytes, input.token);
+    await this.storage.deleteUpload(input.path, input.token);
+    return this.beers.setImage(input.beerId, url);
   }
 }
