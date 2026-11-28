@@ -443,6 +443,9 @@ describe("GeladeiraTela", () => {
 
       const area = await screen.findByRole("region", { name: "Prateleiras da Geladeira" });
       expect(area.className).toMatch(/pt-4/);
+      expect(area.className).toMatch(/pb-5/);
+      // A spec proíbe rolagem lateral: só a vertical existe.
+      expect(area.className).toMatch(/overflow-x-hidden/);
     });
   });
 
