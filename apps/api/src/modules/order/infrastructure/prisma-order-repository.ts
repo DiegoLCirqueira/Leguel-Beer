@@ -3,7 +3,7 @@ import type { PrismaService } from "../../../common/prisma/prisma.service.js";
 import type { OrderStatus, Prisma } from "../../../generated/prisma/client.js";
 import type { ExpirableOrder, OrderRepository } from "../domain/order-repository.js";
 
-const STATUS_BY_ROW: Record<OrderStatus, StatusDoPedido> = {
+export const STATUS_BY_ROW: Record<OrderStatus, StatusDoPedido> = {
   AWAITING_PAYMENT: "aguardando-pagamento",
   PAID: "pago",
   PREPARING: "em-preparo",
