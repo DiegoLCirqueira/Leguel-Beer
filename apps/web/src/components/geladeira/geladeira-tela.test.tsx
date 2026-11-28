@@ -382,6 +382,21 @@ describe("GeladeiraTela", () => {
     });
   });
 
+  describe("área rolável das prateleiras", () => {
+    it("é uma região nomeada e focável, para rolar com o teclado, e a moldura tem teto de largura (tablet)", async () => {
+      render(
+        <GeladeiraProvider>
+          <GeladeiraTela />
+        </GeladeiraProvider>,
+      );
+
+      const area = await screen.findByRole("region", { name: "Prateleiras da Geladeira" });
+      expect(area).toHaveAttribute("tabindex", "0");
+      const moldura = area.querySelector("[data-moldura]");
+      expect(moldura?.className).toMatch(/max-w-/);
+    });
+  });
+
   describe("conta que não respondeu", () => {
     it("busca que falhou avisa com Tentar de novo, em vez de mostrar a Geladeira vazia em silêncio", async () => {
       const buscar = vi
