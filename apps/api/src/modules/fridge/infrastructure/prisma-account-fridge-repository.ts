@@ -98,9 +98,10 @@ export async function capPendingDeductions(
     if (cut === 0) continue;
     excess.set(row.beerId, (excess.get(row.beerId) ?? 0) - cut);
     if (cut === row.quantity) {
-      await tx.fridgePendingDeduction.delete({ where: { id: row.id } });
+      // `deleteMany`/`updateMany`: a expiração pode ter apagado a linha depois da leitura (count 0 vale).
+      await tx.fridgePendingDeduction.deleteMany({ where: { id: row.id } });
     } else {
-      await tx.fridgePendingDeduction.update({
+      await tx.fridgePendingDeduction.updateMany({
         where: { id: row.id },
         data: { quantity: row.quantity - cut },
       });
