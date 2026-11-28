@@ -3,6 +3,8 @@ import {
   estoqueBaixoNoAdmin,
   historicoDoEstoqueSchema,
   itemDoEstoqueSchema,
+  listaDoEstoqueSchema,
+  movimentoDeEstoqueSchema,
 } from "./estoque-lista.js";
 
 describe("estoqueBaixoNoAdmin", () => {
@@ -41,26 +43,126 @@ describe("itemDoEstoqueSchema", () => {
   });
 });
 
-describe("historicoDoEstoqueSchema", () => {
-  const MOVIMENTO = {
-    id: "m1",
+describe("itemDoEstoqueSchema: tetos e rigor", () => {
+  const ITEM = {
+    cervejaId: "1",
+    nome: "Maré Alta",
+    fisico: 10,
+    reservado: 4,
+    disponivel: 6,
+    minimo: 6,
+    baixo: true,
+  };
+
+  it("o disponível não é negativo: o físico nunca fica abaixo do reservado", () => {
+    expect(
+      itemDoEstoqueSchema.safeParse({ ...ITEM, fisico: 3, reservado: 4, disponivel: -1 }).success,
+    ).toBe(false);
+  });
+
+  it("os inteiros vão até o Int de 32 bits do banco; acima falha", () => {
+    const max = 2_147_483_647;
+    expect(
+      itemDoEstoqueSchema.safeParse({
+        ...ITEM,
+        fisico: max,
+        reservado: 0,
+        disponivel: max,
+        baixo: false,
+      }).success,
+    ).toBe(true);
+    expect(
+      itemDoEstoqueSchema.safeParse({
+        ...ITEM,
+        fisico: max + 1,
+        reservado: 0,
+        disponivel: max + 1,
+        baixo: false,
+      }).success,
+    ).toBe(false);
+  });
+
+  it("campo a mais é recusado", () => {
+    expect(itemDoEstoqueSchema.safeParse({ ...ITEM, custo: 1 }).success).toBe(false);
+    expect(listaDoEstoqueSchema.safeParse({ itens: [], extra: 1 }).success).toBe(false);
+  });
+});
+
+describe("movimentoDeEstoqueSchema: tipo, sinal, motivo e pedido", () => {
+  const BASE = { id: "m1", saldoFisico: 8, criadoEm: "2026-11-28T15:00:00.000Z" };
+  const entrada = {
+    ...BASE,
+    tipo: "entrada",
+    quantidade: 5,
+    motivo: "Produção",
+    numeroDoPedido: null,
+  };
+  const perda = { ...BASE, tipo: "perda", quantidade: -2, motivo: "Quebra", numeroDoPedido: null };
+  const correcao = {
+    ...BASE,
+    tipo: "correcao",
+    quantidade: -1,
+    motivo: "Contagem",
+    numeroDoPedido: null,
+  };
+  const venda = {
+    ...BASE,
     tipo: "venda",
     quantidade: -2,
     motivo: null,
-    saldoFisico: 8,
     numeroDoPedido: "#LB482731",
-    criadoEm: "2026-11-28T15:00:00.000Z",
   };
+  const cancelamento = {
+    ...BASE,
+    tipo: "cancelamento",
+    quantidade: 2,
+    motivo: null,
+    numeroDoPedido: "#LB482731",
+  };
+  const ok = (m: object) => movimentoDeEstoqueSchema.safeParse(m).success;
 
-  it("aceita movimento com sinal e saldo", () => {
-    expect(historicoDoEstoqueSchema.safeParse({ movimentos: [MOVIMENTO] }).success).toBe(true);
+  it("aceita um movimento coerente de cada tipo (correção com os dois sinais)", () => {
+    for (const m of [
+      entrada,
+      perda,
+      correcao,
+      { ...correcao, quantidade: 3 },
+      venda,
+      cancelamento,
+    ]) {
+      expect(ok(m)).toBe(true);
+    }
   });
 
-  it("recusa movimento zero, tipo desconhecido e saldo negativo", () => {
-    for (const ruim of [{ quantidade: 0 }, { tipo: "ajuste" }, { saldoFisico: -1 }]) {
-      expect(
-        historicoDoEstoqueSchema.safeParse({ movimentos: [{ ...MOVIMENTO, ...ruim }] }).success,
-      ).toBe(false);
-    }
+  it.each([
+    ["entrada negativa", { ...entrada, quantidade: -5 }],
+    ["entrada sem motivo", { ...entrada, motivo: null }],
+    ["entrada com pedido", { ...entrada, numeroDoPedido: "#LB482731" }],
+    ["perda positiva", { ...perda, quantidade: 2 }],
+    ["perda sem motivo", { ...perda, motivo: null }],
+    ["perda com pedido", { ...perda, numeroDoPedido: "#LB482731" }],
+    ["correção zero", { ...correcao, quantidade: 0 }],
+    ["correção sem motivo", { ...correcao, motivo: null }],
+    ["venda positiva", { ...venda, quantidade: 2 }],
+    ["venda sem número do pedido", { ...venda, numeroDoPedido: null }],
+    ["venda com motivo", { ...venda, motivo: "x" }],
+    ["cancelamento negativo", { ...cancelamento, quantidade: -2 }],
+    ["cancelamento sem número do pedido", { ...cancelamento, numeroDoPedido: null }],
+    ["tipo desconhecido", { ...entrada, tipo: "ajuste" }],
+    ["saldo negativo", { ...entrada, saldoFisico: -1 }],
+    ["saldo acima do Int de 32 bits", { ...entrada, saldoFisico: 2_147_483_648 }],
+    ["quantidade acima do teto", { ...entrada, quantidade: 100_001 }],
+    ["número de pedido fora do formato", { ...venda, numeroDoPedido: "482731" }],
+    ["campo a mais", { ...entrada, custo: 1 }],
+  ])("recusa %s", (_nome, movimento) => {
+    expect(ok(movimento)).toBe(false);
+  });
+
+  it("o histórico traz a lista de movimentos coerentes", () => {
+    expect(historicoDoEstoqueSchema.safeParse({ movimentos: [entrada, venda] }).success).toBe(true);
+    expect(
+      historicoDoEstoqueSchema.safeParse({ movimentos: [{ ...venda, numeroDoPedido: null }] })
+        .success,
+    ).toBe(false);
   });
 });
