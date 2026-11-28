@@ -178,4 +178,19 @@ describe("FaixaDaPrateleira", () => {
 
     expect(screen.getByText("Lager")).toBeInTheDocument();
   });
+
+  it("nomes que só diferem pela sigla (IPA, Lager) mostram o nome inteiro, para não ficarem iguais", () => {
+    render(
+      <FaixaDaPrateleira
+        categoriaNome="IPA"
+        rotulos={[
+          { cervejaId: "a", nome: "Maré IPA", quantidade: 1, totalCentavos: 3200, coluna: 0 },
+          { cervejaId: "b", nome: "Maré Lager", quantidade: 1, totalCentavos: 3200, coluna: 1 },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Maré IPA")).toBeInTheDocument();
+    expect(screen.getByText("Maré Lager")).toBeInTheDocument();
+  });
 });
