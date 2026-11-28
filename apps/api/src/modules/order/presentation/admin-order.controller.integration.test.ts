@@ -1,3 +1,4 @@
+import { confirmacaoDoPagamentoSchema } from "@leguele/shared";
 import type { INestApplication } from "@nestjs/common";
 import { APP_FILTER, APP_PIPE } from "@nestjs/core";
 import { Test } from "@nestjs/testing";
@@ -117,7 +118,9 @@ describe("POST /admin/pedidos/:id/confirmar-pagamento (HTTP, banco real)", () =>
   it("o admin confirma o pagamento: o pedido fica pago e o estoque físico baixa", async () => {
     const response = await confirm(orderId);
 
-    expect(response.status).toBe(204);
+    expect(response.status).toBe(200);
+    // Sem provedor de e-mail (adaptador de desenvolvimento), o admin recebe o aviso de que não saiu.
+    expect(confirmacaoDoPagamentoSchema.parse(response.body)).toEqual({ emailEnviado: false });
     expect((await prisma.order.findUniqueOrThrow({ where: { id: orderId } })).status).toBe("PAID");
     expect((await prisma.beer.findUniqueOrThrow({ where: { id: beerId } })).stock).toBe(8);
     expect(await prisma.orderStatusHistory.findMany({ where: { orderId } })).toMatchObject([
