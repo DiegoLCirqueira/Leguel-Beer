@@ -15,13 +15,20 @@ export class SupabasePhotoStorage implements PhotoStorage {
     private readonly fetchFn: typeof fetch = fetch,
   ) {}
 
-  async readUpload(path: string, token: string): Promise<Uint8Array | null> {
+  async readUpload(
+    path: string,
+    token: string,
+    maxBytes: number,
+  ): Promise<Uint8Array | null | "too-large"> {
     const response = await this.fetchFn(
       `${this.baseUrl}/storage/v1/object/authenticated/${UPLOAD_BUCKET}/${path}`,
       { method: "GET", headers: this.headers(token) },
     );
     if (response.status === 404 || response.status === 400) return null;
     if (!response.ok) throw new Error(`STORAGE_READ_${response.status}`);
+    // Recusa pelo cabeçalho, antes de baixar o corpo de um arquivo que já passa do teto.
+    const declared = Number(response.headers.get("content-length"));
+    if (Number.isFinite(declared) && declared > maxBytes) return "too-large";
     return new Uint8Array(await response.arrayBuffer());
   }
 

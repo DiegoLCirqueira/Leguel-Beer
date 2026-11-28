@@ -33,10 +33,10 @@ export class PublishBeerPhoto {
       throw new PhotoPathInvalidError();
     }
 
-    const bytes = await this.storage.readUpload(input.path, input.token);
+    const bytes = await this.storage.readUpload(input.path, input.token, FOTO_TAMANHO_MAXIMO_BYTES);
     if (!bytes) throw new InvalidPhotoError();
-    // Os bytes decidem, não o tipo nem a extensão declarados.
-    if (bytes.length > FOTO_TAMANHO_MAXIMO_BYTES || !ehWebp(bytes)) {
+    // Acima do teto o armazenamento recusa pelo Content-Length, sem baixar; os bytes decidem o resto.
+    if (bytes === "too-large" || bytes.length > FOTO_TAMANHO_MAXIMO_BYTES || !ehWebp(bytes)) {
       await this.storage.deleteUpload(input.path, input.token);
       throw new InvalidPhotoError();
     }

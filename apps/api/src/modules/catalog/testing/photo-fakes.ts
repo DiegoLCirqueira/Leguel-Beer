@@ -31,10 +31,22 @@ export class InMemoryPhotoStorage implements PhotoStorage {
   readonly deleted: string[] = [];
   readonly tokens: string[] = [];
   failPublish = false;
+  /** Quantas vezes os bytes foram baixados (recusar pelo tamanho não baixa). */
+  readBytes = 0;
+  /** Faz o armazenamento ignorar o teto, para provar a segunda conferência do caso de uso. */
+  ignoreMax = false;
 
-  async readUpload(path: string, token: string): Promise<Uint8Array | null> {
+  async readUpload(
+    path: string,
+    token: string,
+    maxBytes: number,
+  ): Promise<Uint8Array | null | "too-large"> {
     this.tokens.push(token);
-    return this.uploads.get(path) ?? null;
+    const bytes = this.uploads.get(path);
+    if (!bytes) return null;
+    if (!this.ignoreMax && bytes.length > maxBytes) return "too-large";
+    this.readBytes += 1;
+    return bytes;
   }
 
   async deleteUpload(path: string, token: string): Promise<void> {
