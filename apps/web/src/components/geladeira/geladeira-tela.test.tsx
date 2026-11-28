@@ -416,6 +416,23 @@ describe("GeladeiraTela", () => {
       await waitFor(() => expect(screen.queryByRole("alert")).not.toBeInTheDocument());
       expect(buscar).toHaveBeenCalledTimes(2);
     });
+
+    it("o aviso de falha é uma linha compacta (não uma coluna alta) para não encolher a Geladeira", async () => {
+      const conta: ContaDaGeladeira = {
+        buscar: async () => ({ tipo: "erro" }),
+        enviar: async () => ({ tipo: "erro" }),
+        validar: async () => ({ tipo: "erro" }),
+      };
+      render(
+        <GeladeiraProvider conta={conta}>
+          <GeladeiraTela />
+        </GeladeiraProvider>,
+      );
+
+      const aviso = await screen.findByRole("alert");
+      expect(aviso.className).toMatch(/flex-row/);
+      expect(aviso.className).not.toMatch(/flex-col/);
+    });
   });
 
   describe("adicionar pela garrafa fantasma, sem sair da Geladeira", () => {
