@@ -14,52 +14,49 @@ const TAMANHOS = [
   { width: 430, height: 932 },
 ];
 
-const cerveja = (id: string, nome: string, categoria: string, quantidade: number) => ({
-  cerveja: {
-    id,
-    slug: id,
-    nome,
-    estilo: "Estilo",
-    categoria: { slug: categoria, nome: categoria.toUpperCase(), ordem: 1 },
-    teorAlcoolico: 5,
-    ibu: 20,
-    volumeMl: 330,
-    precoCentavos: 3200,
-    destaque: false,
-    quantidadeDisponivel: 20,
-    esgotada: false,
-    imagemUrl: null,
-    cadastradaEm: "2026-10-01T10:00:00.000Z",
-  },
-  quantidade,
-});
+const API = process.env.API_URL ?? "http://localhost:3333";
 
-// IPA com 3 grupos (dois "Jaraguá" e um "Carnaval") e Lager cheia: o pior caso para as placas.
-const GELADEIRA_CHEIA = {
-  versao: 1,
-  itens: [
-    cerveja("jaragua-premium", "Jaraguá Premium", "ipa", 2),
-    cerveja("jaragua-extra", "Jaraguá Extra", "ipa", 1),
-    cerveja("carnaval", "Leguelé Carnaval", "ipa", 4),
-    cerveja("l1", "Ponta Verde Pilsen", "lager", 1),
-    cerveja("l2", "Pajuçara Extra Lager", "lager", 1),
-    cerveja("l3", "Maceió Clássica", "lager", 1),
-    cerveja("l4", "Jatiúca Lager", "lager", 1),
-  ],
-};
+// Cervejas REAIS do seed (a revalidação do convidado descarta ids que o catálogo não conhece, e uma
+// cerveja inventada sumia da Geladeira): IPA com 4 grupos e Lager com 3, o pior caso para as placas.
+const SEMENTE = [
+  ["jaragua-hazy-ipa", 2],
+  ["leguele-carnaval", 4],
+  ["mare-alta", 1],
+  ["leguele-maceio-ipa", 1],
+  ["leguele-kolsch", 1],
+  ["leguele-cream-ale", 1],
+  ["ponta-verde-pilsen", 1],
+] as const;
+
+test.beforeEach(async ({ context, page, baseURL, request }) => {
+  await context.addCookies([
+    { name: "leguele_convidado", value: "1", url: baseURL ?? "http://localhost:3000" },
+  ]);
+  const itens = await Promise.all(
+    SEMENTE.map(async ([slug, quantidade]) => ({
+      cerveja: await (await request.get(`${API}/catalogo/${slug}`)).json(),
+      quantidade,
+    })),
+  );
+  // Semeia só na primeira carga, para recarregar não desfazer o que o teste fez.
+  await page.addInitScript((semente) => {
+    if (localStorage.getItem("semeado")) return;
+    localStorage.setItem("semeado", "1");
+    localStorage.setItem("lb:geladeira", JSON.stringify({ versao: 1, itens: semente }));
+  }, itens);
+});
 
 for (const tamanho of TAMANHOS) {
   test(`em ${tamanho.width}x${tamanho.height} com a Geladeira cheia: sem rolagem lateral, placas legíveis e letreiro inteiro no fim da rolagem`, async ({
     page,
   }) => {
-    await page.addInitScript((geladeira) => {
-      window.localStorage.setItem("lb:geladeira", JSON.stringify(geladeira));
-    }, GELADEIRA_CHEIA);
     await page.setViewportSize(tamanho);
     await page.goto("/geladeira");
 
     const area = page.getByRole("region", { name: "Prateleiras da Geladeira" });
-    await expect(page.locator("[data-placa]").first()).toBeVisible();
+    // Espera o conteúdo da Geladeira (7 placas de cerveja) e não só o primeiro convite de prateleira
+    // vazia: no CI o localStorage chega depois da hidratação, e medir antes dava 0 placas.
+    await expect(page.locator("[data-placa] > span[aria-hidden]")).toHaveCount(7);
 
     // Sem rolagem lateral na área (a spec proíbe).
     expect(await area.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0);
