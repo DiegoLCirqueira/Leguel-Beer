@@ -60,4 +60,17 @@ describe("PrismaPhotoUploadRepository (banco real)", () => {
 
     expect(results.filter(Boolean)).toHaveLength(1);
   });
+
+  it("ao emitir, apaga os caminhos vencidos há mais de um dia: a tabela não cresce para sempre", async () => {
+    const day = 24 * 3_600_000;
+    const old = await repository.issue(adminId, new Date(NOW.getTime() - 2 * day));
+    const recent = await repository.issue(adminId, new Date(NOW.getTime() - 2 * 3_600_000));
+
+    const fresh = await repository.issue(adminId, NOW);
+
+    const paths = (await prisma.beerPhotoUpload.findMany()).map((row) => row.path);
+    expect(paths).not.toContain(old.path);
+    expect(paths).toContain(recent.path);
+    expect(paths).toContain(fresh.path);
+  });
 });
