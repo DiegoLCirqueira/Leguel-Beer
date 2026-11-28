@@ -53,6 +53,17 @@ describe("buscarCatalogo", () => {
     expect(await buscarCatalogo(query)).toEqual({ ok: false });
   });
 
+  it("um 429 transitório é tentado de novo uma vez, e a segunda resposta vale", async () => {
+    fetchFalso
+      .mockResolvedValueOnce(new Response("{}", { status: 429 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify(resposta), { status: 200 }));
+
+    const resultado = await buscarCatalogo(query);
+
+    expect(resultado).toEqual({ ok: true, dados: resposta });
+    expect(fetchFalso).toHaveBeenCalledTimes(2);
+  });
+
   it("uma API que não responde cai no estado de erro depois de 8 segundos", async () => {
     vi.useFakeTimers();
     try {
