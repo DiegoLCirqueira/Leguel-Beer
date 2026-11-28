@@ -96,7 +96,12 @@ test("o card do catálogo abre a página da cerveja", async ({ page }) => {
   await page.goto("/catalogo");
   await aguardarRevelacao(page);
 
-  await page.getByRole("link", { name: "Maré Alta" }).click();
+  // Espera por sinais, não por tempo: o card pronto (com o destino certo) e a navegação concluída.
+  // Se o card não chegar ou a navegação travar, a falha aponta qual dos dois passos foi (em vez de
+  // estourar os 30 s do teste sem dizer onde).
+  const card = page.getByRole("link", { name: "Maré Alta" });
+  await expect(card).toHaveAttribute("href", "/catalogo/mare-alta", { timeout: 10_000 });
+  await Promise.all([page.waitForURL(/\/catalogo\/mare-alta$/, { timeout: 15_000 }), card.click()]);
 
   await expect(page).toHaveURL(/\/catalogo\/mare-alta$/);
   await expect(page.getByRole("heading", { level: 1, name: "Maré Alta" })).toBeVisible();
