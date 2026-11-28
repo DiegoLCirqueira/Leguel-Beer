@@ -1,6 +1,7 @@
 import { PEDIDOS_POR_PAGINA } from "@leguele/shared";
 import { describe, expect, it } from "vitest";
 import { ValidationError } from "../../../common/errors/validation-error.js";
+import { encodeOrderCursor } from "../domain/order-cursor.js";
 import type { OrderListRow } from "../domain/order-reader.js";
 import { InMemoryOrderReader } from "../testing/in-memory-order-reader.js";
 import { ListMyOrders } from "./list-my-orders.js";
@@ -30,8 +31,18 @@ function readerWith(rows: OrderListRow[], ownerId = ANA): InMemoryOrderReader {
   return reader;
 }
 
-function useCase(reader: InMemoryOrderReader): ListMyOrders {
-  return new ListMyOrders(reader, { execute: async (id) => reader.expire(id) }, () => NOW);
+const reported: { orderId: string; error: unknown }[] = [];
+
+function useCase(
+  reader: InMemoryOrderReader,
+  expire: (id: string) => Promise<void> = async (id) => reader.expire(id),
+): ListMyOrders {
+  return new ListMyOrders(
+    reader,
+    { execute: expire },
+    () => NOW,
+    (failure) => reported.push(failure),
+  );
 }
 
 describe("ListMyOrders", () => {
@@ -81,5 +92,52 @@ describe("ListMyOrders", () => {
     await expect(
       list.execute({ ownerId: ANA, cursor, limit: PEDIDOS_POR_PAGINA }),
     ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  it("um pedido que falha ao expirar não derruba a lista: a falha é reportada por pedido e os outros seguem", async () => {
+    reported.length = 0;
+    const poison = listRow(1, {
+      status: "aguardando-pagamento",
+      createdAt: new Date(NOW.getTime() - 40 * 60_000),
+    });
+    const other = listRow(2, {
+      status: "aguardando-pagamento",
+      createdAt: new Date(NOW.getTime() - 35 * 60_000),
+    });
+    const reader = readerWith([poison, other]);
+    const boom = new Error("dado do cliente");
+    const list = useCase(reader, async (id) => {
+      if (id === poison.id) throw boom;
+      reader.expire(id);
+    });
+
+    const result = await list.execute({ ownerId: ANA, limit: PEDIDOS_POR_PAGINA });
+
+    expect(Object.fromEntries(result.pedidos.map((p) => [p.numero, p.status]))).toEqual({
+      [poison.number]: "aguardando-pagamento",
+      [other.number]: "cancelado",
+    });
+    expect(reported).toEqual([{ orderId: poison.id, error: boom }]);
+  });
+
+  it("só a primeira página expira pedidos: com cursor, nada é expirado", async () => {
+    const calls: string[] = [];
+    const stale = listRow(1, {
+      status: "aguardando-pagamento",
+      createdAt: new Date(NOW.getTime() - 40 * 60_000),
+    });
+    const reader = readerWith([stale]);
+    const cursor = encodeOrderCursor({
+      createdAt: NOW,
+      id: "00000000-0000-4000-8000-0000000000ff",
+    });
+
+    await useCase(reader, async (id) => void calls.push(id)).execute({
+      ownerId: ANA,
+      cursor,
+      limit: PEDIDOS_POR_PAGINA,
+    });
+
+    expect(calls).toEqual([]);
   });
 });

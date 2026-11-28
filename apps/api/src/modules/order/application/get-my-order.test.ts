@@ -59,8 +59,16 @@ function readerWith(order: OrderDetailRow, ownerId = ANA): InMemoryOrderReader {
   return reader;
 }
 
-function useCase(reader: InMemoryOrderReader): GetMyOrder {
-  return new GetMyOrder(reader, { execute: async (id) => reader.expire(id) }, () => NOW);
+function useCase(
+  reader: InMemoryOrderReader,
+  expire: (id: string) => Promise<void> = async (id) => reader.expire(id),
+): GetMyOrder {
+  return new GetMyOrder(
+    reader,
+    { execute: expire },
+    () => NOW,
+    () => {},
+  );
 }
 
 describe("GetMyOrder", () => {
@@ -113,5 +121,19 @@ describe("GetMyOrder", () => {
     await expect(
       useCase(reader).execute({ ownerId: ANA, orderId: ORDER_ID }),
     ).rejects.toBeInstanceOf(NotFoundError);
+  });
+
+  it("se a expiração falha, devolve o pedido como está, sem erro", async () => {
+    const waiting = detail({
+      status: "aguardando-pagamento",
+      createdAt: new Date(NOW.getTime() - 31 * 60_000),
+      expiresAt: new Date(NOW.getTime() - 60_000),
+    });
+    const reader = readerWith(waiting);
+    const order = await useCase(reader, async () => {
+      throw new Error("banco fora");
+    }).execute({ ownerId: ANA, orderId: ORDER_ID });
+
+    expect(order.status).toBe("aguardando-pagamento");
   });
 });
