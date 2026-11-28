@@ -13,7 +13,9 @@ const TOKEN = "token-do-admin";
 const webp = (size: number): Uint8Array => {
   const bytes = new Uint8Array(size);
   bytes.set([0x52, 0x49, 0x46, 0x46], 0); // RIFF
-  bytes.set([0x57, 0x45, 0x42, 0x50], 8); // WEBP
+  bytes.set([0x57, 0x45, 0x42, 0x50], 8);
+  // Tamanho do bloco RIFF: o arquivo inteiro menos os 8 bytes do cabeçalho (little-endian).
+  new DataView(bytes.buffer).setUint32(4, size - 8, true); // WEBP
   return bytes;
 };
 
@@ -75,13 +77,23 @@ describe("PublishBeerPhoto", () => {
     expect(beers.beer.imageUrl).toBeNull();
   });
 
-  it("recusa WebP acima de 40 KB, mesmo com o cabeçalho certo", async () => {
+  it("recusa WebP acima de 40 KB, mesmo com o cabeçalho certo e o armazenamento sem teto", async () => {
+    storage.ignoreMax = true;
     storage.uploads.set(path, webp(FOTO_TAMANHO_MAXIMO_BYTES + 1));
 
     await expect(run()).rejects.toBeInstanceOf(InvalidPhotoError);
 
     expect(storage.deleted).toEqual([path]);
     expect(beers.beer.imageUrl).toBeNull();
+  });
+
+  it("quando o armazenamento avisa que o arquivo passa do teto (Content-Length), recusa sem baixar e apaga o envio", async () => {
+    storage.uploads.set(path, webp(FOTO_TAMANHO_MAXIMO_BYTES + 1));
+
+    await expect(run()).rejects.toBeInstanceOf(InvalidPhotoError);
+
+    expect(storage.readBytes).toBe(0);
+    expect(storage.deleted).toEqual([path]);
   });
 
   it("caminho que nunca recebeu arquivo é foto inválida e nada é publicado", async () => {

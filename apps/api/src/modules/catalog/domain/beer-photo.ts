@@ -15,8 +15,15 @@ export interface PhotoUploadRepository {
 
 /** O armazenamento de arquivos; sempre com o token da sessão do admin, nunca uma chave de serviço. */
 export interface PhotoStorage {
-  /** Os bytes do arquivo no bucket privado; `null` se não existe. */
-  readUpload(path: string, token: string): Promise<Uint8Array | null>;
+  /**
+   * Os bytes do arquivo no bucket privado; `null` se não existe; `"too-large"` se passa de `maxBytes`
+   * (conferido pelo Content-Length, antes de baixar o corpo).
+   */
+  readUpload(
+    path: string,
+    token: string,
+    maxBytes: number,
+  ): Promise<Uint8Array | null | "too-large">;
   deleteUpload(path: string, token: string): Promise<void>;
   /** Grava no bucket público com este nome (sem sobrescrever) e devolve o endereço público. */
   publish(name: string, bytes: Uint8Array, token: string): Promise<string>;
