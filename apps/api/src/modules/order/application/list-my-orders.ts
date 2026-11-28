@@ -1,4 +1,5 @@
 import type { ListaDePedidos } from "@leguele/shared";
+import { ValidationError } from "../../../common/errors/validation-error.js";
 import { decodeOrderCursor, encodeOrderCursor } from "../domain/order-cursor.js";
 import type { OrderReader } from "../domain/order-reader.js";
 import type { OrderExpirer } from "./expire-due-orders.js";
@@ -18,11 +19,14 @@ export class ListMyOrders {
   ) {}
 
   async execute(input: ListMyOrdersInput): Promise<ListaDePedidos> {
+    const after = input.cursor ? decodeOrderCursor(input.cursor) : null;
+    if (input.cursor && !after) {
+      throw new ValidationError([{ field: "cursor", message: "Cursor inválido." }]);
+    }
     // Vencido, o pedido cancela na própria requisição, sem esperar o cron diário.
     for (const id of await this.reader.findDueOwnedIds(input.ownerId, this.now())) {
       await this.expiration.execute(id);
     }
-    const after = input.cursor ? decodeOrderCursor(input.cursor) : null;
     // Uma a mais que a página: se ela vier, existe próxima página.
     const rows = await this.reader.listOwned(input.ownerId, { after, limit: input.limit + 1 });
     const page = rows.slice(0, input.limit);
