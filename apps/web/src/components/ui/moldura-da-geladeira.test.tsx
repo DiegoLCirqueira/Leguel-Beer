@@ -49,4 +49,12 @@ describe("MolduraDaGeladeira", () => {
     expect(nome).toHaveAttribute("aria-hidden", "true");
     expect(screen.queryByRole("link", { name: /Leguelé Beer/ })).not.toBeInTheDocument();
   });
+
+  it("o letreiro 'Leguelé Beer' brilha como neon verde (halo de texto na cor primária)", () => {
+    render(<MolduraDaGeladeira itens={[]} />);
+
+    const estilo = screen.getByText("Leguelé Beer").getAttribute("style") ?? "";
+    expect(estilo).toMatch(/text-shadow/);
+    expect(estilo).toMatch(/--color-primaria/);
+  });
 });
