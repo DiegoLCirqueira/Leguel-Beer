@@ -1,1 +1,2 @@
 export const BEER_REPOSITORY = Symbol("BEER_REPOSITORY");
+export const ADMIN_BEER_REPOSITORY = Symbol("ADMIN_BEER_REPOSITORY");

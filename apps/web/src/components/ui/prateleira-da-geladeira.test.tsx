@@ -116,6 +116,20 @@ describe("PrateleiraDaGeladeira", () => {
     sombras.forEach((sombra) => expect(sombra).toHaveAttribute("aria-hidden", "true"));
   });
 
+  it("cada garrafa tem um reflexo dourado suave no parapeito, decorativo", () => {
+    const { container } = render(
+      <PrateleiraDaGeladeira indice={1} categoria={IPA} itens={[mare(2)]} />,
+    );
+
+    const reflexos = container.querySelectorAll("[data-garrafa] [data-reflexo]");
+    expect(reflexos).toHaveLength(2);
+    reflexos.forEach((reflexo) => {
+      expect(reflexo).toHaveAttribute("aria-hidden", "true");
+      expect(reflexo.getAttribute("style")).toMatch(/radial-gradient/);
+      expect(reflexo.getAttribute("style")).toMatch(/--color-aviso/);
+    });
+  });
+
   it("a sombra de contato usa gradiente radial, sem blur", () => {
     const { container } = render(
       <PrateleiraDaGeladeira indice={1} categoria={IPA} itens={[mare(1)]} />,

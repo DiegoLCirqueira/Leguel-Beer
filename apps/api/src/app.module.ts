@@ -1,6 +1,7 @@
 import { Module, type MiddlewareConsumer, type NestModule } from "@nestjs/common";
 import { APP_FILTER, APP_GUARD, APP_PIPE } from "@nestjs/core";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
+import { noStoreMiddleware } from "./common/http/no-store.middleware.js";
 import { CommonModule } from "./common/common.module.js";
 import { PrismaModule } from "./common/prisma/prisma.module.js";
 import { AllExceptionsFilter } from "./common/http/all-exceptions.filter.js";
@@ -8,6 +9,7 @@ import { throttleLimitFromEnv } from "./common/http/throttle-limit.js";
 import { requestIdMiddleware } from "./common/http/request-id.middleware.js";
 import { ZodValidationPipe } from "./common/validation/zod-validation.pipe.js";
 import { AccountModule } from "./modules/account/account.module.js";
+import { AdminModule } from "./modules/admin/admin.module.js";
 import { CatalogModule } from "./modules/catalog/catalog.module.js";
 import { DeliveryModule } from "./modules/delivery/delivery.module.js";
 import { FridgeModule } from "./modules/fridge/fridge.module.js";
@@ -23,6 +25,7 @@ import { OrderModule } from "./modules/order/order.module.js";
     FridgeModule,
     DeliveryModule,
     OrderModule,
+    AdminModule,
     HealthModule,
     // Assíncrono para ler o ambiente depois do .env ser carregado no main.ts.
     ThrottlerModule.forRootAsync({
@@ -38,5 +41,6 @@ import { OrderModule } from "./modules/order/order.module.js";
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer.apply(requestIdMiddleware).forRoutes("*path");
+    consumer.apply(noStoreMiddleware).forRoutes("admin", "admin/*path");
   }
 }
