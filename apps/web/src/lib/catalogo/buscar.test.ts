@@ -130,6 +130,18 @@ describe("buscarCatalogo", () => {
     expect(fetchFalso).toHaveBeenCalledTimes(1);
   });
 
+  it.each(["", "  ", "abc", "-1"])(
+    "429 com Retry-After %j (vazio ou inválido) conta como ausente: sem retry",
+    async (valor) => {
+      fetchFalso.mockResolvedValue(
+        new Response("{}", { status: 429, headers: { "Retry-After": valor } }),
+      );
+
+      expect(await buscarCatalogo(query)).toEqual({ ok: false });
+      expect(fetchFalso).toHaveBeenCalledTimes(1);
+    },
+  );
+
   it("as duas tentativas dividem um orçamento total de 8 s: a segunda só tem o que restou", async () => {
     vi.useFakeTimers();
     try {
