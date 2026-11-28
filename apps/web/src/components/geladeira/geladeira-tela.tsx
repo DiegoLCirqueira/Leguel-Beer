@@ -9,11 +9,11 @@ import {
   BottomSheet,
   Button,
   MolduraDaGeladeira,
+  PRATELEIRAS,
   Skeleton,
   Toast,
 } from "@/components/ui";
 import type { FreteEstimado } from "@/components/ui";
-import { PRATELEIRAS } from "@/components/ui/moldura-da-geladeira";
 import type { Desfazer } from "@/lib/geladeira/estado";
 import { mensagemDoLimite } from "@/lib/geladeira/estado";
 import { useTelaLarga } from "@/lib/use-tela-larga";
