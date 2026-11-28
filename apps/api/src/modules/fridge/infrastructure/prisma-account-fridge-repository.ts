@@ -67,6 +67,45 @@ async function writeItems(
   await tx.fridgeItem.createMany({
     data: items.map((item, position) => ({ ...item, fridgeId: fridge.id, position })),
   });
+  await capPendingDeductions(tx, profileId, items);
+}
+
+/**
+ * A baixa pendente dos pedidos aguardando pagamento nunca passa do que a Geladeira tem: o que o
+ * cliente tirou depois de criar o pedido não sai de novo na aprovação. O que passa é descontado
+ * primeiro do pedido mais antigo. Aumentar a Geladeira não devolve a baixa.
+ */
+async function capPendingDeductions(
+  tx: Prisma.TransactionClient,
+  profileId: string,
+  items: readonly StoredFridgeItem[],
+): Promise<void> {
+  const pending = await tx.fridgePendingDeduction.findMany({
+    where: { order: { profileId } },
+    orderBy: [{ order: { createdAt: "asc" } }, { id: "asc" }],
+    select: { id: true, beerId: true, quantity: true },
+  });
+  const inFridge = new Map(items.map((item) => [item.beerId, item.quantity]));
+  const excess = new Map<string, number>();
+  for (const row of pending) {
+    excess.set(row.beerId, (excess.get(row.beerId) ?? 0) + row.quantity);
+  }
+  for (const [beerId, total] of excess)
+    excess.set(beerId, Math.max(0, total - (inFridge.get(beerId) ?? 0)));
+
+  for (const row of pending) {
+    const cut = Math.min(row.quantity, excess.get(row.beerId) ?? 0);
+    if (cut === 0) continue;
+    excess.set(row.beerId, (excess.get(row.beerId) ?? 0) - cut);
+    if (cut === row.quantity) {
+      await tx.fridgePendingDeduction.delete({ where: { id: row.id } });
+    } else {
+      await tx.fridgePendingDeduction.update({
+        where: { id: row.id },
+        data: { quantity: row.quantity - cut },
+      });
+    }
+  }
 }
 
 /**
