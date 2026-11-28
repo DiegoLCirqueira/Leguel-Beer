@@ -473,6 +473,8 @@ describe("GeladeiraTela", () => {
       // aria-disabled (não `disabled`): o botão mantém o foco enquanto tenta, e o clique não repete a busca.
       expect(botao).toHaveAttribute("aria-disabled", "true");
       expect(botao).not.toBeDisabled();
+      // O Button só estiliza `disabled:`: com aria-disabled ele precisa de estilo próprio (não parecer clicável).
+      expect(botao.className).toMatch(/aria-disabled:opacity-60/);
       await userEvent.click(botao);
       expect(buscar).toHaveBeenCalledTimes(2);
       responder({ tipo: "erro" });
