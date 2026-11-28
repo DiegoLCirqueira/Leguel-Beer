@@ -80,7 +80,7 @@ export function FaixaDaPrateleira({ categoriaNome, rotulos }: FaixaDaPrateleiraP
               className={
                 unico
                   ? "shrink-0 font-semibold not-italic text-primaria"
-                  : "absolute -right-1 -top-[0.9em] rounded-full bg-primaria px-1 text-[0.85em] font-bold not-italic leading-tight text-texto-na-primaria"
+                  : "absolute -right-1 -top-[0.9em] rounded-full bg-primaria px-1 text-[max(8px,0.85em)] font-bold not-italic leading-tight text-texto-na-primaria"
               }
             >
               {`×${rotulo.quantidade}`}
