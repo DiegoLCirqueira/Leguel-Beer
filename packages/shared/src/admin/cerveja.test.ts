@@ -80,7 +80,8 @@ describe("criarCervejaSchema", () => {
 });
 
 describe("editarCervejaSchema", () => {
-  const { estoqueInicial: _inicial, ...SEM_ESTOQUE_INICIAL } = VALIDA;
+  const SEM_ESTOQUE_INICIAL: Partial<typeof VALIDA> = { ...VALIDA };
+  delete SEM_ESTOQUE_INICIAL.estoqueInicial;
 
   it("não leva estoque inicial: o estoque só muda pela tela de Estoque", () => {
     expect(editarCervejaSchema.safeParse(SEM_ESTOQUE_INICIAL).success).toBe(true);
