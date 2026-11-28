@@ -16,7 +16,7 @@ describe("limite por IP atrás do proxy da Vercel", () => {
       .useValue({ isUp: () => Promise.resolve(true) })
       .compile();
     app = moduleRef.createNestApplication();
-    setupApp(app, { webOrigin: "http://localhost:3000" });
+    setupApp(app, { webOrigin: "http://localhost:3000", production: true });
     await app.init();
   });
 
