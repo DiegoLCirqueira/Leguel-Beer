@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Put, Query } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  HttpCode,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Put,
+  Query,
+} from "@nestjs/common";
 import {
   ApiBadRequestResponse,
   ApiConflictResponse,
@@ -15,6 +26,8 @@ import {
   criarCervejaSchema,
   editarCervejaSchema,
   listaDeCervejasDoAdminSchema,
+  publicarFotoSchema,
+  type CaminhoDeEnvioResposta,
   type CervejaDoAdmin,
   type ListaDeCervejasDoAdmin,
 } from "@leguele/shared";
@@ -25,8 +38,11 @@ import { CurrentUser, Roles } from "../../account/presentation/access.decorators
 import type { AdminBeer, AdminBeerRepository } from "../domain/admin-beer.js";
 import { Inject } from "@nestjs/common";
 import { ADMIN_BEER_REPOSITORY } from "../catalog.tokens.js";
+import { IssuePhotoPath } from "../application/issue-photo-path.js";
+import { PublishBeerPhoto } from "../application/publish-beer-photo.js";
 import { withAdminBeerErrors } from "./admin-beer-http-errors.js";
 
+class PublicarFotoDto extends zodDto(publicarFotoSchema) {}
 class CriarCervejaDto extends zodDto(criarCervejaSchema) {}
 class EditarCervejaDto extends zodDto(editarCervejaSchema) {}
 class ConsultaDto extends zodDto(consultaDeCervejasDoAdminSchema) {}
@@ -57,7 +73,47 @@ function toResponse(beer: AdminBeer): CervejaDoAdmin {
 @Roles("admin")
 @Controller("admin/cervejas")
 export class AdminBeerController {
-  constructor(@Inject(ADMIN_BEER_REPOSITORY) private readonly beers: AdminBeerRepository) {}
+  constructor(
+    @Inject(ADMIN_BEER_REPOSITORY) private readonly beers: AdminBeerRepository,
+    private readonly issuePhotoPath: IssuePhotoPath,
+    private readonly publishPhoto: PublishBeerPhoto,
+  ) {}
+
+  @Post("foto/caminho")
+  @ApiOperation({
+    summary: "Emite o caminho de envio da foto",
+    description:
+      "Nome aleatório (UUID.webp), de uso único, do admin que o pediu, válido por 10 minutos. O site grava o WebP no bucket privado com a sessão do admin e depois pede a publicação.",
+  })
+  @ApiCreatedResponse({ description: "Formato `caminhoDeEnvioRespostaSchema`." })
+  async photoPath(@CurrentUser() user: AuthorizedUser): Promise<CaminhoDeEnvioResposta> {
+    return this.issuePhotoPath.execute(user.id);
+  }
+
+  @Post(":id/foto")
+  @HttpCode(200)
+  @ApiOperation({
+    summary: "Publica a foto enviada da cerveja",
+    description:
+      "Lê o arquivo do bucket privado com a sessão do admin, confere que é WebP de verdade e tem até 40 KB, copia para o bucket público com um nome novo, apaga o envio e grava o endereço. Recusado, o envio é apagado e nada muda.",
+  })
+  @ApiOkResponse({ description: "A cerveja com a foto nova (`cervejaDoAdminSchema`)." })
+  @ApiBadRequestResponse({ description: "Caminho fora do formato." })
+  @ApiNotFoundResponse({ description: "Cerveja inexistente." })
+  @ApiUnprocessableEntityResponse({ description: "PHOTO_PATH_INVALID ou INVALID_PHOTO." })
+  async publishPhotoOf(
+    @CurrentUser() user: AuthorizedUser,
+    @Param("id", ParseUUIDPipe) id: string,
+    @Headers("authorization") authorization: string | undefined,
+    @Body() body: PublicarFotoDto,
+  ): Promise<CervejaDoAdmin> {
+    const token = (authorization ?? "").replace(/^Bearer\s+/i, "");
+    const beer = await withAdminBeerErrors(() =>
+      this.publishPhoto.execute({ beerId: id, adminId: user.id, token, path: body.caminho }),
+    );
+    if (!beer) throw new NotFoundError();
+    return toResponse(beer);
+  }
 
   @Get()
   @ApiOperation({ summary: "Lista todas as cervejas, ativas e inativas, com busca e filtro" })

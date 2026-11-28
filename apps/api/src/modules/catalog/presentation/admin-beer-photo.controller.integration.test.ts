@@ -27,6 +27,7 @@ const webp = (size: number): Uint8Array => {
 
 describe("foto da cerveja do admin (HTTP, banco real, armazenamento falso)", () => {
   const tokens = createTestTokens();
+  const adminToken = tokens.admin();
   const storage = new InMemoryPhotoStorage();
   let app: INestApplication;
   let prisma: PrismaService;
@@ -82,7 +83,7 @@ describe("foto da cerveja do admin (HTTP, banco real, armazenamento falso)", () 
   afterAll(() => app.close());
 
   const post = (path: string, options: { token?: string | null; body?: object } = {}) => {
-    const { token = tokens.admin(), body } = options;
+    const { token = adminToken, body } = options;
     const req = request(app.getHttpServer()).post(path);
     if (token) req.set("Authorization", `Bearer ${token}`);
     return body ? req.send(body) : req;
@@ -116,7 +117,7 @@ describe("foto da cerveja do admin (HTTP, banco real, armazenamento falso)", () 
       beer.imagemUrl,
     );
     // O armazenamento recebeu a sessão do próprio admin, repassada da requisição.
-    expect(new Set(storage.tokens)).toEqual(new Set([tokens.admin()].map((t) => t)));
+    expect(new Set(storage.tokens)).toEqual(new Set([adminToken]));
   });
 
   it("arquivo que não é WebP: 422 INVALID_PHOTO, envio apagado e a cerveja sem foto", async () => {
