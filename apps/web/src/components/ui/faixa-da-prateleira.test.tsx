@@ -96,7 +96,6 @@ describe("FaixaDaPrateleira", () => {
       expect(placa.className).toMatch(/min-w-0/);
       expect(placa.className).toMatch(/max-w-full/);
       expect(placa.querySelector("em")?.className).not.toMatch(/truncate/);
-      expect(placa.querySelector("em")?.className).toMatch(/shrink-0/);
     });
     expect(screen.getByText("Ponta").className).toMatch(/truncate/);
     expect(screen.getByText("Superlongonomesemespaco").className).toMatch(/truncate/);
@@ -145,7 +144,7 @@ describe("FaixaDaPrateleira", () => {
     expect(screen.getByText("Maré Alta")).toBeInTheDocument();
   });
 
-  it("apelidos que se repetem na prateleira ganham mais uma palavra, para cada placa ser única", () => {
+  it("quando a 1ª palavra se repete, a placa mostra o que distingue (sem o prefixo comum), curto e único", () => {
     render(
       <FaixaDaPrateleira
         categoriaNome="Lager"
@@ -163,9 +162,11 @@ describe("FaixaDaPrateleira", () => {
       />,
     );
 
-    expect(screen.getByText("Jaraguá Premium")).toBeInTheDocument();
-    expect(screen.getByText("Jaraguá Extra")).toBeInTheDocument();
+    expect(screen.getByText("Premium")).toBeInTheDocument();
+    expect(screen.getByText("Extra")).toBeInTheDocument();
     expect(screen.getByText("Carnaval")).toBeInTheDocument();
+    // O leitor de tela segue lendo o nome completo.
+    expect(screen.getByText(/^Jaraguá Premium, 1 unidade/)).toBeInTheDocument();
   });
 
   it("nome só de sigla (Ale, Lager) cai no nome inteiro, nunca numa placa vazia", () => {
@@ -211,5 +212,35 @@ describe("FaixaDaPrateleira", () => {
     container
       .querySelectorAll("[data-placa]")
       .forEach((placa) => expect(placa.className).toMatch(/justify-self-center/));
+  });
+
+  it("com várias cervejas, o ×N vira um selo no canto da placa (o nome fica com a largura da coluna)", () => {
+    render(
+      <FaixaDaPrateleira
+        categoriaNome="IPA"
+        rotulos={[
+          { cervejaId: "a", nome: "Maré", quantidade: 2, totalCentavos: 6400, coluna: 0 },
+          { cervejaId: "b", nome: "Jaraguá", quantidade: 1, totalCentavos: 3200, coluna: 1 },
+        ]}
+      />,
+    );
+
+    const selo = screen.getByText("×2");
+    expect(selo.className).toMatch(/absolute/);
+    expect(selo.className).toMatch(/rounded-full/);
+    expect(selo.className).toMatch(/bg-primaria/);
+    // Tamanho mínimo legível mesmo com a fonte da faixa no piso (7 px): o selo não passa de 8 px para baixo.
+    expect(selo.className).toMatch(/text-\[max\(8px,0\.85em\)\]/);
+  });
+
+  it("com uma cerveja só, o ×N segue na linha, ao lado do nome", () => {
+    render(
+      <FaixaDaPrateleira
+        categoriaNome="IPA"
+        rotulos={[{ cervejaId: "a", nome: "Maré", quantidade: 2, totalCentavos: 6400, coluna: 0 }]}
+      />,
+    );
+
+    expect(screen.getByText("×2").className).not.toMatch(/absolute/);
   });
 });

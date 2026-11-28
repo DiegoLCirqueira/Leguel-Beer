@@ -26,24 +26,28 @@ const palavrasDoNome = (nome: string) => {
 };
 
 /**
- * Apelidos da prateleira, calculados juntos: 1ª palavra (2 se a placa é única) e, onde dois apelidos
- * se repetem, mais uma palavra em cada um, até ficarem diferentes ou acabarem as palavras.
+ * Apelidos da prateleira, calculados juntos: a 1ª palavra (2 se a placa é única). Onde a 1ª palavra se
+ * repete, a placa mostra a palavra que distingue (depois do prefixo comum: "Jaraguá Premium" e
+ * "Jaraguá Extra" viram "Premium" e "Extra"). Se ainda sobrar repetido (só diferem pela sigla), o
+ * nome inteiro, que a placa trunca se não couber.
  */
 export function apelidosDaPrateleira(nomes: string[]): string[] {
   const palavras = nomes.map(palavrasDoNome);
-  const tamanhos: number[] = nomes.map(() => (nomes.length === 1 ? 2 : 1));
-  const apelido = (i: number) => palavras[i]!.slice(0, tamanhos[i]).join(" ");
-  for (let rodada = 0; rodada < 10; rodada++) {
-    const repetidos = nomes
-      .map((_, i) => i)
-      .filter((i) => nomes.some((_, j) => j !== i && apelido(j) === apelido(i)));
-    const crescem = repetidos.filter((i) => tamanhos[i]! < palavras[i]!.length);
-    if (crescem.length === 0) break;
-    crescem.forEach((i) => (tamanhos[i] = tamanhos[i]! + 1));
-  }
-  // Ainda repetidos (só diferem pela sigla): o nome inteiro, que a placa trunca se não couber.
+  const primeira = (i: number) => palavras[i]![0]!;
+  const apelidos = nomes.map((_, i) => {
+    if (nomes.length === 1) return palavras[i]!.slice(0, 2).join(" ");
+    const iguais = nomes.map((_, j) => j).filter((j) => primeira(j) === primeira(i));
+    if (iguais.length === 1) return primeira(i);
+    let comum = 0;
+    while (
+      comum < palavras[i]!.length &&
+      iguais.every((j) => palavras[j]![comum] === palavras[i]![comum])
+    )
+      comum += 1;
+    return palavras[i]![comum] ?? palavras[i]!.join(" ");
+  });
   return nomes.map((nome, i) =>
-    nomes.some((_, j) => j !== i && apelido(j) === apelido(i)) ? nome : apelido(i),
+    apelidos.some((outro, j) => j !== i && outro === apelidos[i]) ? nome : apelidos[i]!,
   );
 }
 
@@ -63,7 +67,7 @@ export function FaixaDaPrateleira({ categoriaNome, rotulos }: FaixaDaPrateleiraP
           <span
             key={rotulo.cervejaId}
             data-placa=""
-            className={`flex min-w-0 max-w-full items-center justify-center gap-1 whitespace-nowrap rounded-full border border-primaria/40 bg-superficie px-1.5 ${
+            className={`relative flex min-w-0 max-w-full items-center justify-center gap-1 whitespace-nowrap rounded-full border border-primaria/40 bg-superficie ${unico ? "px-1.5" : "px-1"} ${
               unico ? "col-span-4 justify-self-center" : "justify-self-center"
             }`}
             style={unico ? undefined : { gridColumn: rotulo.coluna + 1 }}
@@ -71,7 +75,14 @@ export function FaixaDaPrateleira({ categoriaNome, rotulos }: FaixaDaPrateleiraP
             <span aria-hidden="true" className="min-w-0 truncate">
               {apelidos[i]}
             </span>
-            <em aria-hidden="true" className="shrink-0 font-semibold not-italic text-primaria">
+            <em
+              aria-hidden="true"
+              className={
+                unico
+                  ? "shrink-0 font-semibold not-italic text-primaria"
+                  : "absolute -right-1 -top-[0.9em] rounded-full bg-primaria px-1 text-[max(8px,0.85em)] font-bold not-italic leading-tight text-texto-na-primaria"
+              }
+            >
               {`×${rotulo.quantidade}`}
             </em>
             <span className="sr-only">{leitura(rotulo)}</span>
