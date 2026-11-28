@@ -43,8 +43,9 @@ describe("buscarCatalogo", () => {
   });
 
   it("falha de rede, status de erro ou corpo fora do contrato viram erro, sem lançar", async () => {
-    fetchFalso.mockRejectedValueOnce(new Error("sem rede"));
+    fetchFalso.mockRejectedValue(new Error("sem rede"));
     expect(await buscarCatalogo(query)).toEqual({ ok: false });
+    fetchFalso.mockReset();
 
     fetchFalso.mockResolvedValueOnce(new Response("{}", { status: 500 }));
     expect(await buscarCatalogo(query)).toEqual({ ok: false });
@@ -62,6 +63,36 @@ describe("buscarCatalogo", () => {
 
     expect(resultado).toEqual({ ok: true, dados: resposta });
     expect(fetchFalso).toHaveBeenCalledTimes(2);
+  });
+
+  it("falha de rede também é tentada de novo uma vez", async () => {
+    fetchFalso
+      .mockRejectedValueOnce(new Error("sem rede"))
+      .mockResolvedValueOnce(new Response(JSON.stringify(resposta), { status: 200 }));
+
+    expect(await buscarCatalogo(query)).toEqual({ ok: true, dados: resposta });
+    expect(fetchFalso).toHaveBeenCalledTimes(2);
+  });
+
+  it("se a segunda tentativa também falha, devolve o erro (só 2 chamadas, sem esconder)", async () => {
+    fetchFalso.mockResolvedValue(new Response("{}", { status: 503 }));
+
+    expect(await buscarCatalogo(query)).toEqual({ ok: false });
+    expect(fetchFalso).toHaveBeenCalledTimes(2);
+  });
+
+  it.each([400, 404, 500])("erro real %i não é repetido", async (status) => {
+    fetchFalso.mockResolvedValue(new Response("{}", { status }));
+
+    expect(await buscarCatalogo(query)).toEqual({ ok: false });
+    expect(fetchFalso).toHaveBeenCalledTimes(1);
+  });
+
+  it("corpo fora do contrato não é repetido", async () => {
+    fetchFalso.mockResolvedValue(new Response(JSON.stringify({ itens: 1 }), { status: 200 }));
+
+    expect(await buscarCatalogo(query)).toEqual({ ok: false });
+    expect(fetchFalso).toHaveBeenCalledTimes(1);
   });
 
   it("uma API que não responde cai no estado de erro depois de 8 segundos", async () => {
