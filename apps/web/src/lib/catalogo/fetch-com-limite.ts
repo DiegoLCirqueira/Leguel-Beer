@@ -8,9 +8,10 @@ export const TEMPO_LIMITE_MS = 8000;
 export async function buscarComLimite<T>(
   url: string,
   tratar: (resposta: Response) => Promise<T>,
+  limiteMs: number = TEMPO_LIMITE_MS,
 ): Promise<T> {
   const controle = new AbortController();
-  const limite = setTimeout(() => controle.abort(), TEMPO_LIMITE_MS);
+  const limite = setTimeout(() => controle.abort(), limiteMs);
   try {
     const resposta = await fetch(url, { cache: "no-store", signal: controle.signal });
     return await tratar(resposta);
