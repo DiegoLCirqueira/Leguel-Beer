@@ -110,4 +110,27 @@ describe("PrismaOrderReader (banco real)", () => {
       totalCents: 7290,
     });
   });
+
+  it("pagina com pedidos de dois clientes intercalados e criados no mesmo instante, sem buraco nem repetição", async () => {
+    const mine: string[] = [];
+    for (let i = 0; i < 5; i += 1) {
+      // Dois pares no mesmo instante: só o id desempata.
+      const at = new Date(T0.getTime() + Math.floor(i / 2) * 1000);
+      mine.push((await createOrder(ana, at)).id);
+      await createOrder(bruno, at);
+    }
+
+    const seen: string[] = [];
+    let after: { createdAt: Date; id: string } | null = null;
+    for (;;) {
+      const page = await reader.listOwned(ana, { after, limit: 2 });
+      seen.push(...page.map((row) => row.id));
+      const last = page[page.length - 1];
+      if (page.length < 2 || !last) break;
+      after = { createdAt: last.createdAt, id: last.id };
+    }
+
+    expect(seen).toHaveLength(5);
+    expect([...seen].sort()).toEqual([...mine].sort());
+  });
 });
