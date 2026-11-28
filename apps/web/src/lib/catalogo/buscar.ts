@@ -17,10 +17,10 @@ const RETRY_AFTER_MAXIMO_S = 2;
 function transitorio(resposta: Response): boolean {
   if (STATUS_TRANSITORIOS.has(resposta.status)) return true;
   if (resposta.status !== 429) return false;
-  const espera = Number(resposta.headers.get("Retry-After"));
-  return (
-    Number.isFinite(espera) && resposta.headers.has("Retry-After") && espera <= RETRY_AFTER_MAXIMO_S
-  );
+  const bruto = resposta.headers.get("Retry-After")?.trim();
+  // Ausente, vazio ou inválido (não é um número de segundos >= 0) conta como ausente: sem retry.
+  if (!bruto || !/^\d+(\.\d+)?$/.test(bruto)) return false;
+  return Number(bruto) <= RETRY_AFTER_MAXIMO_S;
 }
 
 type Tentativa = { resultado: ResultadoDoCatalogo; transitoria: boolean };
