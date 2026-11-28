@@ -103,7 +103,24 @@ export const movimentoDeEstoqueSchema = z.discriminatedUnion("tipo", [
 
 export type MovimentoDeEstoque = z.infer<typeof movimentoDeEstoqueSchema>;
 
+/** Página do histórico, do mais recente ao mais antigo; `proximoCursor` é nulo na última. */
 export const historicoDoEstoqueSchema = z.strictObject({
   movimentos: z.array(movimentoDeEstoqueSchema),
+  proximoCursor: z.string().min(1).max(200).nullable(),
 });
 export type HistoricoDoEstoque = z.infer<typeof historicoDoEstoqueSchema>;
+
+export const MOVIMENTOS_POR_PAGINA = 20;
+export const MOVIMENTOS_POR_PAGINA_MAXIMO = 50;
+
+/** Consulta do histórico: `cursor` da página anterior (opcional) e `limite` (padrão 20, de 1 a 50). */
+export const consultaDoHistoricoSchema = z.strictObject({
+  cursor: z.string().min(1).max(200).optional(),
+  limite: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(MOVIMENTOS_POR_PAGINA_MAXIMO)
+    .default(MOVIMENTOS_POR_PAGINA),
+});
+export type ConsultaDoHistorico = z.infer<typeof consultaDoHistoricoSchema>;
