@@ -133,3 +133,52 @@ describe("saldo do histórico de estoque nas cervejas existentes (banco real)", 
     expect(flagged.map((r) => r.slug)).toEqual(["a-mais"]);
   });
 });
+
+describe("procedimento manual do README para soma maior que o estoque (banco real)", () => {
+  const prisma = new PrismaService();
+
+  beforeEach(() => resetDatabase(prisma));
+  afterAll(() => prisma.onModuleDestroy());
+
+  it("o INSERT do README fecha a diferença sem tocar no estoque, e é o mesmo que a conferência acusava", async () => {
+    const readme = readFileSync(new URL("../../../../README.md", import.meta.url), "utf-8");
+    const block = /```sql\r?\n-- PROCEDIMENTO MANUAL[\s\S]*?\r?\n```/.exec(readme)?.[0] ?? "";
+    const insert = /INSERT INTO[\s\S]*?;/.exec(block)?.[0] ?? "";
+    expect(insert).not.toBe("");
+    const category = await prisma.category.create({ data: { slug: "ipa", name: "IPA", order: 1 } });
+    const odd = await prisma.beer.create({
+      data: {
+        slug: "a-mais",
+        name: "a-mais",
+        style: "IPA",
+        categoryId: category.id,
+        abv: 5,
+        ibu: 30,
+        volumeMl: 500,
+        priceCents: 3000,
+        stock: 3,
+      },
+    });
+    await prisma.stockMovement.create({
+      data: { beerId: odd.id, type: "ENTRY", quantity: 10, reason: "x", balanceAfter: 10 },
+    });
+
+    await prisma.$executeRawUnsafe(insert.replace("<ID_DA_CERVEJA>", odd.id));
+
+    expect((await prisma.beer.findUniqueOrThrow({ where: { id: odd.id } })).stock).toBe(3);
+    expect(
+      await prisma.stockMovement.findFirstOrThrow({
+        where: { beerId: odd.id, reason: "Reconciliação" },
+      }),
+    ).toMatchObject({
+      type: "CORRECTION",
+      quantity: -7,
+      balanceAfter: 3,
+    });
+    const sum = await prisma.stockMovement.aggregate({
+      where: { beerId: odd.id },
+      _sum: { quantity: true },
+    });
+    expect(sum._sum.quantity).toBe(3);
+  });
+});
