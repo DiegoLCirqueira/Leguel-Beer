@@ -16,8 +16,14 @@ export type FaixaDaPrateleiraProps = {
 const leitura = ({ nome, quantidade, totalCentavos }: RotuloDaFaixa) =>
   `${nome}, ${quantidade} ${quantidade === 1 ? "unidade" : "unidades"}, ${formatPriceBRL(totalCentavos)}`;
 
-/** Nome curto da placa: sem o prefixo da marca. */
-const nomeCurto = (nome: string) => nome.replace(/^Leguelé\s+/, "");
+/** Apelido da placa: sem o prefixo da marca e sem a sigla do estilo; 1ª palavra (2 se a placa é única). */
+const nomeCurto = (nome: string, palavras: number) =>
+  nome
+    .replace(/^Leguelé\s+/, "")
+    .split(/\s+/)
+    .filter((palavra) => !/^(IPA|Lager|Ale)$/.test(palavra))
+    .slice(0, palavras)
+    .join(" ");
 
 /** Faixa sobre o parapeito: o que há na prateleira ou o convite para escolher uma cerveja. */
 export function FaixaDaPrateleira({ categoriaNome, rotulos }: FaixaDaPrateleiraProps) {
@@ -40,7 +46,7 @@ export function FaixaDaPrateleira({ categoriaNome, rotulos }: FaixaDaPrateleiraP
             style={unico ? undefined : { gridColumn: rotulo.coluna + 1 }}
           >
             <span aria-hidden="true" className="min-w-0 truncate">
-              {nomeCurto(rotulo.nome)}
+              {nomeCurto(rotulo.nome, unico ? 2 : 1)}
             </span>
             <em aria-hidden="true" className="shrink-0 font-semibold not-italic text-primaria">
               {`×${rotulo.quantidade}`}

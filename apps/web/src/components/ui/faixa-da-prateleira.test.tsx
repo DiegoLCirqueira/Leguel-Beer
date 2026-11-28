@@ -95,7 +95,7 @@ describe("FaixaDaPrateleira", () => {
       expect(placa.querySelector("em")?.className).not.toMatch(/truncate/);
       expect(placa.querySelector("em")?.className).toMatch(/shrink-0/);
     });
-    expect(screen.getByText("Ponta Verde Pilsen").className).toMatch(/truncate/);
+    expect(screen.getByText("Ponta").className).toMatch(/truncate/);
     expect(screen.getByText("Superlongonomesemespaco").className).toMatch(/truncate/);
   });
 
