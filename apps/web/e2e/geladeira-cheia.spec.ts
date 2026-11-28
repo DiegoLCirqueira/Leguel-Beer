@@ -1,6 +1,12 @@
 import { expect, test } from "./support/maior-de-idade";
 
-test.use({ isMobile: false, hasTouch: false });
+// Com as barras de rolagem VISÍVEIS (o headless as esconde por padrão): a barra clássica de ~15 px
+// tirava largura da área e fazia a moldura passar do conteúdo útil (barra horizontal no portal).
+test.use({
+  isMobile: false,
+  hasTouch: false,
+  launchOptions: { ignoreDefaultArgs: ["--hide-scrollbars"] },
+});
 
 const TAMANHOS = [
   { width: 360, height: 640 },
@@ -57,6 +63,19 @@ for (const tamanho of TAMANHOS) {
 
     // Sem rolagem lateral na área (a spec proíbe).
     expect(await area.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0);
+
+    // A área não tem barra que roube largura, e a moldura fica centrada nela.
+    const geometria = await area.evaluate((el) => {
+      const moldura = el.querySelector("[data-moldura]")!.getBoundingClientRect();
+      const caixa = el.getBoundingClientRect();
+      return {
+        barra: el.offsetWidth - el.clientWidth,
+        esquerda: moldura.left - caixa.left,
+        direita: caixa.right - moldura.right,
+      };
+    });
+    expect(geometria.barra).toBe(0);
+    expect(Math.abs(geometria.esquerda - geometria.direita)).toBeLessThanOrEqual(1);
 
     // O nome de cada placa aparece inteiro (sem reticências).
     const nomes = await page
