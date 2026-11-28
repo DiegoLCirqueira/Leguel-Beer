@@ -125,3 +125,5 @@ export type {
   ConsultaDeCervejasDoAdmin,
   ListaDeCervejasDoAdmin,
 } from "./admin/cerveja-do-admin.js";
+export { resumoDoAdminSchema } from "./admin/resumo.js";
+export type { ResumoDoAdmin } from "./admin/resumo.js";
