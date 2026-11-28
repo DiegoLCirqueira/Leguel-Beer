@@ -75,6 +75,8 @@ describe("saldo do histórico de estoque nas cervejas existentes (banco real)", 
       where: { beerId: parcial.id, reason: "Saldo inicial" },
     });
     expect(opening.map((m) => m.quantity)).toEqual([10]);
+    // O saldo da abertura é a própria abertura: os movimentos seguintes partem dele.
+    expect(opening.map((m) => m.balanceAfter)).toEqual([10]);
   });
 
   it("é idempotente: rodar de novo não muda nada", async () => {
