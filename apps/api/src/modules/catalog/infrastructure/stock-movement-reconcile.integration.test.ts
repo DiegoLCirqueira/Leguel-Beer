@@ -91,4 +91,45 @@ describe("saldo do histórico de estoque nas cervejas existentes (banco real)", 
 
     expect(await prisma.stockMovement.count()).toBe(first);
   });
+
+  it("com vários movimentos, a abertura é o estoque menos a soma de todos e fica antes do primeiro", async () => {
+    const many = await beer("varios", 20);
+    const first = new Date("2026-11-20T10:00:00.000Z");
+    for (const [i, quantity] of [-3, 5, -2].entries()) {
+      await prisma.stockMovement.create({
+        data: {
+          beerId: many.id,
+          type: quantity > 0 ? "ENTRY" : "LOSS",
+          quantity,
+          reason: "x",
+          balanceAfter: 1,
+          createdAt: new Date(first.getTime() + i * 60_000),
+        },
+      });
+    }
+
+    await prisma.$executeRawUnsafe(RECONCILE);
+
+    const opening = await prisma.stockMovement.findFirstOrThrow({
+      where: { beerId: many.id, reason: "Saldo inicial" },
+    });
+    expect(opening.quantity).toBe(20); // 20 - (-3 + 5 - 2) = 20
+    expect(opening.createdAt.getTime()).toBeLessThan(first.getTime());
+    expect((await sums()).find((r) => r.slug === "varios")?.total).toBe(20);
+  });
+
+  it("se os movimentos somam mais que o estoque, a migration não inventa saída e a conferência acusa a cerveja", async () => {
+    const odd = await beer("a-mais", 3);
+    await prisma.stockMovement.create({
+      data: { beerId: odd.id, type: "ENTRY", quantity: 10, reason: "x", balanceAfter: 10 },
+    });
+
+    await prisma.$executeRawUnsafe(RECONCILE);
+
+    expect(await prisma.stockMovement.count({ where: { beerId: odd.id } })).toBe(1);
+    const flagged = await prisma.$queryRaw<{ slug: string }[]>`
+      SELECT b.slug FROM beers b LEFT JOIN stock_movements m ON m.beer_id = b.id
+      GROUP BY b.id HAVING b.stock <> COALESCE(SUM(m.quantity), 0)`;
+    expect(flagged.map((r) => r.slug)).toEqual(["a-mais"]);
+  });
 });
