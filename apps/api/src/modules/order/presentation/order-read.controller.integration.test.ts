@@ -24,7 +24,6 @@ const T0 = new Date("2026-11-27T14:00:00.000Z");
 describe("GET /me/pedidos e /me/pedidos/:id (HTTP, banco real)", () => {
   const tokens = createTestTokens();
   const outroId = crypto.randomUUID();
-  const outroToken = tokens.custom({ sub: outroId, email: "outro@leguele.test" });
   let app: INestApplication;
   let prisma: PrismaService;
   let beerId: string;
