@@ -229,6 +229,8 @@ describe("FaixaDaPrateleira", () => {
     expect(selo.className).toMatch(/absolute/);
     expect(selo.className).toMatch(/rounded-full/);
     expect(selo.className).toMatch(/bg-primaria/);
+    // Tamanho mínimo legível mesmo com a fonte da faixa no piso (7 px): o selo não passa de 8 px para baixo.
+    expect(selo.className).toMatch(/text-\[max\(8px,0\.85em\)\]/);
   });
 
   it("com uma cerveja só, o ×N segue na linha, ao lado do nome", () => {
