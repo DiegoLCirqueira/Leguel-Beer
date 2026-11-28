@@ -15,4 +15,9 @@ describe("gerarSlug", () => {
   it("o slug reservado 'destaques' também ganha sufixo", () => {
     expect(gerarSlug("Destaques", [])).toBe("destaques-2");
   });
+
+  it("nome sem letra nem número usa 'cerveja' e segue a regra do sufixo", () => {
+    expect(gerarSlug("???", [])).toBe("cerveja");
+    expect(gerarSlug("???", ["cerveja"])).toBe("cerveja-2");
+  });
 });
