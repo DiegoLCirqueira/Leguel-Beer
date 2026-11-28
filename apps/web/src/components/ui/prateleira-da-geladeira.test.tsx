@@ -115,4 +115,14 @@ describe("PrateleiraDaGeladeira", () => {
     expect(sombras).toHaveLength(2);
     sombras.forEach((sombra) => expect(sombra).toHaveAttribute("aria-hidden", "true"));
   });
+
+  it("a sombra de contato usa gradiente radial, sem blur", () => {
+    const { container } = render(
+      <PrateleiraDaGeladeira indice={1} categoria={IPA} itens={[mare(1)]} />,
+    );
+
+    const sombra = container.querySelector("[data-garrafa] [data-sombra]");
+    expect(sombra?.className).not.toMatch(/blur/);
+    expect(sombra?.getAttribute("style")).toMatch(/radial-gradient/);
+  });
 });

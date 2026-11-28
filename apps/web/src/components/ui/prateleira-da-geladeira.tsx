@@ -86,7 +86,11 @@ export function PrateleiraDaGeladeira({
             <span
               aria-hidden="true"
               data-sombra=""
-              className="absolute -bottom-[2%] -left-[15%] h-[7%] w-[130%] rounded-[50%] bg-sombra blur-[3px]"
+              className="absolute -bottom-[2%] -left-[15%] h-[7%] w-[130%] rounded-[50%]"
+              style={{
+                background:
+                  "radial-gradient(ellipse at 50% 50%, var(--color-sombra), transparent 70%)",
+              }}
             />
           </div>
         );
