@@ -157,6 +157,7 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
         {pronta ? (
           <MolduraDaGeladeira
             itens={estado.itens}
+            desatualizada={falhouAoBuscar}
             className="min-h-0 flex-1"
             aoAdicionar={(categoria) => setCategoriaAberta(categoria)}
           />
