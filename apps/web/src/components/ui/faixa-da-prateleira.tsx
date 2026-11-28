@@ -26,24 +26,28 @@ const palavrasDoNome = (nome: string) => {
 };
 
 /**
- * Apelidos da prateleira, calculados juntos: 1ª palavra (2 se a placa é única) e, onde dois apelidos
- * se repetem, mais uma palavra em cada um, até ficarem diferentes ou acabarem as palavras.
+ * Apelidos da prateleira, calculados juntos: a 1ª palavra (2 se a placa é única). Onde a 1ª palavra se
+ * repete, a placa mostra a palavra que distingue (depois do prefixo comum: "Jaraguá Premium" e
+ * "Jaraguá Extra" viram "Premium" e "Extra"). Se ainda sobrar repetido (só diferem pela sigla), o
+ * nome inteiro, que a placa trunca se não couber.
  */
 export function apelidosDaPrateleira(nomes: string[]): string[] {
   const palavras = nomes.map(palavrasDoNome);
-  const tamanhos: number[] = nomes.map(() => (nomes.length === 1 ? 2 : 1));
-  const apelido = (i: number) => palavras[i]!.slice(0, tamanhos[i]).join(" ");
-  for (let rodada = 0; rodada < 10; rodada++) {
-    const repetidos = nomes
-      .map((_, i) => i)
-      .filter((i) => nomes.some((_, j) => j !== i && apelido(j) === apelido(i)));
-    const crescem = repetidos.filter((i) => tamanhos[i]! < palavras[i]!.length);
-    if (crescem.length === 0) break;
-    crescem.forEach((i) => (tamanhos[i] = tamanhos[i]! + 1));
-  }
-  // Ainda repetidos (só diferem pela sigla): o nome inteiro, que a placa trunca se não couber.
+  const primeira = (i: number) => palavras[i]![0]!;
+  const apelidos = nomes.map((_, i) => {
+    if (nomes.length === 1) return palavras[i]!.slice(0, 2).join(" ");
+    const iguais = nomes.map((_, j) => j).filter((j) => primeira(j) === primeira(i));
+    if (iguais.length === 1) return primeira(i);
+    let comum = 0;
+    while (
+      comum < palavras[i]!.length &&
+      iguais.every((j) => palavras[j]![comum] === palavras[i]![comum])
+    )
+      comum += 1;
+    return palavras[i]![comum] ?? palavras[i]!.join(" ");
+  });
   return nomes.map((nome, i) =>
-    nomes.some((_, j) => j !== i && apelido(j) === apelido(i)) ? nome : apelido(i),
+    apelidos.some((outro, j) => j !== i && outro === apelidos[i]) ? nome : apelidos[i]!,
   );
 }
 
