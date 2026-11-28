@@ -123,6 +123,13 @@ describe("PrateleiraDaGeladeira", () => {
 
     const reflexos = container.querySelectorAll("[data-garrafa] [data-reflexo]");
     expect(reflexos).toHaveLength(2);
+    // O reflexo vem ANTES da imagem no DOM: fica sob o vidro da garrafa, não pintado por cima dela.
+    reflexos.forEach((reflexo) => {
+      const imagem = reflexo.parentElement!.querySelector("[data-garrafa] > div");
+      expect(
+        reflexo.compareDocumentPosition(imagem!) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    });
     reflexos.forEach((reflexo) => {
       expect(reflexo).toHaveAttribute("aria-hidden", "true");
       expect(reflexo.getAttribute("style")).toMatch(/radial-gradient/);
