@@ -13,7 +13,9 @@ const TOKEN = "token-do-admin";
 const webp = (size: number): Uint8Array => {
   const bytes = new Uint8Array(size);
   bytes.set([0x52, 0x49, 0x46, 0x46], 0); // RIFF
-  bytes.set([0x57, 0x45, 0x42, 0x50], 8); // WEBP
+  bytes.set([0x57, 0x45, 0x42, 0x50], 8);
+  // Tamanho do bloco RIFF: o arquivo inteiro menos os 8 bytes do cabeçalho (little-endian).
+  new DataView(bytes.buffer).setUint32(4, size - 8, true); // WEBP
   return bytes;
 };
 
