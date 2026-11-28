@@ -32,6 +32,7 @@ export function MolduraDaGeladeira({
 }: MolduraDaGeladeiraProps) {
   return (
     <div
+      data-moldura=""
       data-desatualizada={desatualizada ? "" : undefined}
       className={cn(
         "@container relative overflow-hidden",

@@ -382,6 +382,43 @@ describe("GeladeiraTela", () => {
     });
   });
 
+  describe("área rolável das prateleiras", () => {
+    const tela = () =>
+      render(
+        <GeladeiraProvider>
+          <GeladeiraTela />
+        </GeladeiraProvider>,
+      );
+
+    it("é uma região nomeada, e a moldura tem teto de largura (tablet)", async () => {
+      tela();
+
+      const area = await screen.findByRole("region", { name: "Prateleiras da Geladeira" });
+      expect(area.querySelector("[data-moldura]")?.className).toMatch(/max-w-/);
+    });
+
+    it("sem rolagem (tudo cabe), a região não entra na ordem do Tab", async () => {
+      tela();
+
+      const area = await screen.findByRole("region", { name: "Prateleiras da Geladeira" });
+      expect(area).not.toHaveAttribute("tabindex");
+    });
+
+    it("com rolagem, a região é focável para rolar com o teclado", async () => {
+      const alturas = vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(900);
+      const visivel = vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(400);
+      try {
+        tela();
+
+        const area = await screen.findByRole("region", { name: "Prateleiras da Geladeira" });
+        await waitFor(() => expect(area).toHaveAttribute("tabindex", "0"));
+      } finally {
+        alturas.mockRestore();
+        visivel.mockRestore();
+      }
+    });
+  });
+
   describe("conta que não respondeu", () => {
     it("busca que falhou avisa com Tentar de novo, em vez de mostrar a Geladeira vazia em silêncio", async () => {
       const buscar = vi
@@ -434,7 +471,7 @@ describe("GeladeiraTela", () => {
       expect(aviso.className).not.toMatch(/flex-col/);
     });
 
-    it("durante o retry o botão vira 'Tentando...' e fica desabilitado", async () => {
+    it("durante o retry o botão vira 'Tentando...', desabilitado por aria-disabled (mantém o foco)", async () => {
       let responder!: (r: { tipo: "erro" }) => void;
       const buscar = vi
         .fn()
@@ -455,7 +492,13 @@ describe("GeladeiraTela", () => {
       await userEvent.click(screen.getByRole("button", { name: "Tentar de novo" }));
 
       const botao = await screen.findByRole("button", { name: "Tentando..." });
-      expect(botao).toBeDisabled();
+      // aria-disabled (não `disabled`): o botão mantém o foco enquanto tenta, e o clique não repete a busca.
+      expect(botao).toHaveAttribute("aria-disabled", "true");
+      expect(botao).not.toBeDisabled();
+      // O Button só estiliza `disabled:`: com aria-disabled ele precisa de estilo próprio (não parecer clicável).
+      expect(botao.className).toMatch(/aria-disabled:opacity-60/);
+      await userEvent.click(botao);
+      expect(buscar).toHaveBeenCalledTimes(2);
       responder({ tipo: "erro" });
       expect(await screen.findByRole("button", { name: "Tentar de novo" })).toBeEnabled();
     });

@@ -19,4 +19,14 @@ beforeEach(() => {
     }) as MediaQueryList;
 });
 
+// jsdom não tem ResizeObserver: um que não observa nada (os testes que medem mexem em scrollHeight).
+beforeEach(() => {
+  if (typeof window === "undefined") return;
+  window.ResizeObserver ??= class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+});
+
 afterEach(cleanup);

@@ -14,7 +14,7 @@ test.beforeEach(async ({ context, baseURL }) => {
   ]);
 });
 
-for (const tamanho of TAMANHOS.filter((t) => t.width !== 390)) {
+for (const tamanho of TAMANHOS) {
   test(`em ${tamanho.width}x${tamanho.height} a Geladeira ocupa ~89% da largura e a área rola na vertical entre o header e a barra, sem rolagem lateral nem da página`, async ({
     page,
   }) => {
@@ -34,6 +34,15 @@ for (const tamanho of TAMANHOS.filter((t) => t.width !== 390)) {
     }));
     expect(rolagem.lateral).toBeLessThanOrEqual(0);
     expect(rolagem.pagina).toBeLessThanOrEqual(0);
+
+    // A área é que rola (a moldura é mais alta que ela), não a página.
+    const area = page.getByRole("region", { name: "Prateleiras da Geladeira" });
+    const medidas = await area.evaluate((el) => ({
+      rolagem: el.scrollHeight,
+      visivel: el.clientHeight,
+    }));
+    expect(medidas.rolagem).toBeGreaterThan(medidas.visivel);
+    await expect(area).toHaveAttribute("tabindex", "0");
 
     // A última prateleira é alcançada rolando a área, e fica entre o header e a barra inferior.
     const ultima = page.getByRole("button", { name: "Adicionar Lager" }).first();
@@ -147,7 +156,7 @@ test.describe("esqueleto de carregamento (HTML do servidor, sem JavaScript)", ()
   test.use({ javaScriptEnabled: false });
 
   for (const tamanho of TAMANHOS) {
-    test(`em ${tamanho.width}x${tamanho.height} o esqueleto cabe entre o header e a barra, sem rolagem`, async ({
+    test(`em ${tamanho.width}x${tamanho.height} o esqueleto ocupa ~89% da largura, como a moldura, sem rolagem lateral`, async ({
       page,
     }) => {
       await page.setViewportSize(tamanho);
@@ -158,13 +167,13 @@ test.describe("esqueleto de carregamento (HTML do servidor, sem JavaScript)", ()
       ).toBeVisible();
       const esqueleto = page.getByTestId("esqueleto-da-geladeira");
       const caixa = (await esqueleto.boundingBox())!;
-      const barra = (await page.getByRole("navigation").last().boundingBox())!;
-      expect(caixa.y + caixa.height).toBeLessThanOrEqual(barra.y + 1);
+      expect(caixa.width / tamanho.width).toBeGreaterThanOrEqual(0.85);
+      expect(caixa.width / tamanho.width).toBeLessThanOrEqual(0.9);
       expect(caixa.width / caixa.height).toBeCloseTo(710 / 1573, 2);
-      const rolagem = await page.evaluate(
-        () => document.documentElement.scrollHeight - document.documentElement.clientHeight,
+      const lateral = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
       );
-      expect(rolagem).toBeLessThanOrEqual(0);
+      expect(lateral).toBeLessThanOrEqual(0);
     });
   }
 });
