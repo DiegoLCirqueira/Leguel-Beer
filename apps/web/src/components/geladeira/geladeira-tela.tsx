@@ -73,7 +73,7 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
     desfazer,
   } = useGeladeira();
   const larga = useTelaLarga();
-  const [areaRef, areaRolavel] = useRolavel<HTMLDivElement>();
+  const [areaRef, areaRolavel] = useRolavel<HTMLDivElement>(`${pronta}-${falhouAoBuscar}`);
   // Os avisos valem para esta visita: ao sair da Geladeira, somem.
   useEffect(() => limparAjustes, [limparAjustes]);
   const [sheetAberto, setSheetAberto] = useState(false);
