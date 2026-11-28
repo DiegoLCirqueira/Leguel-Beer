@@ -169,4 +169,99 @@ describe("GET /me/pedidos e /me/pedidos/:id (HTTP, banco real)", () => {
     expect(list.pedidos[0]).toMatchObject({ quantidadeDeItens: 2, cervejas: ["Maré Alta"] });
     expect(list.proximoCursor).toBeNull();
   });
+
+  it("pagina com 21 pedidos: 20 na primeira página e 1 na segunda, sem repetir", async () => {
+    for (let i = 0; i < 21; i += 1) {
+      await createOrder(tokens.customerId, new Date(T0.getTime() + i * 1000));
+    }
+
+    const first = listaDePedidosSchema.parse((await get("/me/pedidos")).body);
+    expect(first.pedidos).toHaveLength(20);
+    expect(first.proximoCursor).not.toBeNull();
+
+    const second = listaDePedidosSchema.parse(
+      (await get(`/me/pedidos?cursor=${first.proximoCursor}`)).body,
+    );
+    expect(second.pedidos).toHaveLength(1);
+    expect(second.proximoCursor).toBeNull();
+    expect(new Set([...first.pedidos, ...second.pedidos].map((p) => p.id)).size).toBe(21);
+  });
+
+  it("cursor inventado ou limite acima de 20 respondem 400 VALIDATION_ERROR", async () => {
+    expect((await get("/me/pedidos?cursor=lixo")).body).toMatchObject({ code: "VALIDATION_ERROR" });
+    expect((await get("/me/pedidos?limite=21")).status).toBe(400);
+  });
+
+  it("um pedido aguardando pagamento com o Pix vencido volta como cancelado na lista e na leitura, sem rodar o cron", async () => {
+    const stale = await createOrder(
+      tokens.customerId,
+      new Date(Date.now() - 2 * 3_600_000),
+      "AWAITING_PAYMENT",
+    );
+
+    const list = listaDePedidosSchema.parse((await get("/me/pedidos")).body);
+    expect(list.pedidos[0]?.status).toBe("cancelado");
+    const detail = pedidoDoClienteSchema.parse((await get(`/me/pedidos/${stale.id}`)).body);
+    expect(detail.status).toBe("cancelado");
+    expect(detail.historico.map((h) => h.status)).toEqual(["aguardando-pagamento", "cancelado"]);
+  });
+
+  it("lê um pedido da conta no contrato, com endereço e histórico, sem o motivo do cancelamento", async () => {
+    const order = await createOrder(tokens.customerId, T0, "CANCELLED");
+
+    const response = await get(`/me/pedidos/${order.id}`);
+
+    expect(response.status).toBe(200);
+    const detail = pedidoDoClienteSchema.parse(response.body);
+    expect(detail).toMatchObject({
+      id: order.id,
+      numero: order.number,
+      enderecoDeEntrega: { rua: "Rua do Sol", uf: "AL" },
+      historico: [
+        { status: "aguardando-pagamento", em: "2026-11-27T14:00:00.000Z" },
+        { status: "cancelado", em: "2026-11-27T14:01:00.000Z" },
+      ],
+    });
+    expect(JSON.stringify(response.body)).not.toContain("segredo-interno-do-admin");
+  });
+
+  it.each(["PAID", "AWAITING_PAYMENT", "CANCELLED"] as const)(
+    "o pedido %s de outro cliente e um id inexistente dão o mesmo 404, sem dado do pedido",
+    async (status) => {
+      const others = await createOrder(outroId, new Date(Date.now() - 60_000), status);
+
+      const foreign = await get(`/me/pedidos/${others.id}`);
+      const missing = await get(`/me/pedidos/${crypto.randomUUID()}`);
+
+      expect(foreign.status).toBe(404);
+      expect(missing.status).toBe(404);
+      const clean = (body: object) => JSON.stringify(body).replace(/[0-9a-f-]{36}/g, "ID");
+      expect(clean(foreign.body)).toBe(clean(missing.body));
+      expect(JSON.stringify(foreign.body)).not.toContain(others.number);
+      expect(JSON.stringify(foreign.body)).not.toContain("Rua do Sol");
+    },
+  );
+
+  it("o pedido de outro cliente nunca expira pela leitura de quem não é o dono", async () => {
+    const others = await createOrder(
+      outroId,
+      new Date(Date.now() - 2 * 3_600_000),
+      "AWAITING_PAYMENT",
+    );
+
+    await get(`/me/pedidos/${others.id}`);
+    await get("/me/pedidos");
+
+    expect((await prisma.order.findUniqueOrThrow({ where: { id: others.id } })).status).toBe(
+      "AWAITING_PAYMENT",
+    );
+  });
+
+  it("id fora do formato responde 400 e não existe leitura pelo número do pedido", async () => {
+    const order = await createOrder(tokens.customerId, T0);
+
+    expect((await get("/me/pedidos/abc")).status).toBe(400);
+    expect((await get(`/me/pedidos/${encodeURIComponent(order.number)}`)).status).toBe(400);
+    expect((await get(`/me/pedidos/numero/${encodeURIComponent(order.number)}`)).status).toBe(404);
+  });
 });
