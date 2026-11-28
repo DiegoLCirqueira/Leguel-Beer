@@ -1,14 +1,17 @@
-import { Beer, Citrus, Hop, Snowflake, Wheat, type LucideIcon } from "lucide-react";
+import { Beer, Citrus, Hop, Snowflake, Wheat } from "lucide-react";
+import type { ReactElement } from "react";
 
-const ICONES = new Map<string, LucideIcon>([
-  ["ipa", Hop],
-  ["frutas", Citrus],
-  ["malt", Wheat],
-  ["lager", Snowflake],
+const CLASSE = "size-4";
+
+/** Ícone de cada categoria do MVP, já como elemento (nada de componente escolhido no render). */
+const ICONES = new Map<string, ReactElement>([
+  ["ipa", <Hop key="ipa" aria-hidden="true" className={CLASSE} />],
+  ["frutas", <Citrus key="frutas" aria-hidden="true" className={CLASSE} />],
+  ["malt", <Wheat key="malt" aria-hidden="true" className={CLASSE} />],
+  ["lager", <Snowflake key="lager" aria-hidden="true" className={CLASSE} />],
 ]);
 
 /** Ícone decorativo da categoria (slug); categoria desconhecida e "todas" usam a caneca. */
 export function IconeDaCategoria({ slug }: { slug: string }) {
-  const Icone = ICONES.get(slug) ?? Beer;
-  return <Icone aria-hidden="true" className="size-4" />;
+  return ICONES.get(slug) ?? <Beer aria-hidden="true" className={CLASSE} />;
 }
