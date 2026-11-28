@@ -434,6 +434,32 @@ describe("GeladeiraTela", () => {
       expect(aviso.className).not.toMatch(/flex-col/);
     });
 
+    it("durante o retry o botão vira 'Tentando...' e fica desabilitado", async () => {
+      let responder!: (r: { tipo: "erro" }) => void;
+      const buscar = vi
+        .fn()
+        .mockResolvedValueOnce({ tipo: "erro" })
+        .mockReturnValueOnce(new Promise((resolve) => (responder = resolve)));
+      const conta: ContaDaGeladeira = {
+        buscar,
+        enviar: async () => ({ tipo: "erro" }),
+        validar: async () => ({ tipo: "erro" }),
+      };
+      render(
+        <GeladeiraProvider conta={conta}>
+          <GeladeiraTela />
+        </GeladeiraProvider>,
+      );
+      await screen.findByRole("alert");
+
+      await userEvent.click(screen.getByRole("button", { name: "Tentar de novo" }));
+
+      const botao = await screen.findByRole("button", { name: "Tentando..." });
+      expect(botao).toBeDisabled();
+      responder({ tipo: "erro" });
+      expect(await screen.findByRole("button", { name: "Tentar de novo" })).toBeEnabled();
+    });
+
     it("com a busca falha, a moldura aparece esmaecida como não atualizada, e volta ao normal ao acertar", async () => {
       const buscar = vi
         .fn()
@@ -454,12 +480,42 @@ describe("GeladeiraTela", () => {
       );
 
       await screen.findByRole("alert");
-      expect(container.querySelector("[data-desatualizada]")).toBeInTheDocument();
+      const moldura = container.querySelector("[data-desatualizada]");
+      expect(moldura).toBeInTheDocument();
+      // Esmaece pouco: as placas e os "+" seguem legíveis (contraste AA) e não parecem desabilitados.
+      expect(moldura?.className).toMatch(/opacity-80/);
 
       await userEvent.click(screen.getByRole("button", { name: "Tentar de novo" }));
 
       await waitFor(() => expect(screen.queryByRole("alert")).not.toBeInTheDocument());
       expect(container.querySelector("[data-desatualizada]")).not.toBeInTheDocument();
+    });
+
+    it("depois de um retry que acerta, o foco vai para a primeira prateleira (o botão sumiu)", async () => {
+      const buscar = vi
+        .fn()
+        .mockResolvedValueOnce({ tipo: "erro" })
+        .mockResolvedValue({
+          tipo: "ok",
+          resposta: { itens: [], ajustes: [], quantidadeTotal: 0, subtotalCentavos: 0 },
+        });
+      const conta: ContaDaGeladeira = {
+        buscar,
+        enviar: async () => ({ tipo: "erro" }),
+        validar: async () => ({ tipo: "erro" }),
+      };
+      const { container } = render(
+        <GeladeiraProvider conta={conta}>
+          <GeladeiraTela />
+        </GeladeiraProvider>,
+      );
+      await screen.findByRole("alert");
+
+      await userEvent.click(screen.getByRole("button", { name: "Tentar de novo" }));
+
+      await waitFor(() =>
+        expect(container.querySelector('[data-titulo-da-prateleira="ipa"]')).toHaveFocus(),
+      );
     });
   });
 
