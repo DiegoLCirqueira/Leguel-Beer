@@ -20,9 +20,16 @@ export type CaminhoDeEnvioResposta = z.infer<typeof caminhoDeEnvioRespostaSchema
 export const publicarFotoSchema = z.strictObject({ caminho: caminhoDeEnvioSchema });
 export type PublicarFoto = z.infer<typeof publicarFotoSchema>;
 
-/** Confere os bytes: um WebP de verdade (cabeçalho RIFF....WEBP), não só o tipo ou a extensão declarados. */
+/** Confere os bytes: um WebP de verdade (RIFF....WEBP com o tamanho do bloco certo), não só o tipo ou a extensão. */
 export function ehWebp(bytes: Uint8Array): boolean {
   if (bytes.length < 12) return false;
   const text = (from: number, to: number) => String.fromCharCode(...bytes.slice(from, to));
-  return text(0, 4) === "RIFF" && text(8, 12) === "WEBP";
+  if (text(0, 4) !== "RIFF" || text(8, 12) !== "WEBP") return false;
+  // O tamanho do bloco RIFF (bytes 4 a 8, little-endian) é o arquivo inteiro menos os 8 do cabeçalho.
+  const tamanho =
+    (bytes[4] ?? 0) +
+    (bytes[5] ?? 0) * 2 ** 8 +
+    (bytes[6] ?? 0) * 2 ** 16 +
+    (bytes[7] ?? 0) * 2 ** 24;
+  return tamanho === bytes.length - 8;
 }
