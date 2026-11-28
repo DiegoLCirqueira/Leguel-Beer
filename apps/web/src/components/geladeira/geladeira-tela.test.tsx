@@ -490,6 +490,33 @@ describe("GeladeiraTela", () => {
       await waitFor(() => expect(screen.queryByRole("alert")).not.toBeInTheDocument());
       expect(container.querySelector("[data-desatualizada]")).not.toBeInTheDocument();
     });
+
+    it("depois de um retry que acerta, o foco vai para a primeira prateleira (o botão sumiu)", async () => {
+      const buscar = vi
+        .fn()
+        .mockResolvedValueOnce({ tipo: "erro" })
+        .mockResolvedValue({
+          tipo: "ok",
+          resposta: { itens: [], ajustes: [], quantidadeTotal: 0, subtotalCentavos: 0 },
+        });
+      const conta: ContaDaGeladeira = {
+        buscar,
+        enviar: async () => ({ tipo: "erro" }),
+        validar: async () => ({ tipo: "erro" }),
+      };
+      const { container } = render(
+        <GeladeiraProvider conta={conta}>
+          <GeladeiraTela />
+        </GeladeiraProvider>,
+      );
+      await screen.findByRole("alert");
+
+      await userEvent.click(screen.getByRole("button", { name: "Tentar de novo" }));
+
+      await waitFor(() =>
+        expect(container.querySelector('[data-titulo-da-prateleira="ipa"]')).toHaveFocus(),
+      );
+    });
   });
 
   describe("adicionar pela garrafa fantasma, sem sair da Geladeira", () => {
