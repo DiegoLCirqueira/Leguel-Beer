@@ -34,7 +34,7 @@ describe("buckets e políticas das fotos das cervejas (Supabase local)", () => {
     await client.query("BEGIN");
     await client.query(MIGRATION);
     await client.query(
-      `INSERT INTO public.profiles (id, email, role) VALUES ($1, 'adm-pol@x.test', 'ADMIN'), ($2, 'cli-pol@x.test', 'CUSTOMER')`,
+      `INSERT INTO public.profiles (id, email, role, updated_at) VALUES ($1, 'adm-pol@x.test', 'ADMIN', now()), ($2, 'cli-pol@x.test', 'CUSTOMER', now())`,
       [adminId, customerId],
     );
   });
@@ -59,6 +59,10 @@ describe("buckets e políticas das fotos das cervejas (Supabase local)", () => {
     }
   };
 
+  // O armazenamento recusa DELETE direto em SQL; a API dele liga este setting. As políticas valem igual.
+  const allowDelete = () =>
+    client.query(`SELECT set_config('storage.allow_delete_query', 'true', true)`);
+
   const upload = (bucket: string, name: string) =>
     attempt(`INSERT INTO storage.objects (bucket_id, name) VALUES ($1, $2)`, [bucket, name]);
 
@@ -68,11 +72,16 @@ describe("buckets e políticas das fotos das cervejas (Supabase local)", () => {
     );
 
     expect(rows).toEqual([
-      { id: "cervejas", public: true, file_size_limit: 40960, allowed_mime_types: ["image/webp"] },
+      {
+        id: "cervejas",
+        public: true,
+        file_size_limit: "40960",
+        allowed_mime_types: ["image/webp"],
+      },
       {
         id: "cervejas-envio",
         public: false,
-        file_size_limit: 40960,
+        file_size_limit: "40960",
         allowed_mime_types: ["image/webp"],
       },
     ]);
@@ -101,6 +110,7 @@ describe("buckets e políticas das fotos das cervejas (Supabase local)", () => {
     expect(
       await attempt(`SELECT name FROM storage.objects WHERE bucket_id = 'cervejas-envio'`),
     ).toMatchObject({ rows: 0 });
+    await allowDelete();
     expect(await attempt(`DELETE FROM storage.objects WHERE name = 'x.webp'`)).toMatchObject({
       rows: 0,
     });
@@ -112,6 +122,7 @@ describe("buckets e políticas das fotos das cervejas (Supabase local)", () => {
     expect(
       await attempt(`UPDATE storage.objects SET name = 'y.webp' WHERE name = 'x.webp'`),
     ).toMatchObject({ rows: 0 });
+    await allowDelete();
     expect(await attempt(`DELETE FROM storage.objects WHERE name = 'x.webp'`)).toMatchObject({
       rows: 1,
     });
@@ -119,15 +130,15 @@ describe("buckets e políticas das fotos das cervejas (Supabase local)", () => {
 
   it("is_admin() responde pelo papel no banco, sem abrir a tabela de perfis ao papel authenticated", async () => {
     await asUser(adminId);
-    expect((await client.query(`SELECT public.is_admin() AS admin`)).rows[0]).toEqual({
+    expect((await client.query(`SELECT app_guard.is_admin() AS admin`)).rows[0]).toEqual({
       admin: true,
     });
     await asUser(customerId);
-    expect((await client.query(`SELECT public.is_admin() AS admin`)).rows[0]).toEqual({
+    expect((await client.query(`SELECT app_guard.is_admin() AS admin`)).rows[0]).toEqual({
       admin: false,
     });
     await asUser(null);
-    expect((await client.query(`SELECT public.is_admin() AS admin`)).rows[0]).toEqual({
+    expect((await client.query(`SELECT app_guard.is_admin() AS admin`)).rows[0]).toEqual({
       admin: false,
     });
   });
