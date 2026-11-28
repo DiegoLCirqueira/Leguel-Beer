@@ -1,0 +1,4 @@
+
+# Configs de bancada do Playwright (só o playwright.config.ts oficial é rastreado)
+playwright.*.config.ts
+!playwright.config.ts
