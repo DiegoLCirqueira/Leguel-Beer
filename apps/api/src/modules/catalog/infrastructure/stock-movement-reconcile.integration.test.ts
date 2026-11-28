@@ -144,6 +144,9 @@ describe("procedimento manual do README para soma maior que o estoque (banco rea
     const readme = readFileSync(new URL("../../../../README.md", import.meta.url), "utf-8");
     const block = /```sql\r?\n-- PROCEDIMENTO MANUAL[\s\S]*?\r?\n```/.exec(readme)?.[0] ?? "";
     const insert = /INSERT INTO[\s\S]*?;/.exec(block)?.[0] ?? "";
+    const lock = /SELECT id FROM beers[\s\S]*?FOR UPDATE;/.exec(block)?.[0] ?? "";
+    expect(lock).toContain("FOR UPDATE");
+    expect(block.indexOf(lock)).toBeLessThan(block.indexOf(insert));
     expect(insert).not.toBe("");
     const category = await prisma.category.create({ data: { slug: "ipa", name: "IPA", order: 1 } });
     const odd = await prisma.beer.create({
@@ -164,8 +167,13 @@ describe("procedimento manual do README para soma maior que o estoque (banco rea
     });
 
     await prisma.$executeRawUnsafe(insert.replace("<ID_DA_CERVEJA>", odd.id));
+    // Rodar de novo não duplica a correção: a diferença já fechou.
+    await prisma.$executeRawUnsafe(insert.replace("<ID_DA_CERVEJA>", odd.id));
 
     expect((await prisma.beer.findUniqueOrThrow({ where: { id: odd.id } })).stock).toBe(3);
+    expect(
+      await prisma.stockMovement.count({ where: { beerId: odd.id, reason: "Reconciliação" } }),
+    ).toBe(1);
     expect(
       await prisma.stockMovement.findFirstOrThrow({
         where: { beerId: odd.id, reason: "Reconciliação" },

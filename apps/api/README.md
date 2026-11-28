@@ -14,6 +14,8 @@ NestJS na porta 3333. Swagger em http://localhost:3333/docs. Spec: `docs/02-feat
 ```sql
 -- PROCEDIMENTO MANUAL: troque <ID_DA_CERVEJA> pelo id da cerveja que a conferência acusou.
 BEGIN;
+-- Trava a cerveja antes de ler a soma: uma venda entre a leitura e o COMMIT reabriria a diferença.
+SELECT id FROM beers WHERE id = '<ID_DA_CERVEJA>' FOR UPDATE;
 INSERT INTO stock_movements (id, beer_id, type, quantity, reason, balance_after)
 SELECT gen_random_uuid(), b.id, 'CORRECTION', b.stock - COALESCE(SUM(m.quantity), 0),
   'Reconciliação', b.stock
