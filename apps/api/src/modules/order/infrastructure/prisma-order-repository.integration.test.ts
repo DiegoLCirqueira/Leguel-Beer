@@ -366,4 +366,59 @@ describe("PrismaOrderRepository (banco real)", () => {
       }
     });
   });
+
+  describe("trava do perfil dono do pedido", () => {
+    const pause = (ms: number) =>
+      new Promise<"waiting">((resolve) => setTimeout(resolve, ms, "waiting"));
+    let adminId: string;
+
+    beforeEach(async () => {
+      // Outro perfil como autor: o autor no histórico é FK do perfil e já travaria a linha dele.
+      adminId = (
+        await prisma.profile.create({ data: { id: crypto.randomUUID(), email: "adm@x.test" } })
+      ).id;
+    });
+
+    /** Segura o `FOR UPDATE` do perfil, como a gravação da Geladeira, até `release()`. */
+    async function holdProfileLock(): Promise<{ release: () => Promise<void> }> {
+      let release!: () => void;
+      const released = new Promise<void>((resolve) => (release = resolve));
+      let acquired!: () => void;
+      const locked = new Promise<void>((resolve) => (acquired = resolve));
+      const transaction = prisma.$transaction(
+        async (tx) => {
+          await tx.$queryRaw`SELECT id FROM profiles WHERE id = ${profileId}::uuid FOR UPDATE`;
+          acquired();
+          await released;
+        },
+        { timeout: 15_000 },
+      );
+      await locked;
+      return { release: async () => (release(), transaction) };
+    }
+
+    it.each([
+      [
+        "confirmar o pagamento",
+        () =>
+          orders.confirmPaymentIfAwaiting(orderId, adminId, new Date("2026-11-14T10:10:00.000Z")),
+      ],
+      [
+        "cancelar ou expirar",
+        () => orders.cancelIfAwaitingPayment(orderId, "pagamento não concluído", NOW),
+      ],
+    ])(
+      "%s espera a trava do perfil e termina com true depois que ela é solta",
+      async (_name, run) => {
+        const lock = await holdProfileLock();
+        const operation = run();
+
+        const early = await Promise.race([operation.then(() => "done" as const), pause(300)]);
+        expect(early).toBe("waiting");
+
+        await lock.release();
+        expect(await operation).toBe(true);
+      },
+    );
+  });
 });

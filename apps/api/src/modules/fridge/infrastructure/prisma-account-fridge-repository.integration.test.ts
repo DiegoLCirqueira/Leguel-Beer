@@ -1,8 +1,11 @@
-import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { PrismaService } from "../../../common/prisma/prisma.service.js";
 import { resetDatabase } from "../../../common/testing/database.js";
 import { FridgeOwnerNotFoundError } from "../domain/account-fridge-repository.js";
-import { PrismaAccountFridgeRepository } from "./prisma-account-fridge-repository.js";
+import {
+  capPendingDeductions,
+  PrismaAccountFridgeRepository,
+} from "./prisma-account-fridge-repository.js";
 
 describe("PrismaAccountFridgeRepository (banco real)", () => {
   const prisma = new PrismaService();
@@ -181,5 +184,101 @@ describe("PrismaAccountFridgeRepository (banco real)", () => {
     await Promise.all([updating, replacing]);
 
     expect(await repository.find(profileId)).toEqual([stored(2, 9)]);
+  });
+
+  describe("baixa pendente do pedido aguardando pagamento", () => {
+    let seq = 0;
+
+    async function awaitingOrder(pending: number, minutesAgo = 5) {
+      seq += 1;
+      const createdAt = new Date(Date.now() - minutesAgo * 60_000);
+      const order = await prisma.order.create({
+        data: {
+          number: `#LB${String(seq).padStart(6, "0")}`,
+          profileId,
+          paymentMethod: "PIX",
+          subtotalCents: 6400,
+          shippingCents: 0,
+          totalCents: 6400,
+          createdAt,
+          expiresAt: new Date(createdAt.getTime() + 30 * 60_000),
+          customerName: "Ana",
+          customerPhone: "82999990000",
+          shipZip: "57035000",
+          shipStreet: "Rua do Sol",
+          shipNumber: "100",
+          shipDistrict: "Farol",
+          shipCity: "Maceió",
+          shipState: "AL",
+          pendingDeductions: { create: { beerId: beerIds[0] as string, quantity: pending } },
+        },
+      });
+      return order.id;
+    }
+
+    const pendingOf = async (orderId: string) =>
+      (await prisma.fridgePendingDeduction.findFirst({ where: { orderId } }))?.quantity ?? 0;
+
+    it("diminuir a Geladeira abaixo da baixa pendente diminui a baixa na mesma medida", async () => {
+      const orderId = await awaitingOrder(2);
+      await repository.replace(profileId, [stored(0, 2)]);
+
+      await repository.replace(profileId, [stored(0, 1)]);
+
+      expect(await pendingOf(orderId)).toBe(1);
+    });
+
+    it("remover a cerveja zera a baixa pendente e recolocar depois não a devolve", async () => {
+      const orderId = await awaitingOrder(2);
+      await repository.replace(profileId, [stored(0, 2)]);
+
+      await repository.replace(profileId, []);
+      await repository.replace(profileId, [stored(0, 1)]);
+
+      expect(await pendingOf(orderId)).toBe(0);
+    });
+
+    it("adicionar mais unidades, ou mexer em outra cerveja, não muda a baixa pendente", async () => {
+      const orderId = await awaitingOrder(2);
+      await repository.replace(profileId, [stored(0, 2), stored(1, 5)]);
+
+      await repository.replace(profileId, [stored(0, 3), stored(1, 1)]);
+
+      expect(await pendingOf(orderId)).toBe(2);
+    });
+
+    it("com dois pedidos aguardando, o desconto sai primeiro do mais antigo", async () => {
+      const older = await awaitingOrder(2, 20);
+      const newer = await awaitingOrder(2, 5);
+      await repository.replace(profileId, [stored(0, 4)]);
+
+      await repository.replace(profileId, [stored(0, 3)]);
+
+      expect(await pendingOf(older)).toBe(1);
+      expect(await pendingOf(newer)).toBe(2);
+    });
+
+    it.each([
+      ["zerar", 0],
+      ["diminuir", 1],
+    ])(
+      "se o pedido expira entre a leitura e o corte, a gravação da Geladeira não falha (%s)",
+      async (_name, kept) => {
+        const items = kept === 0 ? [] : [stored(0, kept)];
+        // A linha que a leitura devolveu já foi apagada pela expiração: `delete`/`update` por id lançariam P2025.
+        const vanished = {
+          id: crypto.randomUUID(),
+          beerId: beerIds[0] as string,
+          quantity: 2,
+        };
+        const spy = vi
+          .spyOn(prisma.fridgePendingDeduction, "findMany")
+          .mockResolvedValueOnce([vanished] as never);
+
+        await expect(capPendingDeductions(prisma, profileId, items)).resolves.toBeUndefined();
+
+        spy.mockRestore();
+      },
+    );
   });
 });

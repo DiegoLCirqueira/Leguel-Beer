@@ -37,6 +37,7 @@ export class PrismaOrderRepository implements OrderRepository {
 
   async cancelIfAwaitingPayment(orderId: string, reason: string, at: Date): Promise<boolean> {
     return this.prisma.$transaction(async (tx) => {
+      await lockOrderOwner(tx, orderId);
       const change = { orderId, to: "CANCELLED" as const, reason, at };
       const left = await leaveAwaitingPayment(tx, { ...change, data: { cancelReason: reason } });
       if (!left) return false;
@@ -54,6 +55,7 @@ export class PrismaOrderRepository implements OrderRepository {
 
   async confirmPaymentIfAwaiting(orderId: string, actorId: string, at: Date): Promise<boolean> {
     return this.prisma.$transaction(async (tx) => {
+      await lockOrderOwner(tx, orderId);
       const change = { orderId, to: "PAID" as const, actorId, at };
       // Dentro da validade: a expiração e a confirmação disputam a mesma linha.
       const left = await leaveAwaitingPayment(tx, { ...change, where: { expiresAt: { gt: at } } });
@@ -76,6 +78,17 @@ export class PrismaOrderRepository implements OrderRepository {
 }
 
 type Tx = Prisma.TransactionClient;
+
+/**
+ * Trava a linha do perfil dono do pedido, a mesma que a gravação da Geladeira usa: confirmar,
+ * cancelar e expirar passam uma de cada vez com ela, então a baixa não é desfeita no meio de uma
+ * gravação. Ordem de travas fixa em todo o código: perfil primeiro, depois o pedido e suas linhas.
+ */
+async function lockOrderOwner(tx: Tx, orderId: string): Promise<void> {
+  await tx.$queryRaw`
+    SELECT p.id FROM profiles p JOIN orders o ON o.profile_id = p.id
+    WHERE o.id = ${orderId}::uuid FOR UPDATE OF p`;
+}
 
 type Leaving = {
   orderId: string;
