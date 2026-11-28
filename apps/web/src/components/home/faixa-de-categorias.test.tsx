@@ -23,6 +23,16 @@ describe("FaixaDeCategorias (home)", () => {
     expect(botoes).toEqual(["Todas (16)", "IPAs (4)", "Frutas (4)", "Malt (4)", "Lager (4)"]);
   });
 
+  it("cada chip tem um ícone decorativo, que o leitor de tela ignora", () => {
+    render(<FaixaDeCategorias categorias={categorias} />);
+
+    const botoes = screen.getAllByRole("button");
+    expect(botoes).toHaveLength(5);
+    botoes.forEach((botao) =>
+      expect(botao.querySelector("svg[aria-hidden='true']")).toBeInTheDocument(),
+    );
+  });
+
   it("tocar numa categoria abre o catálogo filtrado nela", async () => {
     render(<FaixaDeCategorias categorias={categorias} />);
 
