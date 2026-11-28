@@ -9,7 +9,21 @@ NestJS na porta 3333. Swagger em http://localhost:3333/docs. Spec: `docs/02-feat
 3. `pnpm db:start` sobe o Supabase local (projeto `leguele-beer`; containers `supabase_*_leguele-beer`). `pnpm db:stop` para.
 4. `pnpm db:migrate` cria e aplica migrations em desenvolvimento; `pnpm db:reset` recria o banco (migrations + seed); `pnpm db:seed` roda só o seed. O `db:reset` foi validado em 2026-10-29, com autorização do Diego (o Prisma bloqueia `migrate reset` rodado por agente sem consentimento explícito).
 5. `pnpm db:check` aplica as migrations e falha se o schema tiver mudanças sem migration (roda no CI).
-6. **Deploy: as migrations vêm antes do código** ([[ADR-021-merge-vira-deploy-na-vercel]]). Em especial, `20261128130000_stock_movements` precisa estar aplicada antes do deploy que traz o "Confirmar pagamento" gravando em `stock_movements`: sem ela, toda confirmação falha com 500. A `20261128140000_stock_movements_backfill` preenche o "Saldo inicial" das cervejas existentes e é segura de rodar mais de uma vez. A `20261128150000_stock_movements_reconcile` completa quem já tinha movimentos parciais (abertura = estoque − soma dos movimentos). **Migre fora do horário de uso** e **confira a soma depois**: `SELECT b.slug, b.stock, COALESCE(SUM(m.quantity), 0) FROM beers b LEFT JOIN stock_movements m ON m.beer_id = b.id GROUP BY b.id HAVING b.stock <> COALESCE(SUM(m.quantity), 0);` deve voltar vazio.
+6. **Deploy: as migrations vêm antes do código** ([[ADR-021-merge-vira-deploy-na-vercel]]). Em especial, `20261128130000_stock_movements` precisa estar aplicada antes do deploy que traz o "Confirmar pagamento" gravando em `stock_movements`: sem ela, toda confirmação falha com 500. A `20261128140000_stock_movements_backfill` preenche o "Saldo inicial" das cervejas existentes e é segura de rodar mais de uma vez. A `20261128150000_stock_movements_reconcile` completa quem já tinha movimentos parciais (abertura = estoque − soma dos movimentos). **Migre fora do horário de uso** e **confira a soma depois**: `SELECT b.slug, b.stock, COALESCE(SUM(m.quantity), 0) FROM beers b LEFT JOIN stock_movements m ON m.beer_id = b.id GROUP BY b.id HAVING b.stock <> COALESCE(SUM(m.quantity), 0);` deve voltar vazio. Se aparecer alguma cerveja, os movimentos somam **mais** que o estoque (a migration só completa diferença positiva e não inventa saída). **Um ajuste na tela de Estoque não fecha essa diferença**: ele muda o estoque e o movimento pela mesma variação, então `SUM(quantity) − stock` fica igual. O movimento nunca é apagado nem editado (é o histórico). Ou se aceita a diferença como histórica e anotada, ou, **depois de achar a causa** (movimento duplicado ou estoque mexido fora do sistema), roda-se este **PROCEDIMENTO MANUAL** numa transação, conferindo a consulta antes e depois e **sem tocar em `beers.stock`**:
+
+```sql
+-- PROCEDIMENTO MANUAL: troque <ID_DA_CERVEJA> pelo id da cerveja que a conferência acusou.
+BEGIN;
+INSERT INTO stock_movements (id, beer_id, type, quantity, reason, balance_after)
+SELECT gen_random_uuid(), b.id, 'CORRECTION', b.stock - COALESCE(SUM(m.quantity), 0),
+  'Reconciliação', b.stock
+FROM beers b LEFT JOIN stock_movements m ON m.beer_id = b.id
+WHERE b.id = '<ID_DA_CERVEJA>'
+GROUP BY b.id
+HAVING b.stock <> COALESCE(SUM(m.quantity), 0);
+-- Rode a consulta de conferência de novo: não deve acusar a cerveja. Então COMMIT; senão ROLLBACK.
+```
+
 
 A Data API (PostgREST) do Supabase fica desligada (`[api] enabled = false` em `supabase/config.toml`); o banco é acessado só pela API.
 
