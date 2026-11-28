@@ -50,4 +50,23 @@ describe("ListMyOrders", () => {
     expect(second.pedidos.map((p) => p.numero)).toEqual([rows[20]?.number]);
     expect(second.proximoCursor).toBeNull();
   });
+
+  it("um pedido aguardando pagamento com o Pix vencido volta como cancelado, sem esperar o cron", async () => {
+    const waiting = listRow(1, {
+      status: "aguardando-pagamento",
+      createdAt: new Date(NOW.getTime() - 31 * 60_000),
+    });
+    const fresh = listRow(2, {
+      status: "aguardando-pagamento",
+      createdAt: new Date(NOW.getTime() - 5 * 60_000),
+    });
+    const reader = readerWith([waiting, fresh]);
+
+    const result = await useCase(reader).execute({ ownerId: ANA, limit: PEDIDOS_POR_PAGINA });
+
+    expect(Object.fromEntries(result.pedidos.map((p) => [p.numero, p.status]))).toEqual({
+      [waiting.number]: "cancelado",
+      [fresh.number]: "aguardando-pagamento",
+    });
+  });
 });
