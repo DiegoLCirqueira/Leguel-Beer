@@ -181,4 +181,14 @@ describe("PrismaOrderReader (banco real)", () => {
     expect(await reader.findOwned(ana, others.id)).toBeNull();
     expect(await reader.findOwned(ana, crypto.randomUUID())).toBeNull();
   });
+
+  it("aponta só os pedidos do cliente que aguardam pagamento com a validade vencida", async () => {
+    const at = new Date(T0.getTime() + 31 * 60_000);
+    const due = await createOrder(ana, T0, { status: "AWAITING_PAYMENT" });
+    await createOrder(ana, new Date(T0.getTime() + 10 * 60_000), { status: "AWAITING_PAYMENT" });
+    await createOrder(ana, T0, { status: "PAID" });
+    await createOrder(bruno, T0, { status: "AWAITING_PAYMENT" });
+
+    expect(await reader.findDueOwnedIds(ana, at)).toEqual([due.id]);
+  });
 });
