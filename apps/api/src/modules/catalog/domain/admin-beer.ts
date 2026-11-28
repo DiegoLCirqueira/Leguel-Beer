@@ -54,8 +54,11 @@ export interface AdminBeerRepository {
   list(filter: AdminBeerFilter): Promise<AdminBeer[]>;
   /** `null` se a cerveja não existe. */
   find(id: string): Promise<AdminBeer | null>;
-  /** Lança `CategoryNotFoundError`, `BeerNameTakenError` ou `CategoryFullError`. */
-  create(input: CriarCerveja): Promise<AdminBeer>;
+  /**
+   * Lança `CategoryNotFoundError`, `BeerNameTakenError` ou `CategoryFullError`. Com estoque inicial
+   * maior que zero, grava o movimento "Entrada inicial" na mesma transação (o saldo bate com a soma).
+   */
+  create(input: CriarCerveja, actorId?: string): Promise<AdminBeer>;
   /** `null` se a cerveja não existe; os mesmos erros do cadastro. O slug nunca muda. */
   update(id: string, input: EditarCerveja): Promise<AdminBeer | null>;
 }
