@@ -122,7 +122,7 @@ describe("/admin/cervejas (HTTP, banco real)", () => {
     expect(response.status).toBe(409);
     expect(response.body).toMatchObject({
       code: "CATEGORY_FULL",
-      detail: "A categoria IPA já tem 4 cervejas ativas. Desative uma antes.",
+      message: "A categoria IPA já tem 4 cervejas ativas. Desative uma antes.",
     });
   });
 
