@@ -46,6 +46,9 @@ export class PrismaStockRepository implements StockRepository {
 
   async list(at: Date): Promise<StockItem[]> {
     // Disponível = físico menos as reservas válidas (não liberadas, não consumidas, dentro da validade).
+    // Uma única consulta (um instantâneo): físico e reservas vêm do mesmo comando. A lista é só para
+    // exibir e a recusa do ajuste relê as reservas sob a trava da cerveja; uma reserva criada logo
+    // depois da leitura só aparece na próxima abertura.
     const rows = await this.prisma.$queryRaw<
       { id: string; name: string; physical: number; minimum: number; reserved: number }[]
     >`

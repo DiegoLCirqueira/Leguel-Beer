@@ -9,6 +9,7 @@ NestJS na porta 3333. Swagger em http://localhost:3333/docs. Spec: `docs/02-feat
 3. `pnpm db:start` sobe o Supabase local (projeto `leguele-beer`; containers `supabase_*_leguele-beer`). `pnpm db:stop` para.
 4. `pnpm db:migrate` cria e aplica migrations em desenvolvimento; `pnpm db:reset` recria o banco (migrations + seed); `pnpm db:seed` roda só o seed. O `db:reset` foi validado em 2026-10-29, com autorização do Diego (o Prisma bloqueia `migrate reset` rodado por agente sem consentimento explícito).
 5. `pnpm db:check` aplica as migrations e falha se o schema tiver mudanças sem migration (roda no CI).
+6. **Deploy: as migrations vêm antes do código** ([[ADR-021-merge-vira-deploy-na-vercel]]). Em especial, `20261128130000_stock_movements` precisa estar aplicada antes do deploy que traz o "Confirmar pagamento" gravando em `stock_movements`: sem ela, toda confirmação falha com 500. A `20261128140000_stock_movements_backfill` preenche o "Saldo inicial" das cervejas existentes e é segura de rodar mais de uma vez.
 
 A Data API (PostgREST) do Supabase fica desligada (`[api] enabled = false` em `supabase/config.toml`); o banco é acessado só pela API.
 

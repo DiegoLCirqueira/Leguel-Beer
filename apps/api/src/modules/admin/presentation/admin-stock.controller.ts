@@ -106,7 +106,7 @@ export class AdminStockController {
   @ApiOperation({
     summary: "Ajusta o estoque físico da cerveja",
     description:
-      "Entrada (soma; motivo padrão Produção), perda (subtrai) e correção (soma ou subtrai). Recusa físico negativo e abaixo do reservado (422). Usa a mesma trava por cerveja da criação do pedido.",
+      "Entrada (soma; motivo padrão Produção), perda (subtrai) e correção (soma ou subtrai). Recusa físico negativo e abaixo do reservado (422). Usa a mesma trava por cerveja da criação do pedido. Não aceita Idempotency-Key: um envio repetido soma de novo, então o site trava o botão enquanto a requisição está em andamento.",
   })
   @ApiCreatedResponse({ description: "O movimento gravado (formato `movimentoDeEstoqueSchema`)." })
   @ApiBadRequestResponse({ description: "Corpo ou id fora do contrato." })
