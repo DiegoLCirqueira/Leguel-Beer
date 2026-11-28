@@ -146,7 +146,7 @@ export function GeladeiraTela({ cotarFrete, catalogo = [] }: Props) {
     />
   );
   return (
-    <main className="flex h-[calc(100dvh-var(--altura-header-loja)-var(--altura-barra-loja)-env(safe-area-inset-bottom,0px))] flex-col lg:flex-row lg:justify-center lg:gap-8">
+    <main className="flex bg-gradient-to-b from-fundo via-superficie to-fundo h-[calc(100dvh-var(--altura-header-loja)-var(--altura-barra-loja)-env(safe-area-inset-bottom,0px))] flex-col lg:flex-row lg:justify-center lg:gap-8">
       <div
         role="region"
         aria-label="Prateleiras da Geladeira"
