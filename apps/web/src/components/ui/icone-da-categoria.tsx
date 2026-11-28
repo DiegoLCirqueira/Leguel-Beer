@@ -1,14 +1,14 @@
 import { Beer, Citrus, Hop, Snowflake, Wheat, type LucideIcon } from "lucide-react";
 
-const ICONES: Record<string, LucideIcon> = {
-  ipa: Hop,
-  frutas: Citrus,
-  malt: Wheat,
-  lager: Snowflake,
-};
+const ICONES = new Map<string, LucideIcon>([
+  ["ipa", Hop],
+  ["frutas", Citrus],
+  ["malt", Wheat],
+  ["lager", Snowflake],
+]);
 
 /** Ícone decorativo da categoria (slug); categoria desconhecida e "todas" usam a caneca. */
 export function IconeDaCategoria({ slug }: { slug: string }) {
-  const Icone = ICONES[slug] ?? Beer;
+  const Icone = ICONES.get(slug) ?? Beer;
   return <Icone aria-hidden="true" className="size-4" />;
 }
