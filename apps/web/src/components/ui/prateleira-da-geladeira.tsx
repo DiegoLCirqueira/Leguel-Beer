@@ -86,6 +86,7 @@ export function PrateleiraDaGeladeira({
               }}
             />
             <div
+              data-imagem=""
               key={garrafa.rodada}
               className="relative size-full origin-bottom"
               style={{ animationDelay: `${garrafa.atraso}ms` }}
