@@ -434,7 +434,7 @@ describe("GeladeiraTela", () => {
       expect(aviso.className).not.toMatch(/flex-col/);
     });
 
-    it("durante o retry o botão vira 'Tentando...' e fica desabilitado", async () => {
+    it("durante o retry o botão vira 'Tentando...', desabilitado por aria-disabled (mantém o foco)", async () => {
       let responder!: (r: { tipo: "erro" }) => void;
       const buscar = vi
         .fn()
@@ -455,7 +455,11 @@ describe("GeladeiraTela", () => {
       await userEvent.click(screen.getByRole("button", { name: "Tentar de novo" }));
 
       const botao = await screen.findByRole("button", { name: "Tentando..." });
-      expect(botao).toBeDisabled();
+      // aria-disabled (não `disabled`): o botão mantém o foco enquanto tenta, e o clique não repete a busca.
+      expect(botao).toHaveAttribute("aria-disabled", "true");
+      expect(botao).not.toBeDisabled();
+      await userEvent.click(botao);
+      expect(buscar).toHaveBeenCalledTimes(2);
       responder({ tipo: "erro" });
       expect(await screen.findByRole("button", { name: "Tentar de novo" })).toBeEnabled();
     });
