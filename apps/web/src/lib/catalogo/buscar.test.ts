@@ -54,9 +54,9 @@ describe("buscarCatalogo", () => {
     expect(await buscarCatalogo(query)).toEqual({ ok: false });
   });
 
-  it("um 429 transitório é tentado de novo uma vez, e a segunda resposta vale", async () => {
+  it("um 429 com Retry-After curto (até 2 s) é tentado de novo uma vez, e a segunda resposta vale", async () => {
     fetchFalso
-      .mockResolvedValueOnce(new Response("{}", { status: 429 }))
+      .mockResolvedValueOnce(new Response("{}", { status: 429, headers: { "Retry-After": "1" } }))
       .mockResolvedValueOnce(new Response(JSON.stringify(resposta), { status: 200 }));
 
     const resultado = await buscarCatalogo(query);
@@ -111,6 +111,44 @@ describe("buscarCatalogo", () => {
       await vi.advanceTimersByTimeAsync(1);
 
       expect(await busca).toEqual({ ok: false });
+      expect(fetchFalso).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("429 sem Retry-After ou com espera longa não é repetido (o retry só gastaria o limite)", async () => {
+    fetchFalso.mockResolvedValue(
+      new Response("{}", { status: 429, headers: { "Retry-After": "30" } }),
+    );
+    expect(await buscarCatalogo(query)).toEqual({ ok: false });
+    expect(fetchFalso).toHaveBeenCalledTimes(1);
+
+    fetchFalso.mockReset();
+    fetchFalso.mockResolvedValue(new Response("{}", { status: 429 }));
+    expect(await buscarCatalogo(query)).toEqual({ ok: false });
+    expect(fetchFalso).toHaveBeenCalledTimes(1);
+  });
+
+  it("as duas tentativas dividem um orçamento total de 8 s: a segunda só tem o que restou", async () => {
+    vi.useFakeTimers();
+    try {
+      let chamada = 0;
+      fetchFalso.mockImplementation((_url: string, opcoes: { signal: AbortSignal }) => {
+        chamada += 1;
+        return new Promise((_resolve, rejeitar) => {
+          if (chamada === 1) setTimeout(() => rejeitar(new Error("sem rede")), 5000);
+          else opcoes.signal.addEventListener("abort", () => rejeitar(opcoes.signal.reason));
+        });
+      });
+
+      const busca = buscarCatalogo(query);
+      await vi.advanceTimersByTimeAsync(7999);
+      expect(await Promise.race([busca, Promise.resolve("pendente")])).toBe("pendente");
+      await vi.advanceTimersByTimeAsync(1);
+
+      expect(await busca).toEqual({ ok: false });
+      expect(fetchFalso).toHaveBeenCalledTimes(2);
     } finally {
       vi.useRealTimers();
     }
